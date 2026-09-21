@@ -525,10 +525,10 @@
 - [x] 이모지 ↔ Dataview 변환 명령 `tasksmd.convertFormat`(파일 단위, 코드블록 제외)
 
 ### M8.5 문서
-- [ ] `README.md` — 기능 소개, 스크린샷/GIF, 설치, 문법 요약, 쿼리 요약, 설정 표, Obsidian 호환 범위
-- [ ] `docs/user-guide.md` — 상세 사용법(한국어), FAQ
-- [ ] `CHANGELOG.md` v1.0.0 정리
-- [ ] design.md 열린 이슈 D-1~D-5 결론 기록, requirements.md 최종 상태 갱신
+- [x] `README.md` — 기능 소개, 시작하기, 명령·단축키 표, 설정 표, 미리보기 제한, Obsidian 호환 (스크린샷/GIF는 사용자가 F5로 확인 후 추가)
+- [x] `docs/user-guide.md` — 상세 사용법(한국어), FAQ
+- [x] `CHANGELOG.md` 1.0.0 정리, `package.json` version 1.0.0
+- [x] design.md 열린 이슈 D-1~D-5 결론 기록(각 마일스톤에서 완료), requirements.md 0.5
 
 ### M8.6 패키징·게시 (NFR-9, D§13)
 - [ ] `pnpm package` → `.vsix` 생성, `.vscodeignore` 검증(번들 크기 확인)

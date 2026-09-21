@@ -1,6 +1,8 @@
 # Changelog
 
-## Unreleased
+## 1.0.0 — 2026-09-21
+
+First release. Built in milestones M0–M8 (see docs/Tasks.md).
 
 ### M7 — extras (2026-09-21)
 - Daily summary and due-soon notifications (VS Code toasts + native OS notifications, snooze).

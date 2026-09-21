@@ -2,7 +2,7 @@
   "name": "tasks-for-markdown",
   "displayName": "Tasks for Markdown",
   "description": "Obsidian Tasks-compatible task management for Markdown files in VS Code and Cursor.",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "publisher": "HMCVECDT",
   "license": "MIT",
   "repository": {

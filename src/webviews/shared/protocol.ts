@@ -57,6 +57,8 @@ export interface InitState {
   savedQueries: SavedQueryDto[];
   /** Per-app state restored from workspaceState. */
   uiState: Record<string, unknown>;
+  editModal: { accessKeys: boolean; hiddenFields: string[] };
+  globalFilter: string;
 }
 
 export type TaskFieldName = 'status' | 'priority' | 'due' | 'scheduled' | 'start' | 'created' | 'done' | 'cancelled' | 'description' | 'recurrence' | 'onCompletion' | 'id' | 'dependsOn';
@@ -66,7 +68,9 @@ export type ToWebview =
   | { type: 'state/patch'; state: Partial<InitState> }
   | { type: 'query/result'; requestId: number; tasks: TaskDto[]; groups: GroupDto | null; matched: number; errors: string[] }
   | { type: 'index/changed' }
-  | { type: 'task/loaded'; requestId: number; task: TaskDto | null; candidates: TaskDto[] }
+  | { type: 'task/loaded'; requestId: number; task: TaskDto | null; candidates: TaskDto[]; dependants: TaskDto[] }
+  | { type: 'edit/target'; key: string | null; line: number | null }
+  | { type: 'recurrence/validated'; requestId: number; valid: boolean; canonical: string | null }
   | { type: 'error'; message: string };
 
 export interface GroupDto {
@@ -86,6 +90,7 @@ export type FromWebview =
   | { type: 'task/create'; key: string | null; line: number | null; fields: Partial<Record<TaskFieldName, string | string[] | null>> }
   | { type: 'task/open'; key: string; line: number }
   | { type: 'task/load'; requestId: number; key: string | null; line: number | null }
+  | { type: 'recurrence/validate'; requestId: number; text: string }
   | { type: 'ui/close' }
   | { type: 'ui/notify'; level: 'info' | 'warn' | 'error'; message: string };
 

@@ -208,11 +208,6 @@
         "command": "tasksmd.explainQuery",
         "title": "%tasksmd.explainQuery.title%",
         "category": "Tasks"
-      },
-      {
-        "command": "tasksmd._openSmokeWebview",
-        "title": "Tasks: Open webview smoke test",
-        "category": "Tasks"
       }
     ],
     "configuration": {
@@ -487,6 +482,30 @@
           "type": "boolean",
           "default": true,
           "description": "%tasksmd.config.preview.renderBadges%"
+        },
+        "tasksmd.editModal.accessKeys": {
+          "type": "boolean",
+          "default": true,
+          "description": "%tasksmd.config.editModal.accessKeys%"
+        },
+        "tasksmd.editModal.hiddenFields": {
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "string",
+            "enum": [
+              "priority",
+              "recurrence",
+              "start",
+              "scheduled",
+              "due",
+              "otherDates",
+              "status",
+              "dependencies",
+              "onCompletion"
+            ]
+          },
+          "description": "%tasksmd.config.editModal.hiddenFields%"
         }
       }
     },
@@ -537,10 +556,6 @@
         },
         {
           "command": "tasksmd.savedQuery.refresh",
-          "when": "false"
-        },
-        {
-          "command": "tasksmd._openSmokeWebview",
           "when": "false"
         }
       ],

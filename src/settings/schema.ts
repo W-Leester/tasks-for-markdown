@@ -34,6 +34,8 @@ export interface SettingsSchema {
   savedQueries: { name: string; query: string }[];
   'preview.enabled': boolean;
   'preview.renderBadges': boolean;
+  'editModal.accessKeys': boolean;
+  'editModal.hiddenFields': string[];
 }
 
 export const SETTINGS_SECTION = 'tasksmd';
@@ -67,6 +69,8 @@ export const SETTINGS_DEFAULTS: Readonly<SettingsSchema> = {
   savedQueries: [],
   'preview.enabled': true,
   'preview.renderBadges': true,
+  'editModal.accessKeys': true,
+  'editModal.hiddenFields': [],
 };
 
 export type SettingsKey = keyof SettingsSchema;

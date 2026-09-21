@@ -24,8 +24,20 @@ export function createPanelOpener(deps: WebviewHostDeps, app: string, title: str
   };
 }
 
-export function registerWebviews(context: vscode.ExtensionContext, deps: WebviewHostDeps): { openSmoke: () => WebviewHost } {
-  const openSmoke = createPanelOpener(deps, 'smoke', 'Tasks (webview smoke)', 'beaker');
-  context.subscriptions.push(vscode.commands.registerCommand('tasksmd._openSmokeWebview', () => openSmoke()));
-  return { openSmoke };
+export interface EditTarget {
+  key: string | null;
+  line: number | null;
+}
+
+export function registerWebviews(context: vscode.ExtensionContext, deps: WebviewHostDeps): { openEdit: (target: EditTarget) => WebviewHost } {
+  const openEditPanel = createPanelOpener(deps, 'edit', vscode.l10n.t('Tasks: Create or edit'), 'edit');
+  const openEdit = (target: EditTarget) => {
+    const host = openEditPanel();
+    host.extras = { editTarget: target };
+    // If the panel was already open, tell the running app to switch target.
+    host.send({ type: 'edit/target', key: target.key, line: target.line });
+    return host;
+  };
+  void context;
+  return { openEdit };
 }

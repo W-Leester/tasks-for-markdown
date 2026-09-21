@@ -36,7 +36,8 @@ const webviewConfig = {
   minify: production,
   logLevel: 'info',
   conditions: ['svelte', 'browser'],
-  plugins: [esbuildSvelte({ compilerOptions: { css: 'external' } })],
+  // accesskey is intentional (Obsidian-style shortcuts, configurable), so silence that a11y warning.
+  plugins: [esbuildSvelte({ compilerOptions: { css: 'external' }, filterWarnings: (w) => w.code !== 'a11y_accesskey' })],
 };
 
 if (watch) {

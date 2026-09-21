@@ -266,11 +266,43 @@ suite('markdown preview', () => {
   });
 });
 
-suite('webviews', () => {
-  test('a Svelte webview boots, receives state/init and runs a query', async () => {
+suite('edit dialog', () => {
+  const guard = new FixtureGuard();
+  teardown(() => guard.restore());
+
+  test('opens for the task under the cursor and applies fields from the webview', async () => {
     const api = await getApi();
-    const host = api.webviews.openSmoke();
-    await waitFor(() => host.received.includes('ui/ready') && host.received.includes('query/run'), 8000, 'webview handshake');
+    guard.protect('notes/project-a.md');
+    const uri = fixtureUri('notes/project-a.md');
+    const task = await findTask(api, 'notes/project-a.md', 'Budget proposal');
+    const host = api.webviews.openEdit({ key: task.location.key, line: task.location.line });
+    await waitFor(() => host.received.includes('task/load'), 8000, 'edit dialog loaded the task');
+    // Simulate what the Apply button sends.
+    await (host as unknown as { handle(m: unknown): Promise<void> }).handle({
+      type: 'task/setFields', key: task.location.key, line: task.location.line,
+      fields: { description: 'Budget proposal v2', priority: '1', due: '2026-10-03', recurrence: 'every month', status: '/' },
+    });
+    const line = fs.readFileSync(uri.fsPath, 'utf8').split('\n')[task.location.line];
+    assert.equal(line, '- [/] Budget proposal v2 ⏫ 🔁 every month 📅 2026-10-03');
+    await vscode.commands.executeCommand('workbench.action.closeAllEditors');
+  });
+
+  test('creates a task at a line with dependency refs resolved to ids', async () => {
+    const api = await getApi();
+    guard.protect('notes/project-a.md');
+    const uri = fixtureUri('notes/project-a.md');
+    const dep = await findTask(api, 'notes/project-a.md', 'Star marker task'); // has no id
+    const host = api.webviews.openEdit({ key: uri.toString(), line: 1 });
+    await waitFor(() => host.received.includes('task/load'), 8000, 'dialog ready');
+    await (host as unknown as { handle(m: unknown): Promise<void> }).handle({
+      type: 'task/create', key: uri.toString(), line: 1,
+      fields: { description: 'created from dialog', dependsOn: [`@${dep.location.key}#${dep.location.line}`] },
+    });
+    const lines = fs.readFileSync(uri.fsPath, 'utf8').split('\n');
+    const created = lines.find((l) => l.includes('created from dialog'))!;
+    const m = /⛔ ([a-z0-9]{6})$/.exec(created);
+    assert.ok(m, created);
+    assert.ok(lines.some((l) => l.includes(`Star marker task 🆔 ${m![1]}`)), 'dependency got an id');
     await vscode.commands.executeCommand('workbench.action.closeAllEditors');
   });
 });

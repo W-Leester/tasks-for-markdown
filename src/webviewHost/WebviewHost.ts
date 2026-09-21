@@ -1,7 +1,9 @@
 import * as vscode from 'vscode';
 import { systemClock, type Clock } from '../core/dates';
 import type { TaskIndex } from '../core/index';
-import { DateField, type StatusRegistry, Task } from '../core/task';
+import { DateField, type StatusRegistry, StatusType, Task, generateTaskId } from '../core/task';
+import { Recurrence } from '../core/recurrence';
+import { dependants } from '../core/index';
 import type { QueryService } from '../services/QueryService';
 import type { SavedQueryStore } from '../services/SavedQueryStore';
 import { StaleLineError, type TaskEditService } from '../services/TaskEditService';
@@ -37,6 +39,8 @@ export class WebviewHost implements vscode.Disposable {
   private webview: vscode.Webview | null = null;
   /** Message types received so far — handy for tests and logs. */
   readonly received: string[] = [];
+  /** Extra per-panel values merged into `state/init.uiState` (e.g. the edit target). */
+  extras: Record<string, unknown> = {};
 
   constructor(
     private readonly deps: WebviewHostDeps,
@@ -71,7 +75,9 @@ export class WebviewHost implements vscode.Disposable {
       statuses: this.deps.getStatusRegistry().all().map((s) => ({ symbol: s.symbol, name: s.name, type: s.type, nextSymbol: s.nextSymbol })),
       taskFormat: this.deps.settings.get('taskFormat'),
       savedQueries: this.deps.savedQueries.all().map((q) => ({ id: q.id, name: q.name, query: q.query, source: q.source })),
-      uiState: this.deps.context.workspaceState.get<Record<string, unknown>>(`webview.${this.options.app}`, {}),
+      uiState: { ...this.deps.context.workspaceState.get<Record<string, unknown>>(`webview.${this.options.app}`, {}), ...this.extras },
+      editModal: { accessKeys: this.deps.settings.get('editModal.accessKeys'), hiddenFields: this.deps.settings.get('editModal.hiddenFields') },
+      globalFilter: this.deps.settings.get('globalFilter'),
     };
   }
 
@@ -115,8 +121,10 @@ export class WebviewHost implements vscode.Disposable {
         }
         case 'task/create': {
           const registry = this.deps.getStatusRegistry();
-          let task = Task.blank('', registry.bySymbol(' '));
+          let task = Task.blank('', registry.firstOfType(StatusType.TODO) ?? registry.bySymbol(' '));
+          if (Array.isArray(msg.fields.dependsOn)) msg.fields.dependsOn = await this.resolveDependencyRefs(msg.fields.dependsOn);
           task = this.withFields(task, msg.fields);
+          if (typeof msg.fields.status === 'string') task = task.with({ status: registry.bySymbol(msg.fields.status) });
           if (this.deps.settings.get('setCreatedDate')) task = task.with({ created: DateField.fromDate(this.today()) });
           const target = msg.key ? vscode.Uri.parse(msg.key) : vscode.window.activeTextEditor?.document.uri;
           if (!target) throw new Error(vscode.l10n.t('Open a Markdown file to create a task.'));
@@ -133,7 +141,13 @@ export class WebviewHost implements vscode.Disposable {
           const today = this.today();
           const task = msg.key !== null && msg.line !== null ? this.deps.index.taskAt(msg.key, msg.line) : undefined;
           const candidates = this.deps.index.all().filter((t) => !t.isCompleted && t !== task).map((t) => toTaskDto(t, this.deps.index, today));
-          this.send({ type: 'task/loaded', requestId: msg.requestId, task: task ? toTaskDto(task, this.deps.index, today) : null, candidates });
+          const deps = task ? dependants(task, this.deps.index).map((t) => toTaskDto(t, this.deps.index, today)) : [];
+          this.send({ type: 'task/loaded', requestId: msg.requestId, task: task ? toTaskDto(task, this.deps.index, today) : null, candidates, dependants: deps });
+          break;
+        }
+        case 'recurrence/validate': {
+          const r = Recurrence.fromText(msg.text, { start: null, scheduled: null, due: null }, { today: this.today() });
+          this.send({ type: 'recurrence/validated', requestId: msg.requestId, valid: r !== null, canonical: r ? r.toText() : null });
           break;
         }
         case 'ui/notify':
@@ -175,9 +189,27 @@ export class WebviewHost implements vscode.Disposable {
     return t;
   }
 
+  /** `@<key>#<line>` entries in dependsOn refer to tasks without an id: mint one and rewrite. */
+  private async resolveDependencyRefs(list: string[]): Promise<string[]> {
+    const out: string[] = [];
+    for (const entry of list) {
+      if (!entry.startsWith('@')) { out.push(entry); continue; }
+      const hash = entry.lastIndexOf('#');
+      const key = entry.slice(1, hash), line = Number(entry.slice(hash + 1));
+      const t = this.deps.index.taskAt(key, line);
+      if (!t) continue;
+      if (t.id) { out.push(t.id); continue; }
+      const id = generateTaskId((x) => this.deps.index.byId(x).length > 0 || out.includes(x));
+      await this.deps.editService.update(t, { id });
+      out.push(id);
+    }
+    return out;
+  }
+
   private async applyFields(task: Task, fields: Partial<Record<TaskFieldName, string | string[] | null>>): Promise<void> {
     const { status, ...rest } = fields;
-    let current = task;
+    if (Array.isArray(rest.dependsOn)) rest.dependsOn = await this.resolveDependencyRefs(rest.dependsOn);
+    let current = this.deps.index.taskAt(task.location.key, task.location.line) ?? task;
     if (Object.keys(rest).length) current = await this.deps.editService.update(current, this.withFields(current, rest).toFields());
     if (typeof status === 'string') {
       const target = this.deps.getStatusRegistry().bySymbol(status);

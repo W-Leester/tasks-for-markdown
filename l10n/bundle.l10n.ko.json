@@ -173,5 +173,21 @@
   "Line {0}: {1}": "{0}행: {1}",
   "Explanation": "설명",
   "No tasks match this query.": "이 쿼리에 맞는 태스크가 없습니다.",
-  "{0} of {1} tasks": "{1}개 중 {0}개 표시"
+  "{0} of {1} tasks": "{1}개 중 {0}개 표시",
+  "Tasks: Create or edit": "Tasks: 만들기 / 편집",
+  "Edit task": "태스크 편집",
+  "New task": "새 태스크",
+  "Description": "설명",
+  "e.g. 2026-09-25, tomorrow, next fri, in 3 days": "예: 2026-09-25, 내일, 다음 금, 3일 후",
+  "{0} picker": "{0} 선택기",
+  "Created / done / cancelled dates": "생성 / 완료 / 취소일",
+  "Search tasks that must finish first…": "먼저 끝나야 하는 태스크 검색…",
+  "Blocks": "막고 있는 태스크",
+  "Keep": "유지",
+  "Preview": "미리보기",
+  "Apply": "적용",
+  "Loading…": "불러오는 중…",
+  "The recurrence rule is not valid.": "반복 규칙이 유효하지 않습니다.",
+  "A recurring task needs a due, scheduled or start date.": "반복 태스크는 마감·예정·시작일 중 하나가 필요합니다.",
+  "Remove": "제거"
 }

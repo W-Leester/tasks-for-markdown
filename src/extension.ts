@@ -35,7 +35,7 @@ export interface ExtensionApi {
   settings: Settings;
   /** Consumed by VS Code's built-in Markdown extension (contributes.markdown.markdownItPlugins). */
   extendMarkdownIt(md: import('markdown-it').MarkdownIt): import('markdown-it').MarkdownIt;
-  webviews: { openSmoke: () => WebviewHost };
+  webviews: { openEdit: (target: { key: string | null; line: number | null }) => WebviewHost };
 }
 
 export async function activate(context: vscode.ExtensionContext): Promise<ExtensionApi> {
@@ -52,9 +52,10 @@ export async function activate(context: vscode.ExtensionContext): Promise<Extens
   context.subscriptions.push(queries, savedQueries);
 
   context.subscriptions.push(output, settings, indexService, new TaskLineContext(), { dispose: () => index.dispose() });
+  const webviews = registerWebviews(context, { context, index, settings, queries, savedQueries, editService, getStatusRegistry, log });
   const commandDeps = { index, indexService, editService, settings, getStatusRegistry, log };
   registerCommands(context, commandDeps);
-  registerEditCommands(context, commandDeps);
+  registerEditCommands(context, { ...commandDeps, openEdit: (target) => webviews.openEdit(target) });
   registerStatusCommands(context, commandDeps);
   registerQueryCommands(context, { ...commandDeps, queries });
   // Status types decide isDone/isCompleted, so a change means every file must be re-parsed.
@@ -84,7 +85,6 @@ export async function activate(context: vscode.ExtensionContext): Promise<Extens
 
   const preview = new PreviewIntegration({ index, queries, settings, getStatusRegistry });
   context.subscriptions.push(preview);
-  const webviews = registerWebviews(context, { context, index, settings, queries, savedQueries, editService, getStatusRegistry, log });
 
   void indexService.start();
   return { index, indexService, editService, queries, savedQueries, settings, extendMarkdownIt: (md) => preview.extendMarkdownIt(md), webviews };

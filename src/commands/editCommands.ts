@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { systemClock, type Clock } from '../core/dates';
-import { DateField, type DateFieldName, Task } from '../core/task';
+import { DateField, type DateFieldName, type Task } from '../core/task';
 import { pickDependencies } from '../editor/quickpicks/dependencyPick';
 import { pickDate, pickPostpone, pickPriority, pickRecurrence, pickStatus } from '../editor/quickpicks/pickers';
 import { isValidRecurrenceText } from '../core/recurrence';
@@ -17,7 +17,7 @@ const DATE_LABEL: Record<DateFieldName, string> = {
 };
 
 /** Commands that change one field of the task(s) under the cursor through a QuickPick (FR-3.16). */
-export function registerEditCommands(context: vscode.ExtensionContext, deps: CommandDeps, clock: Clock = systemClock): void {
+export function registerEditCommands(context: vscode.ExtensionContext, deps: CommandDeps & { openEdit: (target: { key: string | null; line: number | null }) => unknown }, clock: Clock = systemClock): void {
   const register = (id: string, handler: (...args: unknown[]) => unknown) =>
     context.subscriptions.push(vscode.commands.registerCommand(id, handler));
 
@@ -103,38 +103,15 @@ export function registerEditCommands(context: vscode.ExtensionContext, deps: Com
     }),
   );
 
-  // Temporary create/edit flow (sequential pickers) until the webview modal lands in M6.
+  // Create or edit: opens the webview dialog (FR-6). Edits the task under the cursor / the tree
+  // argument, otherwise creates a new task at the cursor line of the active Markdown editor.
   register('tasksmd.createOrEdit', (arg) =>
     runEdit(deps, async () => {
       const editor = vscode.window.activeTextEditor;
       const existing = resolveTargetTasks(arg, deps)[0];
-      const description = await vscode.window.showInputBox({
-        prompt: existing ? vscode.l10n.t('Edit task description') : vscode.l10n.t('New task description'),
-        value: existing?.description ?? '',
-        valueSelection: existing ? undefined : [0, 0],
-        ignoreFocusOut: true,
-      });
-      if (description === undefined) return;
-      const priority = await pickPriority(existing?.priority);
-      if (priority === undefined) return;
-      const due = await pickDate(vscode.l10n.t('Due date'), existing?.due ?? null, clock);
-      if (due === undefined) return;
-
-      if (existing) {
-        await deps.editService.update(existing, { description, priority, due });
-        return;
-      }
-      if (!editor || editor.document.languageId !== 'markdown') {
-        void vscode.window.showInformationMessage(vscode.l10n.t('Open a Markdown file to create a task.'));
-        return;
-      }
-      let task = Task.blank(description, deps.getStatusRegistry().bySymbol(' ')).with({ priority, due });
-      if (deps.settings.get('setCreatedDate')) task = task.with({ created: DateField.fromDate(clock.now()) });
-      const gf = deps.settings.get('globalFilter');
-      if (gf && !task.description.includes(gf)) task = task.with({ description: `${gf} ${task.description}`.trim() });
-      const line = await deps.editService.insertNewTask(editor.document.uri, editor.selection.active.line, task);
-      const pos = editor.document.lineAt(line).range.end;
-      editor.selection = new vscode.Selection(pos, pos);
+      if (existing) deps.openEdit({ key: existing.location.key, line: existing.location.line });
+      else if (editor && editor.document.languageId === 'markdown') deps.openEdit({ key: editor.document.uri.toString(), line: editor.selection.active.line });
+      else deps.openEdit({ key: null, line: null });
     }),
   );
 }

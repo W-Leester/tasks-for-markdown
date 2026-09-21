@@ -415,16 +415,16 @@
 - [ ] 공통 컴포넌트: TaskCard, Chip, DateInput(자연어 해석 미리보기), StatusSelect (→ M6.2/M6.3에서 만들며 추출)
 - [x] `retainContextWhenHidden: false`, UI 상태는 `ui/state`로 `workspaceState`에 저장 (NFR-4)
 
-- [x] 스모크 앱(`webviews/smoke`) + 통합 테스트: 실제 웹뷰에서 `ui/ready` → `state/init` → `query/run` 왕복 확인
+- [x] 웹뷰 왕복 검증은 편집 모달 통합 테스트로 (`ui/ready` → `state/init` → `task/load` → `task/setFields`)
 
 ### M6.2 편집 모달 (`webviews/edit-modal/`)
-- [ ] 필드 전부: 설명(멀티라인·글로벌 필터 자동), 우선순위, 반복(텍스트+프리셋+유효성+when done), 시작/예정/마감(자연어+피커), 접힌 생성/완료/취소일, 상태, 의존성(전/후 양방향 검색), 완료 시 동작 (FR-6.1)
-- [ ] 열기 규칙: 커서가 태스크 줄이면 편집, 아니면 그 위치에 새 태스크; 미리보기·트리·칸반에서 호출 (FR-6.2)
-- [ ] 적용(Enter/버튼) → `task/setField`·`task/create` → 정규화 줄 치환; Esc 취소 (FR-6.3)
-- [ ] 액세스 키(Alt+글자), 설정 `editModal.accessKeys`, `editModal.hiddenFields` (FR-6.4)
-- [ ] 하단 실시간 마크다운 미리보기 줄 (FR-6.5)
-- [ ] 기존 `createOrEdit` QuickPick 임시 구현 교체, CodeLens ✎·Hover·트리·미리보기 연결
-- [ ] 키보드 탐색·ARIA·포커스 트랩 (NFR-5)
+- [x] 필드 전부: 설명(멀티라인·글로벌 필터 자동), 우선순위, 반복(텍스트+프리셋+호스트 rrule 검증+when done), 시작/예정/마감(자연어+네이티브 피커), 접힌 생성/완료/취소일, 상태, 의존성(검색·다중 선택, id 없는 태스크는 적용 시 자동 발급; 역방향 '막고 있는 태스크'는 표시 전용), 완료 시 동작 (FR-6.1)
+- [x] 열기 규칙: 커서가 태스크 줄이면 편집, 아니면 그 위치에 새 태스크; 미리보기·트리·칸반에서 호출 (FR-6.2)
+- [x] 적용(Enter/버튼) → `task/setField`·`task/create` → 정규화 줄 치환; Esc 취소 (FR-6.3)
+- [x] 액세스 키(Alt+글자), 설정 `editModal.accessKeys`, `editModal.hiddenFields` (FR-6.4)
+- [x] 하단 실시간 마크다운 미리보기 줄 (FR-6.5)
+- [x] 기존 `createOrEdit` QuickPick 임시 구현 교체, CodeLens ✎·Hover·트리·미리보기 연결
+- [ ] 키보드 탐색·ARIA·포커스 트랩 점검 (NFR-5) — M8.3
 
 ### M6.3 칸반 / 컬럼 뷰 (`webviews/kanban/`)
 - [ ] D-3: DnD 라이브러리 결정(`svelte-dnd-action` vs 자체) → 기록

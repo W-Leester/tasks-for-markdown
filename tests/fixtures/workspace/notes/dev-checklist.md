@@ -531,12 +531,12 @@
 - [x] design.md 열린 이슈 D-1~D-5 결론 기록(각 마일스톤에서 완료), requirements.md 0.5
 
 ### M8.6 패키징·게시 (NFR-9, D§13)
-- [ ] `pnpm package` → `.vsix` 생성, `.vscodeignore` 검증(번들 크기 확인)
-- [ ] Marketplace 퍼블리셔 `HMCVECDT` 생성/토큰 발급, `vsce publish` 시험 (pre-release 채널로 먼저)
-- [ ] Open VSX 네임스페이스 생성, `ovsx publish` 시험
-- [ ] GitHub Actions `release.yml` — 태그 `v*` → 빌드·테스트·패키징·Release 첨부·(시크릿 있으면) 게시
-- [ ] `latest.json` 생성 스크립트 + 사내 공유 경로 안내 문서
-- [ ] 저장소 public 전환 여부 결정 (Marketplace 게시 시점)
+- [x] `pnpm package` → `tasks-for-markdown-1.0.0.vsix` (minified, ~370KB, 23파일), `.vscodeignore` 검증
+- [ ] **(사용자 작업)** Marketplace 퍼블리셔 `HMCVECDT` 생성/PAT 발급 → Secrets `VSCE_PAT` — `docs/release.md`
+- [ ] **(사용자 작업)** Open VSX 네임스페이스 생성/토큰 → Secrets `OVSX_PAT`
+- [x] GitHub Actions `release.yml` — 태그 `v*` → 빌드·테스트·패키징·Release 첨부·(시크릿 있으면) 게시
+- [x] `latest.json` 생성 스크립트 + `docs/release.md`(사내 배포 절차)
+- [ ] **(사용자 결정)** 저장소 public 전환 여부 (Marketplace 게시 시점)
 
 ### M8.7 수동 테스트 체크리스트 (릴리스 전)
 - [ ] VS Code macOS / Windows / Linux — 설치, 인덱싱, 토글(+`Cmd+Z` undo 복구 — 자동 테스트 불가), CodeLens, 자동완성, 미리보기 클릭, 칸반 DnD, 캘린더 DnD, 알림, 아카이브, 업데이트 확인

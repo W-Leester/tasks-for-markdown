@@ -88,7 +88,9 @@ export class Query {
           else buckets.set(name, [t]);
         }
       }
-      let names = [...buckets.keys()].sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+      // Natural order, with "(No tags)" / "No due date" style fallback groups last.
+      const isFallback = (n: string) => n.startsWith('(') || /^No /.test(n);
+      let names = [...buckets.keys()].sort((a, b) => Number(isFallback(a)) - Number(isFallback(b)) || a.localeCompare(b, undefined, { numeric: true }));
       if (grouper.reverse) names.reverse();
       if (this.groupLimit !== null) names = names.slice(0, this.groupLimit);
       const children = names.map((n) => ({ ...build(buckets.get(n)!, depth + 1), name: n }));

@@ -327,11 +327,11 @@
 - [x] regex 필터: 컴파일 1회, 길이 제한 + 중첩 수량자 패턴 거부 (Obsidian 8.3 동등)
 
 ### M4.3 정렬·그룹·제한·레이아웃
-- [ ] `sort by <field> [reverse]` 전 필드 + 기본 정렬 status.type → urgency → due → priority → path (FR-7.10)
-- [ ] `group by <field> [reverse]` 전 필드 + `backlink`, `root`; 다단계 → `GroupNode` 트리 (FR-7.11)
-- [ ] `limit N`, `limit groups N` (FR-7.12)
-- [ ] `hide|show <element>` 전 항목, `short mode`, `full mode`, `hide nested backlink` → `Layout` 객체 (FR-7.13)
-- [ ] `QueryResult { root: GroupNode, totalCount, explain, errors }`
+- [x] `sort by <field> [reverse]` 전 필드 + 기본 정렬 status.type → urgency → due → priority → path (FR-7.10)
+- [x] `group by <field> [reverse]` 전 필드 + `backlink`, `root`; 다단계 → `GroupNode` 트리 (FR-7.11)
+- [x] `limit N`, `limit groups N` (FR-7.12)
+- [x] `hide|show <element>` 전 항목, `short mode`, `full mode`, `hide nested backlink` → `Layout` 객체 (FR-7.13) (M4.1에서 구현)
+- [x] `QueryResult { root: GroupNode, totalCount, explain, errors }`
 
 ### M4.4 JS 함수 (`filter|sort|group by function`)
 - [ ] 설정 `query.allowFunctions`(기본 false) + `workspace.isTrusted` 둘 다 참일 때만 컴파일 (FR-7.7, NFR-4)

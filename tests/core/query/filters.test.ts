@@ -24,7 +24,9 @@ const run = (text: string, allowFunctions = false) => {
   const q = Query.parse(text);
   if (q.errors.length) throw new Error(q.errors.map((e) => e.message).join('; '));
   const r = q.run({ index, today, allowFunctions });
-  return r.root.tasks.map((t) => t.description);
+  // These tests check *which* tasks match, so present them in file order regardless of sorting.
+  const all = index.all();
+  return [...r.root.tasks].sort((a, b) => all.indexOf(a) - all.indexOf(b)).map((t) => t.description);
 };
 const errorOf = (text: string) => Query.parse(text).errors[0]?.message;
 

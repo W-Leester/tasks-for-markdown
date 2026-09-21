@@ -1,5 +1,6 @@
 import { registerFilters } from './filters';
 import { registerLayout } from './layout';
+import { registerSortGroup } from './sortGroup';
 
 let registered = false;
 /** Idempotent: installs every instruction parser into Query. Called by the module consumers. */
@@ -8,6 +9,7 @@ export function setupQuery(): void {
   registered = true;
   registerFilters();
   registerLayout();
+  registerSortGroup();
 }
 setupQuery();
 

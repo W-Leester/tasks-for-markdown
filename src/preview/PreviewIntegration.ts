@@ -19,6 +19,7 @@ export interface PreviewDeps {
   settings: Settings;
   getStatusRegistry(): StatusRegistry;
   clock?: Clock;
+  log?(m: string): void;
 }
 
 /**
@@ -35,8 +36,13 @@ export class PreviewIntegration implements vscode.Disposable {
     this.disposables.push({ dispose: () => sub.dispose() }, deps.settings.onDidChange(() => this.scheduleRefresh(), ['preview.enabled', 'preview.renderBadges', 'globalFilter']));
   }
 
+  /** How many times VS Code asked for the plugin — 0 means the built-in preview never picked it up. */
+  extendCalls = 0;
+
   /** Called by VS Code through `extendMarkdownIt` on the extension's exported API. */
   extendMarkdownIt(md: MarkdownIt): MarkdownIt {
+    this.extendCalls++;
+    this.deps.log?.(`extendMarkdownIt called (${this.extendCalls})`);
     tasksMarkdownItPlugin(md, {
       getStatusRegistry: () => this.deps.getStatusRegistry(),
       runQuery: (text, source) => this.deps.queries.run(text, source),

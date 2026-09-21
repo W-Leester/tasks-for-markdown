@@ -961,12 +961,10 @@
         }
       }
     ],
-    "markdown": {
-      "markdownItPlugins": true,
-      "previewStyles": [
-        "./media/preview.css"
-      ]
-    }
+    "markdown.markdownItPlugins": true,
+    "markdown.previewStyles": [
+      "./media/preview.css"
+    ]
   },
   "scripts": {
     "build": "node esbuild.config.mjs",

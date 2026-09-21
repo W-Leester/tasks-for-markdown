@@ -1,6 +1,6 @@
 # Tasks for Markdown — 설계 문서
 
-- 문서 버전: 0.3
+- 문서 버전: 0.4
 - 작성일: 2026-09-21
 - 근거 문서: [requirements.md](requirements.md) v0.3
 - 다이어그램은 Mermaid 소스와 함께 렌더링된 SVG(`imgs/`)를 나란히 둡니다. Mermaid를 렌더링하지 못하는 뷰어에서는 SVG를 보면 됩니다. UI 목업도 ASCII 원본 아래에 SVG 버전을 두었습니다.
@@ -800,7 +800,7 @@ GitHub Actions: PR마다 `typecheck + lint + test`, 태그 `v*` 푸시 시 패�
 
 | # | 이슈 | 결정 시점 |
 |---|---|---|
-| D-1 | ~~기본 미리보기 ↔ 확장 간 양방향 메시지 채널~~ → **결정(M5.0 스파이크, VS Code 1.138 소스 분석)**: 클래식 미리보기(`markdown.showPreview`)에는 채널이 **없다**. 기여 스크립트는 `acquireVsCodeApi`를 얻을 수 없고(미리보기가 이미 획득), 웹뷰에 `enableCommandUris`가 없어 `command:` 링크도 실행되지 않으며, 확장이 처리하는 메시지는 `revealLine`/`didClick`/`openLink`뿐. 따라서 미리보기 연동은 **렌더 시점 통합**으로 한정: markdown-it 플러그인이 확장 프로세스에서 실행되므로 태스크 뱃지와 ` ```tasks ` 결과를 렌더 시 HTML로 생성하고, 인덱스 변경 시 `markdown.preview.refresh`로 갱신. 체크박스 클릭·편집은 사이드바/칸반/에디터에서. 태스크 링크는 `file.md#L12`(`markdown.preview.openMarkdownLinks: inEditor`일 때 줄로 이동). **참고**: VS Code 1.138에는 새 내장 "Markdown Editor"(WYSIWYG 커스텀 에디터)와 `markdown.codeBlockEditors` 확장 포인트(양방향 transport)가 있어 향후 ` ```tasks ` 블록을 상호작용형으로 렌더링할 수 있음 → v1.x 후보 | 완료 |
+| D-1 | ~~기본 미리보기 ↔ 확장 간 양방향 메시지 채널~~ → **결정(M5.0 스파이크 + 2026-09-21 재검증)**: 클래식 미리보기(`markdown.showPreview`)에는 편집에 쓸 채널이 **없다**. 기여 스크립트는 (`contributes["markdown.previewScripts"]` 평면 키로) 로드되지만 `acquireVsCodeApi`는 이미 획득되어 실패, 웹뷰에 `enableCommandUris`가 없어 `command:` 링크·커스텀 스킴 링크 불통. 유일하게 동작하는 것은 **상대 링크 클릭 → `openLink` → 마크다운 확장이 파일을 여는 것**뿐이라(실측: 링크 클릭으로 `dev-checklist.md`가 열림) 토글용으로는 부적합(가짜 파일+커스텀 에디터 트릭은 탭 깜빡임 때문에 기각). 따라서 미리보기 연동은 **렌더 시점 통합**으로 한정: markdown-it 플러그인이 확장 프로세스에서 실행되므로 태스크 뱃지와 ` ```tasks ` 결과를 렌더 시 HTML로 생성하고, 인덱스 변경 시 `markdown.preview.refresh`로 갱신. 체크박스 클릭·편집은 사이드바/칸반/에디터에서. 태스크 링크는 `file.md#L12`(`markdown.preview.openMarkdownLinks: inEditor`일 때 줄로 이동). **참고**: VS Code 1.138에는 새 내장 "Markdown Editor"(WYSIWYG 커스텀 에디터)와 `markdown.codeBlockEditors` 확장 포인트(양방향 transport)가 있어 향후 ` ```tasks ` 블록을 상호작용형으로 렌더링할 수 있음 → v1.x 후보 | 완료 |
 | D-2 | ~~Cursor의 `markdown.previewScripts` 지원 여부~~ → **결정(M5.0)**: Cursor 3.12.10은 클래식 미리보기만 있고(`vscode.markdown.preview.editor`), `codeBlockEditors`/내장 Markdown Editor 없음. `markdownItPlugins`/`previewStyles`/`previewScripts` 계약은 동일 → 렌더 시점 통합이 VS Code·Cursor 공통 기준선 | 완료 |
 | D-3 | ~~드래그앤드롭 라이브러리~~ → **결정(M6.3)**: 네이티브 HTML5 DnD(`dataTransfer` + `dragover/drop`), 라이브러리 없음. 카드는 `application/x-tfm-task` 페이로드로 `{key,line}` 전달, 컬럼이 `task/setField`로 변환 | 완료 |
 | D-4 | `rrule` 번들 크기(≈ 60KB)와 Obsidian Tasks의 반복 파서 이식 범위 | M3 |
@@ -812,6 +812,7 @@ GitHub Actions: PR마다 `typecheck + lint + test`, 태그 `v*` 푸시 시 패�
 
 | 날짜 | 버전 | 내용 |
 |---|---|---|
+| 2026-09-21 | 0.4 | D-1 재검증: 미리보기 스크립트는 로드되나 `openLink`(파일 열기)만 통함 — 결론 유지. 기여 키는 평면 `markdown.*` 형태여야 함(중첩 시 무시) |
 | 2026-09-21 | 0.3 | 4.1 직렬화 순서를 Obsidian 실제 구현에 맞춤 (id/dependsOn이 앞, cancelled가 done 앞) |
 | 2026-09-21 | 0.2 | 모든 Mermaid 다이어그램과 ASCII 목업에 SVG 버전 추가 (`imgs/`) · 5.4/5.5 Mermaid 소스의 백틱 파싱 오류 수정 |
 | 2026-09-21 | 0.1 | 초안 — 아키텍처, 도메인 모델, 데이터 흐름, UI 와이어프레임, 보안·성능·테스트·배포 |

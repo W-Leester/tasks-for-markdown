@@ -38,6 +38,7 @@ export interface ExtensionApi {
   savedQueries: SavedQueryStore;
   settings: Settings;
   archive: ArchiveService;
+  preview: PreviewIntegration;
   /** Consumed by VS Code's built-in Markdown extension (contributes.markdown.markdownItPlugins). */
   extendMarkdownIt(md: import('markdown-it').MarkdownIt): import('markdown-it').MarkdownIt;
   webviews: { openEdit: (target: { key: string | null; line: number | null }) => WebviewHost; openKanban: () => WebviewHost; openQueryBuilder: (id: string | null) => WebviewHost; openStats: () => WebviewHost; openCalendar: () => WebviewHost };
@@ -89,7 +90,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<Extens
   index.onDidChange(updateEmpty);
   index.onDidChangeProgress(updateEmpty);
 
-  const preview = new PreviewIntegration({ index, queries, settings, getStatusRegistry });
+  const preview = new PreviewIntegration({ index, queries, settings, getStatusRegistry, log });
   context.subscriptions.push(preview);
 
   const archive = new ArchiveService({ index, indexService, settings, log });
@@ -104,7 +105,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<Extens
   if (context.extensionMode !== vscode.ExtensionMode.Test) void updates.checkOnStartup();
 
   void indexService.start();
-  return { index, indexService, editService, queries, savedQueries, settings, archive, extendMarkdownIt: (md) => preview.extendMarkdownIt(md), webviews };
+  return { index, indexService, editService, queries, savedQueries, settings, archive, preview, extendMarkdownIt: (md) => preview.extendMarkdownIt(md), webviews };
 }
 
 export function deactivate(): void {

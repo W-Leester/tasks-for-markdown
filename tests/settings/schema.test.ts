@@ -4,6 +4,15 @@ import { describe, expect, it } from 'vitest';
 import { SETTINGS_DEFAULTS, SETTINGS_KEYS, SETTINGS_SECTION } from '../../src/settings/schema';
 
 // Guards against package.json and schema.ts drifting apart.
+describe('markdown contribution keys', () => {
+  const pkg = JSON.parse(readFileSync(join(__dirname, '..', '..', 'package.json'), 'utf8'));
+  it('uses the flat dotted keys the built-in markdown extension reads', () => {
+    expect(pkg.contributes['markdown.markdownItPlugins']).toBe(true);
+    expect(pkg.contributes['markdown.previewStyles']).toEqual(['./media/preview.css']);
+    expect(pkg.contributes.markdown).toBeUndefined();
+  });
+});
+
 describe('settings schema vs package.json', () => {
   const pkg = JSON.parse(readFileSync(join(__dirname, '..', '..', 'package.json'), 'utf8'));
   const props = pkg.contributes.configuration.properties as Record<string, { default: unknown }>;

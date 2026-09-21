@@ -244,6 +244,11 @@
         "title": "%tasksmd.openCalendar.title%",
         "category": "Tasks",
         "icon": "$(calendar)"
+      },
+      {
+        "command": "tasksmd.checkForUpdates",
+        "title": "%tasksmd.checkForUpdates.title%",
+        "category": "Tasks"
       }
     ],
     "configuration": {
@@ -590,6 +595,11 @@
           "type": "string",
           "default": "",
           "description": "%tasksmd.config.calendar.newTaskFile%"
+        },
+        "tasksmd.updateCheckUrl": {
+          "type": "string",
+          "default": "",
+          "description": "%tasksmd.config.updateCheckUrl%"
         }
       }
     },
@@ -957,12 +967,13 @@
     "test:watch": "vitest",
     "lint": "eslint src tests",
     "format": "prettier --write .",
-    "package": "pnpm build && vsce package --no-dependencies",
+    "package": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\" && pnpm build:prod && vsce package --no-dependencies && node scripts/make-latest.mjs",
     "publish:vsce": "vsce publish --no-dependencies",
     "publish:ovsx": "ovsx publish --no-dependencies",
     "vscode:prepublish": "pnpm build",
     "test:integration": "pnpm build && node -e \"require('fs').rmSync('dist/tests',{recursive:true,force:true})\" && tsc -p tsconfig.integration.json && vscode-test",
-    "test:all": "pnpm test && pnpm test:integration"
+    "test:all": "pnpm test && pnpm test:integration",
+    "build:prod": "node esbuild.config.mjs --production"
   },
   "dependencies": {
     "dayjs": "^1.11.13",
@@ -995,7 +1006,8 @@
       "description": "%tasksmd.capabilities.untrusted%",
       "restrictedConfigurations": [
         "tasksmd.query.allowFunctions",
-        "tasksmd.notifications.os"
+        "tasksmd.notifications.os",
+        "tasksmd.updateCheckUrl"
       ]
     },
     "virtualWorkspaces": {

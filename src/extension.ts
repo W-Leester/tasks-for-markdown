@@ -17,6 +17,7 @@ import { NotificationService } from './services/NotificationService';
 import { QueryService } from './services/QueryService';
 import { SavedQueryStore } from './services/SavedQueryStore';
 import { TaskEditService } from './services/TaskEditService';
+import { UpdateCheckService } from './services/UpdateCheckService';
 import { Settings } from './settings/Settings';
 import { statusRegistryFromSettings } from './settings/statusRegistryFromSettings';
 import { registerSavedQueryView } from './views/registerSavedQueryView';
@@ -95,6 +96,10 @@ export async function activate(context: vscode.ExtensionContext): Promise<Extens
   context.subscriptions.push(notifications);
   // Not during tests: toasts would block the runner.
   if (context.extensionMode !== vscode.ExtensionMode.Test) notifications.start();
+
+  const updates = new UpdateCheckService(context, settings, log);
+  context.subscriptions.push(vscode.commands.registerCommand('tasksmd.checkForUpdates', () => updates.check(true)));
+  if (context.extensionMode !== vscode.ExtensionMode.Test) void updates.checkOnStartup();
 
   void indexService.start();
   return { index, indexService, editService, queries, savedQueries, settings, archive, extendMarkdownIt: (md) => preview.extendMarkdownIt(md), webviews };

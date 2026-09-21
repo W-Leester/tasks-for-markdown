@@ -44,6 +44,7 @@ export interface SettingsSchema {
   'archive.afterDays': number;
   'archive.linkStyle': 'wiki' | 'markdown';
   'calendar.newTaskFile': string;
+  updateCheckUrl: string;
 }
 
 export const SETTINGS_SECTION = 'tasksmd';
@@ -87,6 +88,7 @@ export const SETTINGS_DEFAULTS: Readonly<SettingsSchema> = {
   'archive.afterDays': 30,
   'archive.linkStyle': 'wiki',
   'calendar.newTaskFile': '',
+  updateCheckUrl: '',
 };
 
 export type SettingsKey = keyof SettingsSchema;

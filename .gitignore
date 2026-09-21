@@ -1,6 +1,5 @@
-node_modules/
-dist/
 *.vsix
 .vscode-test/
 coverage/
-.vscode-test/
+dist/
+node_modules/

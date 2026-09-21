@@ -97,5 +97,7 @@
   "tasksmd.archiveCompleted.title": "완료 태스크 아카이브…",
   "tasksmd.openStats.title": "통계 열기",
   "tasksmd.config.calendar.newTaskFile": "캘린더(및 대상이 없는 다른 뷰)에서 만든 태스크를 추가할 워크스페이스 상대 경로 마크다운 파일. 비어 있으면 활성 마크다운 편집기.",
-  "tasksmd.openCalendar.title": "캘린더 열기"
+  "tasksmd.openCalendar.title": "캘린더 열기",
+  "tasksmd.config.updateCheckUrl": ".vsix 설치용: latest.json({ version, vsix, notes })의 경로 또는 URL. 하루 1회 확인하며 비어 있으면 확인하지 않습니다. 마켓플레이스 설치본에서는 무시됩니다.",
+  "tasksmd.checkForUpdates.title": "업데이트 확인 (.vsix)"
 }

@@ -192,11 +192,11 @@
 - `📅 2026-13-40` 은 Problems 패널에 경고로 뜬다.
 
 ### M2.1 날짜 코어 (`src/core/dates/`)
-- [ ] `Clock` 인터페이스(`now()`) — 모든 날짜 로직에 주입, 테스트에서 고정 (D§12)
-- [ ] `DateParser` — `today`, `tomorrow`, `yesterday`, `next monday`, `last friday`, `in 3 days`, `next week`, `6 oct`, `2026-09-25`; 라이브러리 결정: `chrono-node` vs 자체 구현 (번들 크기 확인 후 결정)
-- [ ] `DateRange` — `this|last|next week|month|quarter|year`, `YYYY-Www`, `YYYY-MM`, `YYYY-Qn`, `YYYY`, `<date> <date>`; 주 시작 월요일 (Q-16)
-- [ ] `Relative` — `{ key: 'daysLeft' | 'daysOver' | 'today' | 'tomorrow' …, n }` 반환 (i18n은 렌더링 층) (D§11)
-- [ ] 테스트: 고정 `today`로 표 기반 케이스 50개 이상
+- [x] `Clock` 인터페이스(`now()`) — 모든 날짜 로직에 주입, 테스트에서 고정 (D§12)
+- [x] `DateParser` — `today`, `tomorrow`, `yesterday`, `next monday`, `last friday`, `in 3 days`, `next week`, `6 oct`, `2026-09-25`; 라이브러리 결정: **자체 구현** (chrono-node 미사용 — 번들·결정성; 영어 + 한국어 기본형 지원)
+- [x] `DateRange` — `this|last|next week|month|quarter|year`, `YYYY-Www`, `YYYY-MM`, `YYYY-Qn`, `YYYY`, `<date> <date>`; 주 시작 월요일 (Q-16)
+- [x] `Relative` — `{ key: 'daysLeft' | 'daysOver' | 'today' | 'tomorrow' …, n }` 반환 (i18n은 렌더링 층) (D§11)
+- [x] 테스트: 고정 `today`로 표 기반 케이스 50개 이상
 
 ### M2.2 Decoration (`src/editor/TaskDecorations.ts`)
 - [ ] 줄 끝 가상 텍스트 — 상대 날짜(`📅 3일 남음`), 기한 초과(`⚠ 2일 지남`), 반복 요약, 차단(M3) (FR-3.1)

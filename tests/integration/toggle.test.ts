@@ -1,7 +1,7 @@
 import * as assert from 'node:assert/strict';
 import * as fs from 'node:fs';
 import * as vscode from 'vscode';
-import { FixtureGuard, fixtureUri, getApi, sleep } from './helpers';
+import { FixtureGuard, findTask, fixtureUri, getApi, sleep } from './helpers';
 
 const today = () => new Date().toISOString().slice(0, 10);
 
@@ -60,7 +60,7 @@ suite('toggle', () => {
     guard.protect('notes/project-a.md');
     await vscode.commands.executeCommand('workbench.action.closeAllEditors');
     const uri = fixtureUri('notes/project-a.md');
-    const task = api.index.file(uri.toString())!.tasks.find((t) => t.description === 'Star marker task')!;
+    const task = await findTask(api, 'notes/project-a.md', 'Star marker task');
     await api.editService.toggle(task);
     const onDisk = fs.readFileSync(uri.fsPath, 'utf8').split('\n')[task.location.line]!;
     assert.equal(onDisk, `* [x] Star marker task ✅ ${today()}`);
@@ -72,7 +72,7 @@ suite('toggle', () => {
     const api = await getApi();
     guard.protect('notes/project-a.md');
     const uri = fixtureUri('notes/project-a.md');
-    const task = api.index.file(uri.toString())!.tasks.find((t) => t.description === 'Numbered task')!;
+    const task = await findTask(api, 'notes/project-a.md', 'Numbered task');
     const stale = task.with({ originalMarkdown: '1. [ ] Numbered task (stale copy)' });
     await assert.rejects(() => api.editService.toggle(stale), /changed since it was indexed/);
     assert.equal(fs.readFileSync(uri.fsPath, 'utf8').split('\n')[task.location.line], '1. [ ] Numbered task');
@@ -87,7 +87,7 @@ suite('edit service', () => {
     const api = await getApi();
     guard.protect('notes/project-a.md');
     const uri = fixtureUri('notes/project-a.md');
-    const task = api.index.file(uri.toString())!.tasks.find((t) => t.description === 'Review contract')!;
+    const task = await findTask(api, 'notes/project-a.md', 'Review contract');
     const { DateField, Priority } = await import('../../src/core/task');
     await api.editService.update(task, { priority: Priority.Highest, due: DateField.parse('2026-10-01'), scheduled: DateField.parse('2026-09-28') });
     const line = fs.readFileSync(uri.fsPath, 'utf8').split('\n')[task.location.line];

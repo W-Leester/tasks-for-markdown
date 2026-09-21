@@ -1,7 +1,7 @@
 import * as assert from 'node:assert/strict';
 import * as fs from 'node:fs';
 import * as vscode from 'vscode';
-import { FixtureGuard, fixtureUri, getApi, sleep, waitFor } from './helpers';
+import { FixtureGuard, findTask, fixtureUri, getApi, sleep, waitFor } from './helpers';
 
 suite('index', () => {
   const guard = new FixtureGuard();
@@ -81,7 +81,7 @@ suite('tree view', () => {
     guard.protect('notes/project-a.md');
     try {
       const uri = fixtureUri('notes/project-a.md');
-      let task = api.index.file(uri.toString())!.tasks.find((t) => t.description === 'Budget proposal')!;
+      let task = await findTask(api, 'notes/project-a.md', 'Budget proposal');
       await vscode.commands.executeCommand('tasksmd.markDone', task);
       task = api.index.taskAt(uri.toString(), task.location.line)!;
       assert.equal(task.isDone, true);

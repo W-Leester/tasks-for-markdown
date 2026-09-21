@@ -39,16 +39,33 @@ export class FixtureGuard {
     if (!this.saved.has(p)) this.saved.set(p, fs.readFileSync(p, 'utf8'));
   }
   async restore(): Promise<void> {
-    // Revert dirty buffers first, otherwise a lingering in-memory document would shadow the
-    // restored file (and later saves fail with "File Modified Since").
-    for (const doc of vscode.workspace.textDocuments) {
-      if (!doc.isDirty) continue;
-      await vscode.window.showTextDocument(doc, { preview: false });
-      await vscode.commands.executeCommand('workbench.action.revertAndCloseActiveEditor');
+    // Restore through the VS Code API (not fs) so the in-memory document, the file on disk and
+    // the index agree and no "File Modified Since" conflict dialog can appear.
+    for (const [p, text] of this.saved) {
+      const uri = vscode.Uri.file(p);
+      const doc = await vscode.workspace.openTextDocument(uri);
+      if (doc.getText() !== text) {
+        const edit = new vscode.WorkspaceEdit();
+        edit.replace(uri, new vscode.Range(0, 0, doc.lineCount, 0), text);
+        await vscode.workspace.applyEdit(edit);
+      }
+      if (doc.isDirty) await doc.save();
     }
-    await vscode.commands.executeCommand('workbench.action.closeAllEditors');
-    for (const [p, text] of this.saved) fs.writeFileSync(p, text);
+    const restored = [...this.saved.keys()];
     this.saved.clear();
-    await sleep(150); // let the watcher re-index the restored files
+    await vscode.commands.executeCommand('workbench.action.closeAllEditors');
+    const api = await getApi();
+    for (const p of restored) await api.indexService.indexUri(vscode.Uri.file(p));
   }
+}
+
+/** Find an indexed task by description, waiting briefly for the index to settle. */
+export async function findTask(api: ExtensionApi, rel: string, description: string): Promise<import('../../src/core/task').Task> {
+  const key = fixtureUri(rel).toString();
+  let found: import('../../src/core/task').Task | undefined;
+  await waitFor(() => {
+    found = api.index.file(key)?.tasks.find((t) => t.description === description);
+    return found !== undefined;
+  }, 3000, `task "${description}" in ${rel}`);
+  return found!;
 }

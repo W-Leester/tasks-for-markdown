@@ -309,10 +309,10 @@
 - `filter by function`은 설정 off 또는 신뢰되지 않은 워크스페이스에서 실행되지 않는다.
 
 ### M4.1 토크나이저·파서 (`src/core/query/`)
-- [ ] `Tokenizer` — 줄 분리, `#` 주석, 줄 끝 `\` 연속, 빈 줄 무시 (FR-7.14)
-- [ ] 플레이스홀더 `{{query.file.path|folder|filename|root}}` 치환 (FR-7.9)
-- [ ] `Query` — 각 줄을 Instruction 매처 목록에 순서대로 시도, 실패 시 `QueryError { line, text, reason }` 누적 (FR-7.15)
-- [ ] `explain` 출력 생성 — 각 필터의 사람이 읽는 설명 + 기본 정렬 명시 (FR-7.13)
+- [x] `Tokenizer` — 줄 분리, `#` 주석, 줄 끝 `\` 연속, 빈 줄 무시 (FR-7.14)
+- [x] 플레이스홀더 `{{query.file.path|folder|filename|root}}` 치환 (FR-7.9)
+- [x] `Query` — 각 줄을 Instruction 매처 목록에 순서대로 시도, 실패 시 `QueryError { line, text, reason }` 누적 (FR-7.15)
+- [x] `explain` 출력 생성 — 각 필터의 사람이 읽는 설명 + 기본 정렬 명시 (FR-7.13); `limit`/`hide|show`/`short mode` 파서 포함
 
 ### M4.2 필터 (`filters/`) — 명령어 하나 = 파일 하나
 - [ ] 상태: `done`, `not done`, `status.type is|is not …`, `status.name includes|does not include`, `status.symbol …` (FR-7.1)

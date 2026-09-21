@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### M6 — webviews (2026-09-21)
+- Create or edit task dialog (`Cmd/Ctrl+Alt+T`): all fields, natural-language dates, recurrence validation, dependency picker, live preview line, access keys.
+- Kanban board in the sidebar and as an editor panel: columns by status / due date / priority / file, drag & drop edits, any saved query as data source.
+- Query builder: assemble filters, sorting, grouping and layout with dropdowns, see the explanation and match count live, save to `.tasks/queries/` or settings, insert into a note.
+
 ### M5 — Markdown preview (2026-09-21)
 - Built-in preview renders checklist items with checkboxes and metadata badges, and ```tasks blocks as live query results (groups, counts, explain, errors); previews refresh when tasks change anywhere.
 - Preview is render-only (the classic preview offers no channel back to extensions); toggling/editing stays in the sidebar, kanban and editor.

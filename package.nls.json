@@ -84,5 +84,7 @@
   "tasksmd.config.editModal.accessKeys": "Enable Alt+letter access keys for the fields of the Create or edit task dialog.",
   "tasksmd.config.editModal.hiddenFields": "Fields to hide in the Create or edit task dialog.",
   "tasksmd.view.kanban": "Kanban",
-  "tasksmd.openKanban.title": "Open kanban board"
+  "tasksmd.openKanban.title": "Open kanban board",
+  "tasksmd.openQueryBuilder.title": "Open query builder",
+  "tasksmd.savedQuery.openInBuilder.title": "Open in query builder"
 }

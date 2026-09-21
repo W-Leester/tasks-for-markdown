@@ -214,6 +214,18 @@
         "title": "%tasksmd.openKanban.title%",
         "category": "Tasks",
         "icon": "$(project)"
+      },
+      {
+        "command": "tasksmd.openQueryBuilder",
+        "title": "%tasksmd.openQueryBuilder.title%",
+        "category": "Tasks",
+        "icon": "$(tools)"
+      },
+      {
+        "command": "tasksmd.savedQuery.openInBuilder",
+        "title": "%tasksmd.savedQuery.openInBuilder.title%",
+        "category": "Tasks",
+        "icon": "$(tools)"
       }
     ],
     "configuration": {
@@ -563,6 +575,10 @@
         {
           "command": "tasksmd.savedQuery.refresh",
           "when": "false"
+        },
+        {
+          "command": "tasksmd.savedQuery.openInBuilder",
+          "when": "false"
         }
       ],
       "editor/context": [
@@ -662,6 +678,11 @@
           "command": "tasksmd.openKanban",
           "when": "view == tasksmd.kanban",
           "group": "navigation@1"
+        },
+        {
+          "command": "tasksmd.openQueryBuilder",
+          "when": "view == tasksmd.savedQueries",
+          "group": "navigation@0"
         }
       ],
       "view/item/context": [
@@ -749,6 +770,11 @@
           "command": "tasksmd.savedQuery.delete",
           "when": "view == tasksmd.savedQueries && viewItem =~ /^savedQuery/",
           "group": "1_q@3"
+        },
+        {
+          "command": "tasksmd.savedQuery.openInBuilder",
+          "when": "view == tasksmd.savedQueries && viewItem =~ /^savedQuery/",
+          "group": "1_q@0"
         }
       ]
     },

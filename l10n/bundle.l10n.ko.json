@@ -195,5 +195,22 @@
   "Tasks": "태스크",
   "All (incl. done)": "전체 (완료 포함)",
   "Filter…": "필터…",
-  "Drop tasks here": "여기에 태스크를 놓으세요"
+  "Drop tasks here": "여기에 태스크를 놓으세요",
+  "Tasks: Query builder": "Tasks: 쿼리 빌더",
+  "Saved query \"{0}\".": "쿼리 \"{0}\"을(를) 저장했습니다.",
+  "Give the query a name first.": "먼저 쿼리 이름을 입력하세요.",
+  "Query name": "쿼리 이름",
+  "Save to": "저장 위치",
+  "Update": "업데이트",
+  "Save": "저장",
+  "Insert into note": "노트에 삽입",
+  "Builder": "빌더",
+  "Text": "텍스트",
+  "Filters": "필터",
+  "all must match": "모두 만족",
+  "raw": "직접 입력",
+  "Add filter": "필터 추가",
+  "Sort, group, layout": "정렬·그룹·레이아웃",
+  "Add": "추가",
+  "{0} tasks match": "{0}개 일치"
 }

@@ -325,3 +325,24 @@ suite('kanban', () => {
     await vscode.commands.executeCommand('workbench.action.closeAllEditors');
   });
 });
+
+suite('query builder', () => {
+  test('explains and saves a query to a file', async () => {
+    const api = await getApi();
+    const host = api.webviews.openQueryBuilder(null);
+    await waitFor(() => host.received.includes('query/explain'), 8000, 'builder explain request');
+    const h = host as unknown as { handle(m: unknown): Promise<void> };
+    await h.handle({ type: 'query/save', id: null, name: 'Builder test', query: 'not done\nsort by urgency', destination: 'file' });
+    const uri = fixtureUri('.tasks/queries/Builder test.md');
+    try {
+      const text = fs.readFileSync(uri.fsPath, 'utf8');
+      assert.ok(text.includes('```tasks\nnot done\nsort by urgency\n```'), text);
+      await api.savedQueries.reload();
+      assert.ok(api.savedQueries.all().some((q) => q.name === 'Builder test'));
+    } finally {
+      fs.unlinkSync(uri.fsPath);
+      await api.savedQueries.reload();
+      await vscode.commands.executeCommand('workbench.action.closeAllEditors');
+    }
+  });
+});

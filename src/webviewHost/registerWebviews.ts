@@ -42,7 +42,7 @@ export function registerWebviewView(context: vscode.ExtensionContext, deps: Webv
   );
 }
 
-export function registerWebviews(context: vscode.ExtensionContext, deps: WebviewHostDeps): { openEdit: (target: EditTarget) => WebviewHost; openKanban: () => WebviewHost } {
+export function registerWebviews(context: vscode.ExtensionContext, deps: WebviewHostDeps): { openEdit: (target: EditTarget) => WebviewHost; openKanban: () => WebviewHost; openQueryBuilder: (id: string | null) => WebviewHost } {
   const openEditPanel = createPanelOpener(deps, 'edit', vscode.l10n.t('Tasks: Create or edit'), 'edit');
   const openEdit = (target: EditTarget) => {
     const host = openEditPanel();
@@ -54,5 +54,19 @@ export function registerWebviews(context: vscode.ExtensionContext, deps: Webview
   const openKanban = createPanelOpener(deps, 'kanban', vscode.l10n.t('Tasks: Kanban'), 'project');
   registerWebviewView(context, deps, 'tasksmd.kanban', 'kanban', 'Kanban');
   context.subscriptions.push(vscode.commands.registerCommand('tasksmd.openKanban', () => openKanban()));
-  return { openEdit, openKanban };
+  const openBuilderPanel = createPanelOpener(deps, 'query-builder', vscode.l10n.t('Tasks: Query builder'), 'search');
+  const openQueryBuilder = (id: string | null) => {
+    const host = openBuilderPanel();
+    host.extras = { queryTarget: id };
+    host.send({ type: 'query/target', id });
+    return host;
+  };
+  context.subscriptions.push(
+    vscode.commands.registerCommand('tasksmd.openQueryBuilder', () => openQueryBuilder(null)),
+    vscode.commands.registerCommand('tasksmd.savedQuery.openInBuilder', (arg: unknown) => {
+      const q = arg && typeof arg === 'object' && 'query' in arg ? (arg as { query: { id: string } }).query : undefined;
+      return openQueryBuilder(q?.id ?? null);
+    }),
+  );
+  return { openEdit, openKanban, openQueryBuilder };
 }

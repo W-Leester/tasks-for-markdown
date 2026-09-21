@@ -84,5 +84,7 @@
   "tasksmd.config.editModal.accessKeys": "태스크 만들기/편집 대화상자에서 Alt+글자 액세스 키를 사용합니다.",
   "tasksmd.config.editModal.hiddenFields": "태스크 만들기/편집 대화상자에서 숨길 필드.",
   "tasksmd.view.kanban": "칸반",
-  "tasksmd.openKanban.title": "칸반 보드 열기"
+  "tasksmd.openKanban.title": "칸반 보드 열기",
+  "tasksmd.openQueryBuilder.title": "쿼리 빌더 열기",
+  "tasksmd.savedQuery.openInBuilder.title": "쿼리 빌더에서 열기"
 }

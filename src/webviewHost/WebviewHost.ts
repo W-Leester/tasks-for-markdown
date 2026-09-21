@@ -150,6 +150,40 @@ export class WebviewHost implements vscode.Disposable {
           this.send({ type: 'task/loaded', requestId: msg.requestId, task: task ? toTaskDto(task, this.deps.index, today) : null, candidates, dependants: deps });
           break;
         }
+        case 'query/explain': {
+          const r = this.deps.queries.run(msg.query);
+          this.send({ type: 'query/explained', requestId: msg.requestId, explain: this.deps.queries.explain(msg.query), errors: [...r.errors.map((e) => `Line ${e.line}: ${e.message}`), ...r.runtimeErrors], matched: r.matched });
+          break;
+        }
+        case 'query/save': {
+          const existing = msg.id ? this.deps.savedQueries.byId(msg.id) : undefined;
+          if (existing?.source === 'file' && existing.uri) {
+            const doc = await vscode.workspace.openTextDocument(existing.uri);
+            const text = doc.getText();
+            const fenced = /```tasks[^\n]*\n[\s\S]*?```/.test(text) ? text.replace(/(```tasks[^\n]*\n)[\s\S]*?(```)/, (_, a, b) => `${a}${msg.query.trim()}\n${b}`) : `# ${msg.name}\n\n\`\`\`tasks\n${msg.query.trim()}\n\`\`\`\n`;
+            const edit = new vscode.WorkspaceEdit();
+            edit.replace(existing.uri, new vscode.Range(0, 0, doc.lineCount, 0), text.replace(/^#\s+.+$/m, `# ${msg.name}`) === text && !text.startsWith('# ') ? fenced : fenced.replace(/^#\s+.+$/m, `# ${msg.name}`));
+            await vscode.workspace.applyEdit(edit);
+            await doc.save();
+          } else if (existing?.source === 'settings') {
+            const idx = Number(existing.id.split(':')[1]);
+            const list = this.deps.settings.get('savedQueries').map((q, i) => (i === idx ? { name: msg.name, query: msg.query } : q));
+            await this.deps.settings.update('savedQueries', list, vscode.ConfigurationTarget.Workspace);
+          } else if (msg.destination === 'file') {
+            await this.deps.savedQueries.createFile(msg.name, msg.query.trim());
+          } else {
+            await this.deps.savedQueries.saveToSettings(msg.name, msg.query.trim());
+          }
+          void vscode.window.showInformationMessage(vscode.l10n.t('Saved query "{0}".', msg.name));
+          break;
+        }
+        case 'query/insert': {
+          const editor = vscode.window.activeTextEditor ?? vscode.window.visibleTextEditors.find((e) => e.document.languageId === 'markdown');
+          if (!editor || editor.document.languageId !== 'markdown') throw new Error(vscode.l10n.t('Open a Markdown file to insert a query block.'));
+          await editor.insertSnippet(new vscode.SnippetString('```tasks\n' + msg.query.trim().replace(/\$/g, '\\$') + '\n```\n$0'));
+          await vscode.window.showTextDocument(editor.document, editor.viewColumn);
+          break;
+        }
         case 'recurrence/validate': {
           const r = Recurrence.fromText(msg.text, { start: null, scheduled: null, due: null }, { today: this.today() });
           this.send({ type: 'recurrence/validated', requestId: msg.requestId, valid: r !== null, canonical: r ? r.toText() : null });

@@ -71,6 +71,8 @@ export type ToWebview =
   | { type: 'task/loaded'; requestId: number; task: TaskDto | null; candidates: TaskDto[]; dependants: TaskDto[] }
   | { type: 'edit/target'; key: string | null; line: number | null }
   | { type: 'recurrence/validated'; requestId: number; valid: boolean; canonical: string | null }
+  | { type: 'query/explained'; requestId: number; explain: string; errors: string[]; matched: number }
+  | { type: 'query/target'; id: string | null }
   | { type: 'error'; message: string };
 
 export interface GroupDto {
@@ -92,6 +94,9 @@ export type FromWebview =
   | { type: 'task/edit'; key: string; line: number }
   | { type: 'task/load'; requestId: number; key: string | null; line: number | null }
   | { type: 'recurrence/validate'; requestId: number; text: string }
+  | { type: 'query/explain'; requestId: number; query: string }
+  | { type: 'query/save'; id: string | null; name: string; query: string; destination: 'file' | 'settings' }
+  | { type: 'query/insert'; query: string }
   | { type: 'ui/close' }
   | { type: 'ui/notify'; level: 'info' | 'warn' | 'error'; message: string };
 

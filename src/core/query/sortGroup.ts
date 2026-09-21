@@ -58,11 +58,31 @@ function makeSorter(field: string, instruction: string): Sorter['compare'] {
   }
 }
 
+/** Cheap precomputed keys for the hot fields; strings sort with localeCompare semantics approximated by lowercase. */
+function makeKey(field: string): Sorter['key'] | undefined {
+  const dateKey = (f: DateSel) => (t: Task) => dateOf(t, f)?.valueOf() ?? Number.POSITIVE_INFINITY;
+  switch (field) {
+    case 'status.type': case 'status': return (t) => STATUS_TYPE_ORDER[t.status.type];
+    case 'urgency': return (t, ctx) => -urgency(t, ctx.today);
+    case 'due': case 'scheduled': case 'start': case 'done': case 'created': case 'cancelled': case 'happens': return dateKey(field);
+    case 'priority': return (t) => priorityNumber(t.priority);
+    case 'line': return (t) => t.location.line;
+    case 'recurring': return (t) => (t.isRecurring ? 0 : 1);
+    case 'path': return (t) => `${t.location.path.toLowerCase()}\u0000${String(t.location.line).padStart(8, '0')}`;
+    default: return undefined;
+  }
+}
+
+function sorterFor(field: string, instruction: string, reverse: boolean): Sorter {
+  const key = makeKey(field);
+  return { instruction: `sort by ${field}`, reverse, compare: makeSorter(field, instruction), ...(key ? { key } : {}) };
+}
+
 const sortParser: InstructionParser = (line, q) => {
   const m = /^sort by ([a-z.]+)( reverse)?$/i.exec(line);
   if (!m) return null;
   const field = m[1]!.toLowerCase();
-  q.sorters.push({ instruction: `sort by ${field}`, reverse: !!m[2], compare: makeSorter(field, line) });
+  q.sorters.push(sorterFor(field, line, !!m[2]));
   return 'handled';
 };
 
@@ -73,8 +93,17 @@ const GROUP_FIELDS = [
   'priority', 'tags', 'path', 'folder', 'filename', 'root', 'heading', 'backlink', 'recurring', 'recurrence', 'id', 'depends on',
 ] as const;
 
+const dateGroupCache = new Map<number, string>();
 function dateGroup(d: Dayjs | null, what: string): string {
-  return d ? `${d.format('YYYY-MM-DD dddd')}` : `No ${what} date`;
+  if (!d) return `No ${what} date`;
+  const k = d.valueOf();
+  let name = dateGroupCache.get(k);
+  if (!name) {
+    name = d.format('YYYY-MM-DD dddd');
+    if (dateGroupCache.size > 5000) dateGroupCache.clear();
+    dateGroupCache.set(k, name);
+  }
+  return name;
 }
 
 function makeGrouper(field: string): Grouper['groups'] {
@@ -115,7 +144,7 @@ const groupParser: InstructionParser = (line, q) => {
 
 /** Obsidian's default order, appended after the user's sorters: status.type, urgency, due, priority, path. */
 export function defaultSorters(): Sorter[] {
-  return ['status.type', 'urgency', 'due', 'priority', 'path'].map((f) => ({ instruction: `sort by ${f}`, reverse: false, compare: makeSorter(f, f) }));
+  return ['status.type', 'urgency', 'due', 'priority', 'path'].map((f) => sorterFor(f, f, false));
 }
 
 export function registerSortGroup(): void {

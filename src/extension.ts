@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { registerEditCommands } from './commands/editCommands';
+import { registerQueryCommands } from './commands/queryCommands';
 import { registerCommands } from './commands/registerCommands';
 import { registerStatusCommands } from './commands/statusCommands';
 import { TaskIndex } from './core/index';
@@ -49,6 +50,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<Extens
   registerCommands(context, commandDeps);
   registerEditCommands(context, commandDeps);
   registerStatusCommands(context, commandDeps);
+  registerQueryCommands(context, { ...commandDeps, queries });
   // Status types decide isDone/isCompleted, so a change means every file must be re-parsed.
   context.subscriptions.push(
     settings.onDidChange(() => {

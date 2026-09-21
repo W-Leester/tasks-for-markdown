@@ -25,6 +25,11 @@ export interface Sorter {
   instruction: string;
   reverse: boolean;
   compare(a: Task, b: Task, ctx: QueryContext): number;
+  /**
+   * Optional precomputed sort key (number or string) — computed once per task per run, which is
+   * far cheaper than calling `compare` O(n log n) times for expensive fields such as urgency.
+   */
+  key?(task: Task, ctx: QueryContext): number | string;
 }
 
 export interface Grouper {

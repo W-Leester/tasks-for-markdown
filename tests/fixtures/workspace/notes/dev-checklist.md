@@ -29,8 +29,8 @@
 | M1 | 최소 사용 가능: 인덱스 + 토글 + 사이드바 트리 + 상태바 | ✅ 완료 | 2026-09-21 · unit 228 / integration 12 |
 | M2 | 에디터 보조 UI: Decoration·CodeLens·Hover·자동완성·진단·QuickPick | ✅ 완료 | 2026-09-21 · unit 320 / integration 20 |
 | M3 | 반복·커스텀 상태·의존성·긴급도 | ✅ 완료 | 2026-09-21 · unit 369 / integration 24 |
-| M4 | 쿼리 엔진 + 저장된 쿼리 + 쿼리 빌더 + 빠른 검색 | 🟡 진행 중 | |
-| M5 | 마크다운 미리보기 연동 | ⬜ 대기 | D-1, D-2 스파이크 선행 |
+| M4 | 쿼리 엔진 + 저장된 쿼리 + 빠른 검색 (쿼리 빌더 → M6.4) | ✅ 완료 | 2026-09-21 · unit 437 / integration 26 |
+| M5 | 마크다운 미리보기 연동 | 🟡 진행 중 | D-1, D-2 스파이크 선행 |
 | M6 | 웹뷰: 편집 모달 + 칸반 | ⬜ 대기 | D-3 |
 | M7 | 추가 기능: 알림·아카이브·통계·캘린더·업데이트 확인 | ⬜ 대기 | D-5 |
 | M8 | 마감: i18n·성능·접근성·문서·패키징·게시 | ⬜ 대기 | v1.0 |
@@ -350,14 +350,14 @@
 - [x] 스마트 뷰 7종을 쿼리 텍스트로 재정의 (`SMART_VIEW_QUERIES`; 하드코딩 필터 제거)
 
 ### M4.6 빠른 검색·명령
-- [ ] `tasksmd.quickSearch` — QuickPick 퍼지 검색, 미완료 전체, 선택 시 이동 / 버튼으로 완료·편집 (FR-5.12), 키 `Cmd/Ctrl+Shift+;`
-- [ ] `tasksmd.insertQueryBlock` — ` ```tasks ` 스니펫
-- [ ] `tasksmd.explainQuery` — 커서가 있는 ` ```tasks ` 블록 설명을 출력 채널/알림으로
+- [x] `tasksmd.quickSearch` — QuickPick 퍼지 검색, 미완료 전체, 선택 시 이동 / 버튼으로 완료·편집 (FR-5.12), 키 `Cmd/Ctrl+Shift+;`
+- [x] `tasksmd.insertQueryBlock` — ` ```tasks ` 스니펫
+- [x] `tasksmd.explainQuery` — 커서가 있는 ` ```tasks ` 블록 설명을 출력 채널/알림으로
 
 ### M4.7 테스트
-- [ ] 명령어별 단위 테스트 + `explain` 스냅샷
-- [ ] Obsidian Tasks `tests/Query/**` 케이스 이식 (호환성 회귀 방지)
-- [ ] 벤치마크 스크립트 — 50,000 태스크 합성 인덱스에서 대표 쿼리 시간 측정, CI에서 임계값 경고
+- [x] 명령어별 단위 테스트 + `explain` 검증 (tokenizer 4 · skeleton 4 · filters 23 · sort/group 18 · functions 10)
+- [ ] Obsidian Tasks `tests/Query/**` 케이스 이식 (호환성 회귀 방지) — M8에서 선별 이식
+- [x] 벤치마크 스크립트 — `BENCH=1 pnpm vitest run tests/perf`: 50,000 태스크에서 not done 55ms · group by folder/due 61ms · function filter 98ms (정렬 키 사전 계산으로 780ms→55ms); CI는 완화된 상한만 검사
 
 ---
 

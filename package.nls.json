@@ -75,5 +75,8 @@
   "tasksmd.savedQuery.edit.title": "Edit query",
   "tasksmd.savedQuery.delete.title": "Delete query",
   "tasksmd.savedQuery.explain.title": "Explain query",
-  "tasksmd.savedQuery.refresh.title": "Refresh queries"
+  "tasksmd.savedQuery.refresh.title": "Refresh queries",
+  "tasksmd.quickSearch.title": "Quick search tasks",
+  "tasksmd.insertQueryBlock.title": "Insert query block",
+  "tasksmd.explainQuery.title": "Explain query under cursor"
 }

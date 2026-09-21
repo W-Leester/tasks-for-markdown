@@ -63,13 +63,23 @@ export class Query {
     const matched = tasks.length;
 
     const sorters = [...this.sorters, ...Query.defaultSorters()];
-    tasks.sort((a, b) => {
-      for (const s of sorters) {
-        const c = safe(() => s.compare(a, b, ctx), 0);
+    // Decorate-sort-undecorate: precompute keys for sorters that offer them.
+    const keys = sorters.map((s) => (s.key ? tasks.map((t) => safe(() => s.key!(t, ctx), 0)) : null));
+    const order = tasks.map((_, i) => i);
+    order.sort((ia, ib) => {
+      for (let si = 0; si < sorters.length; si++) {
+        const s = sorters[si]!;
+        const k = keys[si];
+        let c: number;
+        if (k) {
+          const ka = k[ia]!, kb = k[ib]!;
+          c = ka < kb ? -1 : ka > kb ? 1 : 0;
+        } else c = safe(() => s.compare(tasks[ia]!, tasks[ib]!, ctx), 0);
         if (c !== 0) return s.reverse ? -c : c;
       }
-      return 0;
+      return ia - ib;
     });
+    tasks = order.map((i) => tasks[i]!);
     if (this.limit !== null) tasks = tasks.slice(0, this.limit);
 
     const root = this.groupTasks(tasks, ctx, safe);

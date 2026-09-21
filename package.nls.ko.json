@@ -75,5 +75,8 @@
   "tasksmd.savedQuery.edit.title": "쿼리 편집",
   "tasksmd.savedQuery.delete.title": "쿼리 삭제",
   "tasksmd.savedQuery.explain.title": "쿼리 설명",
-  "tasksmd.savedQuery.refresh.title": "쿼리 새로 고침"
+  "tasksmd.savedQuery.refresh.title": "쿼리 새로 고침",
+  "tasksmd.quickSearch.title": "태스크 빠른 검색",
+  "tasksmd.insertQueryBlock.title": "쿼리 블록 삽입",
+  "tasksmd.explainQuery.title": "커서 위치 쿼리 설명"
 }

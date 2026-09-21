@@ -15,12 +15,15 @@ const SCHEDULED = 5.0;
 const STARTED = -3.0;
 const PRIORITY = 6.0;
 
+const MS_PER_DAY = 86_400_000;
+
 export function urgency(task: Task, now: Dayjs): number {
   let score = 0;
   const startOfToday = now.startOf('day');
 
   if (task.due?.date) {
-    const daysOverdue = Math.round(startOfToday.diff(task.due.date, 'day', true));
+    // Both values are local-midnight timestamps; dividing by ms/day and rounding tolerates DST.
+    const daysOverdue = Math.round((startOfToday.valueOf() - task.due.date.valueOf()) / MS_PER_DAY);
     let multiplier: number;
     if (daysOverdue >= 7) multiplier = 1.0;
     else if (daysOverdue >= -14) multiplier = ((daysOverdue + 14) * 0.8) / 21 + 0.2;

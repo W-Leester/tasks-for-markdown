@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### M4 — query engine (2026-09-21)
+- Obsidian Tasks-compatible query language: status, date (single/range/natural language), priority, recurrence, dependency, text/regex, tag and boolean filters; sort by / group by every field with the plugin's default order; limits, layout instructions, `explain`.
+- `filter/sort/group by function` (opt-in, trusted workspaces only, time-budgeted).
+- Saved queries from `tasksmd.savedQueries` and `.tasks/queries/*.md`, shown in the sidebar with grouped results.
+- Quick search (`Cmd/Ctrl+Shift+;`), insert query block, explain query under cursor.
+- 50,000-task benchmark: representative queries under 100 ms.
+
 ### M3 — recurrence, statuses, dependencies (2026-09-21)
 - Recurring tasks: completing a `🔁 every …` task inserts the next instance (Obsidian rules: reference date priority, relative dates, `when done`, short months, `🏁 delete`), configurable position / id handling / dependsOn copy.
 - Custom statuses via `tasksmd.statuses` with theme presets (Core, Minimal, ITS, Things); behaviour follows the status type.

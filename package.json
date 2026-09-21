@@ -192,6 +192,22 @@
         "title": "%tasksmd.savedQuery.refresh.title%",
         "category": "Tasks",
         "icon": "$(refresh)"
+      },
+      {
+        "command": "tasksmd.quickSearch",
+        "title": "%tasksmd.quickSearch.title%",
+        "category": "Tasks",
+        "icon": "$(search)"
+      },
+      {
+        "command": "tasksmd.insertQueryBlock",
+        "title": "%tasksmd.insertQueryBlock.title%",
+        "category": "Tasks"
+      },
+      {
+        "command": "tasksmd.explainQuery",
+        "title": "%tasksmd.explainQuery.title%",
+        "category": "Tasks"
       }
     ],
     "configuration": {
@@ -471,6 +487,11 @@
         "key": "ctrl+alt+t",
         "mac": "cmd+alt+t",
         "when": "editorTextFocus && editorLangId == markdown"
+      },
+      {
+        "command": "tasksmd.quickSearch",
+        "key": "ctrl+shift+;",
+        "mac": "cmd+shift+;"
       }
     ],
     "menus": {
@@ -562,6 +583,11 @@
         }
       ],
       "view/title": [
+        {
+          "command": "tasksmd.quickSearch",
+          "when": "view == tasksmd.tasks",
+          "group": "navigation@0"
+        },
         {
           "command": "tasksmd.tree.filter",
           "when": "view == tasksmd.tasks && !tasksmd.tree.filterActive",

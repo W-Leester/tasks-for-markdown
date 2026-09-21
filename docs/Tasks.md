@@ -407,13 +407,15 @@
 - 웹뷰가 CSP 위반 없이 로드되고(콘솔 오류 0), 키보드만으로 모달을 조작할 수 있다.
 
 ### M6.1 웹뷰 인프라 (`src/webviews/shared/`, `WebviewHost`)
-- [ ] esbuild 두 번째 엔트리 — Svelte 컴파일, `dist/webviews/<app>.js|css`, watch 모드 (D§13)
-- [ ] `WebviewHost<T>` — HTML 생성(CSP nonce, `localResourceRoots: dist/webviews`), 메시지 라우팅, 인덱스 이벤트 → `state/patch` (D§5.6, D§10)
-- [ ] `protocol.ts` — discriminated union 메시지 타입, 양쪽에서 import (D§5.6 표)
-- [ ] `tokens.css` — `--vscode-*` 기반 우선순위/기한 색, editor/와 동일 매핑 (D§7.7)
-- [ ] `state/init`에 l10n 번들 포함, Svelte `t(key)` (D§11)
-- [ ] 공통 컴포넌트: TaskCard, Chip, DateInput(자연어 해석 미리보기), StatusSelect
-- [ ] `retainContextWhenHidden` 최소화, 숨김 시 상태를 `workspaceState`에 저장 (NFR-4)
+- [x] esbuild 두 번째 엔트리 — Svelte 컴파일, `dist/webviews/<app>.js|css`, watch 모드 (D§13)
+- [x] `WebviewHost`(`src/webviewHost/`) — HTML 생성(CSP nonce, `localResourceRoots: dist/webviews`), 메시지 라우팅(query/run, task/toggle·setField(s)·create·open·load, ui/state·notify·close), 인덱스 변경 → `index/changed`, 설정/저장 쿼리 변경 → `state/patch` (D§5.6, D§10)
+- [x] `protocol.ts` — discriminated union 메시지 타입, 양쪽에서 import (D§5.6 표)
+- [x] `tokens.css` — `--vscode-*` 기반 우선순위/기한 색, editor/와 동일 매핑 (D§7.7)
+- [x] `state/init`에 l10n 번들 포함, Svelte `t(key)` (D§11)
+- [ ] 공통 컴포넌트: TaskCard, Chip, DateInput(자연어 해석 미리보기), StatusSelect (→ M6.2/M6.3에서 만들며 추출)
+- [x] `retainContextWhenHidden: false`, UI 상태는 `ui/state`로 `workspaceState`에 저장 (NFR-4)
+
+- [x] 스모크 앱(`webviews/smoke`) + 통합 테스트: 실제 웹뷰에서 `ui/ready` → `state/init` → `query/run` 왕복 확인
 
 ### M6.2 편집 모달 (`webviews/edit-modal/`)
 - [ ] 필드 전부: 설명(멀티라인·글로벌 필터 자동), 우선순위, 반복(텍스트+프리셋+유효성+when done), 시작/예정/마감(자연어+피커), 접힌 생성/완료/취소일, 상태, 의존성(전/후 양방향 검색), 완료 시 동작 (FR-6.1)

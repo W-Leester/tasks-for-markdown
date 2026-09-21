@@ -1,0 +1,43 @@
+/* Shared design tokens for every Tasks webview — VS Code theme variables only (D§7.7). */
+:root {
+  --tfm-fg: var(--vscode-foreground);
+  --tfm-muted: var(--vscode-descriptionForeground);
+  --tfm-bg: var(--vscode-editor-background);
+  --tfm-panel: var(--vscode-sideBar-background, var(--vscode-editor-background));
+  --tfm-border: var(--vscode-widget-border, var(--vscode-panel-border, rgba(128, 128, 128, 0.35)));
+  --tfm-accent: var(--vscode-focusBorder);
+  --tfm-link: var(--vscode-textLink-foreground);
+  --tfm-error: var(--vscode-errorForeground);
+  --tfm-warn: var(--vscode-editorWarning-foreground);
+  --tfm-ok: var(--vscode-testing-iconPassed, #2e7d32);
+  --tfm-input-bg: var(--vscode-input-background);
+  --tfm-input-fg: var(--vscode-input-foreground);
+  --tfm-input-border: var(--vscode-input-border, transparent);
+  --tfm-button-bg: var(--vscode-button-background);
+  --tfm-button-fg: var(--vscode-button-foreground);
+  --tfm-button2-bg: var(--vscode-button-secondaryBackground);
+  --tfm-button2-fg: var(--vscode-button-secondaryForeground);
+  --tfm-badge-bg: var(--vscode-badge-background);
+  --tfm-badge-fg: var(--vscode-badge-foreground);
+  --tfm-pri-highest: var(--vscode-charts-red, #f14c4c);
+  --tfm-pri-high: var(--vscode-charts-orange, #d18616);
+  --tfm-pri-medium: var(--vscode-charts-yellow, #cca700);
+  --tfm-pri-low: var(--vscode-charts-blue, #3794ff);
+  --tfm-pri-lowest: var(--vscode-descriptionForeground);
+  --tfm-overdue-bg: color-mix(in srgb, var(--vscode-errorForeground) 18%, transparent);
+  --tfm-today-bg: color-mix(in srgb, var(--vscode-editorWarning-foreground) 18%, transparent);
+  --tfm-radius: 6px;
+  --tfm-font: var(--vscode-font-family);
+  --tfm-font-size: var(--vscode-font-size, 13px);
+}
+body { font-family: var(--tfm-font); font-size: var(--tfm-font-size); color: var(--tfm-fg); background: transparent; margin: 0; padding: 0; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button.tfm-btn { background: var(--tfm-button-bg); color: var(--tfm-button-fg); border: none; border-radius: 3px; padding: 4px 12px; cursor: pointer; }
+button.tfm-btn.secondary { background: var(--tfm-button2-bg); color: var(--tfm-button2-fg); }
+button.tfm-btn:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible { outline: 1px solid var(--tfm-accent); outline-offset: 1px; }
+input.tfm-input, select.tfm-input, textarea.tfm-input { background: var(--tfm-input-bg); color: var(--tfm-input-fg); border: 1px solid var(--tfm-input-border); border-radius: 3px; padding: 4px 6px; }
+.tfm-chip { display: inline-block; font-size: 0.85em; line-height: 1.6; padding: 0 0.55em; border-radius: 0.9em; background: var(--tfm-badge-bg); color: var(--tfm-badge-fg); white-space: nowrap; }
+.tfm-chip.overdue { background: var(--tfm-overdue-bg); color: var(--tfm-error); font-weight: 600; }
+.tfm-chip.today { background: var(--tfm-today-bg); color: var(--tfm-warn); }
+.tfm-chip.pri-0 { color: var(--tfm-pri-highest); } .tfm-chip.pri-1 { color: var(--tfm-pri-high); } .tfm-chip.pri-2 { color: var(--tfm-pri-medium); } .tfm-chip.pri-4 { color: var(--tfm-pri-low); } .tfm-chip.pri-5 { color: var(--tfm-pri-lowest); }
+.tfm-muted { color: var(--tfm-muted); }

@@ -265,3 +265,12 @@ suite('markdown preview', () => {
     assert.ok(html.includes('href="project-a.md#L'), 'relative link with line');
   });
 });
+
+suite('webviews', () => {
+  test('a Svelte webview boots, receives state/init and runs a query', async () => {
+    const api = await getApi();
+    const host = api.webviews.openSmoke();
+    await waitFor(() => host.received.includes('ui/ready') && host.received.includes('query/run'), 8000, 'webview handshake');
+    await vscode.commands.executeCommand('workbench.action.closeAllEditors');
+  });
+});

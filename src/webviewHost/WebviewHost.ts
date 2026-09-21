@@ -1,0 +1,214 @@
+import * as vscode from 'vscode';
+import { systemClock, type Clock } from '../core/dates';
+import type { TaskIndex } from '../core/index';
+import { DateField, type StatusRegistry, Task } from '../core/task';
+import type { QueryService } from '../services/QueryService';
+import type { SavedQueryStore } from '../services/SavedQueryStore';
+import { StaleLineError, type TaskEditService } from '../services/TaskEditService';
+import { toGroupDto, toTaskDto } from '../services/dto';
+import type { Settings } from '../settings/Settings';
+import type { FromWebview, InitState, TaskFieldName, ToWebview } from '../webviews/shared/protocol';
+
+export interface WebviewHostDeps {
+  context: vscode.ExtensionContext;
+  index: TaskIndex;
+  settings: Settings;
+  queries: QueryService;
+  savedQueries: SavedQueryStore;
+  editService: TaskEditService;
+  getStatusRegistry(): StatusRegistry;
+  log(m: string): void;
+  clock?: Clock;
+}
+
+export interface WebviewAppOptions {
+  /** Name of the bundle under dist/webviews/<app>.js and the workspaceState key for UI state. */
+  app: string;
+  title: string;
+}
+
+/**
+ * Everything a Svelte webview needs from the extension (D§5.6): HTML with a strict CSP, the
+ * typed message protocol, `state/init` on ready, `index/changed` pushes, and the edit
+ * operations routed through TaskEditService. Works for both WebviewPanel and WebviewView.
+ */
+export class WebviewHost implements vscode.Disposable {
+  private readonly disposables: vscode.Disposable[] = [];
+  private webview: vscode.Webview | null = null;
+  /** Message types received so far — handy for tests and logs. */
+  readonly received: string[] = [];
+
+  constructor(
+    private readonly deps: WebviewHostDeps,
+    private readonly options: WebviewAppOptions,
+  ) {}
+
+  attach(webview: vscode.Webview): void {
+    this.webview = webview;
+    webview.options = { enableScripts: true, localResourceRoots: [vscode.Uri.joinPath(this.deps.context.extensionUri, 'dist', 'webviews')] };
+    webview.html = this.html(webview);
+    this.disposables.push(
+      webview.onDidReceiveMessage((m: FromWebview) => void this.handle(m)),
+      this.deps.settings.onDidChange(() => this.send({ type: 'state/patch', state: this.state() })),
+      this.deps.savedQueries.onDidChange(() => this.send({ type: 'state/patch', state: { savedQueries: this.state().savedQueries } })),
+      this.deps.queries.onDidChange(() => this.send({ type: 'index/changed' })),
+    );
+  }
+
+  send(msg: ToWebview): void {
+    void this.webview?.postMessage(msg);
+  }
+
+  private today() {
+    return (this.deps.clock ?? systemClock).now().startOf('day');
+  }
+
+  private state(): InitState {
+    return {
+      locale: vscode.env.language,
+      l10n: (vscode.l10n.bundle as Record<string, string> | undefined) ?? {},
+      today: this.today().format('YYYY-MM-DD'),
+      statuses: this.deps.getStatusRegistry().all().map((s) => ({ symbol: s.symbol, name: s.name, type: s.type, nextSymbol: s.nextSymbol })),
+      taskFormat: this.deps.settings.get('taskFormat'),
+      savedQueries: this.deps.savedQueries.all().map((q) => ({ id: q.id, name: q.name, query: q.query, source: q.source })),
+      uiState: this.deps.context.workspaceState.get<Record<string, unknown>>(`webview.${this.options.app}`, {}),
+    };
+  }
+
+  private async handle(msg: FromWebview): Promise<void> {
+    this.received.push(msg.type);
+    try {
+      switch (msg.type) {
+        case 'ui/ready':
+          this.send({ type: 'state/init', state: this.state() });
+          break;
+        case 'ui/state':
+          await this.deps.context.workspaceState.update(`webview.${this.options.app}`, msg.state);
+          break;
+        case 'query/run': {
+          const r = this.deps.queries.run(msg.query);
+          const today = this.today();
+          this.send({
+            type: 'query/result',
+            requestId: msg.requestId,
+            tasks: r.root.children.length ? [] : r.root.tasks.map((t) => toTaskDto(t, this.deps.index, today)),
+            groups: r.root.children.length ? toGroupDto(r.root, this.deps.index, today) : null,
+            matched: r.matched,
+            errors: [...r.errors.map((e) => `Line ${e.line}: ${e.message}`), ...r.runtimeErrors],
+          });
+          break;
+        }
+        case 'task/toggle': {
+          const task = this.deps.index.taskAt(msg.key, msg.line);
+          if (task) await this.deps.editService.toggle(task);
+          break;
+        }
+        case 'task/setField': {
+          const task = this.deps.index.taskAt(msg.key, msg.line);
+          if (task) await this.applyFields(task, { [msg.field]: msg.value });
+          break;
+        }
+        case 'task/setFields': {
+          const task = this.deps.index.taskAt(msg.key, msg.line);
+          if (task) await this.applyFields(task, msg.fields);
+          break;
+        }
+        case 'task/create': {
+          const registry = this.deps.getStatusRegistry();
+          let task = Task.blank('', registry.bySymbol(' '));
+          task = this.withFields(task, msg.fields);
+          if (this.deps.settings.get('setCreatedDate')) task = task.with({ created: DateField.fromDate(this.today()) });
+          const target = msg.key ? vscode.Uri.parse(msg.key) : vscode.window.activeTextEditor?.document.uri;
+          if (!target) throw new Error(vscode.l10n.t('Open a Markdown file to create a task.'));
+          const line = msg.line ?? vscode.window.activeTextEditor?.selection.active.line ?? Number.MAX_SAFE_INTEGER;
+          await this.deps.editService.insertNewTask(target, line, task);
+          break;
+        }
+        case 'task/open': {
+          const task = this.deps.index.taskAt(msg.key, msg.line);
+          if (task) await vscode.commands.executeCommand('tasksmd.openTask', task);
+          break;
+        }
+        case 'task/load': {
+          const today = this.today();
+          const task = msg.key !== null && msg.line !== null ? this.deps.index.taskAt(msg.key, msg.line) : undefined;
+          const candidates = this.deps.index.all().filter((t) => !t.isCompleted && t !== task).map((t) => toTaskDto(t, this.deps.index, today));
+          this.send({ type: 'task/loaded', requestId: msg.requestId, task: task ? toTaskDto(task, this.deps.index, today) : null, candidates });
+          break;
+        }
+        case 'ui/notify':
+          if (msg.level === 'error') void vscode.window.showErrorMessage(msg.message);
+          else if (msg.level === 'warn') void vscode.window.showWarningMessage(msg.message);
+          else void vscode.window.showInformationMessage(msg.message);
+          break;
+        case 'ui/close':
+          this.onClose?.();
+          break;
+      }
+    } catch (err) {
+      const message = err instanceof StaleLineError ? vscode.l10n.t('The file changed since it was indexed; it has been re-read. Please try again.') : err instanceof Error ? err.message : String(err);
+      this.deps.log(`webview ${this.options.app}: ${message}`);
+      this.send({ type: 'error', message });
+      void vscode.window.showErrorMessage(vscode.l10n.t('Tasks: {0}', message));
+    }
+  }
+
+  onClose?: () => void;
+
+  private withFields(task: Task, fields: Partial<Record<TaskFieldName, string | string[] | null>>): Task {
+    const registry = this.deps.getStatusRegistry();
+    const date = (v: string | string[] | null | undefined) => (typeof v === 'string' && v ? DateField.parse(v) : null);
+    let t = task;
+    for (const [field, value] of Object.entries(fields) as [TaskFieldName, string | string[] | null][]) {
+      switch (field) {
+        case 'description': t = t.with({ description: typeof value === 'string' ? value : '' }); break;
+        case 'priority': t = t.with({ priority: (typeof value === 'string' && /^[0-5]$/.test(value) ? value : '3') as Task['priority'] }); break;
+        case 'due': case 'scheduled': case 'start': case 'created': case 'done': case 'cancelled': t = t.with({ [field]: date(value) }); break;
+        case 'recurrence': t = t.with({ recurrenceText: typeof value === 'string' && value ? value : null }); break;
+        case 'onCompletion': t = t.with({ onCompletion: typeof value === 'string' && value ? value : null }); break;
+        case 'id': t = t.with({ id: typeof value === 'string' && value ? value : null }); break;
+        case 'dependsOn': t = t.with({ dependsOn: Array.isArray(value) ? value : typeof value === 'string' && value ? value.split(',').map((s) => s.trim()).filter(Boolean) : [] }); break;
+        case 'status': break; // handled separately (needs date side effects)
+      }
+    }
+    void registry;
+    return t;
+  }
+
+  private async applyFields(task: Task, fields: Partial<Record<TaskFieldName, string | string[] | null>>): Promise<void> {
+    const { status, ...rest } = fields;
+    let current = task;
+    if (Object.keys(rest).length) current = await this.deps.editService.update(current, this.withFields(current, rest).toFields());
+    if (typeof status === 'string') {
+      const target = this.deps.getStatusRegistry().bySymbol(status);
+      const fresh = this.deps.index.taskAt(current.location.key, current.location.line) ?? current;
+      if (fresh.status.symbol !== target.symbol) await this.deps.editService.setStatus(fresh, target);
+    }
+  }
+
+  private html(webview: vscode.Webview): string {
+    const nonce = Array.from({ length: 32 }, () => 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'[Math.floor(Math.random() * 62)]).join('');
+    const script = webview.asWebviewUri(vscode.Uri.joinPath(this.deps.context.extensionUri, 'dist', 'webviews', `${this.options.app}.js`));
+    const css = webview.asWebviewUri(vscode.Uri.joinPath(this.deps.context.extensionUri, 'dist', 'webviews', `${this.options.app}.css`));
+    return `<!DOCTYPE html>
+<html lang="${vscode.env.language}">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}'; img-src ${webview.cspSource} data:; font-src ${webview.cspSource};">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="${css}">
+<title>${this.options.title}</title>
+</head>
+<body>
+<div id="app"></div>
+<script nonce="${nonce}" src="${script}"></script>
+</body>
+</html>`;
+  }
+
+  dispose(): void {
+    for (const d of this.disposables) d.dispose();
+    this.disposables.length = 0;
+    this.webview = null;
+  }
+}

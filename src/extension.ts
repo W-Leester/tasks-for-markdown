@@ -19,6 +19,8 @@ import { Settings } from './settings/Settings';
 import { statusRegistryFromSettings } from './settings/statusRegistryFromSettings';
 import { registerSavedQueryView } from './views/registerSavedQueryView';
 import { registerTreeView } from './views/registerTreeView';
+import { registerWebviews } from './webviewHost/registerWebviews';
+import type { WebviewHost } from './webviewHost/WebviewHost';
 import { StatusBar } from './views/StatusBar';
 
 const output = vscode.window.createOutputChannel('Tasks for Markdown');
@@ -33,6 +35,7 @@ export interface ExtensionApi {
   settings: Settings;
   /** Consumed by VS Code's built-in Markdown extension (contributes.markdown.markdownItPlugins). */
   extendMarkdownIt(md: import('markdown-it').MarkdownIt): import('markdown-it').MarkdownIt;
+  webviews: { openSmoke: () => WebviewHost };
 }
 
 export async function activate(context: vscode.ExtensionContext): Promise<ExtensionApi> {
@@ -81,9 +84,10 @@ export async function activate(context: vscode.ExtensionContext): Promise<Extens
 
   const preview = new PreviewIntegration({ index, queries, settings, getStatusRegistry });
   context.subscriptions.push(preview);
+  const webviews = registerWebviews(context, { context, index, settings, queries, savedQueries, editService, getStatusRegistry, log });
 
   void indexService.start();
-  return { index, indexService, editService, queries, savedQueries, settings, extendMarkdownIt: (md) => preview.extendMarkdownIt(md) };
+  return { index, indexService, editService, queries, savedQueries, settings, extendMarkdownIt: (md) => preview.extendMarkdownIt(md), webviews };
 }
 
 export function deactivate(): void {

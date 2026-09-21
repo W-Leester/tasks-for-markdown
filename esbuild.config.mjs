@@ -1,4 +1,6 @@
 import * as esbuild from 'esbuild';
+import esbuildSvelte from 'esbuild-svelte';
+import { readdirSync, existsSync } from 'node:fs';
 
 const watch = process.argv.includes('--watch');
 const production = process.argv.includes('--production');
@@ -17,9 +19,29 @@ const extensionConfig = {
   logLevel: 'info',
 };
 
+/** One Svelte app per folder under src/webviews that has a main.ts. */
+const apps = readdirSync('src/webviews', { withFileTypes: true })
+  .filter((d) => d.isDirectory() && existsSync(`src/webviews/${d.name}/main.ts`))
+  .map((d) => d.name);
+
+/** @type {esbuild.BuildOptions} */
+const webviewConfig = {
+  entryPoints: Object.fromEntries(apps.map((a) => [a, `src/webviews/${a}/main.ts`])),
+  bundle: true,
+  outdir: 'dist/webviews',
+  format: 'iife',
+  platform: 'browser',
+  target: 'es2022',
+  sourcemap: !production,
+  minify: production,
+  logLevel: 'info',
+  conditions: ['svelte', 'browser'],
+  plugins: [esbuildSvelte({ compilerOptions: { css: 'external' } })],
+};
+
 if (watch) {
-  const ctx = await esbuild.context(extensionConfig);
-  await ctx.watch();
+  const ctxs = await Promise.all([esbuild.context(extensionConfig), esbuild.context(webviewConfig)]);
+  await Promise.all(ctxs.map((c) => c.watch()));
 } else {
-  await esbuild.build(extensionConfig);
+  await Promise.all([esbuild.build(extensionConfig), esbuild.build(webviewConfig)]);
 }

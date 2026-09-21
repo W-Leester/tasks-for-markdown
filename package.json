@@ -619,7 +619,7 @@
         "command": "tasksmd.createOrEdit",
         "key": "ctrl+shift+c",
         "mac": "ctrl+shift+c",
-        "when": "!terminalFocus && !inputFocus"
+        "when": "!terminalFocus && (editorTextFocus || !inputFocus)"
       },
       {
         "command": "tasksmd.quickSearch",

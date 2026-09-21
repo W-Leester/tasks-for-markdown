@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import type { GroupMode } from '../core/views';
 import type { TaskEditService } from '../services/TaskEditService';
 import { GROUP_MODES, TREE_VIEW_ID, TaskTreeProvider, type TaskTreeDeps, isTaskNode } from './TaskTreeProvider';
+import { t } from '../l10n';
 
 const GROUP_LABELS: Record<GroupMode, string> = {
   none: 'No grouping',
@@ -34,16 +35,16 @@ export function registerTreeView(context: vscode.ExtensionContext, deps: TaskTre
     vscode.commands.registerCommand('tasksmd.tree.refresh', () => provider.refresh()),
     vscode.commands.registerCommand('tasksmd.tree.groupBy', async () => {
       const picked = await vscode.window.showQuickPick(
-        GROUP_MODES.map((m) => ({ label: vscode.l10n.t(GROUP_LABELS[m]), mode: m, picked: m === provider.grouping })),
-        { placeHolder: vscode.l10n.t('Group tasks by…') },
+        GROUP_MODES.map((m) => ({ label: t(GROUP_LABELS[m]), mode: m, picked: m === provider.grouping })),
+        { placeHolder: t('Group tasks by…') },
       );
       if (picked) await provider.setGrouping(picked.mode);
     }),
     vscode.commands.registerCommand('tasksmd.tree.filter', async () => {
       const text = await vscode.window.showInputBox({
-        prompt: vscode.l10n.t('Filter tasks by description or file path'),
+        prompt: t('Filter tasks by description or file path'),
         value: provider.filter,
-        placeHolder: vscode.l10n.t('e.g. report'),
+        placeHolder: t('e.g. report'),
       });
       if (text !== undefined) provider.setFilter(text);
     }),

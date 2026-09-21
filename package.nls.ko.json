@@ -100,5 +100,7 @@
   "tasksmd.openCalendar.title": "캘린더 열기",
   "tasksmd.config.updateCheckUrl": ".vsix 설치용: latest.json({ version, vsix, notes })의 경로 또는 URL. 하루 1회 확인하며 비어 있으면 확인하지 않습니다. 마켓플레이스 설치본에서는 무시됩니다.",
   "tasksmd.checkForUpdates.title": "업데이트 확인 (.vsix)",
-  "tasksmd.convertFormat.title": "이 파일의 태스크 포맷 변환…"
+  "tasksmd.convertFormat.title": "이 파일의 태스크 포맷 변환…",
+  "tasksmd.config.language": "확장 UI(사이드바, 대화상자, 힌트)의 언어. 명령 이름과 설정 설명은 항상 에디터 표시 언어를 따릅니다. 변경 후 창을 리로드하세요.",
+  "tasksmd.config.language.auto": "에디터 표시 언어를 따름"
 }

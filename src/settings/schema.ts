@@ -45,6 +45,7 @@ export interface SettingsSchema {
   'archive.linkStyle': 'wiki' | 'markdown';
   'calendar.newTaskFile': string;
   updateCheckUrl: string;
+  language: 'auto' | 'en' | 'ko';
 }
 
 export const SETTINGS_SECTION = 'tasksmd';
@@ -89,6 +90,7 @@ export const SETTINGS_DEFAULTS: Readonly<SettingsSchema> = {
   'archive.linkStyle': 'wiki',
   'calendar.newTaskFile': '',
   updateCheckUrl: '',
+  language: 'auto',
 };
 
 export type SettingsKey = keyof SettingsSchema;

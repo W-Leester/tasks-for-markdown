@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { PRIORITY_EMOJI, Priority, type Task } from '../core/task';
 import type { Settings } from '../settings/Settings';
+import { t } from '../l10n';
 
 const PRIORITY_ICON: Partial<Record<Priority, string>> = {
   [Priority.Highest]: 'triangle-up',
@@ -21,7 +22,7 @@ export function displayDescription(task: Task, settings: Settings): string {
   let d = task.description;
   const gf = settings.get('globalFilter');
   if (gf && settings.get('removeGlobalFilterFromDescription')) d = d.replace(gf, '').replace(/\s{2,}/g, ' ').trim();
-  return d || vscode.l10n.t('(empty task)');
+  return d || t('(empty task)');
 }
 
 /** One task row shared by every tree (smart views, saved queries). */

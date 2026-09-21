@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { type TaskFormat, isTaskLine, parseTaskLine, serializeTask } from '../core/task';
 import type { CommandDeps } from './registerCommands';
+import { t } from '../l10n';
 
 /** Rewrite every task line of the active document in the chosen format (emoji <-> dataview). */
 export function registerConvertCommand(context: vscode.ExtensionContext, deps: CommandDeps): void {
@@ -8,15 +9,15 @@ export function registerConvertCommand(context: vscode.ExtensionContext, deps: C
     vscode.commands.registerCommand('tasksmd.convertFormat', async () => {
       const editor = vscode.window.activeTextEditor;
       if (!editor || editor.document.languageId !== 'markdown') {
-        void vscode.window.showInformationMessage(vscode.l10n.t('Open a Markdown file first.'));
+        void vscode.window.showInformationMessage(t('Open a Markdown file first.'));
         return;
       }
       const picked = await vscode.window.showQuickPick(
         [
-          { label: '📅 ' + vscode.l10n.t('Emoji format'), description: '📅 2026-09-25 ⏫ 🔁 every week', format: 'emoji' as TaskFormat },
-          { label: '[::] ' + vscode.l10n.t('Dataview format'), description: '[due:: 2026-09-25] [priority:: high]', format: 'dataview' as TaskFormat },
+          { label: '📅 ' + t('Emoji format'), description: '📅 2026-09-25 ⏫ 🔁 every week', format: 'emoji' as TaskFormat },
+          { label: '[::] ' + t('Dataview format'), description: '[due:: 2026-09-25] [priority:: high]', format: 'dataview' as TaskFormat },
         ],
-        { placeHolder: vscode.l10n.t('Convert all task lines in this file to…') },
+        { placeHolder: t('Convert all task lines in this file to…') },
       );
       if (!picked) return;
       const doc = editor.document;
@@ -37,7 +38,7 @@ export function registerConvertCommand(context: vscode.ExtensionContext, deps: C
         }
       }
       if (changed) await vscode.workspace.applyEdit(edit);
-      void vscode.window.showInformationMessage(vscode.l10n.t('Converted {0} task lines.', changed));
+      void vscode.window.showInformationMessage(t('Converted {0} task lines.', changed));
     }),
   );
 }

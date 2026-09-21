@@ -5,6 +5,7 @@ import { systemClock, type Clock } from '../core/dates';
 import type { TaskIndex } from '../core/index';
 import type { IndexService } from '../index/IndexService';
 import type { Settings } from '../settings/Settings';
+import { t } from '../l10n';
 
 export interface ArchiveDeps {
   index: TaskIndex;
@@ -24,7 +25,7 @@ export class ArchiveService {
 
   private archiveUri(): vscode.Uri {
     const folder = vscode.workspace.workspaceFolders?.[0];
-    if (!folder) throw new Error(vscode.l10n.t('Open a workspace folder first'));
+    if (!folder) throw new Error(t('Open a workspace folder first'));
     const rel = this.deps.settings.get('archive.file') || 'Archive.md';
     return vscode.Uri.joinPath(folder.uri, ...rel.split(/[\\/]/));
   }
@@ -49,14 +50,14 @@ export class ArchiveService {
     const files = await this.inputs();
     const plan = planArchive(files, { today: this.today(), afterDays });
     if (!plan.totalTasks) {
-      void vscode.window.showInformationMessage(vscode.l10n.t('No completed tasks older than {0} days to archive.', afterDays));
+      void vscode.window.showInformationMessage(t('No completed tasks older than {0} days to archive.', afterDays));
       return;
     }
     // Preview: every root task pre-selected; the user can deselect (FR-10.7).
     const items = plan.entries.flatMap((e) =>
       e.tasks.map((t) => ({ label: t.description || '(empty)', description: `${e.path}:${t.location.line + 1}`, detail: (t.done ?? t.cancelled)?.format(), picked: true, entry: e, task: t })),
     );
-    const picked = await vscode.window.showQuickPick(items, { canPickMany: true, placeHolder: vscode.l10n.t('Archive {0} completed tasks to {1}', plan.totalTasks, this.deps.settings.get('archive.file') || 'Archive.md') });
+    const picked = await vscode.window.showQuickPick(items, { canPickMany: true, placeHolder: t('Archive {0} completed tasks to {1}', plan.totalTasks, this.deps.settings.get('archive.file') || 'Archive.md') });
     if (!picked || picked.length === 0) return;
     const keep = new Set(picked.map((p) => `${p.entry.path}#${p.task.location.line}`));
     const finalPlan = planArchive(files, { today: this.today(), afterDays, select: (t) => keep.has(`${t.location.path}#${t.location.line}`) });
@@ -76,7 +77,7 @@ export class ArchiveService {
     if (!exists) edit.createFile(archiveUri, { ignoreIfExists: true });
     const archiveDoc = exists ? await vscode.workspace.openTextDocument(archiveUri) : null;
     const end = archiveDoc ? archiveDoc.lineAt(Math.max(0, archiveDoc.lineCount - 1)).range.end : new vscode.Position(0, 0);
-    const prefix = archiveDoc && archiveDoc.getText().trim().length ? (archiveDoc.getText().endsWith('\n') ? '\n' : '\n\n') : exists ? '' : `# ${vscode.l10n.t('Archive')}\n\n`;
+    const prefix = archiveDoc && archiveDoc.getText().trim().length ? (archiveDoc.getText().endsWith('\n') ? '\n' : '\n\n') : exists ? '' : `# ${t('Archive')}\n\n`;
     edit.insert(archiveUri, end, prefix + block);
 
     for (const e of finalPlan.entries) {
@@ -98,9 +99,9 @@ export class ArchiveService {
       if (doc) this.deps.indexService.indexText(uri, doc.getText());
     }
     const n = finalPlan.entries.reduce((s, e) => s + e.tasks.length, 0);
-    const open = vscode.l10n.t('Open archive');
+    const open = t('Open archive');
     // Not awaited: the promise only settles when the toast is dismissed.
-    void vscode.window.showInformationMessage(vscode.l10n.t('Archived {0} tasks.', n), open).then((choice) => {
+    void vscode.window.showInformationMessage(t('Archived {0} tasks.', n), open).then((choice) => {
       if (choice === open) void vscode.window.showTextDocument(archiveUri);
     });
   }

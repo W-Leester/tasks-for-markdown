@@ -4,6 +4,7 @@ import { type StatusRegistry, StatusType, Task, isTaskLine, parseTaskLine } from
 import type { IndexService } from '../index/IndexService';
 import type { Settings } from '../settings/Settings';
 import { StaleLineError, type TaskEditService } from '../services/TaskEditService';
+import { t } from '../l10n';
 
 export const VIEW_CONTAINER_ID = 'tasksmd';
 
@@ -75,11 +76,11 @@ export async function runEdit(deps: CommandDeps, action: () => Promise<void>): P
     await action();
   } catch (err) {
     if (err instanceof StaleLineError) {
-      void vscode.window.showWarningMessage(vscode.l10n.t('The file changed since it was indexed; it has been re-read. Please try again.'));
+      void vscode.window.showWarningMessage(t('The file changed since it was indexed; it has been re-read. Please try again.'));
       return;
     }
     deps.log(`command failed: ${err instanceof Error ? err.stack ?? err.message : String(err)}`);
-    void vscode.window.showErrorMessage(vscode.l10n.t('Tasks: {0}', err instanceof Error ? err.message : String(err)));
+    void vscode.window.showErrorMessage(t('Tasks: {0}', err instanceof Error ? err.message : String(err)));
   }
 }
 
@@ -93,7 +94,7 @@ export function registerCommands(context: vscode.ExtensionContext, deps: Command
     runEdit(deps, async () => {
       const targets = resolveTargetTasks(arg, deps);
       if (!targets.length) {
-        void vscode.window.showInformationMessage(vscode.l10n.t('Place the cursor on a task line (e.g. "- [ ] …") first.'));
+        void vscode.window.showInformationMessage(t('Place the cursor on a task line (e.g. "- [ ] …") first.'));
         return;
       }
       // Bottom-up so inserted lines (recurrence, M3) never shift lines still to be edited.
@@ -107,7 +108,7 @@ export function registerCommands(context: vscode.ExtensionContext, deps: Command
     runEdit(deps, async () => {
       const status = deps.getStatusRegistry().firstOfType(type);
       if (!status) {
-        void vscode.window.showWarningMessage(vscode.l10n.t('No status of type {0} is configured.', type));
+        void vscode.window.showWarningMessage(t('No status of type {0} is configured.', type));
         return;
       }
       const targets = resolveTargetTasks(arg, deps);

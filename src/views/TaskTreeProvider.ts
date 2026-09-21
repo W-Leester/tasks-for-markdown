@@ -5,6 +5,7 @@ import type { Task } from '../core/task';
 import { GROUP_MODES, type GroupMode, SMART_VIEWS, type SmartViewId, groupTasks, runSmartView } from '../core/views';
 import type { Settings } from '../settings/Settings';
 import { taskTreeItem } from './taskItem';
+import { t } from '../l10n';
 
 export const TREE_VIEW_ID = 'tasksmd.tasks';
 const MAX_VISIBLE = 1000;
@@ -113,7 +114,7 @@ export class TaskTreeProvider implements vscode.TreeDataProvider<Node>, vscode.D
       case 'smart': {
         const def = SMART_VIEWS.find((v) => v.id === node.id)!;
         const count = this.tasksFor(node.id).length;
-        const item = new vscode.TreeItem(vscode.l10n.t(def.labelKey), node.id === 'open' ? vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.Collapsed);
+        const item = new vscode.TreeItem(t(def.labelKey), node.id === 'open' ? vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.Collapsed);
         item.id = `smart:${node.id}`;
         item.iconPath = new vscode.ThemeIcon(def.icon, node.id === 'overdue' && count ? new vscode.ThemeColor('errorForeground') : undefined);
         item.description = String(count);
@@ -121,7 +122,7 @@ export class TaskTreeProvider implements vscode.TreeDataProvider<Node>, vscode.D
         return item;
       }
       case 'group': {
-        const item = new vscode.TreeItem(node.literal ? node.label : vscode.l10n.t(node.label), vscode.TreeItemCollapsibleState.Expanded);
+        const item = new vscode.TreeItem(node.literal ? node.label : t(node.label), vscode.TreeItemCollapsibleState.Expanded);
         item.id = `group:${node.id}`;
         item.description = String(node.tasks.length);
         item.iconPath = new vscode.ThemeIcon(this.groupMode === 'file' ? 'markdown' : 'folder');
@@ -131,7 +132,7 @@ export class TaskTreeProvider implements vscode.TreeDataProvider<Node>, vscode.D
       case 'task':
         return this.taskItem(node.task);
       case 'more': {
-        const item = new vscode.TreeItem(vscode.l10n.t('… {0} more (narrow with the filter)', node.count));
+        const item = new vscode.TreeItem(t('… {0} more (narrow with the filter)', node.count));
         item.iconPath = new vscode.ThemeIcon('ellipsis');
         return item;
       }

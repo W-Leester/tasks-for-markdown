@@ -5,6 +5,7 @@ import { PRIORITY_EMOJI, PRIORITY_NAME, Priority, type DateFieldName, type Statu
 import { isBlocked, isBlocking } from '../core/index';
 import type { Settings } from '../settings/Settings';
 import { overdueText, relativeText } from './relativeText';
+import { t } from '../l10n';
 
 export interface HoverDeps {
   index: TaskIndex;
@@ -40,10 +41,10 @@ export class TaskHoverProvider implements vscode.HoverProvider {
     const arg = encodeURIComponent(JSON.stringify([taskRef(task)]));
     const cmd = (id: string, label: string) => `[${label}](command:${id}?${arg})`;
 
-    md.appendMarkdown(`**${escape(task.description) || vscode.l10n.t('(empty task)')}**\n\n`);
+    md.appendMarkdown(`**${escape(task.description) || t('(empty task)')}**\n\n`);
     const rows: string[] = [];
     rows.push(`\`[${task.status.symbol}]\` ${task.status.name} · ${task.status.type}`);
-    if (task.priority !== Priority.None) rows.push(`${PRIORITY_EMOJI[task.priority]} ${vscode.l10n.t('Priority')}: ${PRIORITY_NAME[task.priority]}`);
+    if (task.priority !== Priority.None) rows.push(`${PRIORITY_EMOJI[task.priority]} ${t('Priority')}: ${PRIORITY_NAME[task.priority]}`);
     for (const name of ['due', 'scheduled', 'start', 'created', 'done', 'cancelled'] as DateFieldName[]) {
       const f = task[name];
       if (!f) continue;
@@ -51,31 +52,31 @@ export class TaskHoverProvider implements vscode.HoverProvider {
       if (f.date) {
         const r = describeRelative(f.date, today);
         rel = name === 'due' && f.date.isBefore(today) && !task.isCompleted ? ` — ⚠ ${overdueText(r)}` : ` — ${relativeText(r)}`;
-      } else rel = ` — ⚠ ${vscode.l10n.t('invalid date')}`;
-      rows.push(`${DATE_ICON[name]} ${vscode.l10n.t(DATE_LABEL[name])}: ${f.format()}${rel}`);
+      } else rel = ` — ⚠ ${t('invalid date')}`;
+      rows.push(`${DATE_ICON[name]} ${t(DATE_LABEL[name])}: ${f.format()}${rel}`);
     }
-    if (task.recurrenceText) rows.push(`🔁 ${vscode.l10n.t('Repeats')}: ${escape(task.recurrenceText)}`);
-    if (task.onCompletion) rows.push(`🏁 ${vscode.l10n.t('On completion')}: ${task.onCompletion}`);
+    if (task.recurrenceText) rows.push(`🔁 ${t('Repeats')}: ${escape(task.recurrenceText)}`);
+    if (task.onCompletion) rows.push(`🏁 ${t('On completion')}: ${task.onCompletion}`);
     if (task.id) {
       const dependants = this.deps.index.all().filter((t) => t.dependsOn.includes(task.id!));
-      rows.push(`🆔 ${task.id}` + (dependants.length ? ` — ${vscode.l10n.t('blocks')} ${dependants.map((t) => this.link(t)).join(', ')}` : '') + (isBlocking(task, this.deps.index) ? ` (**${vscode.l10n.t('blocking')}**)` : ''));
+      rows.push(`🆔 ${task.id}` + (dependants.length ? ` — ${t('blocks')} ${dependants.map((t) => this.link(t)).join(', ')}` : '') + (isBlocking(task, this.deps.index) ? ` (**${t('blocking')}**)` : ''));
     }
     if (task.dependsOn.length) {
       const items = task.dependsOn.map((id) => {
         const found = this.deps.index.byId(id);
-        if (!found.length) return `\`${id}\` (${vscode.l10n.t('not found')})`;
+        if (!found.length) return `\`${id}\` (${t('not found')})`;
         return found.map((t) => `${this.link(t)}${t.isCompleted ? ' ✅' : ''}`).join(', ');
       });
-      rows.push(`⛔ ${vscode.l10n.t('Depends on')}: ${items.join('; ')}` + (isBlocked(task, this.deps.index) ? ` — **${vscode.l10n.t('blocked')}**` : ''));
+      rows.push(`⛔ ${t('Depends on')}: ${items.join('; ')}` + (isBlocked(task, this.deps.index) ? ` — **${t('blocked')}**` : ''));
     }
     if (task.tags.length) rows.push(`🏷 ${task.tags.map(escape).join(' ')}`);
-    if (!task.isCompleted) rows.push(`🔥 ${vscode.l10n.t('Urgency')}: ${urgency(task, today).toFixed(2)}`);
+    if (!task.isCompleted) rows.push(`🔥 ${t('Urgency')}: ${urgency(task, today).toFixed(2)}`);
     md.appendMarkdown(rows.map((r) => `- ${r}`).join('\n') + '\n\n');
 
     const actions = task.isCompleted
-      ? [cmd('tasksmd.reopen', `$(debug-restart) ${vscode.l10n.t('Reopen')}`)]
-      : [cmd('tasksmd.markDone', `$(check) ${vscode.l10n.t('Done')}`), cmd('tasksmd.markCancelled', `$(circle-slash) ${vscode.l10n.t('Cancel')}`), cmd('tasksmd.setPriority', `$(arrow-up) ${vscode.l10n.t('Priority')}`), cmd('tasksmd.setDueDate', `📅 ${vscode.l10n.t('Due')}`), cmd('tasksmd.postpone', `$(watch) ${vscode.l10n.t('Postpone')}`)];
-    actions.push(cmd('tasksmd.createOrEdit', `$(edit) ${vscode.l10n.t('Edit')}`));
+      ? [cmd('tasksmd.reopen', `$(debug-restart) ${t('Reopen')}`)]
+      : [cmd('tasksmd.markDone', `$(check) ${t('Done')}`), cmd('tasksmd.markCancelled', `$(circle-slash) ${t('Cancel')}`), cmd('tasksmd.setPriority', `$(arrow-up) ${t('Priority')}`), cmd('tasksmd.setDueDate', `📅 ${t('Due')}`), cmd('tasksmd.postpone', `$(watch) ${t('Postpone')}`)];
+    actions.push(cmd('tasksmd.createOrEdit', `$(edit) ${t('Edit')}`));
     md.appendMarkdown(actions.join(' · '));
     return md;
   }

@@ -605,6 +605,21 @@
           "type": "string",
           "default": "",
           "description": "%tasksmd.config.updateCheckUrl%"
+        },
+        "tasksmd.language": {
+          "type": "string",
+          "enum": [
+            "auto",
+            "en",
+            "ko"
+          ],
+          "default": "auto",
+          "enumDescriptions": [
+            "%tasksmd.config.language.auto%",
+            "English",
+            "한국어"
+          ],
+          "description": "%tasksmd.config.language%"
         }
       }
     },

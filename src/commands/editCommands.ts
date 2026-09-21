@@ -6,6 +6,7 @@ import { pickDate, pickPostpone, pickPriority, pickRecurrence, pickStatus } from
 import { isValidRecurrenceText } from '../core/recurrence';
 import { generateTaskId } from '../core/task';
 import { type CommandDeps, resolveTargetTasks, runEdit } from './registerCommands';
+import { t } from '../l10n';
 
 const DATE_LABEL: Record<DateFieldName, string> = {
   due: 'Due date',
@@ -25,7 +26,7 @@ export function registerEditCommands(context: vscode.ExtensionContext, deps: Com
     runEdit(deps, async () => {
       const targets = resolveTargetTasks(arg, deps);
       if (!targets.length) {
-        void vscode.window.showInformationMessage(vscode.l10n.t('Place the cursor on a task line (e.g. "- [ ] …") first.'));
+        void vscode.window.showInformationMessage(t('Place the cursor on a task line (e.g. "- [ ] …") first.'));
         return;
       }
       await fn([...targets].sort((a, b) => b.location.line - a.location.line));
@@ -49,7 +50,7 @@ export function registerEditCommands(context: vscode.ExtensionContext, deps: Com
 
   const dateCommand = (field: DateFieldName) => (arg: unknown) =>
     forTargets(arg, async (tasks) => {
-      const value = await pickDate(vscode.l10n.t(DATE_LABEL[field]), tasks[0]![field], clock);
+      const value = await pickDate(t(DATE_LABEL[field]), tasks[0]![field], clock);
       if (value === undefined) return;
       for (const t of tasks) await deps.editService.update(t, { [field]: value });
     });

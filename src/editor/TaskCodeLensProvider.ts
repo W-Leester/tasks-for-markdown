@@ -3,6 +3,7 @@ import { describeRelative, systemClock, type Clock } from '../core/dates';
 import { PRIORITY_EMOJI, Priority, type StatusRegistry, type Task, isTaskLine, parseTaskLine } from '../core/task';
 import type { Settings } from '../settings/Settings';
 import { relativeText } from './relativeText';
+import { t } from '../l10n';
 
 export interface CodeLensDeps {
   settings: Settings;
@@ -81,22 +82,22 @@ export class TaskCodeLensProvider implements vscode.CodeLensProvider, vscode.Dis
     const out: vscode.CodeLens[] = [];
     out.push(
       task.isCompleted
-        ? lens(`$(debug-restart) ${vscode.l10n.t('Reopen')}`, 'tasksmd.reopen')
-        : lens(`$(check) ${vscode.l10n.t('Done')}`, 'tasksmd.markDone', vscode.l10n.t('Mark as done')),
+        ? lens(`$(debug-restart) ${t('Reopen')}`, 'tasksmd.reopen')
+        : lens(`$(check) ${t('Done')}`, 'tasksmd.markDone', t('Mark as done')),
     );
     if (!task.isCompleted) {
       const p = task.priority;
-      out.push(lens(`${PRIORITY_EMOJI[p] ? PRIORITY_EMOJI[p] + ' ' : ''}${vscode.l10n.t(PRIORITY_LABEL[p])} ▾`, 'tasksmd.setPriority'));
+      out.push(lens(`${PRIORITY_EMOJI[p] ? PRIORITY_EMOJI[p] + ' ' : ''}${t(PRIORITY_LABEL[p])} ▾`, 'tasksmd.setPriority'));
       const dueTitle = task.due?.date
         ? `📅 ${task.due.date.format('MMM D')} · ${relativeText(describeRelative(task.due.date, today))} ▾`
-        : `📅 ${vscode.l10n.t('Due')} ▾`;
+        : `📅 ${t('Due')} ▾`;
       out.push(lens(dueTitle, 'tasksmd.setDueDate'));
       if (task.scheduled?.date) out.push(lens(`⏳ ${task.scheduled.date.format('MMM D')} ▾`, 'tasksmd.setScheduledDate'));
       if (task.recurrenceText) out.push(lens(`🔁 ${task.recurrenceText} ▾`, 'tasksmd.setRecurrence'));
-      else if (task.due || task.scheduled || task.start) out.push(lens(`🔁 ${vscode.l10n.t('Repeat')} ▾`, 'tasksmd.setRecurrence'));
-      if (task.due || task.scheduled) out.push(lens(`$(watch) ${vscode.l10n.t('Postpone')}`, 'tasksmd.postpone'));
+      else if (task.due || task.scheduled || task.start) out.push(lens(`🔁 ${t('Repeat')} ▾`, 'tasksmd.setRecurrence'));
+      if (task.due || task.scheduled) out.push(lens(`$(watch) ${t('Postpone')}`, 'tasksmd.postpone'));
     }
-    out.push(lens(`$(edit) ${vscode.l10n.t('Edit')}`, 'tasksmd.createOrEdit'));
+    out.push(lens(`$(edit) ${t('Edit')}`, 'tasksmd.createOrEdit'));
     return out;
   }
 

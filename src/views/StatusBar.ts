@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import { dayjs } from '../core/dates/dayjs';
 import type { TaskIndex } from '../core/index';
 import { runSmartView } from '../core/views';
+import { t } from '../l10n';
 
 const UPDATE_DEBOUNCE_MS = 250;
 
@@ -34,7 +35,7 @@ export class StatusBar implements vscode.Disposable {
     const p = this.index.progress;
     if (p.state === 'scanning') {
       this.item.text = p.total ? `$(sync~spin) Tasks ${p.done}/${p.total}` : '$(sync~spin) Tasks';
-      this.item.tooltip = vscode.l10n.t('Indexing tasks…');
+      this.item.tooltip = t('Indexing tasks…');
       this.item.backgroundColor = undefined;
       return;
     }
@@ -45,20 +46,20 @@ export class StatusBar implements vscode.Disposable {
     const skipped = this.index.skippedFiles();
 
     const parts = [`$(checklist) ${open}`];
-    if (today) parts.push(vscode.l10n.t('today {0}', today));
-    if (overdue) parts.push(vscode.l10n.t('overdue {0}', overdue));
+    if (today) parts.push(t('today {0}', today));
+    if (overdue) parts.push(t('overdue {0}', overdue));
     if (skipped.length) parts.push('$(warning)');
     this.item.text = parts.join(' · ');
 
     const md = new vscode.MarkdownString();
-    md.appendMarkdown(vscode.l10n.t('**Tasks for Markdown** — {0} files, {1} tasks', this.index.fileCount(), this.index.taskCount()) + '\n\n');
-    md.appendMarkdown(`- ${vscode.l10n.t('Open')}: ${open}\n- ${vscode.l10n.t('Today')}: ${today}\n- ${vscode.l10n.t('Overdue')}: ${overdue}\n`);
+    md.appendMarkdown(t('**Tasks for Markdown** — {0} files, {1} tasks', this.index.fileCount(), this.index.taskCount()) + '\n\n');
+    md.appendMarkdown(`- ${t('Open')}: ${open}\n- ${t('Today')}: ${today}\n- ${t('Overdue')}: ${overdue}\n`);
     if (skipped.length) {
-      md.appendMarkdown('\n' + vscode.l10n.t('Skipped (larger than tasksmd.maxFileSizeKB):') + '\n');
+      md.appendMarkdown('\n' + t('Skipped (larger than tasksmd.maxFileSizeKB):') + '\n');
       for (const f of skipped.slice(0, 10)) md.appendMarkdown(`- ${f.path} (${f.sizeKB} KB)\n`);
       if (skipped.length > 10) md.appendMarkdown(`- … +${skipped.length - 10}\n`);
     }
-    md.appendMarkdown('\n' + vscode.l10n.t('Click to open the Tasks sidebar.'));
+    md.appendMarkdown('\n' + t('Click to open the Tasks sidebar.'));
     this.item.tooltip = md;
     this.item.backgroundColor = overdue ? new vscode.ThemeColor('statusBarItem.warningBackground') : undefined;
   }

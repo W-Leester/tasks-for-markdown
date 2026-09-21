@@ -1,6 +1,7 @@
 import * as fs from 'node:fs/promises';
 import * as vscode from 'vscode';
 import type { Settings } from '../settings/Settings';
+import { t } from '../l10n';
 
 const STATE_LAST_CHECK = 'update.lastCheck';
 const STATE_SKIPPED = 'update.skippedVersion';
@@ -43,7 +44,7 @@ export class UpdateCheckService {
   async check(interactive: boolean): Promise<void> {
     const url = this.settings.get('updateCheckUrl');
     if (!url) {
-      if (interactive) void vscode.window.showInformationMessage(vscode.l10n.t('Set tasksmd.updateCheckUrl to the location of latest.json first.'));
+      if (interactive) void vscode.window.showInformationMessage(t('Set tasksmd.updateCheckUrl to the location of latest.json first.'));
       return;
     }
     let latest: LatestJson;
@@ -51,19 +52,19 @@ export class UpdateCheckService {
       latest = await readLatest(url);
     } catch (err) {
       this.log(`update check failed: ${err instanceof Error ? err.message : String(err)}`);
-      if (interactive) void vscode.window.showWarningMessage(vscode.l10n.t('Could not read {0}.', url));
+      if (interactive) void vscode.window.showWarningMessage(t('Could not read {0}.', url));
       return;
     }
     const current = String(this.context.extension.packageJSON.version);
     if (compareVersions(latest.version, current) <= 0) {
-      if (interactive) void vscode.window.showInformationMessage(vscode.l10n.t('Tasks for Markdown {0} is up to date.', current));
+      if (interactive) void vscode.window.showInformationMessage(t('Tasks for Markdown {0} is up to date.', current));
       return;
     }
     if (!interactive && this.context.globalState.get<string>(STATE_SKIPPED) === latest.version) return;
-    const install = vscode.l10n.t('Open .vsix location');
-    const skip = vscode.l10n.t('Skip this version');
+    const install = t('Open .vsix location');
+    const skip = t('Skip this version');
     const choice = await vscode.window.showInformationMessage(
-      vscode.l10n.t('Tasks for Markdown {0} is available (you have {1}).', latest.version, current) + (latest.notes ? ` ${latest.notes}` : ''),
+      t('Tasks for Markdown {0} is available (you have {1}).', latest.version, current) + (latest.notes ? ` ${latest.notes}` : ''),
       ...(latest.vsix ? [install] : []),
       skip,
     );

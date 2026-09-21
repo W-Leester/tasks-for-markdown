@@ -6,6 +6,7 @@ import { isBlocked } from '../core/index';
 import type { Settings } from '../settings/Settings';
 import { fieldsStartOffset } from './lineFields';
 import { overdueText, relativeText } from './relativeText';
+import { t } from '../l10n';
 
 const DEBOUNCE_MS = 100;
 const RANGE_PADDING = 50;
@@ -139,10 +140,10 @@ export class TaskDecorations implements vscode.Disposable {
     }
     if (task.dependsOn.length && isBlocked(task, this.deps.index)) {
       const n = task.dependsOn.filter((id) => this.deps.index.byId(id).some((t) => !t.isCompleted)).length;
-      parts.push(`⛔ ${vscode.l10n.t('blocked ({0})', n)}`);
+      parts.push(`⛔ ${t('blocked ({0})', n)}`);
     }
     for (const f of [task.due, task.scheduled, task.start, task.created, task.done, task.cancelled]) {
-      if (f && !f.valid) { parts.push(`⚠ ${vscode.l10n.t('invalid date')}`); break; }
+      if (f && !f.valid) { parts.push(`⚠ ${t('invalid date')}`); break; }
     }
     return parts.length ? parts.join('  ') : null;
   }

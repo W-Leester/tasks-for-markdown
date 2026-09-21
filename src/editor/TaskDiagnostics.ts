@@ -4,6 +4,7 @@ import { type TaskIndex, findDependencyCycle } from '../core/index';
 import { isValidRecurrenceText } from '../core/recurrence';
 import { DateField, type DateFieldName, type StatusRegistry, type Task, isTaskLine, parseTaskLine, serializeTask } from '../core/task';
 import type { Settings } from '../settings/Settings';
+import { t } from '../l10n';
 
 const DEBOUNCE_MS = 300;
 export const DIAG_SOURCE = 'Tasks';
@@ -71,7 +72,7 @@ export class TaskDiagnostics implements vscode.CodeActionProvider, vscode.Dispos
       for (const name of DATE_FIELDS) {
         const f = task[name];
         if (f && !f.valid) {
-          const d = new vscode.Diagnostic(rangeOf(doc, line, f.raw), vscode.l10n.t('Invalid {0} date "{1}" — expected YYYY-MM-DD.', DATE_LABEL[name], f.raw), vscode.DiagnosticSeverity.Warning);
+          const d = new vscode.Diagnostic(rangeOf(doc, line, f.raw), t('Invalid {0} date "{1}" — expected YYYY-MM-DD.', DATE_LABEL[name], f.raw), vscode.DiagnosticSeverity.Warning);
           d.code = CODE_INVALID_DATE;
           d.source = DIAG_SOURCE;
           diags.push(d);
@@ -79,14 +80,14 @@ export class TaskDiagnostics implements vscode.CodeActionProvider, vscode.Dispos
       }
       for (const id of task.dependsOn) {
         if (this.deps.index.byId(id).length === 0) {
-          const d = new vscode.Diagnostic(rangeOf(doc, line, id), vscode.l10n.t('No task has the id "{0}".', id), vscode.DiagnosticSeverity.Warning);
+          const d = new vscode.Diagnostic(rangeOf(doc, line, id), t('No task has the id "{0}".', id), vscode.DiagnosticSeverity.Warning);
           d.code = CODE_UNKNOWN_DEPENDENCY;
           d.source = DIAG_SOURCE;
           diags.push(d);
         }
       }
       if (task.recurrenceText && !isValidRecurrenceText(task.recurrenceText)) {
-        const d = new vscode.Diagnostic(rangeOf(doc, line, task.recurrenceText), vscode.l10n.t('Unrecognised recurrence rule "{0}". Examples: every day, every week on Monday, every month on the last.', task.recurrenceText), vscode.DiagnosticSeverity.Warning);
+        const d = new vscode.Diagnostic(rangeOf(doc, line, task.recurrenceText), t('Unrecognised recurrence rule "{0}". Examples: every day, every week on Monday, every month on the last.', task.recurrenceText), vscode.DiagnosticSeverity.Warning);
         d.code = CODE_INVALID_RECURRENCE;
         d.source = DIAG_SOURCE;
         diags.push(d);
@@ -94,14 +95,14 @@ export class TaskDiagnostics implements vscode.CodeActionProvider, vscode.Dispos
       if (task.id && task.dependsOn.length) {
         const cycle = findDependencyCycle(task, this.deps.index);
         if (cycle) {
-          const d = new vscode.Diagnostic(rangeOf(doc, line, task.dependsOn.find((id) => cycle.includes(id)) ?? task.id), vscode.l10n.t('Circular dependency: {0}.', cycle.join(' → ')), vscode.DiagnosticSeverity.Error);
+          const d = new vscode.Diagnostic(rangeOf(doc, line, task.dependsOn.find((id) => cycle.includes(id)) ?? task.id), t('Circular dependency: {0}.', cycle.join(' → ')), vscode.DiagnosticSeverity.Error);
           d.code = CODE_DEPENDENCY_CYCLE;
           d.source = DIAG_SOURCE;
           diags.push(d);
         }
       }
       if (task.recurrenceText && !task.due && !task.scheduled && !task.start) {
-        const d = new vscode.Diagnostic(rangeOf(doc, line, task.recurrenceText), vscode.l10n.t('A recurring task needs a due, scheduled or start date to repeat from.'), vscode.DiagnosticSeverity.Warning);
+        const d = new vscode.Diagnostic(rangeOf(doc, line, task.recurrenceText), t('A recurring task needs a due, scheduled or start date to repeat from.'), vscode.DiagnosticSeverity.Warning);
         d.code = CODE_RECURRING_WITHOUT_DATE;
         d.source = DIAG_SOURCE;
         diags.push(d);
@@ -132,20 +133,20 @@ export class TaskDiagnostics implements vscode.CodeActionProvider, vscode.Dispos
         const field = DATE_FIELDS.find((n) => task[n] && !task[n]!.valid && text.includes(task[n]!.raw));
         if (!field) continue;
         const today = (this.deps.clock ?? systemClock).now();
-        replaceWith(vscode.l10n.t('Set {0} date to today ({1})', DATE_LABEL[field], today.format('YYYY-MM-DD')), task.with({ [field]: DateField.fromDate(today) }), true);
-        replaceWith(vscode.l10n.t('Remove invalid {0} date', DATE_LABEL[field]), task.with({ [field]: null }));
+        replaceWith(t('Set {0} date to today ({1})', DATE_LABEL[field], today.format('YYYY-MM-DD')), task.with({ [field]: DateField.fromDate(today) }), true);
+        replaceWith(t('Remove invalid {0} date', DATE_LABEL[field]), task.with({ [field]: null }));
       } else if (diag.code === CODE_UNKNOWN_DEPENDENCY) {
         const id = doc.getText(diag.range);
-        replaceWith(vscode.l10n.t('Remove dependency on "{0}"', id), task.with({ dependsOn: task.dependsOn.filter((d) => d !== id) }), true);
+        replaceWith(t('Remove dependency on "{0}"', id), task.with({ dependsOn: task.dependsOn.filter((d) => d !== id) }), true);
       } else if (diag.code === CODE_DEPENDENCY_CYCLE) {
         const id = doc.getText(diag.range);
-        if (task.dependsOn.includes(id)) replaceWith(vscode.l10n.t('Remove dependency on "{0}"', id), task.with({ dependsOn: task.dependsOn.filter((d) => d !== id) }), true);
+        if (task.dependsOn.includes(id)) replaceWith(t('Remove dependency on "{0}"', id), task.with({ dependsOn: task.dependsOn.filter((d) => d !== id) }), true);
       } else if (diag.code === CODE_INVALID_RECURRENCE) {
-        replaceWith(vscode.l10n.t('Remove recurrence'), task.with({ recurrenceText: null }));
+        replaceWith(t('Remove recurrence'), task.with({ recurrenceText: null }));
       } else if (diag.code === CODE_RECURRING_WITHOUT_DATE) {
         const today = (this.deps.clock ?? systemClock).now();
-        replaceWith(vscode.l10n.t('Add due date today ({0})', today.format('YYYY-MM-DD')), task.with({ due: DateField.fromDate(today) }), true);
-        replaceWith(vscode.l10n.t('Remove recurrence'), task.with({ recurrenceText: null }));
+        replaceWith(t('Add due date today ({0})', today.format('YYYY-MM-DD')), task.with({ due: DateField.fromDate(today) }), true);
+        replaceWith(t('Remove recurrence'), task.with({ recurrenceText: null }));
       }
     }
     return actions;

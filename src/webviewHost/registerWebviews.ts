@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { WebviewHost, type WebviewHostDeps } from './WebviewHost';
+import { t } from '../l10n';
 
 /** Opens (or reveals) a singleton editor-area panel for the given app. */
 export function createPanelOpener(deps: WebviewHostDeps, app: string, title: string, icon: string): () => WebviewHost {
@@ -43,7 +44,7 @@ export function registerWebviewView(context: vscode.ExtensionContext, deps: Webv
 }
 
 export function registerWebviews(context: vscode.ExtensionContext, deps: WebviewHostDeps): { openEdit: (target: EditTarget) => WebviewHost; openKanban: () => WebviewHost; openQueryBuilder: (id: string | null) => WebviewHost; openStats: () => WebviewHost; openCalendar: () => WebviewHost } {
-  const openEditPanel = createPanelOpener(deps, 'edit', vscode.l10n.t('Tasks: Create or edit'), 'edit');
+  const openEditPanel = createPanelOpener(deps, 'edit', t('Tasks: Create or edit'), 'edit');
   const openEdit = (target: EditTarget) => {
     const host = openEditPanel();
     host.extras = { editTarget: target };
@@ -51,10 +52,10 @@ export function registerWebviews(context: vscode.ExtensionContext, deps: Webview
     host.send({ type: 'edit/target', key: target.key, line: target.line });
     return host;
   };
-  const openKanban = createPanelOpener(deps, 'kanban', vscode.l10n.t('Tasks: Kanban'), 'project');
+  const openKanban = createPanelOpener(deps, 'kanban', t('Tasks: Kanban'), 'project');
   registerWebviewView(context, deps, 'tasksmd.kanban', 'kanban', 'Kanban');
   context.subscriptions.push(vscode.commands.registerCommand('tasksmd.openKanban', () => openKanban()));
-  const openBuilderPanel = createPanelOpener(deps, 'query-builder', vscode.l10n.t('Tasks: Query builder'), 'search');
+  const openBuilderPanel = createPanelOpener(deps, 'query-builder', t('Tasks: Query builder'), 'search');
   const openQueryBuilder = (id: string | null) => {
     const host = openBuilderPanel();
     host.extras = { queryTarget: id };
@@ -68,9 +69,9 @@ export function registerWebviews(context: vscode.ExtensionContext, deps: Webview
       return openQueryBuilder(q?.id ?? null);
     }),
   );
-  const openStats = createPanelOpener(deps, 'stats', vscode.l10n.t('Tasks: Statistics'), 'graph');
+  const openStats = createPanelOpener(deps, 'stats', t('Tasks: Statistics'), 'graph');
   context.subscriptions.push(vscode.commands.registerCommand('tasksmd.openStats', () => openStats()));
-  const openCalendar = createPanelOpener(deps, 'calendar', vscode.l10n.t('Tasks: Calendar'), 'calendar');
+  const openCalendar = createPanelOpener(deps, 'calendar', t('Tasks: Calendar'), 'calendar');
   context.subscriptions.push(vscode.commands.registerCommand('tasksmd.openCalendar', () => openCalendar()));
   return { openEdit, openKanban, openQueryBuilder, openStats, openCalendar };
 }

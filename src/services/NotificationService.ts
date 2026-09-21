@@ -5,6 +5,7 @@ import type { TaskIndex } from '../core/index';
 import type { Task } from '../core/task';
 import { runSmartView } from '../core/views';
 import type { Settings } from '../settings/Settings';
+import { t } from '../l10n';
 
 const MINUTE = 60_000;
 const STATE_LAST_DAILY = 'notifications.lastDaily';
@@ -75,10 +76,10 @@ export class NotificationService implements vscode.Disposable {
     const todayCount = runSmartView('today', this.ctx()).length;
     const overdue = runSmartView('overdue', this.ctx()).length;
     if (todayCount === 0 && overdue === 0) return;
-    const title = vscode.l10n.t('Tasks for today');
+    const title = t('Tasks for today');
     const body = overdue
-      ? vscode.l10n.t('{0} due today or earlier, {1} overdue', todayCount, overdue)
-      : vscode.l10n.t('{0} due today or earlier', todayCount);
+      ? t('{0} due today or earlier, {1} overdue', todayCount, overdue)
+      : t('{0} due today or earlier', todayCount);
     await this.notify(title, body);
   }
 
@@ -96,10 +97,10 @@ export class NotificationService implements vscode.Disposable {
     if (!soon.length) return;
     const list = soon.slice(0, 5).map((t) => `• ${t.description.slice(0, 60)} (${t.due!.format()})`).join('\n');
     const more = soon.length > 5 ? `\n… +${soon.length - 5}` : '';
-    const body = vscode.l10n.t('{0} tasks due within {1} days', soon.length, within);
-    const choice = await this.notify(vscode.l10n.t('Upcoming tasks'), body, `${list}${more}`, [vscode.l10n.t('Snooze until tomorrow'), vscode.l10n.t('Snooze a week')]);
+    const body = t('{0} tasks due within {1} days', soon.length, within);
+    const choice = await this.notify(t('Upcoming tasks'), body, `${list}${more}`, [t('Snooze until tomorrow'), t('Snooze a week')]);
     if (choice) {
-      const days = choice === vscode.l10n.t('Snooze a week') ? 7 : 1;
+      const days = choice === t('Snooze a week') ? 7 : 1;
       const until = today.add(days, 'day').format('YYYY-MM-DD');
       for (const t of soon) snoozed[snoozeKey(t)] = until;
       await this.deps.state.update(STATE_SNOOZE, snoozed);
@@ -115,7 +116,7 @@ export class NotificationService implements vscode.Disposable {
         this.deps.log(`OS notification failed: ${err instanceof Error ? err.message : String(err)}`);
       }
     }
-    const show = vscode.l10n.t('Show today');
+    const show = t('Show today');
     const choice = await vscode.window.showInformationMessage(`${title}: ${body}${detail ? `\n${detail}` : ''}`, show, ...actions);
     if (choice === show) void vscode.commands.executeCommand('tasksmd.openSidebar');
     return choice && choice !== show ? choice : undefined;

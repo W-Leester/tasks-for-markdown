@@ -11,6 +11,7 @@ import { StaleLineError, type TaskEditService } from '../services/TaskEditServic
 import { toGroupDto, toTaskDto } from '../services/dto';
 import type { Settings } from '../settings/Settings';
 import type { FromWebview, InitState, TaskFieldName, ToWebview } from '../webviews/shared/protocol';
+import { currentBundle, currentLanguage, t } from '../l10n';
 
 export interface WebviewHostDeps {
   context: vscode.ExtensionContext;
@@ -70,8 +71,8 @@ export class WebviewHost implements vscode.Disposable {
 
   private state(): InitState {
     return {
-      locale: vscode.env.language,
-      l10n: (vscode.l10n.bundle as Record<string, string> | undefined) ?? {},
+      locale: currentLanguage(),
+      l10n: currentBundle(),
       today: this.today().format('YYYY-MM-DD'),
       statuses: this.deps.getStatusRegistry().all().map((s) => ({ symbol: s.symbol, name: s.name, type: s.type, nextSymbol: s.nextSymbol })),
       taskFormat: this.deps.settings.get('taskFormat'),
@@ -138,7 +139,7 @@ export class WebviewHost implements vscode.Disposable {
               try { await vscode.workspace.fs.stat(target); } catch { await vscode.workspace.fs.writeFile(target, Buffer.from(`# ${inbox.split('/').pop()!.replace(/\.md$/, '')}\n\n`, 'utf8')); }
             } else {
               const editor = vscode.window.activeTextEditor ?? vscode.window.visibleTextEditors.find((e) => e.document.languageId === 'markdown');
-              if (!editor || editor.document.languageId !== 'markdown') throw new Error(vscode.l10n.t('Open a Markdown file to create a task, or set tasksmd.calendar.newTaskFile.'));
+              if (!editor || editor.document.languageId !== 'markdown') throw new Error(t('Open a Markdown file to create a task, or set tasksmd.calendar.newTaskFile.'));
               target = editor.document.uri;
               line = msg.line ?? editor.selection.active.line;
             }
@@ -188,12 +189,12 @@ export class WebviewHost implements vscode.Disposable {
           } else {
             await this.deps.savedQueries.saveToSettings(msg.name, msg.query.trim());
           }
-          void vscode.window.showInformationMessage(vscode.l10n.t('Saved query "{0}".', msg.name));
+          void vscode.window.showInformationMessage(t('Saved query "{0}".', msg.name));
           break;
         }
         case 'query/insert': {
           const editor = vscode.window.activeTextEditor ?? vscode.window.visibleTextEditors.find((e) => e.document.languageId === 'markdown');
-          if (!editor || editor.document.languageId !== 'markdown') throw new Error(vscode.l10n.t('Open a Markdown file to insert a query block.'));
+          if (!editor || editor.document.languageId !== 'markdown') throw new Error(t('Open a Markdown file to insert a query block.'));
           await editor.insertSnippet(new vscode.SnippetString('```tasks\n' + msg.query.trim().replace(/\$/g, '\\$') + '\n```\n$0'));
           await vscode.window.showTextDocument(editor.document, editor.viewColumn);
           break;
@@ -218,10 +219,10 @@ export class WebviewHost implements vscode.Disposable {
           break;
       }
     } catch (err) {
-      const message = err instanceof StaleLineError ? vscode.l10n.t('The file changed since it was indexed; it has been re-read. Please try again.') : err instanceof Error ? err.message : String(err);
+      const message = err instanceof StaleLineError ? t('The file changed since it was indexed; it has been re-read. Please try again.') : err instanceof Error ? err.message : String(err);
       this.deps.log(`webview ${this.options.app}: ${message}`);
       this.send({ type: 'error', message });
-      void vscode.window.showErrorMessage(vscode.l10n.t('Tasks: {0}', message));
+      void vscode.window.showErrorMessage(t('Tasks: {0}', message));
     }
   }
 

@@ -5,6 +5,7 @@ import type { TaskEditService } from '../services/TaskEditService';
 import type { Settings } from '../settings/Settings';
 import { SAVED_QUERY_VIEW_ID, SavedQueryTreeProvider } from './SavedQueryTreeProvider';
 import { isTaskNode } from './taskItem';
+import { t } from '../l10n';
 
 export function registerSavedQueryView(
   context: vscode.ExtensionContext,
@@ -35,7 +36,7 @@ export function registerSavedQueryView(
       }
     }),
     vscode.commands.registerCommand('tasksmd.savedQuery.new', async () => {
-      const name = await vscode.window.showInputBox({ prompt: vscode.l10n.t('Name of the new query'), placeHolder: vscode.l10n.t('e.g. This week') });
+      const name = await vscode.window.showInputBox({ prompt: t('Name of the new query'), placeHolder: t('e.g. This week') });
       if (!name) return;
       const uri = await deps.store.createFile(name);
       await vscode.window.showTextDocument(uri);
@@ -45,14 +46,14 @@ export function registerSavedQueryView(
       if (!q) return;
       if (q.uri) await vscode.window.showTextDocument(q.uri);
       else {
-        void vscode.window.showInformationMessage(vscode.l10n.t('Settings-based queries are edited in settings.json.'));
+        void vscode.window.showInformationMessage(t('Settings-based queries are edited in settings.json.'));
         await vscode.commands.executeCommand('workbench.action.openWorkspaceSettingsFile');
       }
     }),
     vscode.commands.registerCommand('tasksmd.savedQuery.delete', async (arg) => {
       const q = queryArg(arg);
       if (!q) return;
-      const ok = await vscode.window.showWarningMessage(vscode.l10n.t('Delete saved query "{0}"?', q.name), { modal: true }, vscode.l10n.t('Delete'));
+      const ok = await vscode.window.showWarningMessage(t('Delete saved query "{0}"?', q.name), { modal: true }, t('Delete'));
       if (ok) await deps.store.remove(q);
     }),
     vscode.commands.registerCommand('tasksmd.savedQuery.explain', (arg) => {

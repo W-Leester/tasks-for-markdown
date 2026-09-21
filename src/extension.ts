@@ -26,6 +26,7 @@ import { registerTreeView } from './views/registerTreeView';
 import { registerWebviews } from './webviewHost/registerWebviews';
 import type { WebviewHost } from './webviewHost/WebviewHost';
 import { StatusBar } from './views/StatusBar';
+import { configureLanguage, t } from './l10n';
 
 const output = vscode.window.createOutputChannel('Tasks for Markdown');
 const log = (msg: string) => output.appendLine(`[${new Date().toISOString()}] ${msg}`);
@@ -48,6 +49,13 @@ export async function activate(context: vscode.ExtensionContext): Promise<Extens
   log(`activate ${context.extension.packageJSON.version} (${vscode.env.appName} ${vscode.version}, ${vscode.env.language}, trusted=${vscode.workspace.isTrusted})`);
 
   const settings = new Settings();
+  configureLanguage(context.extensionPath, settings.get('language'));
+  context.subscriptions.push(
+    settings.onDidChange(async () => {
+      const reload = t('Reload window');
+      if ((await vscode.window.showInformationMessage(t('Tasks: reload the window to apply the language change.'), reload)) === reload) void vscode.commands.executeCommand('workbench.action.reloadWindow');
+    }, ['language']),
+  );
   const index = new TaskIndex();
   let statusRegistry = statusRegistryFromSettings(settings, log);
   const getStatusRegistry = () => statusRegistry;
@@ -94,7 +102,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<Extens
   context.subscriptions.push(preview);
 
   const archive = new ArchiveService({ index, indexService, settings, log });
-  context.subscriptions.push(vscode.commands.registerCommand('tasksmd.archiveCompleted', () => archive.run().catch((err) => { log(String(err)); void vscode.window.showErrorMessage(vscode.l10n.t('Tasks: {0}', err instanceof Error ? err.message : String(err))); })));
+  context.subscriptions.push(vscode.commands.registerCommand('tasksmd.archiveCompleted', () => archive.run().catch((err) => { log(String(err)); void vscode.window.showErrorMessage(t('Tasks: {0}', err instanceof Error ? err.message : String(err))); })));
   const notifications = new NotificationService({ index, settings, state: context.globalState, log });
   context.subscriptions.push(notifications);
   // Not during tests: toasts would block the runner.

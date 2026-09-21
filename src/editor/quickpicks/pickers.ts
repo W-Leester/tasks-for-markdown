@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import { type Clock, type Dayjs, describeRelative, parseNaturalDate, systemClock } from '../../core/dates';
 import { DateField, PRIORITY_EMOJI, PRIORITY_NAME, Priority, type Status, type StatusRegistry, StatusType } from '../../core/task';
 import { relativeText } from '../relativeText';
+import { t } from '../../l10n';
 
 const TYPE_ICON: Record<StatusType, string> = {
   [StatusType.TODO]: 'circle-large-outline',
@@ -16,10 +17,10 @@ export async function pickStatus(registry: StatusRegistry, current?: Status): Pr
   const items = registry.all().map((s) => ({
     label: `$(${TYPE_ICON[s.type]}) [${s.symbol}] ${s.name}`,
     description: s.type + (s === current || s.symbol === current?.symbol ? `  $(check)` : ''),
-    detail: vscode.l10n.t('Next: [{0}]', s.nextSymbol),
+    detail: t('Next: [{0}]', s.nextSymbol),
     status: s,
   }));
-  const picked = await vscode.window.showQuickPick(items, { placeHolder: vscode.l10n.t('Set status'), matchOnDescription: true });
+  const picked = await vscode.window.showQuickPick(items, { placeHolder: t('Set status'), matchOnDescription: true });
   return picked?.status;
 }
 
@@ -35,11 +36,11 @@ const PRIORITY_LABEL: Record<Priority, string> = {
 
 export async function pickPriority(current?: Priority): Promise<Priority | undefined> {
   const items = PRIORITIES.map((p) => ({
-    label: `${PRIORITY_EMOJI[p] || '　'} ${vscode.l10n.t(PRIORITY_LABEL[p])}`,
+    label: `${PRIORITY_EMOJI[p] || '　'} ${t(PRIORITY_LABEL[p])}`,
     description: (p === current ? '$(check) ' : '') + PRIORITY_NAME[p],
     priority: p,
   }));
-  const picked = await vscode.window.showQuickPick(items, { placeHolder: vscode.l10n.t('Set priority') });
+  const picked = await vscode.window.showQuickPick(items, { placeHolder: t('Set priority') });
   return picked?.priority;
 }
 
@@ -59,22 +60,22 @@ export function pickDate(fieldLabel: string, current: DateField | null, clock: C
     const monday = today.add((8 - today.day()) % 7 || 7, 'day');
     const friday = today.add((5 - today.day() + 7) % 7 || 7, 'day');
     const list: DateItem[] = [
-      { label: `$(calendar) ${vscode.l10n.t('Today')}`, description: fmt(today), value: today },
-      { label: `$(calendar) ${vscode.l10n.t('Tomorrow')}`, description: fmt(today.add(1, 'day')), value: today.add(1, 'day') },
-      { label: `$(calendar) ${vscode.l10n.t('Friday')}`, description: fmt(friday), value: friday },
-      { label: `$(calendar) ${vscode.l10n.t('Next Monday')}`, description: fmt(monday), value: monday },
-      { label: `$(calendar) ${vscode.l10n.t('In 1 week')}`, description: fmt(today.add(7, 'day')), value: today.add(7, 'day') },
-      { label: `$(calendar) ${vscode.l10n.t('In 2 weeks')}`, description: fmt(today.add(14, 'day')), value: today.add(14, 'day') },
-      { label: `$(calendar) ${vscode.l10n.t('Next month')}`, description: fmt(today.add(1, 'month')), value: today.add(1, 'month') },
+      { label: `$(calendar) ${t('Today')}`, description: fmt(today), value: today },
+      { label: `$(calendar) ${t('Tomorrow')}`, description: fmt(today.add(1, 'day')), value: today.add(1, 'day') },
+      { label: `$(calendar) ${t('Friday')}`, description: fmt(friday), value: friday },
+      { label: `$(calendar) ${t('Next Monday')}`, description: fmt(monday), value: monday },
+      { label: `$(calendar) ${t('In 1 week')}`, description: fmt(today.add(7, 'day')), value: today.add(7, 'day') },
+      { label: `$(calendar) ${t('In 2 weeks')}`, description: fmt(today.add(14, 'day')), value: today.add(14, 'day') },
+      { label: `$(calendar) ${t('Next month')}`, description: fmt(today.add(1, 'month')), value: today.add(1, 'month') },
     ];
-    if (current) list.push({ label: `$(trash) ${vscode.l10n.t('Remove {0}', fieldLabel)}`, description: current.format(), value: null });
+    if (current) list.push({ label: `$(trash) ${t('Remove {0}', fieldLabel)}`, description: current.format(), value: null });
     return list;
   };
 
   return new Promise((resolve) => {
     const qp = vscode.window.createQuickPick<DateItem>();
-    qp.title = current ? vscode.l10n.t('{0}: {1}', fieldLabel, current.format()) : fieldLabel;
-    qp.placeholder = vscode.l10n.t('Type a date: 2026-09-25, tomorrow, next fri, in 3 days, 6 oct…');
+    qp.title = current ? t('{0}: {1}', fieldLabel, current.format()) : fieldLabel;
+    qp.placeholder = t('Type a date: 2026-09-25, tomorrow, next fri, in 3 days, 6 oct…');
     qp.matchOnDescription = true;
     qp.items = presets();
     qp.onDidChangeValue((text) => {
@@ -82,7 +83,7 @@ export function pickDate(fieldLabel: string, current: DateField | null, clock: C
       const typed: DateItem[] = parsed
         ? [{ label: `$(arrow-right) ${text.trim()}`, description: fmt(parsed), value: parsed, alwaysShow: true }]
         : text.trim()
-          ? [{ label: `$(warning) ${text.trim()}`, description: vscode.l10n.t('not a recognised date'), value: undefined, alwaysShow: true }]
+          ? [{ label: `$(warning) ${text.trim()}`, description: t('not a recognised date'), value: undefined, alwaysShow: true }]
           : [];
       qp.items = [...typed, ...presets()];
     });
@@ -112,16 +113,16 @@ export async function pickPostpone(from: Dayjs, clock: Clock = systemClock): Pro
   const base = from.isBefore(today) ? today : from; // never postpone into the past
   const monday = base.add((8 - base.day()) % 7 || 7, 'day');
   const choices: PostponeChoice[] = [
-    { label: vscode.l10n.t('Tomorrow'), date: today.add(1, 'day') },
-    { label: vscode.l10n.t('+2 days'), date: base.add(2, 'day') },
-    { label: vscode.l10n.t('Next Monday'), date: monday },
-    { label: vscode.l10n.t('+1 week'), date: base.add(1, 'week') },
-    { label: vscode.l10n.t('+2 weeks'), date: base.add(2, 'week') },
-    { label: vscode.l10n.t('+1 month'), date: base.add(1, 'month') },
+    { label: t('Tomorrow'), date: today.add(1, 'day') },
+    { label: t('+2 days'), date: base.add(2, 'day') },
+    { label: t('Next Monday'), date: monday },
+    { label: t('+1 week'), date: base.add(1, 'week') },
+    { label: t('+2 weeks'), date: base.add(2, 'week') },
+    { label: t('+1 month'), date: base.add(1, 'month') },
   ];
   const picked = await vscode.window.showQuickPick(
     choices.map((c) => ({ label: `$(calendar) ${c.label}`, description: `${c.date.format('YYYY-MM-DD')} (${c.date.format('ddd')})`, date: c.date })),
-    { placeHolder: vscode.l10n.t('Postpone to…') },
+    { placeHolder: t('Postpone to…') },
   );
   return picked?.date;
 }
@@ -139,20 +140,20 @@ export function pickRecurrence(current: string | null, isValid: (text: string) =
     const list: RecurrenceItem[] = [
       'every day', 'every weekday', 'every week', 'every 2 weeks', 'every month', 'every month on the last', 'every year', 'every week when done', 'every day when done',
     ].map((r) => ({ label: `$(sync) ${r}`, value: r, description: r === current ? '$(check)' : undefined }));
-    if (current) list.push({ label: `$(trash) ${vscode.l10n.t('Remove recurrence')}`, value: null });
+    if (current) list.push({ label: `$(trash) ${t('Remove recurrence')}`, value: null });
     return list;
   };
   return new Promise((resolve) => {
     const qp = vscode.window.createQuickPick<RecurrenceItem>();
-    qp.title = current ? `🔁 ${current}` : vscode.l10n.t('Repeat');
-    qp.placeholder = vscode.l10n.t('every day · every week on monday, friday · every month on the 15th · … when done');
+    qp.title = current ? `🔁 ${current}` : t('Repeat');
+    qp.placeholder = t('every day · every week on monday, friday · every month on the 15th · … when done');
     qp.items = presets();
     qp.onDidChangeValue((text) => {
-      const t = text.trim();
-      const typed: RecurrenceItem[] = t
-        ? isValid(t)
-          ? [{ label: `$(arrow-right) ${t}`, description: vscode.l10n.t('valid rule'), value: t, alwaysShow: true }]
-          : [{ label: `$(warning) ${t}`, description: vscode.l10n.t('not a recognised rule'), value: undefined, alwaysShow: true }]
+      const rule = text.trim();
+      const typed: RecurrenceItem[] = rule
+        ? isValid(rule)
+          ? [{ label: `$(arrow-right) ${rule}`, description: t('valid rule'), value: rule, alwaysShow: true }]
+          : [{ label: `$(warning) ${rule}`, description: t('not a recognised rule'), value: undefined, alwaysShow: true }]
         : [];
       qp.items = [...typed, ...presets()];
     });

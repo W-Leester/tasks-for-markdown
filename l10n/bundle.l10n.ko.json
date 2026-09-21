@@ -276,5 +276,7 @@
   "Emoji format": "이모지 포맷",
   "Dataview format": "Dataview 포맷",
   "Convert all task lines in this file to…": "이 파일의 모든 태스크 줄을 다음 포맷으로 변환…",
-  "Converted {0} task lines.": "태스크 줄 {0}개를 변환했습니다."
+  "Converted {0} task lines.": "태스크 줄 {0}개를 변환했습니다.",
+  "Reload window": "창 리로드",
+  "Tasks: reload the window to apply the language change.": "Tasks: 언어 변경을 적용하려면 창을 리로드하세요."
 }

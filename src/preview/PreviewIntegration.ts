@@ -10,6 +10,7 @@ import { overdueText, relativeText } from '../editor/relativeText';
 import type { QueryService } from '../services/QueryService';
 import type { Settings } from '../settings/Settings';
 import { tasksMarkdownItPlugin } from './markdownItPlugin';
+import { t } from '../l10n';
 
 const REFRESH_DEBOUNCE_MS = 500;
 
@@ -72,7 +73,7 @@ export class PreviewIntegration implements vscode.Disposable {
         return `${rel}#L${task.location.line + 1}`;
       },
       globalFilter: gf && this.deps.settings.get('removeGlobalFilterFromDescription') ? gf : undefined,
-      t: (s, ...args) => vscode.l10n.t(s, ...args),
+      t: (s, ...args) => t(s, ...args),
       ...(renderBadges ? {} : { hideBadges: true }),
     };
   }

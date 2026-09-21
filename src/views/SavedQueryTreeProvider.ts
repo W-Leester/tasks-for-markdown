@@ -5,6 +5,7 @@ import type { QueryService } from '../services/QueryService';
 import type { SavedQuery, SavedQueryStore } from '../services/SavedQueryStore';
 import type { Settings } from '../settings/Settings';
 import { taskTreeItem } from './taskItem';
+import { t } from '../l10n';
 
 export const SAVED_QUERY_VIEW_ID = 'tasksmd.savedQueries';
 const MAX_VISIBLE = 1000;
@@ -40,7 +41,7 @@ export class SavedQueryTreeProvider implements vscode.TreeDataProvider<Node>, vs
     if (!element) return this.deps.store.all().map((query) => ({ kind: 'query', query }));
     if (element.kind === 'query') {
       const result = this.deps.queries.run(element.query.query, element.query.uri ? { path: vscode.workspace.asRelativePath(element.query.uri) } : undefined);
-      if (result.errors.length) return result.errors.map((e) => ({ kind: 'error' as const, message: vscode.l10n.t('Line {0}: {1} — {2}', e.line, e.text, e.message) }));
+      if (result.errors.length) return result.errors.map((e) => ({ kind: 'error' as const, message: t('Line {0}: {1} — {2}', e.line, e.text, e.message) }));
       const nodes = this.groupChildren(element.query.id, '', result.root);
       if (result.runtimeErrors.length) nodes.unshift({ kind: 'error', message: result.runtimeErrors[0]! });
       return nodes;
@@ -90,7 +91,7 @@ export class SavedQueryTreeProvider implements vscode.TreeDataProvider<Node>, vs
         return item;
       }
       case 'more': {
-        const item = new vscode.TreeItem(vscode.l10n.t('… {0} more', node.count));
+        const item = new vscode.TreeItem(t('… {0} more', node.count));
         item.iconPath = new vscode.ThemeIcon('ellipsis');
         return item;
       }

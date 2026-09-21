@@ -6,6 +6,7 @@ import { DATAVIEW_DATE_KEY } from '../core/task/formats/dataview';
 import { WRITE_EMOJI } from '../core/task/formats/emoji';
 import type { Settings } from '../settings/Settings';
 import { relativeText } from './relativeText';
+import { t } from '../l10n';
 
 export interface CompletionDeps {
   index: TaskIndex;
@@ -70,29 +71,29 @@ export class TaskCompletionProvider implements vscode.CompletionItemProvider {
   private keywords(today: Dayjs): Keyword[] {
     const iso = today.format('YYYY-MM-DD');
     const date = (field: DateFieldName, match: string, label: string, sort: string): Keyword => ({
-      match, label, detail: vscode.l10n.t('{0} — then pick a date', label), emoji: `${WRITE_EMOJI[field]} `, dataview: `[${DATAVIEW_DATE_KEY[field]}:: `, chain: true, sort,
+      match, label, detail: t('{0} — then pick a date', label), emoji: `${WRITE_EMOJI[field]} `, dataview: `[${DATAVIEW_DATE_KEY[field]}:: `, chain: true, sort,
     });
     const list: Keyword[] = [
-      date('due', 'due', '📅 ' + vscode.l10n.t('due date'), '10'),
-      date('scheduled', 'scheduled', '⏳ ' + vscode.l10n.t('scheduled date'), '11'),
-      date('start', 'start', '🛫 ' + vscode.l10n.t('start date'), '12'),
-      { match: 'created today', label: '➕ ' + vscode.l10n.t('created today'), detail: iso, emoji: `➕ ${iso}`, dataview: `[created:: ${iso}]`, sort: '13' },
-      { match: 'priority highest', label: '🔺 ' + vscode.l10n.t('priority: highest'), detail: 'highest', emoji: '🔺', dataview: '[priority:: highest]', sort: '20' },
-      { match: 'priority high', label: '⏫ ' + vscode.l10n.t('priority: high'), detail: 'high', emoji: '⏫', dataview: '[priority:: high]', sort: '21' },
-      { match: 'priority medium', label: '🔼 ' + vscode.l10n.t('priority: medium'), detail: 'medium', emoji: '🔼', dataview: '[priority:: medium]', sort: '22' },
-      { match: 'priority low', label: '🔽 ' + vscode.l10n.t('priority: low'), detail: 'low', emoji: '🔽', dataview: '[priority:: low]', sort: '23' },
-      { match: 'priority lowest', label: '⏬ ' + vscode.l10n.t('priority: lowest'), detail: 'lowest', emoji: '⏬', dataview: '[priority:: lowest]', sort: '24' },
-      { match: 'every day', label: '🔁 every day', detail: vscode.l10n.t('repeat daily'), emoji: '🔁 every day', dataview: '[repeat:: every day]', sort: '30' },
-      { match: 'every weekday', label: '🔁 every weekday', detail: vscode.l10n.t('repeat Mon–Fri'), emoji: '🔁 every weekday', dataview: '[repeat:: every weekday]', sort: '31' },
-      { match: 'every week', label: '🔁 every week', detail: vscode.l10n.t('repeat weekly'), emoji: '🔁 every week', dataview: '[repeat:: every week]', sort: '32' },
-      { match: 'every 2 weeks', label: '🔁 every 2 weeks', detail: vscode.l10n.t('repeat every two weeks'), emoji: '🔁 every 2 weeks', dataview: '[repeat:: every 2 weeks]', sort: '33' },
-      { match: 'every month', label: '🔁 every month', detail: vscode.l10n.t('repeat monthly'), emoji: '🔁 every month', dataview: '[repeat:: every month]', sort: '34' },
-      { match: 'every year', label: '🔁 every year', detail: vscode.l10n.t('repeat yearly'), emoji: '🔁 every year', dataview: '[repeat:: every year]', sort: '35' },
-      { match: 'every week when done', label: '🔁 every week when done', detail: vscode.l10n.t('repeat from the completion date'), emoji: '🔁 every week when done', dataview: '[repeat:: every week when done]', sort: '36' },
-      { match: 'id', label: '🆔 ' + vscode.l10n.t('id (generated)'), detail: vscode.l10n.t('lets other tasks depend on this one'), emoji: '🆔 ${id}', dataview: '[id:: ${id}]', sort: '40' },
-      { match: 'depends on', label: '⛔ ' + vscode.l10n.t('depends on'), detail: vscode.l10n.t('ids of tasks that must finish first'), emoji: '⛔ ', dataview: '[dependsOn:: ', sort: '41' },
-      { match: 'on completion delete', label: '🏁 delete', detail: vscode.l10n.t('remove the task when done'), emoji: '🏁 delete', dataview: '[onCompletion:: delete]', sort: '50' },
-      { match: 'on completion keep', label: '🏁 keep', detail: vscode.l10n.t('keep the task when done (default)'), emoji: '🏁 keep', dataview: '[onCompletion:: keep]', sort: '51' },
+      date('due', 'due', '📅 ' + t('due date'), '10'),
+      date('scheduled', 'scheduled', '⏳ ' + t('scheduled date'), '11'),
+      date('start', 'start', '🛫 ' + t('start date'), '12'),
+      { match: 'created today', label: '➕ ' + t('created today'), detail: iso, emoji: `➕ ${iso}`, dataview: `[created:: ${iso}]`, sort: '13' },
+      { match: 'priority highest', label: '🔺 ' + t('priority: highest'), detail: 'highest', emoji: '🔺', dataview: '[priority:: highest]', sort: '20' },
+      { match: 'priority high', label: '⏫ ' + t('priority: high'), detail: 'high', emoji: '⏫', dataview: '[priority:: high]', sort: '21' },
+      { match: 'priority medium', label: '🔼 ' + t('priority: medium'), detail: 'medium', emoji: '🔼', dataview: '[priority:: medium]', sort: '22' },
+      { match: 'priority low', label: '🔽 ' + t('priority: low'), detail: 'low', emoji: '🔽', dataview: '[priority:: low]', sort: '23' },
+      { match: 'priority lowest', label: '⏬ ' + t('priority: lowest'), detail: 'lowest', emoji: '⏬', dataview: '[priority:: lowest]', sort: '24' },
+      { match: 'every day', label: '🔁 every day', detail: t('repeat daily'), emoji: '🔁 every day', dataview: '[repeat:: every day]', sort: '30' },
+      { match: 'every weekday', label: '🔁 every weekday', detail: t('repeat Mon–Fri'), emoji: '🔁 every weekday', dataview: '[repeat:: every weekday]', sort: '31' },
+      { match: 'every week', label: '🔁 every week', detail: t('repeat weekly'), emoji: '🔁 every week', dataview: '[repeat:: every week]', sort: '32' },
+      { match: 'every 2 weeks', label: '🔁 every 2 weeks', detail: t('repeat every two weeks'), emoji: '🔁 every 2 weeks', dataview: '[repeat:: every 2 weeks]', sort: '33' },
+      { match: 'every month', label: '🔁 every month', detail: t('repeat monthly'), emoji: '🔁 every month', dataview: '[repeat:: every month]', sort: '34' },
+      { match: 'every year', label: '🔁 every year', detail: t('repeat yearly'), emoji: '🔁 every year', dataview: '[repeat:: every year]', sort: '35' },
+      { match: 'every week when done', label: '🔁 every week when done', detail: t('repeat from the completion date'), emoji: '🔁 every week when done', dataview: '[repeat:: every week when done]', sort: '36' },
+      { match: 'id', label: '🆔 ' + t('id (generated)'), detail: t('lets other tasks depend on this one'), emoji: '🆔 ${id}', dataview: '[id:: ${id}]', sort: '40' },
+      { match: 'depends on', label: '⛔ ' + t('depends on'), detail: t('ids of tasks that must finish first'), emoji: '⛔ ', dataview: '[dependsOn:: ', sort: '41' },
+      { match: 'on completion delete', label: '🏁 delete', detail: t('remove the task when done'), emoji: '🏁 delete', dataview: '[onCompletion:: delete]', sort: '50' },
+      { match: 'on completion keep', label: '🏁 keep', detail: t('keep the task when done (default)'), emoji: '🏁 keep', dataview: '[onCompletion:: keep]', sort: '51' },
     ];
     return list;
   }
@@ -133,13 +134,13 @@ export class TaskCompletionProvider implements vscode.CompletionItemProvider {
     const monday = today.add((8 - today.day()) % 7 || 7, 'day');
     const friday = today.add((5 - today.day() + 7) % 7 || 7, 'day');
     const presets: [string, Dayjs][] = [
-      [vscode.l10n.t('today'), today],
-      [vscode.l10n.t('tomorrow'), today.add(1, 'day')],
-      [vscode.l10n.t('friday'), friday],
-      [vscode.l10n.t('next monday'), monday],
-      [vscode.l10n.t('in 1 week'), today.add(7, 'day')],
-      [vscode.l10n.t('in 2 weeks'), today.add(14, 'day')],
-      [vscode.l10n.t('next month'), today.add(1, 'month')],
+      [t('today'), today],
+      [t('tomorrow'), today.add(1, 'day')],
+      [t('friday'), friday],
+      [t('next monday'), monday],
+      [t('in 1 week'), today.add(7, 'day')],
+      [t('in 2 weeks'), today.add(14, 'day')],
+      [t('next month'), today.add(1, 'month')],
     ];
     const items: vscode.CompletionItem[] = [];
     const parsed = typed.trim() ? parseNaturalDate(typed, today) : null;

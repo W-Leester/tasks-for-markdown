@@ -3,6 +3,7 @@ import type { Task } from '../core/task';
 import type { QueryService } from '../services/QueryService';
 import { displayDescription } from '../views/taskItem';
 import { type CommandDeps, runEdit } from './registerCommands';
+import { t } from '../l10n';
 
 interface TaskPickItem extends vscode.QuickPickItem {
   task: Task;
@@ -37,8 +38,8 @@ export function registerQueryCommands(context: vscode.ExtensionContext, deps: Co
         description: [task.due ? `📅 ${task.due.format()}` : '', task.priority !== '3' ? `p${task.priority}` : ''].filter(Boolean).join(' '),
         detail: `${task.location.path}:${task.location.line + 1}${task.location.heading ? ` › ${task.location.heading}` : ''}`,
         buttons: [
-          { iconPath: new vscode.ThemeIcon('check'), tooltip: vscode.l10n.t('Mark as done') },
-          { iconPath: new vscode.ThemeIcon('edit'), tooltip: vscode.l10n.t('Edit') },
+          { iconPath: new vscode.ThemeIcon('check'), tooltip: t('Mark as done') },
+          { iconPath: new vscode.ThemeIcon('edit'), tooltip: t('Edit') },
         ],
         task,
       }));
@@ -46,10 +47,10 @@ export function registerQueryCommands(context: vscode.ExtensionContext, deps: Co
       qp.items = items;
       qp.matchOnDescription = true;
       qp.matchOnDetail = true;
-      qp.placeholder = vscode.l10n.t('Search {0} open tasks…', items.length);
+      qp.placeholder = t('Search {0} open tasks…', items.length);
       qp.onDidTriggerItemButton(async (e) => {
         qp.hide();
-        if (e.button.tooltip === vscode.l10n.t('Edit')) await vscode.commands.executeCommand('tasksmd.createOrEdit', e.item.task);
+        if (e.button.tooltip === t('Edit')) await vscode.commands.executeCommand('tasksmd.createOrEdit', e.item.task);
         else await runEdit(deps, () => vscode.commands.executeCommand('tasksmd.markDone', e.item.task) as Promise<void>);
       });
       qp.onDidAccept(async () => {
@@ -63,7 +64,7 @@ export function registerQueryCommands(context: vscode.ExtensionContext, deps: Co
     vscode.commands.registerCommand('tasksmd.insertQueryBlock', async () => {
       const editor = vscode.window.activeTextEditor;
       if (!editor || editor.document.languageId !== 'markdown') {
-        void vscode.window.showInformationMessage(vscode.l10n.t('Open a Markdown file to insert a query block.'));
+        void vscode.window.showInformationMessage(t('Open a Markdown file to insert a query block.'));
         return;
       }
       const snippet = new vscode.SnippetString('```tasks\n${1:not done}\n${2:due before next week}\n${3:sort by urgency}\n```\n');
@@ -73,7 +74,7 @@ export function registerQueryCommands(context: vscode.ExtensionContext, deps: Co
       const editor = vscode.window.activeTextEditor;
       const block = editor ? queryBlockAt(editor.document, editor.selection.active.line) : null;
       if (!block) {
-        void vscode.window.showInformationMessage(vscode.l10n.t('Place the cursor inside a ```tasks block.'));
+        void vscode.window.showInformationMessage(t('Place the cursor inside a ```tasks block.'));
         return;
       }
       const source = { path: vscode.workspace.asRelativePath(editor!.document.uri) };
@@ -83,7 +84,7 @@ export function registerQueryCommands(context: vscode.ExtensionContext, deps: Co
       explainOut.appendLine('\n---\n');
       explainOut.appendLine(deps.queries.explain(block.text, source));
       explainOut.appendLine('');
-      explainOut.appendLine(vscode.l10n.t('{0} tasks match, {1} shown.', result.matched, result.shown));
+      explainOut.appendLine(t('{0} tasks match, {1} shown.', result.matched, result.shown));
       for (const e of result.runtimeErrors) explainOut.appendLine(`⚠ ${e}`);
       explainOut.show(true);
     }),

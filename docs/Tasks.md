@@ -54,13 +54,13 @@
 - [x] `.vscodeignore`, `.gitignore`, `.vscode/launch.json`, `.vscode/tasks.json`
 - [x] `LICENSE`(MIT), `NOTICE.md`(Obsidian Tasks 고지), `CHANGELOG.md`, `README.md`
 - [x] `package.nls.json` / `package.nls.ko.json` 스텁
-- [ ] `pnpm install` 실행 후 `pnpm-lock.yaml` 커밋
-- [ ] `src/extension.ts` 최소 구현 — `activate()`에서 `tasks.reindex` 명령 등록(로그만), `deactivate()`
-- [ ] `pnpm build` 로 `dist/extension.js` 생성 확인, F5로 확장 호스트 실행 확인
-- [ ] ESLint에 `no-restricted-imports` 규칙 추가 — `src/core/**` 에서 `vscode` import 금지 (D§3.1 의존성 규칙)
-- [ ] `l10n/bundle.l10n.json`, `l10n/bundle.l10n.ko.json` 빈 파일 생성 + `package.json`의 `l10n` 경로 확인
-- [ ] GitHub Actions `ci.yml` — push/PR마다 `pnpm typecheck && pnpm lint && pnpm test && pnpm build` (D§13)
-- [ ] `tests/fixtures/` 디렉토리 구조 정의 (`parser/*.md`, `workspace/**` )
+- [x] `pnpm install` 실행 후 `pnpm-lock.yaml` 커밋
+- [x] `src/extension.ts` 최소 구현 — `activate()`에서 `tasks.reindex` 명령 등록(로그만), `deactivate()`
+- [x] `pnpm build` 로 `dist/extension.js` 생성 확인, F5로 확장 호스트 실행 확인
+- [x] ESLint에 `no-restricted-imports` 규칙 추가 — `src/core/**` 에서 `vscode` import 금지 (D§3.1 의존성 규칙)
+- [x] `l10n/bundle.l10n.json`, `l10n/bundle.l10n.ko.json` 빈 파일 생성 + `package.json`의 `l10n` 경로 확인
+- [x] GitHub Actions `ci.yml` — push/PR마다 `pnpm typecheck && pnpm lint && pnpm test && pnpm build` (D§13)
+- [x] `tests/fixtures/` 디렉토리 구조 정의 (`parser/*.md`, `workspace/**` )
 
 ### M0.2 코어 모델 (`src/core/task/`)
 - [ ] `StatusType` enum — `TODO | IN_PROGRESS | ON_HOLD | DONE | CANCELLED | NON_TASK`

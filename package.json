@@ -5,7 +5,16 @@
   "version": "0.0.1",
   "publisher": "HMCVECDT",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/W-Leester/tasks-for-markdown.git"
+  },
+  "bugs": {
+    "url": "https://github.com/W-Leester/tasks-for-markdown/issues"
+  },
+  "homepage": "https://github.com/W-Leester/tasks-for-markdown#readme",
   "private": true,
+  "packageManager": "pnpm@12.5.1",
   "engines": {
     "vscode": "^1.90.0"
   },

@@ -1,5 +1,7 @@
 export interface TaskLocation {
-  /** Workspace-relative or absolute path as the index stores it. */
+  /** Index key of the file (the extension uses `Uri.toString()`); equals `path` outside VS Code. */
+  key: string;
+  /** Human-readable, workspace-relative path used for display and queries. */
   path: string;
   /** 0-based line number. */
   line: number;
@@ -14,5 +16,5 @@ export interface TaskLocation {
 }
 
 export function unknownLocation(path = '', line = 0): TaskLocation {
-  return { path, line, heading: null, frontmatterTags: [], depth: 0, parentLine: null };
+  return { key: path, path, line, heading: null, frontmatterTags: [], depth: 0, parentLine: null };
 }

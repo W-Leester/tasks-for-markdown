@@ -8,3 +8,4 @@ export { type TaskLocation, unknownLocation } from './TaskLocation';
 export { TASK_LINE_RE, isTaskLine, parseTaskLine, splitTaskLine, type ParseOptions, type TaskLineParts } from './TaskParser';
 export type { TaskFormat } from './formats/types';
 export { serializeTask, serializeTaskBody } from './TaskSerializer';
+export { applyStatusChange, type StatusChangeOptions, type StatusChangeResult } from './statusChange';

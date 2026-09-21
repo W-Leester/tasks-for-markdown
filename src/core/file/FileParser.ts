@@ -1,6 +1,8 @@
 import { type StatusRegistry, Task, isTaskLine, parseTaskLine, type TaskLocation } from '../task';
 
 export interface FileParseOptions {
+  /** Index key; defaults to `path`. */
+  key?: string;
   path: string;
   statusRegistry: StatusRegistry;
   globalFilter?: string;
@@ -128,7 +130,7 @@ export function parseFile(text: string, options: FileParseOptions): FileParseRes
     stack.push({ indent, line: i });
 
     if (!isTaskLine(line)) continue;
-    const location: TaskLocation = { path: options.path, line: i, heading, frontmatterTags, depth, parentLine };
+    const location: TaskLocation = { key: options.key ?? options.path, path: options.path, line: i, heading, frontmatterTags, depth, parentLine };
     const task = parseTaskLine(line, { statusRegistry: options.statusRegistry, globalFilter: options.globalFilter, location });
     if (task) tasks.push(task);
   }

@@ -1,0 +1,96 @@
+import * as vscode from 'vscode';
+import { dayjs, type Dayjs } from '../core/dates/dayjs';
+import { type StatusRegistry, type Status, type Task, applyStatusChange, serializeTask } from '../core/task';
+import type { IndexService } from '../index/IndexService';
+import type { Settings } from '../settings/Settings';
+
+export class StaleLineError extends Error {
+  constructor(
+    readonly uri: vscode.Uri,
+    readonly line: number,
+    readonly expected: string,
+    readonly actual: string,
+  ) {
+    super(`Line ${line + 1} of ${uri.fsPath} changed since it was indexed`);
+  }
+}
+
+export interface TaskEditDeps {
+  settings: Settings;
+  indexService: IndexService;
+  getStatusRegistry(): StatusRegistry;
+  /** Injectable clock for tests. */
+  today?: () => Dayjs;
+}
+
+export interface LineInsert {
+  position: 'above' | 'below';
+  lines: string[];
+}
+
+/**
+ * The only place that writes task lines to files (D§3.1). Every write re-checks that the target
+ * line still matches the indexed text (NFR-3) and goes through a WorkspaceEdit so that Undo works
+ * in open editors. Files that were not open are saved after the edit so they don't linger dirty.
+ */
+export class TaskEditService {
+  constructor(private readonly deps: TaskEditDeps) {}
+
+  private today(): Dayjs {
+    return (this.deps.today ?? (() => dayjs()))();
+  }
+
+  /** Move the task to its status' `nextSymbol` (FR-1.18). */
+  async toggle(task: Task): Promise<Task> {
+    const registry = this.deps.getStatusRegistry();
+    return this.setStatus(task, registry.next(task.status));
+  }
+
+  async setStatus(task: Task, status: Status): Promise<Task> {
+    const settings = this.deps.settings;
+    const result = applyStatusChange(task, status, {
+      today: this.today(),
+      setDoneDate: settings.get('setDoneDate'),
+      setCancelledDate: settings.get('setCancelledDate'),
+    });
+    const format = settings.get('taskFormat');
+    const insert: LineInsert | undefined = result.newTasks.length
+      ? { position: 'above', lines: result.newTasks.map((t) => serializeTask(t, format)) }
+      : undefined;
+    await this.replaceTask(task, result.task, insert);
+    return result.task;
+  }
+
+  /** Serialise `updated` over `original`'s line, optionally inserting lines next to it. */
+  async replaceTask(original: Task, updated: Task, insert?: LineInsert): Promise<void> {
+    const text = serializeTask(updated, this.deps.settings.get('taskFormat'));
+    await this.replaceLine(vscode.Uri.parse(original.location.key), original.location.line, original.originalMarkdown, text, insert);
+  }
+
+  async replaceLine(uri: vscode.Uri, line: number, expectedOriginal: string, newText: string, insert?: LineInsert): Promise<void> {
+    const wasOpen = vscode.workspace.textDocuments.some((d) => d.uri.toString() === uri.toString());
+    const doc = await vscode.workspace.openTextDocument(uri);
+    const strip = (s: string) => (s.endsWith('\r') ? s.slice(0, -1) : s);
+    const actual = line < doc.lineCount ? doc.lineAt(line).text : '';
+    if (strip(actual) !== strip(expectedOriginal)) {
+      void this.deps.indexService.indexText(uri, doc.getText());
+      throw new StaleLineError(uri, line, expectedOriginal, actual);
+    }
+
+    const edit = new vscode.WorkspaceEdit();
+    const range = doc.lineAt(line).range;
+    edit.replace(uri, range, newText);
+    if (insert?.lines.length) {
+      const eol = doc.eol === vscode.EndOfLine.CRLF ? '\r\n' : '\n';
+      const block = insert.lines.join(eol);
+      if (insert.position === 'above') edit.insert(uri, range.start, block + eol);
+      else edit.insert(uri, range.end, eol + block);
+    }
+    const ok = await vscode.workspace.applyEdit(edit);
+    if (!ok) throw new Error(`Could not edit ${uri.fsPath}`);
+
+    // Keep the index exact immediately instead of waiting for the debounced document event.
+    this.deps.indexService.indexText(uri, doc.getText());
+    if (!wasOpen) await doc.save();
+  }
+}

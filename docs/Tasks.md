@@ -139,14 +139,14 @@
 - [ ] 테스트: 픽스처 워크스페이스 인덱싱 결과 수, 파일 삭제 시 제거, 이름 변경 (→ M1.8 통합 테스트에서)
 
 ### M1.4 편집 서비스 (`src/services/TaskEditService.ts`)
-- [ ] 유일한 쓰기 경로임을 주석/린트로 명시 (D§3.1)
-- [ ] `replaceLine(path, line, expectedOriginal, newText)` — 현재 줄이 `expectedOriginal`과 다르면 `StaleLineError` (NFR-3)
-- [ ] `insertLines(path, line, texts, position)` — 반복 태스크용 (M3에서 사용)
-- [ ] 여러 편집을 하나의 `WorkspaceEdit`로 원자적 적용, `applyEdit()` 결과 검사
-- [ ] `applyStatusChange(task, newStatus, today)` (core) — DONE 진입 ✅ 부여 / 이탈 시 제거, CANCELLED 동일(❌), 설정 `setDoneDate`/`setCancelledDate` 존중 (FR-1.18)
-- [ ] `toggle(task)` — `StatusRegistry.next()` → `applyStatusChange` → `replaceLine` (D§5.2)
-- [ ] stale 시 사용자 알림 + 해당 파일 재인덱스
-- [ ] 테스트: 통합 — 토글 후 파일 내용, Undo, stale 감지
+- [x] 유일한 쓰기 경로임을 주석/린트로 명시 (D§3.1)
+- [x] `replaceLine(path, line, expectedOriginal, newText)` — 현재 줄이 `expectedOriginal`과 다르면 `StaleLineError` (NFR-3)
+- [x] `insertLines(path, line, texts, position)` — 반복 태스크용 (M3에서 사용)
+- [x] 여러 편집을 하나의 `WorkspaceEdit`로 원자적 적용, `applyEdit()` 결과 검사
+- [x] `applyStatusChange(task, newStatus, today)` (core, `statusChange.ts`, 7 tests) — DONE 진입 ✅ 부여 / 이탈 시 제거, CANCELLED 동일(❌), 설정 `setDoneDate`/`setCancelledDate` 존중 (FR-1.18)
+- [x] `toggle(task)` — `StatusRegistry.next()` → `applyStatusChange` → `replaceLine` (D§5.2)
+- [x] stale 시 사용자 알림 + 해당 파일 재인덱스
+- [ ] 테스트: 통합 — 토글 후 파일 내용, Undo, stale 감지 (→ M1.8)
 
 ### M1.5 명령어 (`src/commands/`)
 - [ ] `tasksmd.toggleDone` — 활성 에디터 커서 줄 또는 트리 항목 인자 (FR-8 표)

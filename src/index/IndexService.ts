@@ -117,7 +117,7 @@ export class IndexService implements vscode.Disposable {
     const { index, settings } = this.deps;
     const path = this.displayPath(uri);
     const globalFilter = settings.get('globalFilter') || undefined;
-    const result = parseFile(text, { path, statusRegistry: this.deps.getStatusRegistry(), globalFilter });
+    const result = parseFile(text, { key: uri.toString(), path, statusRegistry: this.deps.getStatusRegistry(), globalFilter });
     index.setFile({ key: uri.toString(), path, tasks: result.tasks, headings: result.headings, frontmatterTags: result.frontmatterTags }, silent);
   }
 

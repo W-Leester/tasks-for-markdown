@@ -315,16 +315,16 @@
 - [x] `explain` 출력 생성 — 각 필터의 사람이 읽는 설명 + 기본 정렬 명시 (FR-7.13); `limit`/`hide|show`/`short mode` 파서 포함
 
 ### M4.2 필터 (`filters/`) — 명령어 하나 = 파일 하나
-- [ ] 상태: `done`, `not done`, `status.type is|is not …`, `status.name includes|does not include`, `status.symbol …` (FR-7.1)
-- [ ] 날짜 6종 + `happens`: `on|before|after|on or before|on or after <date>`, `in|before|after|in or before|in or after <range>`, `has|no <field> date`, `<field> date is invalid` (FR-7.2)
-- [ ] 우선순위: `priority is|is above|is below|is not …` (FR-7.3)
-- [ ] 반복: `is recurring`, `is not recurring`, `recurrence includes|does not include` (FR-7.4)
-- [ ] 의존성: `is blocked|is not blocked|is blocking|is not blocking|has id|no id|has depends on|no depends on|id includes` (FR-7.5)
-- [ ] 텍스트: `description|heading|path|folder|filename|root includes|does not include`, `… regex matches|does not match /…/flags` (FR-7.6)
-- [ ] 태그: `tags include|do not include`, `tag regex …`, `has tags`, `no tags`
-- [ ] 구조: `exclude sub-items` (FR-7.7)
-- [ ] 불리언: `AND OR NOT AND NOT OR NOT XOR` + 괄호, 피연산자는 완전한 필터 (FR-7.8) — Obsidian Tasks `BooleanField` 이식
-- [ ] regex 필터: 컴파일 1회, 재앙적 백트래킹 방지(타임아웃 또는 `safe-regex` 검사) (Obsidian 8.3 동등)
+- [x] 상태: `done`, `not done`, `status.type is|is not …`, `status.name includes|does not include`, `status.symbol …` (FR-7.1)
+- [x] 날짜 6종 + `happens`: `on|before|after|on or before|on or after <date>`, `in|before|after|in or before|in or after <range>`, `has|no <field> date`, `<field> date is invalid` (FR-7.2)
+- [x] 우선순위: `priority is|is above|is below|is not …` (FR-7.3)
+- [x] 반복: `is recurring`, `is not recurring`, `recurrence includes|does not include` (FR-7.4)
+- [x] 의존성: `is blocked|is not blocked|is blocking|is not blocking|has id|no id|has depends on|no depends on|id includes` (FR-7.5)
+- [x] 텍스트: `description|heading|path|folder|filename|root includes|does not include`, `… regex matches|does not match /…/flags` (FR-7.6)
+- [x] 태그: `tags include|do not include`, `tag regex …`, `has tags`, `no tags`
+- [x] 구조: `exclude sub-items` (FR-7.7)
+- [x] 불리언: `AND OR NOT AND NOT OR NOT XOR` + 괄호(중첩), 피연산자는 완전한 필터 (FR-7.8) — 자체 재귀 하강 파서(우선순위 NOT > AND > XOR > OR)
+- [x] regex 필터: 컴파일 1회, 길이 제한 + 중첩 수량자 패턴 거부 (Obsidian 8.3 동등)
 
 ### M4.3 정렬·그룹·제한·레이아웃
 - [ ] `sort by <field> [reverse]` 전 필드 + 기본 정렬 status.type → urgency → due → priority → path (FR-7.10)

@@ -63,15 +63,15 @@
 - [x] `tests/fixtures/` 디렉토리 구조 정의 (`parser/*.md`, `workspace/**` )
 
 ### M0.2 코어 모델 (`src/core/task/`)
-- [ ] `StatusType` enum — `TODO | IN_PROGRESS | ON_HOLD | DONE | CANCELLED | NON_TASK`
-- [ ] `Status` — `symbol`, `name`, `nextSymbol`, `type`; `isCompleted()`(DONE 또는 CANCELLED) (FR-1.15)
-- [ ] `StatusRegistry` — 기본 4종(`[ ]`, `[x]`, `[/]`, `[-]`) 등록, `bySymbol()`, `next()`, 미등록 심볼은 TODO 타입 임시 상태로 반환
-- [ ] `Priority` enum + 이모지 매핑(🔺 ⏫ 🔼 없음 🔽 ⏬) + Dataview 이름 매핑(`highest…lowest`) + 정렬용 숫자
-- [ ] `DateField` — `{ raw: string; valid: boolean; date?: Dayjs }`; `YYYY-MM-DD` 엄격 파싱, `2026-13-40` 같은 값은 `valid:false`로 보존 (FR-3.17 진단 근거)
-- [ ] `TaskLocation` — `path`, `line`, `heading`, `frontmatterTags`, `depth`
-- [ ] `Task` 불변 클래스 — D§4 필드 전부, `with(...)`/`TaskBuilder`로 복제-수정, `isDone`, `happens()`(start/scheduled/due 중 가장 이른 값)
-- [ ] `Recurrence`, `OnCompletion`, `id`, `dependsOn`은 **문자열 그대로 보존**하는 자리만 만든다(해석은 M3)
-- [ ] 태그 추출 — `#tag`, 중첩 `#a/b`, 설명 안 어디든; URL 안의 `#`은 제외
+- [x] `StatusType` enum — `TODO | IN_PROGRESS | ON_HOLD | DONE | CANCELLED | NON_TASK`
+- [x] `Status` — `symbol`, `name`, `nextSymbol`, `type`; `isCompleted()`(DONE 또는 CANCELLED) (FR-1.15)
+- [x] `StatusRegistry` — 기본 4종(`[ ]`, `[x]`, `[/]`, `[-]`) 등록, `bySymbol()`, `next()`, 미등록 심볼은 TODO 타입 임시 상태로 반환
+- [x] `Priority` enum + 이모지 매핑(🔺 ⏫ 🔼 없음 🔽 ⏬) + Dataview 이름 매핑(`highest…lowest`) + 정렬용 숫자
+- [x] `DateField` — `{ raw: string; valid: boolean; date?: Dayjs }`; `YYYY-MM-DD` 엄격 파싱, `2026-13-40` 같은 값은 `valid:false`로 보존 (FR-3.17 진단 근거)
+- [x] `TaskLocation` — `path`, `line`, `heading`, `frontmatterTags`, `depth`
+- [x] `Task` 불변 클래스 — D§4 필드 전부, `with(...)`/`TaskBuilder`로 복제-수정, `isDone`, `happens()`(start/scheduled/due 중 가장 이른 값)
+- [x] `Recurrence`, `OnCompletion`, `id`, `dependsOn`은 **문자열 그대로 보존**하는 자리만 만든다(해석은 M3)
+- [x] 태그 추출 — `#tag`, 중첩 `#a/b`, 설명 안 어디든; URL 안의 `#`은 제외
 
 ### M0.3 파서 (`TaskParser`, `formats/emoji.ts`, `formats/dataview.ts`)
 - [ ] 태스크 줄 인식 정규식 — 마커 `-`, `*`, `+`, `1.`, `1)` + `[x]`(대괄호 안 정확히 1글자) (FR-1.1)

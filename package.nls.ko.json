@@ -40,5 +40,9 @@
   "tasksmd.setDueDate.title": "마감일 설정…",
   "tasksmd.setScheduledDate.title": "예정일 설정…",
   "tasksmd.setStartDate.title": "시작일 설정…",
-  "tasksmd.postpone.title": "미루기…"
+  "tasksmd.postpone.title": "미루기…",
+  "tasksmd.config.codeLens.mode": "태스크 액션 CodeLens(완료 · 우선순위 · 마감일 · 편집)를 표시할 위치.",
+  "tasksmd.config.codeLens.mode.off": "표시 안 함",
+  "tasksmd.config.codeLens.mode.cursorLine": "커서가 있는 태스크 줄 위에만",
+  "tasksmd.config.codeLens.mode.all": "보이는 모든 태스크 줄 위에"
 }

@@ -109,3 +109,33 @@ suite('smoke', () => {
     assert.ok(entry.tasks.every((t) => t.location.heading !== null), 'every task has a heading');
   });
 });
+
+suite('editor providers', () => {
+  test('code lenses appear for the cursor line only (default mode)', async () => {
+    await getApi();
+    const doc = await vscode.workspace.openTextDocument(fixtureUri('notes/week-38.md'));
+    const editor = await vscode.window.showTextDocument(doc);
+    editor.selection = new vscode.Selection(6, 0, 6, 0);
+    await sleep(150);
+    const lenses = await vscode.commands.executeCommand<vscode.CodeLens[]>('vscode.executeCodeLensProvider', doc.uri);
+    const ours = lenses.filter((l) => l.command?.command.startsWith('tasksmd.'));
+    assert.ok(ours.length >= 4, `expected lenses, got ${ours.length}`);
+    assert.ok(ours.every((l) => l.range.start.line === 6), 'lenses only on cursor line');
+    assert.ok(ours.some((l) => l.command!.command === 'tasksmd.markDone'));
+    assert.ok(ours.some((l) => l.command!.command === 'tasksmd.setDueDate' && l.command!.title.includes('Sep 25')));
+    await vscode.commands.executeCommand('workbench.action.closeAllEditors');
+  });
+
+  test('hover shows the task card with fields and command links', async () => {
+    await getApi();
+    const doc = await vscode.workspace.openTextDocument(fixtureUri('notes/week-38.md'));
+    const hovers = await vscode.commands.executeCommand<vscode.Hover[]>('vscode.executeHoverProvider', doc.uri, new vscode.Position(8, 5));
+    const text = hovers.flatMap((h) => h.contents.map((c) => (c as vscode.MarkdownString).value)).join('\n');
+    assert.ok(text.includes('Prepare deployment'), text);
+    assert.ok(text.includes('Collect weekly data'), 'dependency resolved to its description');
+    assert.ok(text.includes('command:tasksmd.markDone'), 'command link present');
+    assert.ok(text.includes('command:tasksmd.openTask'), 'dependency link present');
+    const none = await vscode.commands.executeCommand<vscode.Hover[]>('vscode.executeHoverProvider', doc.uri, new vscode.Position(3, 2));
+    assert.equal(none.filter((h) => (h.contents[0] as vscode.MarkdownString).value.includes('tasksmd')).length, 0);
+  });
+});

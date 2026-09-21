@@ -209,14 +209,14 @@
 - [x] `contributes.colors` — `tasksmd.overdueBackground`, `tasksmd.dueTodayForeground` 등 커스텀 색 토큰
 
 ### M2.3 CodeLens (`src/editor/TaskCodeLensProvider.ts`)
-- [ ] 렌즈 항목: `✔ 완료` · `우선순위: 높음 ▾` · `📅 9/25 ▾` · `🔁 매주 ▾`(M3) · `✎ 편집` (FR-3.7)
-- [ ] 모드 설정 `codeLens.mode: off | cursorLine | all`, 기본 `cursorLine`; 커서 이동 시 `onDidChangeCodeLenses` (FR-3.8)
-- [ ] 각 렌즈 → 해당 명령(QuickPick 또는 편집 모달; M6 전까지 편집은 QuickPick 순차 입력으로 대체)
+- [x] 렌즈 항목: `✔ 완료` · `우선순위: 높음 ▾` · `📅 9/25 ▾` · `🔁 매주 ▾`(M3) · `✎ 편집` (FR-3.7)
+- [x] 모드 설정 `codeLens.mode: off | cursorLine | all`, 기본 `cursorLine`; 커서 이동 시 `onDidChangeCodeLenses` (FR-3.8)
+- [x] 각 렌즈 → 해당 명령(QuickPick 또는 편집 모달; M6 전까지 편집은 QuickPick 순차 입력으로 대체). 렌즈 항목: 완료/다시 열기 · 우선순위 · 📅 마감(+상대) · ⏳ 예정 · 🔁 · 미루기 · 편집
 
 ### M2.4 Hover (`src/editor/TaskHoverProvider.ts`)
-- [ ] 카드: 상태·우선순위·모든 날짜(절대+상대)·반복·의존성 링크·긴급도(M3) (FR-3.9)
-- [ ] `command:` 링크로 완료/편집/우선순위 변경 — `MarkdownString.isTrusted` (FR-3.10)
-- [ ] 의존성 링크 클릭 → 해당 태스크 위치로 이동
+- [x] 카드: 상태·우선순위·모든 날짜(절대+상대)·반복·의존성 링크·긴급도(M3) (FR-3.9)
+- [x] `command:` 링크로 완료/편집/우선순위 변경 — `MarkdownString.isTrusted` (FR-3.10)
+- [x] 의존성 링크 클릭 → 해당 태스크 위치로 이동
 
 ### M2.5 자동완성 (`src/editor/TaskCompletionProvider.ts`)
 - [ ] 태스크 줄에서만 활성 (FR-3.11)

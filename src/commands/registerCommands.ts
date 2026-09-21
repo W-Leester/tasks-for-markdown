@@ -47,6 +47,22 @@ export function tasksAtCursors(editor: vscode.TextEditor, deps: Pick<CommandDeps
 /** Resolve the command argument: a Task (from a tree/menu) or the editor cursor. */
 export function resolveTargetTasks(arg: unknown, deps: CommandDeps): Task[] {
   if (arg instanceof Task) return [arg];
+  // { key, line } reference from a hover/markdown command link.
+  if (arg && typeof arg === 'object' && typeof (arg as { key?: unknown }).key === 'string' && typeof (arg as { line?: unknown }).line === 'number') {
+    const { key, line } = arg as { key: string; line: number };
+    const found = deps.index.taskAt(key, line);
+    if (found) return [found];
+    const doc = vscode.workspace.textDocuments.find((d) => d.uri.toString() === key);
+    if (doc && line < doc.lineCount) {
+      const t = parseTaskLine(doc.lineAt(line).text, {
+        statusRegistry: deps.getStatusRegistry(),
+        globalFilter: deps.settings.get('globalFilter') || undefined,
+        location: { key, path: deps.indexService.displayPath(doc.uri), line, heading: null, frontmatterTags: [], depth: 0, parentLine: null },
+      });
+      if (t) return [t];
+    }
+    return [];
+  }
   if (arg && typeof arg === 'object' && 'task' in arg && (arg as { task: unknown }).task instanceof Task) {
     return [(arg as { task: Task }).task];
   }

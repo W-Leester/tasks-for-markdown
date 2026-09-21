@@ -20,6 +20,7 @@ export interface SettingsSchema {
   'decorations.strikeDone': boolean;
   'decorations.dimFields': boolean;
   'decorations.gutterIcons': boolean;
+  'codeLens.mode': 'off' | 'cursorLine' | 'all';
 }
 
 export const SETTINGS_SECTION = 'tasksmd';
@@ -40,6 +41,7 @@ export const SETTINGS_DEFAULTS: Readonly<SettingsSchema> = {
   'decorations.strikeDone': true,
   'decorations.dimFields': true,
   'decorations.gutterIcons': true,
+  'codeLens.mode': 'cursorLine',
 };
 
 export type SettingsKey = keyof SettingsSchema;

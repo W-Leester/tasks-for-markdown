@@ -40,5 +40,9 @@
   "tasksmd.setDueDate.title": "Set due date…",
   "tasksmd.setScheduledDate.title": "Set scheduled date…",
   "tasksmd.setStartDate.title": "Set start date…",
-  "tasksmd.postpone.title": "Postpone…"
+  "tasksmd.postpone.title": "Postpone…",
+  "tasksmd.config.codeLens.mode": "Where to show task action CodeLenses (Done · Priority · Due · Edit).",
+  "tasksmd.config.codeLens.mode.off": "Never",
+  "tasksmd.config.codeLens.mode.cursorLine": "Only above the task line that has the cursor",
+  "tasksmd.config.codeLens.mode.all": "Above every visible task line"
 }

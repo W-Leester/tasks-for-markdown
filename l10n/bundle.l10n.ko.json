@@ -84,5 +84,22 @@
   "Cancelled date": "취소일",
   "Edit task description": "태스크 설명 편집",
   "New task description": "새 태스크 설명",
-  "Open a Markdown file to create a task.": "태스크를 만들려면 마크다운 파일을 여세요."
+  "Open a Markdown file to create a task.": "태스크를 만들려면 마크다운 파일을 여세요.",
+  "Reopen": "다시 열기",
+  "Done": "완료",
+  "Mark as done": "완료로 표시",
+  "Due": "마감",
+  "Postpone": "미루기",
+  "Edit": "편집",
+  "Cancel": "취소",
+  "Created": "생성",
+  "Start": "시작",
+  "Scheduled": "예정",
+  "Cancelled": "취소됨",
+  "Repeats": "반복",
+  "On completion": "완료 시",
+  "blocks": "→ 막고 있음:",
+  "not found": "없음",
+  "Depends on": "의존",
+  "blocked": "차단됨"
 }

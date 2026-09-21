@@ -242,6 +242,21 @@
           "type": "boolean",
           "default": true,
           "description": "%tasksmd.config.decorations.gutterIcons%"
+        },
+        "tasksmd.codeLens.mode": {
+          "type": "string",
+          "enum": [
+            "off",
+            "cursorLine",
+            "all"
+          ],
+          "default": "cursorLine",
+          "enumDescriptions": [
+            "%tasksmd.config.codeLens.mode.off%",
+            "%tasksmd.config.codeLens.mode.cursorLine%",
+            "%tasksmd.config.codeLens.mode.all%"
+          ],
+          "description": "%tasksmd.config.codeLens.mode%"
         }
       }
     },

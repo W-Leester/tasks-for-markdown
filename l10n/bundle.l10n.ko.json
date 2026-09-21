@@ -34,5 +34,12 @@
   "Group tasks by…": "태스크 그룹 기준…",
   "Filter tasks by description or file path": "설명 또는 파일 경로로 태스크 필터",
   "e.g. report": "예: 보고서",
-  "No status of type {0} is configured.": "{0} 타입의 상태가 설정되어 있지 않습니다."
+  "No status of type {0} is configured.": "{0} 타입의 상태가 설정되어 있지 않습니다.",
+  "Indexing tasks…": "태스크 인덱싱 중…",
+  "today {0}": "오늘 {0}",
+  "overdue {0}": "초과 {0}",
+  "**Tasks for Markdown** — {0} files, {1} tasks": "**Tasks for Markdown** — 파일 {0}개, 태스크 {1}개",
+  "Open": "미완료",
+  "Skipped (larger than tasksmd.maxFileSizeKB):": "건너뜀 (tasksmd.maxFileSizeKB 초과):",
+  "Click to open the Tasks sidebar.": "클릭하면 Tasks 사이드바가 열립니다."
 }

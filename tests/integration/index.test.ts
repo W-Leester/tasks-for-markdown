@@ -98,3 +98,14 @@ suite('tree view', () => {
     }
   });
 });
+
+suite('smoke', () => {
+  test('indexes the project checklist copied into the fixture workspace', async () => {
+    const api = await getApi();
+    const entry = api.index.file(fixtureUri('notes/dev-checklist.md').toString());
+    assert.ok(entry, 'dev-checklist.md indexed');
+    assert.ok(entry.tasks.length > 200, `expected >200 tasks, got ${entry.tasks.length}`);
+    assert.ok(entry.tasks.some((t) => t.isDone), 'some done');
+    assert.ok(entry.tasks.every((t) => t.location.heading !== null), 'every task has a heading');
+  });
+});

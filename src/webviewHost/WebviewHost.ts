@@ -127,9 +127,22 @@ export class WebviewHost implements vscode.Disposable {
           task = this.withFields(task, msg.fields);
           if (typeof msg.fields.status === 'string') task = task.with({ status: registry.bySymbol(msg.fields.status) });
           if (this.deps.settings.get('setCreatedDate')) task = task.with({ created: DateField.fromDate(this.today()) });
-          const target = msg.key ? vscode.Uri.parse(msg.key) : vscode.window.activeTextEditor?.document.uri;
-          if (!target) throw new Error(vscode.l10n.t('Open a Markdown file to create a task.'));
-          const line = msg.line ?? vscode.window.activeTextEditor?.selection.active.line ?? Number.MAX_SAFE_INTEGER;
+          let target = msg.key ? vscode.Uri.parse(msg.key) : undefined;
+          let line = msg.line ?? Number.MAX_SAFE_INTEGER;
+          if (!target) {
+            // Calendar and other views: use the configured inbox file, else the active Markdown editor.
+            const inbox = this.deps.settings.get('calendar.newTaskFile');
+            const folder = vscode.workspace.workspaceFolders?.[0];
+            if (inbox && folder) {
+              target = vscode.Uri.joinPath(folder.uri, ...inbox.split(/[\\/]/));
+              try { await vscode.workspace.fs.stat(target); } catch { await vscode.workspace.fs.writeFile(target, Buffer.from(`# ${inbox.split('/').pop()!.replace(/\.md$/, '')}\n\n`, 'utf8')); }
+            } else {
+              const editor = vscode.window.activeTextEditor ?? vscode.window.visibleTextEditors.find((e) => e.document.languageId === 'markdown');
+              if (!editor || editor.document.languageId !== 'markdown') throw new Error(vscode.l10n.t('Open a Markdown file to create a task, or set tasksmd.calendar.newTaskFile.'));
+              target = editor.document.uri;
+              line = msg.line ?? editor.selection.active.line;
+            }
+          }
           await this.deps.editService.insertNewTask(target, line, task);
           break;
         }

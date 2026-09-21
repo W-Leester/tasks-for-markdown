@@ -43,6 +43,7 @@ export interface SettingsSchema {
   'archive.file': string;
   'archive.afterDays': number;
   'archive.linkStyle': 'wiki' | 'markdown';
+  'calendar.newTaskFile': string;
 }
 
 export const SETTINGS_SECTION = 'tasksmd';
@@ -85,6 +86,7 @@ export const SETTINGS_DEFAULTS: Readonly<SettingsSchema> = {
   'archive.file': 'Archive.md',
   'archive.afterDays': 30,
   'archive.linkStyle': 'wiki',
+  'calendar.newTaskFile': '',
 };
 
 export type SettingsKey = keyof SettingsSchema;

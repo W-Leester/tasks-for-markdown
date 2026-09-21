@@ -38,7 +38,7 @@ export interface ExtensionApi {
   archive: ArchiveService;
   /** Consumed by VS Code's built-in Markdown extension (contributes.markdown.markdownItPlugins). */
   extendMarkdownIt(md: import('markdown-it').MarkdownIt): import('markdown-it').MarkdownIt;
-  webviews: { openEdit: (target: { key: string | null; line: number | null }) => WebviewHost; openKanban: () => WebviewHost; openQueryBuilder: (id: string | null) => WebviewHost; openStats: () => WebviewHost };
+  webviews: { openEdit: (target: { key: string | null; line: number | null }) => WebviewHost; openKanban: () => WebviewHost; openQueryBuilder: (id: string | null) => WebviewHost; openStats: () => WebviewHost; openCalendar: () => WebviewHost };
 }
 
 export async function activate(context: vscode.ExtensionContext): Promise<ExtensionApi> {

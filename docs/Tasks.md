@@ -476,11 +476,11 @@
 - [x] 명령 `tasksmd.openStats`
 
 ### M7.4 캘린더 (`webviews/calendar/`)
-- [ ] 월간/주간 전환, 표시 필드 토글(📅 ⏳ 🛫), 주 시작 월요일 (FR-10.11)
-- [ ] 항목 클릭 → 편집 모달, 더블클릭 → 원본, 드래그 → 해당 날짜 필드 `task/setField` (FR-10.12)
-- [ ] 빈 칸 더블클릭 → 마감일 채운 새 태스크, 대상 파일 `calendar.newTaskFile` (FR-10.13)
-- [ ] 데이터 소스 저장된 쿼리 (FR-10.14)
-- [ ] 명령 `tasksmd.openCalendar`, 마지막 위치 `workspaceState`
+- [x] 월간/주간 전환, 표시 필드 토글(📅 ⏳ 🛫), 주 시작 월요일 (FR-10.11)
+- [x] 항목 클릭 → 편집 모달, 더블클릭 → 원본, 드래그 → 해당 날짜 필드 `task/setField` (FR-10.12)
+- [x] 빈 칸 더블클릭 → 마감일 채운 새 태스크, 대상 파일 `calendar.newTaskFile` (FR-10.13)
+- [x] 데이터 소스 저장된 쿼리 (FR-10.14)
+- [x] 명령 `tasksmd.openCalendar`, 마지막 위치 `workspaceState`
 
 ### M7.5 업데이트 확인 (`services/UpdateCheckService.ts`)
 - [ ] `updateCheckUrl`(파일 경로/HTTP) → `latest.json { version, vsix, notes }` 하루 1회 비교, 새 버전이면 토스트 + 경로 열기/복사 (FR-10.15)

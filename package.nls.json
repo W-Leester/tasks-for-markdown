@@ -95,5 +95,7 @@
   "tasksmd.config.archive.afterDays": "Archive completed (done/cancelled) tasks whose completion date is at least this many days old. 0 archives every completed task, including undated ones.",
   "tasksmd.config.archive.linkStyle": "How the archive links back to the source file: [[wiki]] links or [markdown](links).",
   "tasksmd.archiveCompleted.title": "Archive completed tasks…",
-  "tasksmd.openStats.title": "Open statistics"
+  "tasksmd.openStats.title": "Open statistics",
+  "tasksmd.config.calendar.newTaskFile": "Workspace-relative Markdown file that receives tasks created from the calendar (and other views without a target). Empty = the active Markdown editor.",
+  "tasksmd.openCalendar.title": "Open calendar"
 }

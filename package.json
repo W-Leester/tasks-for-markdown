@@ -238,6 +238,12 @@
         "title": "%tasksmd.openStats.title%",
         "category": "Tasks",
         "icon": "$(graph)"
+      },
+      {
+        "command": "tasksmd.openCalendar",
+        "title": "%tasksmd.openCalendar.title%",
+        "category": "Tasks",
+        "icon": "$(calendar)"
       }
     ],
     "configuration": {
@@ -579,6 +585,11 @@
           ],
           "default": "wiki",
           "description": "%tasksmd.config.archive.linkStyle%"
+        },
+        "tasksmd.calendar.newTaskFile": {
+          "type": "string",
+          "default": "",
+          "description": "%tasksmd.config.calendar.newTaskFile%"
         }
       }
     },
@@ -738,6 +749,11 @@
           "command": "tasksmd.openQueryBuilder",
           "when": "view == tasksmd.savedQueries",
           "group": "navigation@0"
+        },
+        {
+          "command": "tasksmd.openCalendar",
+          "when": "view == tasksmd.tasks",
+          "group": "navigation@4"
         }
       ],
       "view/item/context": [

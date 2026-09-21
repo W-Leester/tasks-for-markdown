@@ -392,3 +392,28 @@ suite('statistics', () => {
     await vscode.commands.executeCommand('workbench.action.closeAllEditors');
   });
 });
+
+suite('calendar', () => {
+  const guard = new FixtureGuard();
+  teardown(async () => {
+    await guard.restore();
+    const inbox = fixtureUri('Inbox.md');
+    if (fs.existsSync(inbox.fsPath)) fs.unlinkSync(inbox.fsPath);
+  });
+
+  test('panel boots; creating from a cell goes to the configured inbox file', async () => {
+    const api = await getApi();
+    await api.settings.update('calendar.newTaskFile', 'Inbox.md', vscode.ConfigurationTarget.Workspace);
+    try {
+      const host = api.webviews.openCalendar();
+      await waitFor(() => host.received.includes('query/run'), 8000, 'calendar query');
+      await (host as unknown as { handle(m: unknown): Promise<void> }).handle({ type: 'task/create', key: null, line: null, fields: { description: 'from calendar', due: '2026-10-07' } });
+      await waitFor(() => fs.existsSync(fixtureUri('Inbox.md').fsPath), 3000, 'inbox created');
+      const text = fs.readFileSync(fixtureUri('Inbox.md').fsPath, 'utf8');
+      assert.ok(text.includes('- [ ] from calendar 📅 2026-10-07'), text);
+    } finally {
+      await api.settings.update('calendar.newTaskFile', undefined, vscode.ConfigurationTarget.Workspace);
+      await vscode.commands.executeCommand('workbench.action.closeAllEditors');
+    }
+  });
+});

@@ -3,7 +3,9 @@
     "target": "ES2022",
     "module": "ESNext",
     "moduleResolution": "Bundler",
-    "lib": ["ES2022"],
+    "lib": [
+      "ES2022"
+    ],
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
@@ -12,8 +14,17 @@
     "sourceMap": true,
     "outDir": "dist",
     "rootDir": ".",
-    "types": ["node"]
+    "types": [
+      "node"
+    ]
   },
-  "include": ["src", "tests"],
-  "exclude": ["tests/integration"]
+  "include": [
+    "src",
+    "tests"
+  ],
+  "exclude": [
+    "tests/integration",
+    "src/preview/previewScript.ts",
+    "src/webviews"
+  ]
 }

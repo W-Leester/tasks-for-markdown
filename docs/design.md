@@ -442,7 +442,7 @@ sequenceDiagram
 
 ![미리보기 브리지](imgs/05-5-preview-bridge.svg)
 
-기본 미리보기의 메시지 통로는 `markdown.previewScripts` + `vscode-notebook-renderer`가 아닌 **`acquireVsCodeApi().postMessage`** 와 확장 측 `markdown.api` 채널(기본 마크다운 확장이 `webview.onDidReceiveMessage`를 `previewScripts`에 노출하는 `vscode.markdown.api` 경로)을 쓴다. 미지원 시 대안: 태스크 줄을 `command:` 링크로 렌더링해 클릭 시 확장 명령을 직접 호출(체크박스 토글은 이 경로로도 충분). 이 결정은 M5 착수 시 스파이크로 확정한다.
+**M5.0 스파이크 결과(D-1)**: 위 시퀀스의 `postMessage`/`query/run` 경로는 클래식 미리보기에서 **불가능**하다(기여 스크립트는 `acquireVsCodeApi` 획득 불가, `command:` 링크 비활성). 실제 구현은 렌더 시점 통합이다 — markdown-it 플러그인이 확장 프로세스에서 `QueryService`를 직접 호출해 결과 HTML을 만들고, 인덱스 변경 시 `markdown.preview.refresh`를 호출한다. 체크박스는 표시 전용이며 토글은 사이드바/칸반/에디터에서 한다. 상호작용형 미리보기는 VS Code의 새 Markdown Editor + `codeBlockEditors`(v1.x 후보)로 가능하다.
 
 ### 5.6 웹뷰 메시지 프로토콜 (모든 Svelte 앱 공통)
 
@@ -800,8 +800,8 @@ GitHub Actions: PR마다 `typecheck + lint + test`, 태그 `v*` 푸시 시 패�
 
 | # | 이슈 | 결정 시점 |
 |---|---|---|
-| D-1 | 기본 미리보기 ↔ 확장 간 양방향 메시지 채널이 현재 VS Code 버전에서 어디까지 지원되는지 (5.5). 미지원이면 `command:` 링크 방식으로 대체 | M5 착수 시 스파이크 |
-| D-2 | Cursor의 `markdown.previewScripts` 지원 여부 확인 | M5 |
+| D-1 | ~~기본 미리보기 ↔ 확장 간 양방향 메시지 채널~~ → **결정(M5.0 스파이크, VS Code 1.138 소스 분석)**: 클래식 미리보기(`markdown.showPreview`)에는 채널이 **없다**. 기여 스크립트는 `acquireVsCodeApi`를 얻을 수 없고(미리보기가 이미 획득), 웹뷰에 `enableCommandUris`가 없어 `command:` 링크도 실행되지 않으며, 확장이 처리하는 메시지는 `revealLine`/`didClick`/`openLink`뿐. 따라서 미리보기 연동은 **렌더 시점 통합**으로 한정: markdown-it 플러그인이 확장 프로세스에서 실행되므로 태스크 뱃지와 ` ```tasks ` 결과를 렌더 시 HTML로 생성하고, 인덱스 변경 시 `markdown.preview.refresh`로 갱신. 체크박스 클릭·편집은 사이드바/칸반/에디터에서. 태스크 링크는 `file.md#L12`(`markdown.preview.openMarkdownLinks: inEditor`일 때 줄로 이동). **참고**: VS Code 1.138에는 새 내장 "Markdown Editor"(WYSIWYG 커스텀 에디터)와 `markdown.codeBlockEditors` 확장 포인트(양방향 transport)가 있어 향후 ` ```tasks ` 블록을 상호작용형으로 렌더링할 수 있음 → v1.x 후보 | 완료 |
+| D-2 | ~~Cursor의 `markdown.previewScripts` 지원 여부~~ → **결정(M5.0)**: Cursor 3.12.10은 클래식 미리보기만 있고(`vscode.markdown.preview.editor`), `codeBlockEditors`/내장 Markdown Editor 없음. `markdownItPlugins`/`previewStyles`/`previewScripts` 계약은 동일 → 렌더 시점 통합이 VS Code·Cursor 공통 기준선 | 완료 |
 | D-3 | 칸반·캘린더의 드래그앤드롭 라이브러리(svelte-dnd-action vs 자체 구현) | M6 |
 | D-4 | `rrule` 번들 크기(≈ 60KB)와 Obsidian Tasks의 반복 파서 이식 범위 | M3 |
 | D-5 | OS 알림의 Linux 지원 범위(`notify-send` 유무) | M7 |

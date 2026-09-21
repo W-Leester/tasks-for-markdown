@@ -16,5 +16,8 @@
     "src",
     "tests/integration"
   ],
-  "exclude": []
+  "exclude": [
+    "src/preview/previewScript.ts",
+    "src/webviews"
+  ]
 }

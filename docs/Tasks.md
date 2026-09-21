@@ -372,10 +372,10 @@
 - 라이트/다크/하이 컨트라스트에서 색이 깨지지 않는다.
 - Cursor에서도 동일하게 동작한다(또는 미지원 사항이 문서화되어 있다).
 
-### M5.0 스파이크 (⚠ 먼저)
-- [ ] D-1: 기본 미리보기 ↔ 확장 양방향 메시지 채널 확인 — `markdown.previewScripts` + `acquireVsCodeApi().postMessage`가 확장의 어떤 API로 도착하는지, 현재 VS Code 버전 기준 실험 → 결과를 design.md D-1에 기록
-- [ ] D-2: Cursor에서 `markdown.previewScripts`·`markdownItPlugins` 지원 확인
-- [ ] 미지원 시 대안 확정: 태스크 줄을 `command:` 링크로 렌더링 (체크박스 토글은 이 경로로 충분)
+### M5.0 스파이크 (완료 — 결론은 design.md D-1/D-2)
+- [x] D-1: 클래식 미리보기 → 확장 채널 실험(`acquireVsCodeApi`, `command:` 링크 클릭) → 둘 다 불가. VS Code 1.138 마크다운 확장 소스 분석: 미리보기는 `revealLine`/`didClick`/`openLink`만 처리, `enableCommandUris` 없음
+- [x] D-2: Cursor 3.12.10 = 클래식 미리보기만(`codeBlockEditors`·내장 Markdown Editor 없음) → 렌더 시점 통합이 공통 기준선
+- [x] 대안 확정: markdown-it 플러그인(확장 프로세스)에서 태스크 뱃지 + ` ```tasks ` 결과 HTML 생성, 인덱스 변경 시 `markdown.preview.refresh`; 체크박스 표시 전용; 링크 `file.md#L<n>`. 상호작용형은 VS Code 내장 Markdown Editor + `codeBlockEditors`(v1.x)
 
 ### M5.1 markdown-it 플러그인 (`src/preview/markdownItPlugin.ts`)
 - [ ] `contributes.markdown.markdownItPlugins: true` + `extendMarkdownIt()` 반환

@@ -16,3 +16,4 @@ History.md
 dist/tests/**
 tsconfig.integration.json
 .vscode-test.mjs
+tsconfig.browser.json

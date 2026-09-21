@@ -118,9 +118,9 @@ def anatomy():
     s = SVG(1180, 360, '4.1 한 줄의 해부')
     s.text(20, 30, '태스크 한 줄의 구조 — 파서는 줄 끝에서부터 필드를 벗겨내고, 남은 앞부분을 description으로 삼는다 (필드 순서 무관)', size=14, weight='bold')
     toks = [('␣␣', 'indentation', C['muted']), ('-', 'listMarker', C['muted']), ('[ ]', 'status.symbol', C['accent']),
-            ('보고서 작성 #work', 'description (+tags)', C['text']), ('⏫', 'priority', '#d84315'), ('🔁 every week', 'recurrence', C['purple']),
-            ('🛫 2026-09-20', 'start', C['ok']), ('⏳ 2026-09-22', 'scheduled', C['warn']), ('📅 2026-09-25', 'due', C['err']),
-            ('🆔 a1b2c3', 'id', C['accent']), ('^blk1', 'blockLink', C['muted'])]
+            ('보고서 작성 #work', 'description (+tags)', C['text']), ('🆔 a1b2c3', 'id', C['accent']), ('⏫', 'priority', '#d84315'),
+            ('🔁 every week', 'recurrence', C['purple']), ('🛫 2026-09-20', 'start', C['ok']), ('⏳ 2026-09-22', 'scheduled', C['warn']),
+            ('📅 2026-09-25', 'due', C['err']), ('^blk1', 'blockLink', C['muted'])]
     x = 70; y = 70; h = 40
     s.rect(16, 58, 1148, 64, fill=C['code'], stroke=C['border'], r=6)
     for i, (t, lbl, col) in enumerate(toks):
@@ -137,9 +137,9 @@ def anatomy():
         x += w + 6
     s.text(20, 245, '읽기: 줄 끝에서부터  blockLink → 날짜/ID/반복/우선순위 정규식을 반복 매칭  → 남은 텍스트 = description',
            size=12, fill=C['muted'])
-    s.text(20, 270, '쓰기: description → priority → recurrence → 🏁 onCompletion → 🆔 id → ⛔ dependsOn → ➕ created → 🛫 start → ⏳ scheduled → 📅 due → ✅ done → ❌ cancelled → blockLink',
+    s.text(20, 270, '쓰기(Obsidian과 동일): description → 🆔 id → ⛔ dependsOn → priority → 🔁 recurrence → 🏁 onCompletion → ➕ created → 🛫 start → ⏳ scheduled → 📅 due → ❌ cancelled → ✅ done → blockLink',
            size=12, fill=C['muted'])
-    s.text(20, 305, 'Dataview 포맷도 동일 구조:  - [ ] 보고서 작성 #work [priority:: high] [repeat:: every week] [start:: 2026-09-20] [scheduled:: 2026-09-22] [due:: 2026-09-25] [id:: a1b2c3]',
+    s.text(20, 305, 'Dataview 포맷도 동일 구조:  - [ ] 보고서 작성 #work [id:: a1b2c3] [priority:: high] [repeat:: every week] [start:: 2026-09-20] [scheduled:: 2026-09-22] [due:: 2026-09-25]',
            size=10.5, fill=C['muted'], mono=True)
     s.text(20, 340, 'Task는 불변(immutable) — 변경은 새 Task를 만들어 직렬화 → 파일 쓰기 → 변경 이벤트로 재파싱', size=12, fill=C['accent'])
     s.save('04-1-line-anatomy.svg')

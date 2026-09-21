@@ -5,9 +5,9 @@ const statusRegistry = StatusRegistry.default();
 const parse = (line: string) => parseTaskLine(line, { statusRegistry })!;
 
 const CANONICAL_EMOJI =
-  '- [ ] 보고서 작성 #work ⏫ 🔁 every week when done 🏁 delete 🆔 a1b2c3 ⛔ x1,y2 ➕ 2026-09-15 🛫 2026-09-20 ⏳ 2026-09-22 📅 2026-09-25 ✅ 2026-09-26 ❌ 2026-09-27 ^blk1';
+  '- [ ] 보고서 작성 #work 🆔 a1b2c3 ⛔ x1,y2 ⏫ 🔁 every week when done 🏁 delete ➕ 2026-09-15 🛫 2026-09-20 ⏳ 2026-09-22 📅 2026-09-25 ❌ 2026-09-27 ✅ 2026-09-26 ^blk1';
 const CANONICAL_DATAVIEW =
-  '- [ ] 보고서 작성 #work [priority:: high] [repeat:: every week when done] [onCompletion:: delete] [id:: a1b2c3] [dependsOn:: x1,y2] [created:: 2026-09-15] [start:: 2026-09-20] [scheduled:: 2026-09-22] [due:: 2026-09-25] [completion:: 2026-09-26] [cancelled:: 2026-09-27] ^blk1';
+  '- [ ] 보고서 작성 #work [id:: a1b2c3] [dependsOn:: x1,y2] [priority:: high] [repeat:: every week when done] [onCompletion:: delete] [created:: 2026-09-15] [start:: 2026-09-20] [scheduled:: 2026-09-22] [due:: 2026-09-25] [cancelled:: 2026-09-27] [completion:: 2026-09-26] ^blk1';
 
 describe('serializeTask', () => {
   it('round-trips a canonical emoji line exactly', () => {
@@ -25,7 +25,7 @@ describe('serializeTask', () => {
 
   it('normalises field order and spacing', () => {
     const messy = '  * [x]   shuffled   ✅ 2026-09-26  📅 2026-09-25 🆔 abc ⏬  🔁 every day';
-    expect(serializeTask(parse(messy))).toBe('  * [x] shuffled ⏬ 🔁 every day 🆔 abc 📅 2026-09-25 ✅ 2026-09-26');
+    expect(serializeTask(parse(messy))).toBe('  * [x] shuffled 🆔 abc ⏬ 🔁 every day 📅 2026-09-25 ✅ 2026-09-26');
   });
 
   it('always writes square brackets for dataview even when read from parentheses', () => {

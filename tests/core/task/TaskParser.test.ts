@@ -53,7 +53,7 @@ describe('structure', () => {
 
 describe('emoji fields', () => {
   const line =
-    '- [ ] 보고서 작성 #work ⏫ 🔁 every week when done 🏁 delete 🆔 a1b2c3 ⛔ x1,y2 ➕ 2026-09-15 🛫 2026-09-20 ⏳ 2026-09-22 📅 2026-09-25 ✅ 2026-09-26 ❌ 2026-09-27 ^blk1';
+    '- [ ] 보고서 작성 #work 🆔 a1b2c3 ⛔ x1,y2 ⏫ 🔁 every week when done 🏁 delete ➕ 2026-09-15 🛫 2026-09-20 ⏳ 2026-09-22 📅 2026-09-25 ❌ 2026-09-27 ✅ 2026-09-26 ^blk1';
 
   it('parses every field', () => {
     const t = parse(line)!;

@@ -4,16 +4,20 @@ import { DATAVIEW_DATE_KEY } from './formats/dataview';
 import { DEPENDS_ON_EMOJI, ID_EMOJI, ON_COMPLETION_EMOJI, RECURRENCE_EMOJI, WRITE_EMOJI } from './formats/emoji';
 import type { TaskFormat } from './formats/types';
 
-/** Fixed write order (FR-1.6): fields are normalised to this order regardless of how they were read. */
-const DATE_ORDER: readonly DateFieldName[] = ['created', 'start', 'scheduled', 'due', 'done', 'cancelled'];
+/**
+ * Fixed write order (FR-1.6), identical to Obsidian Tasks' layout order so that lines written by
+ * either tool are byte-for-byte the same:
+ * id → dependsOn → priority → recurrence → onCompletion → created → start → scheduled → due → cancelled → done.
+ */
+const DATE_ORDER: readonly DateFieldName[] = ['created', 'start', 'scheduled', 'due', 'cancelled', 'done'];
 
 function emojiFields(task: Task): string[] {
   const out: string[] = [];
+  if (task.id) out.push(`${ID_EMOJI} ${task.id}`);
+  if (task.dependsOn.length) out.push(`${DEPENDS_ON_EMOJI} ${task.dependsOn.join(',')}`);
   if (task.priority !== Priority.None) out.push(PRIORITY_EMOJI[task.priority]);
   if (task.recurrenceText) out.push(`${RECURRENCE_EMOJI} ${task.recurrenceText}`);
   if (task.onCompletion) out.push(`${ON_COMPLETION_EMOJI} ${task.onCompletion}`);
-  if (task.id) out.push(`${ID_EMOJI} ${task.id}`);
-  if (task.dependsOn.length) out.push(`${DEPENDS_ON_EMOJI} ${task.dependsOn.join(',')}`);
   for (const name of DATE_ORDER) {
     const f = task[name];
     if (f) out.push(`${WRITE_EMOJI[name]} ${f.format()}`);
@@ -23,11 +27,11 @@ function emojiFields(task: Task): string[] {
 
 function dataviewFields(task: Task): string[] {
   const out: string[] = [];
+  if (task.id) out.push(`[id:: ${task.id}]`);
+  if (task.dependsOn.length) out.push(`[dependsOn:: ${task.dependsOn.join(',')}]`);
   if (task.priority !== Priority.None) out.push(`[priority:: ${PRIORITY_NAME[task.priority]}]`);
   if (task.recurrenceText) out.push(`[repeat:: ${task.recurrenceText}]`);
   if (task.onCompletion) out.push(`[onCompletion:: ${task.onCompletion}]`);
-  if (task.id) out.push(`[id:: ${task.id}]`);
-  if (task.dependsOn.length) out.push(`[dependsOn:: ${task.dependsOn.join(',')}]`);
   for (const name of DATE_ORDER) {
     const f = task[name];
     if (f) out.push(`[${DATAVIEW_DATE_KEY[name]}:: ${f.format()}]`);

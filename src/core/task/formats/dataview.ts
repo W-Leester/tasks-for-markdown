@@ -16,53 +16,73 @@ const keyToDateField = new Map<string, DateFieldName>(
   (Object.entries(DATAVIEW_DATE_KEY) as [DateFieldName, string][]).map(([f, k]) => [k, f]),
 );
 
-const ISO = String.raw`(\d{4}-\d{2}-\d{2})`;
+const ISO = String.raw`\d{4}-\d{2}-\d{2}`;
 const IDENT = String.raw`[a-zA-Z0-9\-_]+`;
-// Fields may be wrapped in [] or (); we accept both but always write [].
-const open = String.raw`[[(]`;
-const close = String.raw`[\])]`;
+
+/**
+ * `[key:: value]` or `(key:: value)` at the end of the line — the brackets must be a matching
+ * pair. Whitespace is allowed inside the brackets and after `::`. Groups: `k1`/`v1` for square
+ * brackets, `k2`/`v2` for parentheses.
+ */
+function dv(key: string, value: string, flags = 'u'): RegExp {
+  const sq = String.raw`\[\s*(?<k1>${key})::\s*(?<v1>${value})\s*\]`;
+  const pa = String.raw`\(\s*(?<k2>${key})::\s*(?<v2>${value})\s*\)`;
+  return new RegExp(String.raw`(?:${sq}|${pa})$`, flags);
+}
+
+function kv(m: RegExpMatchArray): { key: string; value: string } {
+  const g = m.groups!;
+  return { key: (g['k1'] ?? g['k2'])!, value: (g['v1'] ?? g['v2'])! };
+}
 
 export const dataviewMatchers: readonly FieldMatcher[] = [
   {
     name: 'dv-date',
-    regex: new RegExp(String.raw`${open}(created|start|scheduled|due|completion|cancelled)::\s*${ISO}\s*${close}$`, 'u'),
+    regex: dv('created|start|scheduled|due|completion|cancelled', ISO),
+    consumeTrailingComma: true,
     apply: (m, out) => {
-      out.dates[keyToDateField.get(m[1]!)!] = m[2]!;
+      const { key, value } = kv(m);
+      out.dates[keyToDateField.get(key)!] = value;
     },
   },
   {
     name: 'dv-priority',
-    regex: new RegExp(String.raw`${open}priority::\s*(highest|high|medium|none|low|lowest)\s*${close}$`, 'iu'),
+    regex: dv('priority', 'highest|high|medium|none|low|lowest', 'iu'),
+    consumeTrailingComma: true,
     apply: (m, out) => {
-      out.priority = priorityFromName(m[1]!);
+      out.priority = priorityFromName(kv(m).value);
     },
   },
   {
     name: 'dv-repeat',
-    regex: new RegExp(String.raw`${open}repeat::\s*([^\])]+?)\s*${close}$`, 'u'),
+    regex: dv('repeat', String.raw`[^\])]+?`),
+    consumeTrailingComma: true,
     apply: (m, out) => {
-      out.recurrenceText = m[1]!.trim();
+      out.recurrenceText = kv(m).value.trim();
     },
   },
   {
     name: 'dv-onCompletion',
-    regex: new RegExp(String.raw`${open}onCompletion::\s*([a-zA-Z]+)\s*${close}$`, 'u'),
+    regex: dv('onCompletion', '[a-zA-Z]+'),
+    consumeTrailingComma: true,
     apply: (m, out) => {
-      out.onCompletion = m[1]!.toLowerCase();
+      out.onCompletion = kv(m).value.toLowerCase();
     },
   },
   {
     name: 'dv-id',
-    regex: new RegExp(String.raw`${open}id::\s*(${IDENT})\s*${close}$`, 'u'),
+    regex: dv('id', IDENT),
+    consumeTrailingComma: true,
     apply: (m, out) => {
-      out.id = m[1]!;
+      out.id = kv(m).value;
     },
   },
   {
     name: 'dv-dependsOn',
-    regex: new RegExp(String.raw`${open}dependsOn::\s*(${IDENT}(?:\s*,\s*${IDENT})*)\s*${close}$`, 'u'),
+    regex: dv('dependsOn', String.raw`${IDENT}(?:\s*,\s*${IDENT})*`),
+    consumeTrailingComma: true,
     apply: (m, out) => {
-      out.dependsOn = splitDependsOn(m[1]!);
+      out.dependsOn = splitDependsOn(kv(m).value);
     },
   },
 ];

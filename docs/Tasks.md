@@ -25,8 +25,8 @@
 
 | 단계 | 내용 | 상태 | 비고 |
 |---|---|---|---|
-| M0 | 기반: 스캐폴딩 + 코어 태스크 모델·파서·직렬화 | 🟡 진행 중 | 스캐폴딩 일부 완료 |
-| M1 | 최소 사용 가능: 인덱스 + 토글 + 사이드바 트리 + 상태바 | ⬜ 대기 | |
+| M0 | 기반: 스캐폴딩 + 코어 태스크 모델·파서·직렬화 | ✅ 완료 | 2026-09-21 · 175 tests |
+| M1 | 최소 사용 가능: 인덱스 + 토글 + 사이드바 트리 + 상태바 | 🟡 진행 중 | |
 | M2 | 에디터 보조 UI: Decoration·CodeLens·Hover·자동완성·진단·QuickPick | ⬜ 대기 | |
 | M3 | 반복·커스텀 상태·의존성·긴급도 | ⬜ 대기 | |
 | M4 | 쿼리 엔진 + 저장된 쿼리 + 쿼리 빌더 + 빠른 검색 | ⬜ 대기 | |
@@ -86,19 +86,19 @@
 - [x] 잘못된 날짜·알 수 없는 우선순위 등은 예외가 아니라 필드에 표시(`valid:false`)하고 파싱은 계속한다
 
 ### M0.4 직렬화 (`TaskSerializer`)
-- [x] 이모지 포맷 — 고정 순서: description → priority → 🔁 → 🏁 → 🆔 → ⛔ → ➕ → 🛫 → ⏳ → 📅 → ✅ → ❌ → blockLink (FR-1.6)
+- [x] 이모지 포맷 — 고정 순서(Obsidian 동일): description → 🆔 → ⛔ → priority → 🔁 → 🏁 → ➕ → 🛫 → ⏳ → 📅 → ❌ → ✅ → blockLink (FR-1.6)
 - [x] Dataview 포맷 — 같은 순서, 항상 `[]` 사용 (FR-1.9); 우선순위 `none`은 생략
 - [x] 들여쓰기·마커·심볼 그대로 재현; 필드 사이 공백 1개; 원본에 없던 필드는 쓰지 않음
 - [x] `format` 인자로 포맷 선택 (설정 `taskFormat`은 M1에서 연결)
 
 ### M0.5 테스트
-- [ ] 라운드트립: 이모지 픽스처 → parse → serialize → 원문과 동일 (정규화된 순서인 줄만)
-- [ ] 순서 무관: 필드 순서를 섞은 입력 → 같은 Task 객체
-- [ ] 혼합 포맷: `📅 2026-09-25 [priority:: high]` 한 줄
-- [ ] 비태스크 줄: `- [ ]` 없는 줄, `- [xx]`, `[ ]`만 있는 줄, 코드블록 안 줄(M1 FileParser에서 재검증)
-- [ ] 엣지: 설명이 비어 있는 태스크, 이모지 뒤 날짜 없음, 날짜 뒤 텍스트, 탭 들여쓰기, CRLF
-- [ ] Obsidian Tasks `tests/TaskSerializer/*.test.ts`, `tests/Task/*.test.ts` 케이스 이식 (NFR-7) — 이식한 파일 상단에 출처 주석
-- [ ] `tests/fixtures/parser/emoji.md`, `dataview.md`, `mixed.md`, `edge-cases.md` 작성
+- [x] 라운드트립: 이모지 픽스처 → parse → serialize → 원문과 동일 (정규화된 순서인 줄만)
+- [x] 순서 무관: 필드 순서를 섞은 입력 → 같은 Task 객체
+- [x] 혼합 포맷: `📅 2026-09-25 [priority:: high]` 한 줄
+- [x] 비태스크 줄: `- [ ]` 없는 줄, `- [xx]`, `[ ]`만 있는 줄, 코드블록 안 줄(M1 FileParser에서 재검증)
+- [x] 엣지: 설명이 비어 있는 태스크, 이모지 뒤 날짜 없음, 날짜 뒤 텍스트, 탭 들여쓰기, CRLF
+- [x] Obsidian Tasks `tests/TaskSerializer/*.test.ts`, `tests/Task/*.test.ts` 케이스 이식 (NFR-7) — 이식한 파일 상단에 출처 주석
+- [x] `tests/fixtures/parser/emoji.md`, `dataview.md`, `not-tasks.md` 작성 (mixed/edge 케이스는 `TaskParser.test.ts`·`obsidian-port.test.ts`에 인라인)
 
 ---
 

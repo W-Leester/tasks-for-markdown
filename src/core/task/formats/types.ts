@@ -19,6 +19,8 @@ export interface FieldMatcher {
   name: string;
   regex: RegExp;
   apply(match: RegExpMatchArray, out: ParsedFields): void;
+  /** Dataview fields may be separated by commas (`[a:: 1], [b:: 2]`); strip a trailing comma after a match. */
+  consumeTrailingComma?: boolean;
 }
 
 export type TaskFormat = 'emoji' | 'dataview';

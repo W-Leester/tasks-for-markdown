@@ -1,6 +1,6 @@
 # Tasks for Markdown — 설계 문서
 
-- 문서 버전: 0.2
+- 문서 버전: 0.3
 - 작성일: 2026-09-21
 - 근거 문서: [requirements.md](requirements.md) v0.3
 - 다이어그램은 Mermaid 소스와 함께 렌더링된 SVG(`imgs/`)를 나란히 둡니다. Mermaid를 렌더링하지 못하는 뷰어에서는 SVG를 보면 됩니다. UI 목업도 ASCII 원본 아래에 SVG 버전을 두었습니다.
@@ -281,9 +281,9 @@ classDiagram
 ### 4.1 한 줄의 해부
 
 ```
-  - [ ] 보고서 작성 #work ⏫ 🔁 every week 🛫 2026-09-20 ⏳ 2026-09-22 📅 2026-09-25 🆔 a1b2c3 ^blk1
-  │ │ │ └───────┬────────┘ └┬┘ └─────┬──────┘ └─────┬──────┘ └─────┬──────┘ └─────┬──────┘ └──┬──┘ └─┬─┘
-  │ │ │   description     priority  recurrence     start        scheduled      due          id   blockLink
+  - [ ] 보고서 작성 #work 🆔 a1b2c3 ⏫ 🔁 every week 🛫 2026-09-20 ⏳ 2026-09-22 📅 2026-09-25 ^blk1
+  │ │ │ └───────┬────────┘ └──┬──┘ └┬┘ └─────┬──────┘ └─────┬──────┘ └─────┬──────┘ └─────┬──────┘ └─┬─┘
+  │ │ │   description        id   priority recurrence     start        scheduled      due      blockLink
   │ │ └ status.symbol (" ")
   │ └ listMarker ("-")
   └ indentation ("  ")
@@ -291,7 +291,7 @@ classDiagram
 
 ![4.1 한 줄의 해부](imgs/04-1-line-anatomy.svg)
 
-파서는 **줄 끝에서부터** 필드 정규식을 반복 적용해 벗겨내고, 남은 앞부분을 description으로 삼는다(Obsidian Tasks와 동일 전략 — 필드 순서에 무관). 직렬화는 항상 고정 순서로 쓴다.
+파서는 **줄 끝에서부터** 필드 정규식을 반복 적용해 벗겨내고, 남은 앞부분을 description으로 삼는다(Obsidian Tasks와 동일 전략 — 필드 순서에 무관, 필드 사이에 낀 태그는 description으로 되돌린다). 직렬화는 항상 Obsidian과 같은 고정 순서 `🆔 → ⛔ → 우선순위 → 🔁 → 🏁 → ➕ → 🛫 → ⏳ → 📅 → ❌ → ✅ → ^blockLink` 로 쓴다.
 
 ---
 
@@ -812,5 +812,6 @@ GitHub Actions: PR마다 `typecheck + lint + test`, 태그 `v*` 푸시 시 패�
 
 | 날짜 | 버전 | 내용 |
 |---|---|---|
+| 2026-09-21 | 0.3 | 4.1 직렬화 순서를 Obsidian 실제 구현에 맞춤 (id/dependsOn이 앞, cancelled가 done 앞) |
 | 2026-09-21 | 0.2 | 모든 Mermaid 다이어그램과 ASCII 목업에 SVG 버전 추가 (`imgs/`) · 5.4/5.5 Mermaid 소스의 백틱 파싱 오류 수정 |
 | 2026-09-21 | 0.1 | 초안 — 아키텍처, 도메인 모델, 데이터 흐름, UI 와이어프레임, 보안·성능·테스트·배포 |

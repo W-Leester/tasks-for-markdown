@@ -6,7 +6,7 @@ docs/**
 node_modules/**
 **/*.map
 esbuild.config.mjs
-vitest.config.ts
+vitest.config.mts
 eslint.config.mjs
 tsconfig.json
 .prettierrc

@@ -6,6 +6,7 @@ import { type TaskLocation, unknownLocation } from './TaskLocation';
 import { dataviewMatchers } from './formats/dataview';
 import { emojiMatchers } from './formats/emoji';
 import type { ParsedFields } from './formats/types';
+import { TRAILING_TAGS_RE } from './tags';
 
 /**
  * `<indent><marker> [<one char>]<space or end><body>`
@@ -15,8 +16,7 @@ export const TASK_LINE_RE = /^([ \t]*)([-*+]|\d+[.)])[ \t]+\[(.)\](?:[ \t]+(.*))
 
 /** Trailing `^block-id` (Obsidian block reference). */
 const BLOCK_LINK_RE = /\s+\^([a-zA-Z0-9-]+)$/u;
-/** One or more tags at the very end of the body; they are moved back into the description. */
-const TRAILING_TAGS_RE = /(?:\s+#[\p{L}\p{N}_\-/]+)+$/u;
+const TRAILING_COMMA_RE = /\s*,$/u;
 
 const ALL_MATCHERS = [...emojiMatchers, ...dataviewMatchers];
 const MAX_FIELDS = 20;
@@ -65,28 +65,31 @@ export function parseTaskLine(line: string, options: ParseOptions): Task | null 
     rest = rest.slice(0, bl.index).trimEnd();
   }
 
+  // Tags may sit between fields (`#a 📅 2026-01-01 #b`); whenever the end of the line is a run of
+  // tags they are lifted off and later re-attached to the description, mirroring Obsidian Tasks.
   let trailingTags = '';
-  const tt = TRAILING_TAGS_RE.exec(rest);
-  if (tt && tt.index > 0) {
-    trailingTags = tt[0];
-    rest = rest.slice(0, tt.index).trimEnd();
-  }
-
   const fields: ParsedFields = { dates: {} };
   for (let i = 0; i < MAX_FIELDS; i++) {
+    const tt = TRAILING_TAGS_RE.exec(rest);
+    if (tt) {
+      trailingTags = tt[0].trim() + (trailingTags ? ' ' + trailingTags : '');
+      rest = rest.slice(0, tt.index).trimEnd();
+      continue;
+    }
     let matched = false;
     for (const matcher of ALL_MATCHERS) {
       const m = matcher.regex.exec(rest);
       if (!m) continue;
       matcher.apply(m, fields);
       rest = rest.slice(0, m.index).trimEnd();
+      if (matcher.consumeTrailingComma) rest = rest.replace(TRAILING_COMMA_RE, '');
       matched = true;
       break;
     }
     if (!matched) break;
   }
 
-  const description = (rest.trim() + trailingTags).trim();
+  const description = [rest.trim(), trailingTags].filter((x) => x.length > 0).join(' ');
   const date = (name: DateFieldName): DateField | null => {
     const raw = fields.dates[name];
     return raw === undefined ? null : DateField.parse(raw);

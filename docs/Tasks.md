@@ -236,7 +236,7 @@
 - [x] 트리 컨텍스트 메뉴에 우선순위/날짜/미루기/상태/편집 항목 추가 (M1.6 보강)
 
 ### M2.7 진단 (`src/editor/TaskDiagnostics.ts`)
-- [x] `DiagnosticCollection` — 잘못된 날짜, 없는 ID 참조, 날짜 없는 반복 (FR-3.17); (M3에서 추가) 파싱 불가 반복, 순환 의존성
+- [x] `DiagnosticCollection` — 잘못된 날짜, 없는 ID 참조, 날짜 없는 반복, 파싱 불가 반복, 순환 의존성 (FR-3.17)
 - [x] Quick Fix(`CodeActionProvider`): 잘못된 날짜 → 오늘로 / 제거, 없는 의존성 제거, 반복에 오늘 마감 추가 / 반복 제거
 - [x] 열린 문서만 대상, 인덱스 이벤트 시 갱신
 
@@ -277,12 +277,12 @@
 - [x] 타입 전이 기반 날짜 처리 재검증 — `[X]`, `[>]` 등 커스텀 심볼에서도 ✅ 동작 (D§6.1)
 
 ### M3.4 의존성
-- [ ] ID 생성기 — 영숫자 6자, 인덱스 내 중복 회피
-- [ ] 인덱스에 `idMap`, `blockedBy(task)`, `blocking(task)` 계산 — 완료/취소된 선행 태스크는 제외 (FR-1.20, FR-1.21)
-- [ ] 순환 의존성 감지 (FR-1.22) → 진단
-- [ ] `DependencyPick` — 설명 텍스트 퍼지 검색, 다중 선택, 선택 시 상대에 🆔 없으면 발급
-- [ ] 명령 `tasksmd.setDependencies`
-- [ ] 사이드바 "차단됨" 스마트 뷰 실제 동작, 장식 `⛔ 대기 중(N)`, Hover 링크
+- [x] ID 생성기 — 영숫자 6자, 인덱스 내 중복 회피 (M2.5에서 구현)
+- [x] `core/index/dependencies.ts`: `dependencies`/`dependants`/`isBlocked`/`isBlocking`/`findDependencyCycle` — 완료/취소된 선행 태스크는 제외 (FR-1.20, FR-1.21)
+- [x] 순환 의존성 감지 (FR-1.22) → 진단
+- [x] `DependencyPick` — 설명 텍스트 퍼지 검색, 다중 선택, 선택 시 상대에 🆔 없으면 발급
+- [x] 명령 `tasksmd.setDependencies`
+- [x] 사이드바 "차단됨" 스마트 뷰 실제 동작, 장식 `⛔ 대기 중(N)`, Hover 링크
 
 ### M3.5 긴급도
 - [ ] Obsidian Tasks `Urgency.ts` 공식 이식 (FR-1.23) — 마감/예정/시작/우선순위 가중치
@@ -290,7 +290,7 @@
 - [ ] 테스트: 원본 테스트 케이스 이식
 
 ### M3.6 진단·자동완성 보강
-- [ ] 진단: 반복 규칙 파싱 실패, 없는 ID 참조, 순환, 날짜 없는 반복
+- [x] 진단: 반복 규칙 파싱 실패, 없는 ID 참조, 순환(Error), 날짜 없는 반복 + Quick Fix
 - [ ] 자동완성: `every` 프리셋, `id` 자동 발급, `depends on` 검색
 - [ ] CodeLens `🔁 매주 ▾` → `RecurrencePick`(프리셋 + 자유 입력 + 유효성)
 

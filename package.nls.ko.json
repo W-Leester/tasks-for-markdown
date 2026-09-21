@@ -61,5 +61,6 @@
   "tasksmd.config.statuses.nextSymbol": "토글 시 이동할 심볼.",
   "tasksmd.config.statuses.type": "동작을 결정하는 타입.",
   "tasksmd.loadStatusPreset.title": "상태 프리셋 불러오기…",
-  "tasksmd.changeStatusTo.title": "상태 변경…"
+  "tasksmd.changeStatusTo.title": "상태 변경…",
+  "tasksmd.setDependencies.title": "의존성 설정…"
 }

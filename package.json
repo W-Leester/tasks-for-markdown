@@ -152,6 +152,11 @@
         "command": "tasksmd.changeStatusTo",
         "title": "%tasksmd.changeStatusTo.title%",
         "category": "Tasks"
+      },
+      {
+        "command": "tasksmd.setDependencies",
+        "title": "%tasksmd.setDependencies.title%",
+        "category": "Tasks"
       }
     ],
     "configuration": {
@@ -469,6 +474,10 @@
         {
           "command": "tasksmd.postpone",
           "group": "2_fields@6"
+        },
+        {
+          "command": "tasksmd.setDependencies",
+          "group": "2_fields@7"
         }
       ],
       "view/title": [
@@ -548,6 +557,11 @@
           "command": "tasksmd.setStatus",
           "when": "view == tasksmd.tasks && viewItem =~ /^task/",
           "group": "3_fields@5"
+        },
+        {
+          "command": "tasksmd.setDependencies",
+          "when": "view == tasksmd.tasks && viewItem =~ /^task/",
+          "group": "3_fields@6"
         }
       ]
     },

@@ -61,5 +61,6 @@
   "tasksmd.config.statuses.nextSymbol": "Symbol the task moves to when toggled.",
   "tasksmd.config.statuses.type": "Semantic type that drives behaviour.",
   "tasksmd.loadStatusPreset.title": "Load status preset…",
-  "tasksmd.changeStatusTo.title": "Change status to…"
+  "tasksmd.changeStatusTo.title": "Change status to…",
+  "tasksmd.setDependencies.title": "Set dependencies…"
 }

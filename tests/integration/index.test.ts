@@ -203,3 +203,21 @@ suite('diagnostics', () => {
     assert.equal(doc.lineAt(bad.range.start.line).text, '- [ ] bad');
   });
 });
+
+suite('dependencies', () => {
+  const guard = new FixtureGuard();
+  teardown(() => guard.restore());
+
+  test('cycle and invalid recurrence diagnostics', async () => {
+    await getApi();
+    guard.protect('notes/project-a.md');
+    const doc = await vscode.workspace.openTextDocument(fixtureUri('notes/project-a.md'));
+    const editor = await vscode.window.showTextDocument(doc);
+    await editor.edit((eb) => eb.insert(new vscode.Position(doc.lineCount, 0), '\n- [ ] p 🆔 cy1 ⛔ cy2\n- [ ] q 🆔 cy2 ⛔ cy1\n- [ ] r 🔁 every blah 📅 2026-09-25'));
+    const codesNow = () => vscode.languages.getDiagnostics(doc.uri).filter((d) => d.source === 'Tasks').map((d) => d.code);
+    await waitFor(() => codesNow().includes('dependency-cycle') && codesNow().includes('invalid-recurrence'), 4000, 'cycle + recurrence diagnostics');
+    const codes = codesNow();
+    assert.ok(codes.filter((c) => c === 'dependency-cycle').length >= 2, codes.join(','));
+    assert.ok(codes.includes('invalid-recurrence'), codes.join(','));
+  });
+});

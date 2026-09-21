@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { describeRelative, type Clock, systemClock } from '../core/dates';
 import type { TaskIndex } from '../core/index';
 import { StatusType, type StatusRegistry, type Task, isTaskLine, parseTaskLine } from '../core/task';
-import { isBlocked } from '../core/views';
+import { isBlocked } from '../core/index';
 import type { Settings } from '../settings/Settings';
 import { fieldsStartOffset } from './lineFields';
 import { overdueText, relativeText } from './relativeText';

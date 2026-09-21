@@ -1,7 +1,9 @@
 import * as vscode from 'vscode';
 import { systemClock, type Clock } from '../core/dates';
 import { DateField, type DateFieldName, Task } from '../core/task';
+import { pickDependencies } from '../editor/quickpicks/dependencyPick';
 import { pickDate, pickPostpone, pickPriority, pickStatus } from '../editor/quickpicks/pickers';
+import { generateTaskId } from '../core/task';
 import { type CommandDeps, resolveTargetTasks, runEdit } from './registerCommands';
 
 const DATE_LABEL: Record<DateFieldName, string> = {
@@ -66,6 +68,29 @@ export function registerEditCommands(context: vscode.ExtensionContext, deps: Com
         const f: DateFieldName = t.due ? 'due' : t.scheduled ? 'scheduled' : 'due';
         await deps.editService.update(t, { [f]: DateField.fromDate(date) });
       }
+    }),
+  );
+
+  register('tasksmd.setDependencies', (arg) =>
+    forTargets(arg, async (tasks) => {
+      const target = tasks[0]!;
+      const picked = await pickDependencies(deps.index, target);
+      if (!picked) return;
+      // Give ids to picked tasks that lack one (this edits their lines, in their own files).
+      const ids: string[] = [];
+      for (const t of picked) {
+        if (t.id) {
+          ids.push(t.id);
+          continue;
+        }
+        const id = generateTaskId((x) => deps.index.byId(x).length > 0 || ids.includes(x));
+        await deps.editService.update(t, { id });
+        ids.push(id);
+      }
+      // Re-read the target in case it lives in a file we just edited (its line text is unchanged,
+      // but the index entry was replaced).
+      const fresh = deps.index.taskAt(target.location.key, target.location.line) ?? target;
+      await deps.editService.update(fresh, { dependsOn: ids });
     }),
   );
 

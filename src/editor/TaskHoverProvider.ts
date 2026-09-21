@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { describeRelative, systemClock, type Clock } from '../core/dates';
 import type { TaskIndex } from '../core/index';
 import { PRIORITY_EMOJI, PRIORITY_NAME, Priority, type DateFieldName, type StatusRegistry, type Task, isTaskLine, parseTaskLine } from '../core/task';
-import { isBlocked } from '../core/views';
+import { isBlocked, isBlocking } from '../core/index';
 import type { Settings } from '../settings/Settings';
 import { overdueText, relativeText } from './relativeText';
 
@@ -58,7 +58,7 @@ export class TaskHoverProvider implements vscode.HoverProvider {
     if (task.onCompletion) rows.push(`🏁 ${vscode.l10n.t('On completion')}: ${task.onCompletion}`);
     if (task.id) {
       const dependants = this.deps.index.all().filter((t) => t.dependsOn.includes(task.id!));
-      rows.push(`🆔 ${task.id}` + (dependants.length ? ` — ${vscode.l10n.t('blocks')} ${dependants.map((t) => this.link(t)).join(', ')}` : ''));
+      rows.push(`🆔 ${task.id}` + (dependants.length ? ` — ${vscode.l10n.t('blocks')} ${dependants.map((t) => this.link(t)).join(', ')}` : '') + (isBlocking(task, this.deps.index) ? ` (**${vscode.l10n.t('blocking')}**)` : ''));
     }
     if (task.dependsOn.length) {
       const items = task.dependsOn.map((id) => {

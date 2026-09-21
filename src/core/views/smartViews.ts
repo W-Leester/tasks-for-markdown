@@ -1,5 +1,5 @@
 import type { Dayjs } from '../dates/dayjs';
-import type { TaskIndex } from '../index';
+import { type TaskIndex, isBlocked } from '../index';
 import { type Task, StatusType, priorityNumber } from '../task';
 
 export type SmartViewId = 'today' | 'upcoming' | 'overdue' | 'inProgress' | 'blocked' | 'open' | 'doneRecent';
@@ -24,11 +24,6 @@ export const SMART_VIEWS: readonly SmartViewDef[] = [
 export interface SmartViewContext {
   index: TaskIndex;
   today: Dayjs;
-}
-
-/** A task is blocked when any of its ⛔ ids points at a task that is not yet completed (FR-1.20). */
-export function isBlocked(task: Task, index: TaskIndex): boolean {
-  return task.dependsOn.some((id) => index.byId(id).some((t) => !t.isCompleted));
 }
 
 /**

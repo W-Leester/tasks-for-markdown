@@ -146,5 +146,10 @@
   "Replace all statuses": "모든 상태 교체",
   "Add missing statuses": "없는 상태만 추가",
   "Loaded {0} statuses from {1}.": "{1}에서 상태 {0}개를 불러왔습니다.",
-  "Ignoring invalid status entry in tasksmd.statuses: {0}": "tasksmd.statuses의 잘못된 항목을 무시합니다: {0}"
+  "Ignoring invalid status entry in tasksmd.statuses: {0}": "tasksmd.statuses의 잘못된 항목을 무시합니다: {0}",
+  "(an id will be generated)": "(id가 자동 생성됩니다)",
+  "Tasks that must be finished before \"{0}\"": "\"{0}\" 전에 끝나야 하는 태스크",
+  "Unrecognised recurrence rule \"{0}\". Examples: every day, every week on Monday, every month on the last.": "인식할 수 없는 반복 규칙 \"{0}\". 예: every day, every week on Monday, every month on the last.",
+  "Circular dependency: {0}.": "순환 의존성: {0}.",
+  "blocking": "다른 태스크를 막는 중"
 }

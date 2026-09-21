@@ -17,7 +17,6 @@
     "tests/integration"
   ],
   "exclude": [
-    "src/preview/previewScript.ts",
     "src/webviews"
   ]
 }

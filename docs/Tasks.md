@@ -30,8 +30,8 @@
 | M2 | 에디터 보조 UI: Decoration·CodeLens·Hover·자동완성·진단·QuickPick | ✅ 완료 | 2026-09-21 · unit 320 / integration 20 |
 | M3 | 반복·커스텀 상태·의존성·긴급도 | ✅ 완료 | 2026-09-21 · unit 369 / integration 24 |
 | M4 | 쿼리 엔진 + 저장된 쿼리 + 빠른 검색 (쿼리 빌더 → M6.4) | ✅ 완료 | 2026-09-21 · unit 437 / integration 26 |
-| M5 | 마크다운 미리보기 연동 | 🟡 진행 중 | D-1, D-2 스파이크 선행 |
-| M6 | 웹뷰: 편집 모달 + 칸반 | ⬜ 대기 | D-3 |
+| M5 | 마크다운 미리보기 연동 (렌더 전용 — D-1) | ✅ 완료 | 2026-09-21 · unit 445 / integration 27 |
+| M6 | 웹뷰: 편집 모달 + 칸반 + 쿼리 빌더 | 🟡 진행 중 | D-3 |
 | M7 | 추가 기능: 알림·아카이브·통계·캘린더·업데이트 확인 | ⬜ 대기 | D-5 |
 | M8 | 마감: i18n·성능·접근성·문서·패키징·게시 | ⬜ 대기 | v1.0 |
 
@@ -377,21 +377,22 @@
 - [x] D-2: Cursor 3.12.10 = 클래식 미리보기만(`codeBlockEditors`·내장 Markdown Editor 없음) → 렌더 시점 통합이 공통 기준선
 - [x] 대안 확정: markdown-it 플러그인(확장 프로세스)에서 태스크 뱃지 + ` ```tasks ` 결과 HTML 생성, 인덱스 변경 시 `markdown.preview.refresh`; 체크박스 표시 전용; 링크 `file.md#L<n>`. 상호작용형은 VS Code 내장 Markdown Editor + `codeBlockEditors`(v1.x)
 
-### M5.1 markdown-it 플러그인 (`src/preview/markdownItPlugin.ts`)
-- [ ] `contributes.markdown.markdownItPlugins: true` + `extendMarkdownIt()` 반환
-- [ ] 태스크 줄 → `<li class="tfm-task" data-path data-line>` + 체크박스 + 필드 뱃지(우선순위 색, 상대 날짜, 반복, 태그) (FR-4.2)
-- [ ] 원본 이모지 표시 옵션 `preview.renderBadges: false` (FR-4.2)
-- [ ] ✎ 편집 아이콘 (FR-4.3) — M6 전까지는 QuickPick 편집
-- [ ] ` ```tasks ` 블록 → `<div class="tfm-query" data-query>` 플레이스홀더 (FR-4.4)
-- [ ] 완료 태스크 스타일, 기한 초과 색 — `contributes.markdown.previewStyles` CSS, `--vscode-*` 변수만 사용 (FR-4.6, D§7.7)
+### M5.1 markdown-it 플러그인 (`src/preview/markdownItPlugin.ts`, 렌더러는 `src/core/render/html.ts`)
+- [x] `contributes.markdown.markdownItPlugins: true` + API의 `extendMarkdownIt()` (`PreviewIntegration`)
+- [x] 태스크 줄 → `<li class="tfm-task …" data-tfm-line>` + 표시 전용 체크박스 + 필드 뱃지(우선순위 색, 상대 날짜, 기한 초과, 반복, id, 의존성, 태그) (FR-4.2)
+- [x] 원본 이모지 표시 옵션 `preview.renderBadges: false` (FR-4.2)
+- [x] ~~✎ 편집 아이콘~~ → 결과 항목에 원본 링크 `file.md#L<n>` (FR-4.3, 0.5 변경)
+- [x] ` ```tasks ` 블록 → 렌더 시점에 `QueryService` 실행 → 그룹 헤딩·카운트·뱃지·링크·`explain`·오류 HTML (FR-4.4, FR-4.5)
+- [x] `hide|show`/`short mode`/`hide task count` 레이아웃 반영
+- [x] 완료 태스크 스타일, 기한 초과 색 — `media/preview.css`, `--vscode-*` 변수만 사용 (FR-4.6)
 
-### M5.2 미리보기 스크립트 · 브리지
-- [ ] `contributes.markdown.previewScripts` — 체크박스 클릭 → `task/toggle`, 로드 시 `query/run` (FR-4.1)
-- [ ] `PreviewBridge` — 메시지 수신 → `TaskEditService.toggle` / `QueryService.run` → `query/result` HTML 회신 (D§5.5)
-- [ ] 결과 HTML: 그룹 헤딩, 태스크 수, `explain`, 체크박스, 원본 이동 링크 (FR-4.5)
-- [ ] 인덱스 변경 시 열린 미리보기의 쿼리 결과 재전송 (FR-7.17)
-- [ ] 설정 `preview.enabled` (FR-9 표)
-- [ ] 서드파티 미리보기 확장 비호환 문서화 (FR-4.7)
+### M5.2 갱신 · 설정
+- [x] 인덱스 변경 시 `markdown.preview.refresh` (500ms 디바운스) — 확장→미리보기 push는 불가하므로 재렌더로 대체 (FR-7.17)
+- [x] 설정 `preview.enabled`, `preview.renderBadges`
+- [x] 서드파티 미리보기 확장 비호환 문서화 (FR-4.7) — requirements 0.5
+- [x] 테스트: markdown-it 단위 8건(체크박스·뱃지·중첩·fence·오류·explain·레이아웃), 통합 1건(`extendMarkdownIt` 경유 렌더 + 상대 링크)
+- [ ] (v1.x) VS Code 내장 Markdown Editor의 `markdown.codeBlockEditors`로 상호작용형 ` ```tasks ` 렌더러 (Cursor가 해당 버전을 따라잡은 뒤)
+
 
 ---
 

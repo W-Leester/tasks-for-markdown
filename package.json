@@ -472,6 +472,16 @@
             }
           },
           "markdownDescription": "%tasksmd.config.savedQueries%"
+        },
+        "tasksmd.preview.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "%tasksmd.config.preview.enabled%"
+        },
+        "tasksmd.preview.renderBadges": {
+          "type": "boolean",
+          "default": true,
+          "description": "%tasksmd.config.preview.renderBadges%"
         }
       }
     },
@@ -793,8 +803,9 @@
       }
     ],
     "markdown": {
-      "previewScripts": [
-        "./dist/preview.js"
+      "markdownItPlugins": true,
+      "previewStyles": [
+        "./media/preview.css"
       ]
     }
   },
@@ -828,6 +839,7 @@
     "esbuild": "^0.24.0",
     "eslint": "^9.0.0",
     "glob": "^13.0.6",
+    "markdown-it": "^15.0.2",
     "mocha": "^12.0.2",
     "ovsx": "^0.10.0",
     "prettier": "^3.3.0",

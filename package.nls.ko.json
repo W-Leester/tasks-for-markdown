@@ -78,5 +78,7 @@
   "tasksmd.savedQuery.refresh.title": "쿼리 새로 고침",
   "tasksmd.quickSearch.title": "태스크 빠른 검색",
   "tasksmd.insertQueryBlock.title": "쿼리 블록 삽입",
-  "tasksmd.explainQuery.title": "커서 위치 쿼리 설명"
+  "tasksmd.explainQuery.title": "커서 위치 쿼리 설명",
+  "tasksmd.config.preview.enabled": "마크다운 미리보기에서 태스크(체크박스, 뱃지)와 ```tasks 쿼리 블록을 렌더링합니다.",
+  "tasksmd.config.preview.renderBadges": "미리보기에서 태스크 메타데이터를 원본 이모지/Dataview 텍스트 대신 뱃지로 표시합니다."
 }

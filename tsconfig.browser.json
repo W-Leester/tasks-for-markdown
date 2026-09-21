@@ -8,7 +8,6 @@
     "types": []
   },
   "include": [
-    "src/preview/previewScript.ts",
     "src/webviews"
   ],
   "exclude": []

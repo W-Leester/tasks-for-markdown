@@ -78,5 +78,7 @@
   "tasksmd.savedQuery.refresh.title": "Refresh queries",
   "tasksmd.quickSearch.title": "Quick search tasks",
   "tasksmd.insertQueryBlock.title": "Insert query block",
-  "tasksmd.explainQuery.title": "Explain query under cursor"
+  "tasksmd.explainQuery.title": "Explain query under cursor",
+  "tasksmd.config.preview.enabled": "Render tasks (checkboxes, badges) and ```tasks query blocks in the Markdown preview.",
+  "tasksmd.config.preview.renderBadges": "Show task metadata as badges in the preview instead of the raw emoji/Dataview text."
 }

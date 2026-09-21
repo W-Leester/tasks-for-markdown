@@ -24,7 +24,6 @@
   ],
   "exclude": [
     "tests/integration",
-    "src/preview/previewScript.ts",
     "src/webviews"
   ]
 }

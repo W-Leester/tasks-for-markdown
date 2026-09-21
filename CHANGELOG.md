@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### M5 — Markdown preview (2026-09-21)
+- Built-in preview renders checklist items with checkboxes and metadata badges, and ```tasks blocks as live query results (groups, counts, explain, errors); previews refresh when tasks change anywhere.
+- Preview is render-only (the classic preview offers no channel back to extensions); toggling/editing stays in the sidebar, kanban and editor.
+
 ### M4 — query engine (2026-09-21)
 - Obsidian Tasks-compatible query language: status, date (single/range/natural language), priority, recurrence, dependency, text/regex, tag and boolean filters; sort by / group by every field with the plugin's default order; limits, layout instructions, `explain`.
 - `filter/sort/group by function` (opt-in, trusted workspaces only, time-budgeted).

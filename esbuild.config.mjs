@@ -17,23 +17,9 @@ const extensionConfig = {
   logLevel: 'info',
 };
 
-/** Script injected into the built-in Markdown preview webview. */
-/** @type {esbuild.BuildOptions} */
-const previewConfig = {
-  entryPoints: ['src/preview/previewScript.ts'],
-  bundle: true,
-  outfile: 'dist/preview.js',
-  format: 'iife',
-  platform: 'browser',
-  target: 'es2020',
-  sourcemap: !production,
-  minify: production,
-  logLevel: 'info',
-};
-
 if (watch) {
-  const ctxs = await Promise.all([esbuild.context(extensionConfig), esbuild.context(previewConfig)]);
-  await Promise.all(ctxs.map((c) => c.watch()));
+  const ctx = await esbuild.context(extensionConfig);
+  await ctx.watch();
 } else {
-  await Promise.all([esbuild.build(extensionConfig), esbuild.build(previewConfig)]);
+  await esbuild.build(extensionConfig);
 }

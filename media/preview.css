@@ -1,0 +1,37 @@
+/* Tasks for Markdown — built-in Markdown preview styles */
+li.tfm-task { list-style: none; margin-left: -1.2em; }
+li.tfm-task > .tfm-check { margin: 0 0.45em 0 0; vertical-align: -0.1em; pointer-events: none; }
+li.tfm-task.tfm-status-done > .tfm-desc, li.tfm-task.tfm-status-done { color: var(--vscode-disabledForeground, #888); }
+li.tfm-task.tfm-status-done > .tfm-desc { text-decoration: line-through; }
+li.tfm-task.tfm-status-cancelled > .tfm-desc { text-decoration: line-through; opacity: 0.7; }
+
+.tfm-badges { display: inline-flex; flex-wrap: wrap; gap: 0.3em; margin-left: 0.5em; vertical-align: middle; }
+.tfm-badge {
+  display: inline-block; font-size: 0.8em; line-height: 1.5; padding: 0 0.5em; border-radius: 0.8em;
+  background: var(--vscode-badge-background, #ddd); color: var(--vscode-badge-foreground, #333); white-space: nowrap;
+}
+.tfm-badge.tfm-pri-highest, .tfm-badge.tfm-pri-high { background: color-mix(in srgb, var(--vscode-errorForeground, #f14c4c) 25%, transparent); color: var(--vscode-errorForeground, #c72e2e); }
+.tfm-badge.tfm-pri-medium { background: color-mix(in srgb, var(--vscode-editorWarning-foreground, #cca700) 25%, transparent); color: var(--vscode-editorWarning-foreground, #9a7b00); }
+.tfm-badge.tfm-pri-low, .tfm-badge.tfm-pri-lowest { opacity: 0.75; }
+.tfm-badge.tfm-overdue { background: color-mix(in srgb, var(--vscode-errorForeground, #f14c4c) 25%, transparent); color: var(--vscode-errorForeground, #c72e2e); font-weight: 600; }
+.tfm-badge.tfm-invalid { background: color-mix(in srgb, var(--vscode-editorWarning-foreground, #cca700) 30%, transparent); }
+.tfm-badge.tfm-done { color: var(--vscode-testing-iconPassed, #2e7d32); }
+.tfm-badge.tfm-recur { color: var(--vscode-charts-purple, #7c4dff); }
+.tfm-tag { color: var(--vscode-textLink-foreground, #0066b8); }
+
+.tfm-query-block { margin: 0.8em 0; }
+.tfm-query { border: 1px solid var(--vscode-widget-border, var(--vscode-panel-border, #ccc)); border-radius: 6px; padding: 0.6em 0.9em; background: color-mix(in srgb, var(--vscode-editor-background, #fff) 96%, var(--vscode-foreground, #000)); }
+.tfm-query h4.tfm-group, .tfm-query h5.tfm-group, .tfm-query h6.tfm-group { margin: 0.6em 0 0.2em; font-size: 1em; border: none; }
+.tfm-query h5.tfm-group { margin-left: 0.8em; font-weight: 500; }
+.tfm-query h6.tfm-group { margin-left: 1.6em; font-weight: 400; }
+.tfm-count { margin-left: 0.5em; font-size: 0.8em; opacity: 0.7; font-weight: normal; }
+.tfm-list { margin: 0.2em 0 0.4em 0.2em; padding-left: 0.4em; }
+.tfm-list li.tfm-task { margin-left: 0; padding: 0.15em 0; }
+.tfm-backlink { margin-left: 0.6em; font-size: 0.8em; opacity: 0.75; }
+.tfm-backlink a { text-decoration: none; }
+.tfm-task-count { margin-top: 0.5em; font-size: 0.8em; opacity: 0.7; text-align: right; }
+.tfm-empty-result { opacity: 0.7; font-style: italic; }
+.tfm-error { color: var(--vscode-errorForeground, #c72e2e); background: color-mix(in srgb, var(--vscode-errorForeground, #f14c4c) 12%, transparent); padding: 0.4em 0.6em; border-radius: 4px; margin: 0.3em 0; }
+.tfm-error code { display: block; margin-top: 0.2em; }
+.tfm-explain summary { cursor: pointer; font-size: 0.9em; opacity: 0.8; }
+.tfm-explain pre { font-size: 0.85em; }

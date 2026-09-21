@@ -11,6 +11,7 @@ import { TaskDiagnostics } from './editor/TaskDiagnostics';
 import { TaskHoverProvider } from './editor/TaskHoverProvider';
 import { TaskLineContext } from './editor/TaskLineContext';
 import { IndexService } from './index/IndexService';
+import { PreviewIntegration } from './preview/PreviewIntegration';
 import { QueryService } from './services/QueryService';
 import { SavedQueryStore } from './services/SavedQueryStore';
 import { TaskEditService } from './services/TaskEditService';
@@ -30,6 +31,8 @@ export interface ExtensionApi {
   queries: QueryService;
   savedQueries: SavedQueryStore;
   settings: Settings;
+  /** Consumed by VS Code's built-in Markdown extension (contributes.markdown.markdownItPlugins). */
+  extendMarkdownIt(md: import('markdown-it').MarkdownIt): import('markdown-it').MarkdownIt;
 }
 
 export async function activate(context: vscode.ExtensionContext): Promise<ExtensionApi> {
@@ -76,8 +79,11 @@ export async function activate(context: vscode.ExtensionContext): Promise<Extens
   index.onDidChange(updateEmpty);
   index.onDidChangeProgress(updateEmpty);
 
+  const preview = new PreviewIntegration({ index, queries, settings, getStatusRegistry });
+  context.subscriptions.push(preview);
+
   void indexService.start();
-  return { index, indexService, editService, queries, savedQueries, settings };
+  return { index, indexService, editService, queries, savedQueries, settings, extendMarkdownIt: (md) => preview.extendMarkdownIt(md) };
 }
 
 export function deactivate(): void {

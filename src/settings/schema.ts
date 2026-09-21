@@ -32,6 +32,8 @@ export interface SettingsSchema {
   statuses: StatusConfig[];
   'query.allowFunctions': boolean;
   savedQueries: { name: string; query: string }[];
+  'preview.enabled': boolean;
+  'preview.renderBadges': boolean;
 }
 
 export const SETTINGS_SECTION = 'tasksmd';
@@ -63,6 +65,8 @@ export const SETTINGS_DEFAULTS: Readonly<SettingsSchema> = {
   statuses: [...DEFAULT_STATUSES],
   'query.allowFunctions': false,
   savedQueries: [],
+  'preview.enabled': true,
+  'preview.renderBadges': true,
 };
 
 export type SettingsKey = keyof SettingsSchema;

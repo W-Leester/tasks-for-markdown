@@ -249,3 +249,19 @@ suite('queries', () => {
     }
   });
 });
+
+suite('markdown preview', () => {
+  test('extendMarkdownIt renders tasks and query blocks through the built-in markdown engine', async () => {
+    const api = await getApi();
+    const mdExt = vscode.extensions.getExtension('vscode.markdown-language-features');
+    assert.ok(mdExt, 'built-in markdown extension present');
+    // Render through our own hook with a fresh markdown-it to prove the export works end to end.
+    const MarkdownIt = (await import('markdown-it')).default;
+    const md = api.extendMarkdownIt(new MarkdownIt());
+    const html = md.render('- [ ] preview task ⏫ 📅 2026-09-25\n\n```tasks\nnot done\npath includes project-a\n```', { currentDocument: fixtureUri('notes/week-38.md') });
+    assert.ok(html.includes('tfm-task'), html);
+    assert.ok(html.includes('tfm-badge tfm-pri-high'));
+    assert.ok(html.includes('tfm-query-block'));
+    assert.ok(html.includes('href="project-a.md#L'), 'relative link with line');
+  });
+});

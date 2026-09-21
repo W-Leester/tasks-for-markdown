@@ -168,5 +168,10 @@
   "Search {0} open tasks…": "미완료 태스크 {0}개 검색…",
   "Open a Markdown file to insert a query block.": "쿼리 블록을 삽입하려면 마크다운 파일을 여세요.",
   "Place the cursor inside a ```tasks block.": "```tasks 블록 안에 커서를 두세요.",
-  "{0} tasks match, {1} shown.": "{0}개 일치, {1}개 표시."
+  "{0} tasks match, {1} shown.": "{0}개 일치, {1}개 표시.",
+  "Tasks query error": "Tasks 쿼리 오류",
+  "Line {0}: {1}": "{0}행: {1}",
+  "Explanation": "설명",
+  "No tasks match this query.": "이 쿼리에 맞는 태스크가 없습니다.",
+  "{0} of {1} tasks": "{1}개 중 {0}개 표시"
 }

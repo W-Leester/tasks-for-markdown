@@ -32,8 +32,8 @@
 | M4 | 쿼리 엔진 + 저장된 쿼리 + 빠른 검색 (쿼리 빌더 → M6.4) | ✅ 완료 | 2026-09-21 · unit 437 / integration 26 |
 | M5 | 마크다운 미리보기 연동 (렌더 전용 — D-1) | ✅ 완료 | 2026-09-21 · unit 445 / integration 27 |
 | M6 | 웹뷰: 편집 모달 + 칸반 + 쿼리 빌더 | ✅ 완료 | 2026-09-21 · unit 447 / integration 31 |
-| M7 | 추가 기능: 알림·아카이브·통계·캘린더·업데이트 확인 | 🟡 진행 중 | D-5 |
-| M8 | 마감: i18n·성능·접근성·문서·패키징·게시 | ⬜ 대기 | v1.0 |
+| M7 | 추가 기능: 알림·아카이브·통계·캘린더·업데이트 확인 | ✅ 완료 | 2026-09-21 · unit 462 / integration 34 |
+| M8 | 마감: i18n·성능·접근성·문서·패키징·게시 | 🟡 진행 중 | v1.0 |
 
 ---
 
@@ -483,9 +483,9 @@
 - [x] 명령 `tasksmd.openCalendar`, 마지막 위치 `workspaceState`
 
 ### M7.5 업데이트 확인 (`services/UpdateCheckService.ts`)
-- [ ] `updateCheckUrl`(파일 경로/HTTP) → `latest.json { version, vsix, notes }` 하루 1회 비교, 새 버전이면 토스트 + 경로 열기/복사 (FR-10.15)
-- [ ] Marketplace 설치본(`extension.packageJSON.__metadata` 또는 설치 소스)에서는 비활성 (FR-10.16)
-- [ ] 마지막 확인 시각 `globalState`; 신뢰되지 않은 워크스페이스에서는 무시 (NFR-4)
+- [x] `updateCheckUrl`(파일 경로/HTTP) → `latest.json { version, vsix, notes }` 하루 1회 비교, 새 버전이면 토스트 + 경로 열기/복사 (FR-10.15)
+- [x] Marketplace 설치본(`extension.packageJSON.__metadata` 또는 설치 소스)에서는 비활성 (FR-10.16)
+- [x] 마지막 확인 시각 `globalState`; 신뢰되지 않은 워크스페이스에서는 무시 (NFR-4)
 
 ---
 

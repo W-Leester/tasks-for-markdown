@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### M7 — extras (2026-09-21)
+- Daily summary and due-soon notifications (VS Code toasts + native OS notifications, snooze).
+- "Archive completed tasks…" moves old completed tasks into `Archive.md` with links back, after a preview.
+- Weekly statistics panel (completed / created / overdue / remaining per ISO week, tag and folder filters).
+- Calendar panel (month / week) with drag-to-reschedule and inline task creation.
+- Optional update check for `.vsix` installs via `tasksmd.updateCheckUrl` (`latest.json`).
+
 ### M6 — webviews (2026-09-21)
 - Create or edit task dialog (`Cmd/Ctrl+Alt+T`): all fields, natural-language dates, recurrence validation, dependency picker, live preview line, access keys.
 - Kanban board in the sidebar and as an editor panel: columns by status / due date / priority / file, drag & drop edits, any saved query as data source.

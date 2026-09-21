@@ -1,0 +1,113 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="440" viewBox="0 0 1000 440" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif"><title>7.6 주간 통계</title><defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#666"/></marker></defs><rect width="1000" height="440" fill="#ffffff" rx="8"/>
+<rect x="0" y="0" width="1000" height="44" rx="8" fill="#f3f3f3" stroke="none" stroke-width="1"/>
+<text x="16" y="28" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="14" fill="#1f1f1f" text-anchor="start" font-weight="bold">최근 12주 (월요일 시작)</text>
+<text x="600" y="28" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="12" fill="#6b6b6b" text-anchor="start" font-weight="normal">필터:</text>
+<rect x="640" y="12" width="110" height="24" rx="4" fill="#fff" stroke="#c8c8c8" stroke-width="1"/>
+<text x="650" y="28" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start" font-weight="normal">태그: #work ▾</text>
+<rect x="760" y="12" width="110" height="24" rx="4" fill="#fff" stroke="#c8c8c8" stroke-width="1"/>
+<text x="770" y="28" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start" font-weight="normal">폴더: 전체 ▾</text>
+<rect x="60" y="70" width="880" height="220" rx="4" fill="#fff" stroke="#c8c8c8" stroke-width="1"/>
+<line x1="60" y1="290.0" x2="940" y2="290.0" stroke="#eee" stroke-width="1"/>
+<text x="52" y="294.0" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10" fill="#6b6b6b" text-anchor="end" font-weight="normal">0</text>
+<line x1="60" y1="246.0" x2="940" y2="246.0" stroke="#eee" stroke-width="1"/>
+<text x="52" y="250.0" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10" fill="#6b6b6b" text-anchor="end" font-weight="normal">5</text>
+<line x1="60" y1="202.0" x2="940" y2="202.0" stroke="#eee" stroke-width="1"/>
+<text x="52" y="206.0" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10" fill="#6b6b6b" text-anchor="end" font-weight="normal">10</text>
+<line x1="60" y1="158.0" x2="940" y2="158.0" stroke="#eee" stroke-width="1"/>
+<text x="52" y="162.0" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10" fill="#6b6b6b" text-anchor="end" font-weight="normal">15</text>
+<line x1="60" y1="114.0" x2="940" y2="114.0" stroke="#eee" stroke-width="1"/>
+<text x="52" y="118.0" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10" fill="#6b6b6b" text-anchor="end" font-weight="normal">20</text>
+<line x1="60" y1="70.0" x2="940" y2="70.0" stroke="#eee" stroke-width="1"/>
+<text x="52" y="74.0" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10" fill="#6b6b6b" text-anchor="end" font-weight="normal">25</text>
+<rect x="70.0" y="184.4" width="14" height="105.6" rx="2" fill="#0066b8" stroke="none" stroke-width="1"/>
+<rect x="88.0" y="202.0" width="14" height="88.0" rx="2" fill="#9ec5e8" stroke="none" stroke-width="1"/>
+<rect x="106.0" y="281.2" width="14" height="8.8" rx="2" fill="#c72e2e" stroke="none" stroke-width="1"/>
+<text x="96.66666666666666" y="306" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10.5" fill="#6b6b6b" text-anchor="middle" font-weight="normal">W27</text>
+<rect x="143.33333333333331" y="158.0" width="14" height="132.0" rx="2" fill="#0066b8" stroke="none" stroke-width="1"/>
+<rect x="161.33333333333331" y="166.79999999999998" width="14" height="123.20000000000002" rx="2" fill="#9ec5e8" stroke="none" stroke-width="1"/>
+<rect x="179.33333333333331" y="290.0" width="14" height="0.0" rx="2" fill="#c72e2e" stroke="none" stroke-width="1"/>
+<text x="169.99999999999997" y="306" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10.5" fill="#6b6b6b" text-anchor="middle" font-weight="normal">W28</text>
+<rect x="216.66666666666666" y="210.8" width="14" height="79.2" rx="2" fill="#0066b8" stroke="none" stroke-width="1"/>
+<rect x="234.66666666666666" y="184.4" width="14" height="105.6" rx="2" fill="#9ec5e8" stroke="none" stroke-width="1"/>
+<rect x="252.66666666666666" y="272.4" width="14" height="17.6" rx="2" fill="#c72e2e" stroke="none" stroke-width="1"/>
+<text x="243.33333333333331" y="306" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10.5" fill="#6b6b6b" text-anchor="middle" font-weight="normal">W29</text>
+<rect x="290.0" y="131.6" width="14" height="158.4" rx="2" fill="#0066b8" stroke="none" stroke-width="1"/>
+<rect x="308.0" y="158.0" width="14" height="132.0" rx="2" fill="#9ec5e8" stroke="none" stroke-width="1"/>
+<rect x="326.0" y="281.2" width="14" height="8.8" rx="2" fill="#c72e2e" stroke="none" stroke-width="1"/>
+<text x="316.6666666666667" y="306" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10.5" fill="#6b6b6b" text-anchor="middle" font-weight="normal">W30</text>
+<rect x="363.3333333333333" y="114.0" width="14" height="176.0" rx="2" fill="#0066b8" stroke="none" stroke-width="1"/>
+<rect x="381.3333333333333" y="140.39999999999998" width="14" height="149.60000000000002" rx="2" fill="#9ec5e8" stroke="none" stroke-width="1"/>
+<rect x="399.3333333333333" y="263.6" width="14" height="26.4" rx="2" fill="#c72e2e" stroke="none" stroke-width="1"/>
+<text x="390.0" y="306" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10.5" fill="#6b6b6b" text-anchor="middle" font-weight="normal">W31</text>
+<rect x="436.66666666666663" y="166.79999999999998" width="14" height="123.20000000000002" rx="2" fill="#0066b8" stroke="none" stroke-width="1"/>
+<rect x="454.66666666666663" y="175.6" width="14" height="114.4" rx="2" fill="#9ec5e8" stroke="none" stroke-width="1"/>
+<rect x="472.66666666666663" y="272.4" width="14" height="17.6" rx="2" fill="#c72e2e" stroke="none" stroke-width="1"/>
+<text x="463.3333333333333" y="306" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10.5" fill="#6b6b6b" text-anchor="middle" font-weight="normal">W32</text>
+<rect x="510.0" y="193.2" width="14" height="96.8" rx="2" fill="#0066b8" stroke="none" stroke-width="1"/>
+<rect x="528.0" y="184.4" width="14" height="105.6" rx="2" fill="#9ec5e8" stroke="none" stroke-width="1"/>
+<rect x="546.0" y="281.2" width="14" height="8.8" rx="2" fill="#c72e2e" stroke="none" stroke-width="1"/>
+<text x="536.6666666666666" y="306" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10.5" fill="#6b6b6b" text-anchor="middle" font-weight="normal">W33</text>
+<rect x="583.3333333333333" y="149.2" width="14" height="140.8" rx="2" fill="#0066b8" stroke="none" stroke-width="1"/>
+<rect x="601.3333333333333" y="158.0" width="14" height="132.0" rx="2" fill="#9ec5e8" stroke="none" stroke-width="1"/>
+<rect x="619.3333333333333" y="290.0" width="14" height="0.0" rx="2" fill="#c72e2e" stroke="none" stroke-width="1"/>
+<text x="609.9999999999999" y="306" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10.5" fill="#6b6b6b" text-anchor="middle" font-weight="normal">W34</text>
+<rect x="656.6666666666666" y="122.80000000000001" width="14" height="167.2" rx="2" fill="#0066b8" stroke="none" stroke-width="1"/>
+<rect x="674.6666666666666" y="131.6" width="14" height="158.4" rx="2" fill="#9ec5e8" stroke="none" stroke-width="1"/>
+<rect x="692.6666666666666" y="281.2" width="14" height="8.8" rx="2" fill="#c72e2e" stroke="none" stroke-width="1"/>
+<text x="683.3333333333333" y="306" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10.5" fill="#6b6b6b" text-anchor="middle" font-weight="normal">W35</text>
+<rect x="730.0" y="96.4" width="14" height="193.6" rx="2" fill="#0066b8" stroke="none" stroke-width="1"/>
+<rect x="748.0" y="114.0" width="14" height="176.0" rx="2" fill="#9ec5e8" stroke="none" stroke-width="1"/>
+<rect x="766.0" y="272.4" width="14" height="17.6" rx="2" fill="#c72e2e" stroke="none" stroke-width="1"/>
+<text x="756.6666666666666" y="306" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10.5" fill="#6b6b6b" text-anchor="middle" font-weight="normal">W36</text>
+<rect x="803.3333333333333" y="140.39999999999998" width="14" height="149.60000000000002" rx="2" fill="#0066b8" stroke="none" stroke-width="1"/>
+<rect x="821.3333333333333" y="149.2" width="14" height="140.8" rx="2" fill="#9ec5e8" stroke="none" stroke-width="1"/>
+<rect x="839.3333333333333" y="281.2" width="14" height="8.8" rx="2" fill="#c72e2e" stroke="none" stroke-width="1"/>
+<text x="829.9999999999999" y="306" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10.5" fill="#6b6b6b" text-anchor="middle" font-weight="normal">W37</text>
+<rect x="876.6666666666666" y="219.6" width="14" height="70.4" rx="2" fill="#0066b8" stroke="none" stroke-width="1" opacity="0.6"/>
+<rect x="894.6666666666666" y="210.8" width="14" height="79.2" rx="2" fill="#9ec5e8" stroke="none" stroke-width="1" opacity="0.6"/>
+<rect x="912.6666666666666" y="272.4" width="14" height="17.6" rx="2" fill="#c72e2e" stroke="none" stroke-width="1" opacity="0.6"/>
+<text x="903.3333333333333" y="306" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10.5" fill="#6b6b6b" text-anchor="middle" font-weight="normal">W38</text>
+<path d="M 96.7 103.0 L 170.0 114.0 L 243.3 81.0 L 316.7 114.0 L 390.0 147.0 L 463.3 158.0 L 536.7 147.0 L 610.0 158.0 L 683.3 169.0 L 756.7 191.0 L 830.0 202.0 L 903.3 191.0" fill="none" stroke="#7c4dff" stroke-width="2"/>
+<circle cx="96.66666666666666" cy="103.0" r="3" fill="#7c4dff" stroke="none"/>
+<circle cx="169.99999999999997" cy="114.0" r="3" fill="#7c4dff" stroke="none"/>
+<circle cx="243.33333333333331" cy="81.0" r="3" fill="#7c4dff" stroke="none"/>
+<circle cx="316.6666666666667" cy="114.0" r="3" fill="#7c4dff" stroke="none"/>
+<circle cx="390.0" cy="147.0" r="3" fill="#7c4dff" stroke="none"/>
+<circle cx="463.3333333333333" cy="158.0" r="3" fill="#7c4dff" stroke="none"/>
+<circle cx="536.6666666666666" cy="147.0" r="3" fill="#7c4dff" stroke="none"/>
+<circle cx="609.9999999999999" cy="158.0" r="3" fill="#7c4dff" stroke="none"/>
+<circle cx="683.3333333333333" cy="169.0" r="3" fill="#7c4dff" stroke="none"/>
+<circle cx="756.6666666666666" cy="191.0" r="3" fill="#7c4dff" stroke="none"/>
+<circle cx="829.9999999999999" cy="202.0" r="3" fill="#7c4dff" stroke="none"/>
+<circle cx="903.3333333333333" cy="191.0" r="3" fill="#7c4dff" stroke="none"/>
+<text x="948" y="294.0" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10" fill="#7c4dff" text-anchor="start" font-weight="normal">40</text>
+<text x="948" y="184.0" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10" fill="#7c4dff" text-anchor="start" font-weight="normal">50</text>
+<text x="948" y="74.0" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10" fill="#7c4dff" text-anchor="start" font-weight="normal">60</text>
+<text x="880" y="84" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10" fill="#6b6b6b" text-anchor="start" font-weight="normal" font-style="italic">(진행 중)</text>
+<rect x="60" y="324" width="12" height="12" rx="2" fill="#0066b8" stroke="none" stroke-width="1"/>
+<text x="78" y="334" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#1f1f1f" text-anchor="start" font-weight="normal">완료</text>
+<rect x="122" y="324" width="12" height="12" rx="2" fill="#9ec5e8" stroke="none" stroke-width="1"/>
+<text x="140" y="334" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#1f1f1f" text-anchor="start" font-weight="normal">신규 (➕ 기준)</text>
+<rect x="261" y="324" width="12" height="12" rx="2" fill="#c72e2e" stroke="none" stroke-width="1"/>
+<text x="279" y="334" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#1f1f1f" text-anchor="start" font-weight="normal">기한 초과</text>
+<line x1="356" y1="330" x2="376" y2="330" stroke="#7c4dff" stroke-width="2"/>
+<circle cx="366" cy="330" r="3" fill="#7c4dff" stroke="none"/>
+<text x="382" y="334" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#1f1f1f" text-anchor="start" font-weight="normal">미완료 잔량 (주말 시점, 우측 축)</text>
+<rect x="60" y="358" width="205" height="56" rx="6" fill="#f3f3f3" stroke="none" stroke-width="1"/>
+<text x="72" y="376" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11" fill="#6b6b6b" text-anchor="start" font-weight="normal">이번 주 완료</text>
+<text x="72" y="402" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="22" fill="#0066b8" text-anchor="start" font-weight="bold">8</text>
+<text x="120" y="402" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10.5" fill="#6b6b6b" text-anchor="start" font-weight="normal">W38 · 진행 중</text>
+<rect x="285" y="358" width="205" height="56" rx="6" fill="#f3f3f3" stroke="none" stroke-width="1"/>
+<text x="297" y="376" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11" fill="#6b6b6b" text-anchor="start" font-weight="normal">신규</text>
+<text x="297" y="402" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="22" fill="#5b8db8" text-anchor="start" font-weight="bold">9</text>
+<text x="345" y="402" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10.5" fill="#6b6b6b" text-anchor="start" font-weight="normal">➕ 기준</text>
+<rect x="510" y="358" width="205" height="56" rx="6" fill="#f3f3f3" stroke="none" stroke-width="1"/>
+<text x="522" y="376" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11" fill="#6b6b6b" text-anchor="start" font-weight="normal">기한 초과</text>
+<text x="522" y="402" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="22" fill="#c72e2e" text-anchor="start" font-weight="bold">2</text>
+<text x="570" y="402" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10.5" fill="#6b6b6b" text-anchor="start" font-weight="normal">현재</text>
+<rect x="735" y="358" width="205" height="56" rx="6" fill="#f3f3f3" stroke="none" stroke-width="1"/>
+<text x="747" y="376" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11" fill="#6b6b6b" text-anchor="start" font-weight="normal">미완료 잔량</text>
+<text x="747" y="402" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="22" fill="#7c4dff" text-anchor="start" font-weight="bold">49</text>
+<text x="795" y="402" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10.5" fill="#6b6b6b" text-anchor="start" font-weight="normal">전주 대비 +1</text>
+<text x="16" y="430" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11" fill="#6b6b6b" text-anchor="start" font-weight="normal" font-style="italic">ⓘ ✅/➕ 날짜가 없는 태스크 23개는 집계에서 제외됨 · 데이터는 인덱스에서 즉시 계산 (별도 저장 없음)</text>
+</svg>

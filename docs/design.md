@@ -1,9 +1,10 @@
 # Tasks for Markdown — 설계 문서
 
-- 문서 버전: 0.1
+- 문서 버전: 0.2
 - 작성일: 2026-09-21
 - 근거 문서: [requirements.md](requirements.md) v0.3
-- 다이어그램은 Mermaid로 작성되어 GitHub / VS Code(Markdown Preview Mermaid Support 확장)에서 렌더링됩니다.
+- 다이어그램은 Mermaid 소스와 함께 렌더링된 SVG(`imgs/`)를 나란히 둡니다. Mermaid를 렌더링하지 못하는 뷰어에서는 SVG를 보면 됩니다. UI 목업도 ASCII 원본 아래에 SVG 버전을 두었습니다.
+- SVG 재생성: Mermaid는 `@mermaid-js/mermaid-cli`(`docs/imgs/README.md` 참고), UI 목업은 `docs/imgs/gen_mockups.py`.
 
 ---
 
@@ -42,6 +43,8 @@ flowchart LR
     EXT -->|요약·마감 알림| OS
     MKT -->|설치·업데이트| IDE
 ```
+
+![시스템 컨텍스트](imgs/02-system-context.svg)
 
 ---
 
@@ -85,6 +88,8 @@ flowchart TB
     SET -.-> L3
     SET -.-> L4
 ```
+
+![레이어 구조](imgs/03-1-layers.svg)
 
 **의존성 규칙**
 
@@ -269,6 +274,8 @@ classDiagram
     QueryResult o-- Task
 ```
 
+![도메인 모델](imgs/04-domain-model.svg)
+
 **Task는 불변(immutable)** 이다. 변경은 `TaskBuilder`/`with*()`로 새 객체를 만들고, 직렬화해서 파일에 쓴 뒤, 파일 변경 이벤트로 인덱스가 다시 파싱한다. 즉 "메모리에서 바꾼 Task"가 진실이 되는 순간은 없다.
 
 ### 4.1 한 줄의 해부
@@ -281,6 +288,8 @@ classDiagram
   │ └ listMarker ("-")
   └ indentation ("  ")
 ```
+
+![4.1 한 줄의 해부](imgs/04-1-line-anatomy.svg)
 
 파서는 **줄 끝에서부터** 필드 정규식을 반복 적용해 벗겨내고, 남은 앞부분을 description으로 삼는다(Obsidian Tasks와 동일 전략 — 필드 순서에 무관). 직렬화는 항상 고정 순서로 쓴다.
 
@@ -312,6 +321,8 @@ flowchart LR
     H --> S5["Diagnostics 갱신"]
     H --> S6["웹뷰 postMessage<br/>{type:'index/changed'}"]
 ```
+
+![인덱싱 파이프라인](imgs/05-1-index-pipeline.svg)
 
 - 열린 문서는 디스크가 아닌 `TextDocument.getText()`가 진실이다(저장 전 편집 반영).
 - `FileEntry = { version, tasks: Task[], headings, mtime }`. 파일 단위로 통째로 교체하므로 부분 갱신 버그가 없다.
@@ -351,6 +362,8 @@ sequenceDiagram
     end
 ```
 
+![태스크 토글 시퀀스](imgs/05-2-toggle-sequence.svg)
+
 핵심: **뷰는 인덱스를 직접 건드리지 않는다.** 결과는 항상 파일 변경 이벤트를 거쳐 돌아온다. 이 덕분에 Undo(Cmd+Z)가 자연스럽게 동작하고, 미리보기·사이드바·에디터가 항상 같은 상태를 본다.
 
 ### 5.3 반복 태스크 완료
@@ -375,11 +388,13 @@ flowchart TD
     D --> M
 ```
 
+![반복 태스크 완료 흐름](imgs/05-3-recurrence-flow.svg)
+
 ### 5.4 쿼리 실행 파이프라인
 
 ```mermaid
 flowchart LR
-    Q["쿼리 텍스트<br/>(```tasks 블록 / 저장된 쿼리 / 스마트 뷰)"] --> T["Tokenizer<br/>주석·줄 연속·플레이스홀더 치환"]
+    Q["쿼리 텍스트<br/>(tasks 코드블록 / 저장된 쿼리 / 스마트 뷰)"] --> T["Tokenizer<br/>주석·줄 연속·플레이스홀더 치환"]
     T --> P["QueryParser<br/>줄마다 Instruction 매칭"]
     P --> |errors| ERR["QueryError[] → UI에 줄 번호와 표시"]
     P --> F["Filters (AND)<br/>+ BooleanExpr 트리"]
@@ -393,6 +408,8 @@ flowchart LR
     R --> V3["칸반 / 캘린더 컬럼"]
     R --> X["explain 텍스트"]
 ```
+
+![쿼리 실행 파이프라인](imgs/05-4-query-pipeline.svg)
 
 - `filter/sort/group by function`은 `query.allowFunctions && workspace.isTrusted`일 때만 컴파일한다. 함수는 `new Function('task','query', ...)`로 만들고, 예외는 해당 태스크만 제외하고 오류 목록에 누적한다.
 - `QueryService`는 `(queryText, indexVersion)`을 키로 결과를 캐시한다. 인덱스 이벤트마다 무효화된다.
@@ -409,7 +426,7 @@ sequenceDiagram
     participant QS as QueryService
 
     MD->>MIP: 렌더 요청 (markdown-it)
-    MIP-->>MD: 태스크 줄 → <li class="tfm-task" data-line="12"> + 뱃지<br/>```tasks → <div class="tfm-query" data-query="…">
+    MIP-->>MD: 태스크 줄 → li.tfm-task[data-line] + 뱃지<br/>tasks 코드블록 → div.tfm-query[data-query]
     MD->>PS: DOM ready
     PS->>PB: postMessage {type:'query/run', query, sourcePath}
     PB->>QS: run(query)
@@ -422,6 +439,8 @@ sequenceDiagram
     ES-->>PB: 완료
     Note over MD: 파일 변경 → 미리보기 자동 재렌더
 ```
+
+![미리보기 브리지](imgs/05-5-preview-bridge.svg)
 
 기본 미리보기의 메시지 통로는 `markdown.previewScripts` + `vscode-notebook-renderer`가 아닌 **`acquireVsCodeApi().postMessage`** 와 확장 측 `markdown.api` 채널(기본 마크다운 확장이 `webview.onDidReceiveMessage`를 `previewScripts`에 노출하는 `vscode.markdown.api` 경로)을 쓴다. 미지원 시 대안: 태스크 줄을 `command:` 링크로 렌더링해 클릭 시 확장 명령을 직접 호출(체크박스 토글은 이 경로로도 충분). 이 결정은 M5 착수 시 스파이크로 확정한다.
 
@@ -440,6 +459,8 @@ flowchart LR
     STORE --> UI
     UI -- "task/toggle, task/setField, task/create, task/open, query/run, ui/ready" --> HOST
 ```
+
+![웹뷰 메시지 프로토콜](imgs/05-6-webview-protocol.svg)
 
 | 방향 | 메시지 | 용도 |
 |---|---|---|
@@ -479,6 +500,8 @@ stateDiagram-v2
     end note
 ```
 
+![Status 전이](imgs/06-1-status-machine.svg)
+
 전이 규칙은 심볼이 아니라 **타입 변화**로 판단한다. 따라서 ITS 테마의 `[X]`, Minimal의 `[>]` 같은 커스텀 심볼도 타입만 맞으면 동일하게 동작한다.
 
 ### 6.2 인덱스 수명주기
@@ -493,6 +516,8 @@ stateDiagram-v2
     Ready --> Scanning: include/exclude/globalFilter 설정 변경
     Scanning --> Ready
 ```
+
+![인덱스 수명주기](imgs/06-2-index-lifecycle.svg)
 
 상태바는 `Scanning` 중 진행률(`$(sync~spin) Tasks: 1,234/5,000`)을 표시한다.
 
@@ -524,6 +549,8 @@ stateDiagram-v2
 └────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
+![7.1 전체 레이아웃](imgs/07-1-layout.svg)
+
 - **A**: 액티비티 바의 Tasks 아이콘. 클릭하면 세 개의 뷰(스마트 뷰 / 저장된 쿼리 / 칸반)가 한 컨테이너에 표시된다.
 - **에디터**: CodeLens(커서 줄에만, 설정), 줄 끝 상대 날짜 장식, 기한 초과 줄 배경색, 필드 부분 옅은 색.
 - **미리보기**: 체크박스 클릭 가능, 필드는 뱃지, ` ```tasks ` 블록은 결과 카드.
@@ -542,6 +569,8 @@ flowchart LR
     H["마우스 Hover"] --> HC["카드: 상태·날짜·의존성 링크<br/>+ command: 링크"]
     RC["우클릭"] --> CM["컨텍스트 메뉴 › Tasks ›"]
 ```
+
+![에디터 안 상호작용 흐름](imgs/07-2-editor-interaction.svg)
 
 ### 7.3 편집 모달 (Webview)
 
@@ -564,6 +593,8 @@ flowchart LR
 └──────────────────────────────────────────────────────────────────────┘
 ```
 
+![7.3 편집 모달 (Webview)](imgs/07-3-edit-modal.svg)
+
 ### 7.4 칸반 / 컬럼 뷰 (에디터 패널 + 사이드바 공용 컴포넌트)
 
 ```
@@ -581,6 +612,8 @@ flowchart LR
 └────────────────┴────────────────┴────────────────┴────────────────┘
 ```
 
+![7.4 칸반 / 컬럼 뷰](imgs/07-4-kanban.svg)
+
 드래그 결과는 컬럼 기준에 따라 `task/setField`로 변환된다: 상태 → `status`, 마감일 버킷 → `due`, 우선순위 → `priority`. 사이드바 버전은 폭이 좁으므로 컬럼을 탭으로 전환한다.
 
 ### 7.5 캘린더 (월간 / 주간)
@@ -594,6 +627,8 @@ flowchart LR
 │ +2   │      │      │      │      │      │      │
 ├──────┼──────┼──────┼──────┼──────┼──────┼──────┤
 ```
+
+![7.5 캘린더 (월간 / 주간)](imgs/07-5-calendar.svg)
 
 - 칸 안 항목 클릭 → 편집 모달, 드래그 → 해당 날짜 필드 변경, 빈 칸 더블클릭 → 새 태스크(마감일 채움).
 - 주간 뷰는 하루를 세로로 넓게 펼쳐 항목을 모두 표시한다.
@@ -612,6 +647,8 @@ flowchart LR
  └───────────────────────────────────────────┘
  ⓘ ✅/➕ 날짜가 없는 태스크 23개는 집계에서 제외됨
 ```
+
+![7.6 통계 (주 단위)](imgs/07-6-stats.svg)
 
 ### 7.7 디자인 토큰
 
@@ -651,6 +688,8 @@ flowchart TB
     Q --> IDX
     Settings --> IDX
 ```
+
+![저장소와 설정](imgs/08-storage.svg)
 
 원칙: **파일에 넣을 가치가 있는 것(공유되어야 하는 것)만 파일에, UI 편의 상태는 `workspaceState`에.** 확장을 지워도 `.md`에는 표준 문법만 남는다.
 
@@ -712,6 +751,8 @@ flowchart LR
     Unit --> Integ --> Manual
 ```
 
+![테스트 전략](imgs/12-test-strategy.svg)
+
 - 모든 날짜 로직은 `now`를 주입받는다(`Clock` 인터페이스). 테스트에서 고정 날짜 사용.
 - 파서 픽스처는 `tests/fixtures/*.md`에 두고 `docs/samples/`가 채워지면 그대로 추가한다.
 
@@ -732,6 +773,8 @@ flowchart LR
     PKG --> M3["사내 공유 경로: .vsix + latest.json"]
     M3 --> UC["UpdateCheckService (Marketplace 설치본에서는 비활성)"]
 ```
+
+![빌드·배포 파이프라인](imgs/13-build-pipeline.svg)
 
 GitHub Actions: PR마다 `typecheck + lint + test`, 태그 `v*` 푸시 시 패키징 + Release 첨부 + (시크릿 있으면) Marketplace/Open VSX 게시.
 
@@ -769,4 +812,5 @@ GitHub Actions: PR마다 `typecheck + lint + test`, 태그 `v*` 푸시 시 패�
 
 | 날짜 | 버전 | 내용 |
 |---|---|---|
+| 2026-09-21 | 0.2 | 모든 Mermaid 다이어그램과 ASCII 목업에 SVG 버전 추가 (`imgs/`) · 5.4/5.5 Mermaid 소스의 백틱 파싱 오류 수정 |
 | 2026-09-21 | 0.1 | 초안 — 아키텍처, 도메인 모델, 데이터 흐름, UI 와이어프레임, 보안·성능·테스트·배포 |

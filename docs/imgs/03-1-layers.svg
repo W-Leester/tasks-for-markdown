@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="690" viewBox="0 0 1100 690" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif"><title>3.1 레이어 구조</title><defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#666"/></marker></defs><rect width="1100" height="690" fill="#ffffff" rx="8"/>
+<text x="20" y="30" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="15" fill="#1f1f1f" text-anchor="start" font-weight="bold">레이어 구조 — 위에서 아래로만 의존 (Core는 vscode를 모른다)</text>
+<rect x="20" y="50" width="880" height="130" rx="8" fill="#f3e5f5" stroke="#c8c8c8" stroke-width="1"/>
+<text x="34" y="70" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="13" fill="#6b6b6b" text-anchor="start" font-weight="bold">Presentation — VS Code UI</text>
+<rect x="34.0" y="80" width="202.5" height="86" rx="6" fill="#ffffff" stroke="#c8c8c8" stroke-width="1"/>
+<text x="135.25" y="100" font-family="'SF Mono','JetBrains Mono',Menlo,Consolas,monospace" font-size="13" fill="#1f1f1f" text-anchor="middle" font-weight="bold">editor/</text>
+<text x="135.25" y="120" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#6b6b6b" text-anchor="middle" font-weight="normal">Decoration · CodeLens</text>
+<text x="135.25" y="136" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#6b6b6b" text-anchor="middle" font-weight="normal">Hover · Completion</text>
+<text x="135.25" y="152" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#6b6b6b" text-anchor="middle" font-weight="normal">Diagnostics · QuickPick</text>
+<rect x="250.5" y="80" width="202.5" height="86" rx="6" fill="#ffffff" stroke="#c8c8c8" stroke-width="1"/>
+<text x="351.75" y="100" font-family="'SF Mono','JetBrains Mono',Menlo,Consolas,monospace" font-size="13" fill="#1f1f1f" text-anchor="middle" font-weight="bold">views/</text>
+<text x="351.75" y="120" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#6b6b6b" text-anchor="middle" font-weight="normal">TreeView</text>
+<text x="351.75" y="136" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#6b6b6b" text-anchor="middle" font-weight="normal">(스마트 뷰 · 저장 쿼리)</text>
+<text x="351.75" y="152" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#6b6b6b" text-anchor="middle" font-weight="normal">StatusBar</text>
+<rect x="467.0" y="80" width="202.5" height="86" rx="6" fill="#ffffff" stroke="#c8c8c8" stroke-width="1"/>
+<text x="568.25" y="100" font-family="'SF Mono','JetBrains Mono',Menlo,Consolas,monospace" font-size="13" fill="#1f1f1f" text-anchor="middle" font-weight="bold">webviews/ (Svelte)</text>
+<text x="568.25" y="120" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#6b6b6b" text-anchor="middle" font-weight="normal">편집 모달 · 칸반</text>
+<text x="568.25" y="136" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#6b6b6b" text-anchor="middle" font-weight="normal">쿼리 빌더</text>
+<text x="568.25" y="152" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#6b6b6b" text-anchor="middle" font-weight="normal">캘린더 · 통계</text>
+<rect x="683.5" y="80" width="202.5" height="86" rx="6" fill="#ffffff" stroke="#c8c8c8" stroke-width="1"/>
+<text x="784.75" y="100" font-family="'SF Mono','JetBrains Mono',Menlo,Consolas,monospace" font-size="13" fill="#1f1f1f" text-anchor="middle" font-weight="bold">preview/</text>
+<text x="784.75" y="120" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#6b6b6b" text-anchor="middle" font-weight="normal">markdown-it 플러그인</text>
+<text x="784.75" y="136" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#6b6b6b" text-anchor="middle" font-weight="normal">미리보기 스크립트</text>
+<text x="784.75" y="152" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#6b6b6b" text-anchor="middle" font-weight="normal">PreviewBridge</text>
+<rect x="20" y="200" width="880" height="130" rx="8" fill="#e3f2fd" stroke="#c8c8c8" stroke-width="1"/>
+<text x="34" y="220" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="13" fill="#6b6b6b" text-anchor="start" font-weight="bold">Application</text>
+<rect x="34.0" y="230" width="419.0" height="86" rx="6" fill="#ffffff" stroke="#c8c8c8" stroke-width="1"/>
+<text x="243.5" y="250" font-family="'SF Mono','JetBrains Mono',Menlo,Consolas,monospace" font-size="13" fill="#1f1f1f" text-anchor="middle" font-weight="bold">commands/</text>
+<text x="243.5" y="270" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#6b6b6b" text-anchor="middle" font-weight="normal">명령 등록 · 라우팅</text>
+<text x="243.5" y="286" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#6b6b6b" text-anchor="middle" font-weight="normal">키바인딩 · 메뉴</text>
+<rect x="467.0" y="230" width="419.0" height="86" rx="6" fill="#ffffff" stroke="#c8c8c8" stroke-width="1"/>
+<text x="676.5" y="250" font-family="'SF Mono','JetBrains Mono',Menlo,Consolas,monospace" font-size="13" fill="#1f1f1f" text-anchor="middle" font-weight="bold">services/</text>
+<text x="676.5" y="270" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#6b6b6b" text-anchor="middle" font-weight="normal">TaskEditService (유일한 쓰기 경로)</text>
+<text x="676.5" y="286" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#6b6b6b" text-anchor="middle" font-weight="normal">QueryService · SavedQueryStore</text>
+<text x="676.5" y="302" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#6b6b6b" text-anchor="middle" font-weight="normal">Notification · Archive · Stats · UpdateCheck</text>
+<rect x="20" y="350" width="880" height="120" rx="8" fill="#e8f5e9" stroke="#c8c8c8" stroke-width="1"/>
+<text x="34" y="370" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="13" fill="#6b6b6b" text-anchor="start" font-weight="bold">Index</text>
+<rect x="34.0" y="380" width="852.0" height="76" rx="6" fill="#ffffff" stroke="#c8c8c8" stroke-width="1"/>
+<text x="460.0" y="400" font-family="'SF Mono','JetBrains Mono',Menlo,Consolas,monospace" font-size="13" fill="#1f1f1f" text-anchor="middle" font-weight="bold">index/</text>
+<text x="460.0" y="420" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#6b6b6b" text-anchor="middle" font-weight="normal">WorkspaceScanner · FileWatcher</text>
+<text x="460.0" y="436" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#6b6b6b" text-anchor="middle" font-weight="normal">TaskIndex (in-memory, 파일 단위 교체)</text>
+<text x="460.0" y="452" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#6b6b6b" text-anchor="middle" font-weight="normal">IndexEvents → 구독자에게 변경 통지</text>
+<rect x="20" y="490" width="880" height="150" rx="8" fill="#fff8e1" stroke="#c8c8c8" stroke-width="1"/>
+<text x="34" y="510" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="13" fill="#6b6b6b" text-anchor="start" font-weight="bold">Core — vscode 의존 없음 (Vitest로 단위 테스트, v1.x MCP 서버에서 재사용)</text>
+<rect x="34.0" y="520" width="159.2" height="106" rx="6" fill="#ffffff" stroke="#c8c8c8" stroke-width="1"/>
+<text x="113.6" y="540" font-family="'SF Mono','JetBrains Mono',Menlo,Consolas,monospace" font-size="13" fill="#1f1f1f" text-anchor="middle" font-weight="bold">core/task</text>
+<text x="113.6" y="560" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#6b6b6b" text-anchor="middle" font-weight="normal">Task · Parser</text>
+<text x="113.6" y="576" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#6b6b6b" text-anchor="middle" font-weight="normal">Serializer · Status</text>
+<text x="113.6" y="592" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#6b6b6b" text-anchor="middle" font-weight="normal">Priority · Urgency</text>
+<rect x="207.2" y="520" width="159.2" height="106" rx="6" fill="#ffffff" stroke="#c8c8c8" stroke-width="1"/>
+<text x="286.79999999999995" y="540" font-family="'SF Mono','JetBrains Mono',Menlo,Consolas,monospace" font-size="13" fill="#1f1f1f" text-anchor="middle" font-weight="bold">core/recurrence</text>
+<text x="286.79999999999995" y="560" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#6b6b6b" text-anchor="middle" font-weight="normal">rrule 래퍼</text>
+<text x="286.79999999999995" y="576" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#6b6b6b" text-anchor="middle" font-weight="normal">next() · when done</text>
+<rect x="380.4" y="520" width="159.2" height="106" rx="6" fill="#ffffff" stroke="#c8c8c8" stroke-width="1"/>
+<text x="460.0" y="540" font-family="'SF Mono','JetBrains Mono',Menlo,Consolas,monospace" font-size="13" fill="#1f1f1f" text-anchor="middle" font-weight="bold">core/dates</text>
+<text x="460.0" y="560" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#6b6b6b" text-anchor="middle" font-weight="normal">자연어 · 상대 날짜</text>
+<text x="460.0" y="576" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#6b6b6b" text-anchor="middle" font-weight="normal">범위 (week/month/Q)</text>
+<rect x="553.5999999999999" y="520" width="159.2" height="106" rx="6" fill="#ffffff" stroke="#c8c8c8" stroke-width="1"/>
+<text x="633.1999999999999" y="540" font-family="'SF Mono','JetBrains Mono',Menlo,Consolas,monospace" font-size="13" fill="#1f1f1f" text-anchor="middle" font-weight="bold">core/query</text>
+<text x="633.1999999999999" y="560" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#6b6b6b" text-anchor="middle" font-weight="normal">Tokenizer · Filters</text>
+<text x="633.1999999999999" y="576" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#6b6b6b" text-anchor="middle" font-weight="normal">Sort · Group</text>
+<text x="633.1999999999999" y="592" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#6b6b6b" text-anchor="middle" font-weight="normal">Layout · Explain</text>
+<rect x="726.8" y="520" width="159.2" height="106" rx="6" fill="#ffffff" stroke="#c8c8c8" stroke-width="1"/>
+<text x="806.4" y="540" font-family="'SF Mono','JetBrains Mono',Menlo,Consolas,monospace" font-size="13" fill="#1f1f1f" text-anchor="middle" font-weight="bold">core/archive·stats</text>
+<text x="806.4" y="560" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#6b6b6b" text-anchor="middle" font-weight="normal">순수 계산</text>
+<path d="M460.0 180 L460.0 200" fill="none" stroke="#6b6b6b" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M460.0 330 L460.0 350" fill="none" stroke="#6b6b6b" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M460.0 470 L460.0 490" fill="none" stroke="#6b6b6b" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="470.0" y="194" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11" fill="#6b6b6b" text-anchor="start" font-weight="normal">의존</text>
+<text x="470.0" y="344" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11" fill="#6b6b6b" text-anchor="start" font-weight="normal">의존</text>
+<text x="470.0" y="484" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11" fill="#6b6b6b" text-anchor="start" font-weight="normal">의존</text>
+<path d="M870 350 L870 180" fill="none" stroke="#0066b8" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
+<text x="864" y="270" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11" fill="#0066b8" text-anchor="end" font-weight="normal">이벤트 구독</text>
+<rect x="920" y="50" width="180" height="590" rx="8" fill="#f3f3f3" stroke="#c8c8c8" stroke-width="1"/>
+<text x="1010" y="75" font-family="'SF Mono','JetBrains Mono',Menlo,Consolas,monospace" font-size="13" fill="#1f1f1f" text-anchor="middle" font-weight="bold">settings/</text>
+<text x="1010" y="100" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#6b6b6b" text-anchor="middle" font-weight="normal">설정 스키마</text>
+<text x="1010" y="116" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#6b6b6b" text-anchor="middle" font-weight="normal">타입 안전 읽기</text>
+<text x="1010" y="132" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#6b6b6b" text-anchor="middle" font-weight="normal">onDidChange 이벤트</text>
+<path d="M920 115 L900 115" fill="none" stroke="#6b6b6b" stroke-width="1" stroke-dasharray="3,3" marker-end="url(#arrow)"/>
+<path d="M920 265 L900 265" fill="none" stroke="#6b6b6b" stroke-width="1" stroke-dasharray="3,3" marker-end="url(#arrow)"/>
+<path d="M920 410 L900 410" fill="none" stroke="#6b6b6b" stroke-width="1" stroke-dasharray="3,3" marker-end="url(#arrow)"/>
+<path d="M920 565 L900 565" fill="none" stroke="#6b6b6b" stroke-width="1" stroke-dasharray="3,3" marker-end="url(#arrow)"/>
+<text x="1010" y="630" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11" fill="#6b6b6b" text-anchor="middle" font-weight="normal" font-style="italic">모든 레이어가 참조</text>
+<text x="20" y="672" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11" fill="#6b6b6b" text-anchor="start" font-weight="normal">실선 = import 의존 · 점선 = 이벤트 구독/설정 참조 · 가로 레이어끼리(editor/views/webviews/preview)는 서로 참조하지 않음</text>
+</svg>

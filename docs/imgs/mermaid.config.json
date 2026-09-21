@@ -1,0 +1,1 @@
+{ "theme": "default", "htmlLabels": false, "securityLevel": "loose", "themeVariables": { "fontFamily": "'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif", "fontSize": "14px" }, "flowchart": { "htmlLabels": false, "curve": "basis", "useMaxWidth": true }, "sequence": { "useMaxWidth": true }, "class": { "htmlLabels": false }, "state": { "htmlLabels": false } }

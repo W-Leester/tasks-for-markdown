@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="360" viewBox="0 0 1180 360" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif"><title>4.1 한 줄의 해부</title><defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#666"/></marker></defs><rect width="1180" height="360" fill="#ffffff" rx="8"/>
+<text x="20" y="30" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="14" fill="#1f1f1f" text-anchor="start" font-weight="bold">태스크 한 줄의 구조 — 파서는 줄 끝에서부터 필드를 벗겨내고, 남은 앞부분을 description으로 삼는다 (필드 순서 무관)</text>
+<rect x="16" y="58" width="1148" height="64" rx="6" fill="#f6f8fa" stroke="#c8c8c8" stroke-width="1"/>
+<rect x="70" y="70" width="36" height="40" rx="5" fill="#fff" stroke="#6b6b6b" stroke-width="1.5"/>
+<text x="88.0" y="96" font-family="'SF Mono','JetBrains Mono',Menlo,Consolas,monospace" font-size="15" fill="#6b6b6b" text-anchor="middle" font-weight="normal">␣␣</text>
+<line x1="88.0" y1="110" x2="88.0" y2="120" stroke="#6b6b6b" stroke-width="1" stroke-dasharray="2,2"/>
+<rect x="40.4" y="122" width="95.2" height="20" rx="10" fill="#fff" stroke="#6b6b6b" stroke-width="1"/>
+<text x="88.0" y="136" font-family="'SF Mono','JetBrains Mono',Menlo,Consolas,monospace" font-size="11" fill="#6b6b6b" text-anchor="middle" font-weight="normal">indentation</text>
+<rect x="112" y="70" width="27" height="40" rx="5" fill="#fff" stroke="#6b6b6b" stroke-width="1.5"/>
+<text x="125.5" y="96" font-family="'SF Mono','JetBrains Mono',Menlo,Consolas,monospace" font-size="15" fill="#6b6b6b" text-anchor="middle" font-weight="normal">-</text>
+<line x1="125.5" y1="110" x2="125.5" y2="150" stroke="#6b6b6b" stroke-width="1" stroke-dasharray="2,2"/>
+<rect x="81.5" y="152" width="88.0" height="20" rx="10" fill="#fff" stroke="#6b6b6b" stroke-width="1"/>
+<text x="125.5" y="166" font-family="'SF Mono','JetBrains Mono',Menlo,Consolas,monospace" font-size="11" fill="#6b6b6b" text-anchor="middle" font-weight="normal">listMarker</text>
+<rect x="145" y="70" width="45" height="40" rx="5" fill="#fff" stroke="#0066b8" stroke-width="1.5"/>
+<text x="167.5" y="96" font-family="'SF Mono','JetBrains Mono',Menlo,Consolas,monospace" font-size="15" fill="#0066b8" text-anchor="middle" font-weight="normal">[ ]</text>
+<line x1="167.5" y1="110" x2="167.5" y2="180" stroke="#0066b8" stroke-width="1" stroke-dasharray="2,2"/>
+<rect x="112.69999999999999" y="182" width="109.60000000000001" height="20" rx="10" fill="#fff" stroke="#0066b8" stroke-width="1"/>
+<text x="167.5" y="196" font-family="'SF Mono','JetBrains Mono',Menlo,Consolas,monospace" font-size="11" fill="#0066b8" text-anchor="middle" font-weight="normal">status.symbol</text>
+<rect x="196" y="70" width="166" height="40" rx="5" fill="#fff" stroke="#1f1f1f" stroke-width="1.5"/>
+<text x="279.0" y="96" font-family="'SF Mono','JetBrains Mono',Menlo,Consolas,monospace" font-size="15" fill="#1f1f1f" text-anchor="middle" font-weight="normal">보고서 작성 #work</text>
+<line x1="279.0" y1="110" x2="279.0" y2="120" stroke="#1f1f1f" stroke-width="1" stroke-dasharray="2,2"/>
+<rect x="202.6" y="122" width="152.8" height="20" rx="10" fill="#fff" stroke="#1f1f1f" stroke-width="1"/>
+<text x="279.0" y="136" font-family="'SF Mono','JetBrains Mono',Menlo,Consolas,monospace" font-size="11" fill="#1f1f1f" text-anchor="middle" font-weight="normal">description (+tags)</text>
+<rect x="368" y="70" width="27" height="40" rx="5" fill="#fff" stroke="#d84315" stroke-width="1.5"/>
+<text x="381.5" y="96" font-family="'SF Mono','JetBrains Mono',Menlo,Consolas,monospace" font-size="15" fill="#d84315" text-anchor="middle" font-weight="normal">⏫</text>
+<line x1="381.5" y1="110" x2="381.5" y2="150" stroke="#d84315" stroke-width="1" stroke-dasharray="2,2"/>
+<rect x="344.7" y="152" width="73.6" height="20" rx="10" fill="#fff" stroke="#d84315" stroke-width="1"/>
+<text x="381.5" y="166" font-family="'SF Mono','JetBrains Mono',Menlo,Consolas,monospace" font-size="11" fill="#d84315" text-anchor="middle" font-weight="normal">priority</text>
+<rect x="401" y="70" width="134" height="40" rx="5" fill="#fff" stroke="#7c4dff" stroke-width="1.5"/>
+<text x="468.0" y="96" font-family="'SF Mono','JetBrains Mono',Menlo,Consolas,monospace" font-size="15" fill="#7c4dff" text-anchor="middle" font-weight="normal">🔁 every week</text>
+<line x1="468.0" y1="110" x2="468.0" y2="180" stroke="#7c4dff" stroke-width="1" stroke-dasharray="2,2"/>
+<rect x="424.0" y="182" width="88.0" height="20" rx="10" fill="#fff" stroke="#7c4dff" stroke-width="1"/>
+<text x="468.0" y="196" font-family="'SF Mono','JetBrains Mono',Menlo,Consolas,monospace" font-size="11" fill="#7c4dff" text-anchor="middle" font-weight="normal">recurrence</text>
+<rect x="541" y="70" width="134" height="40" rx="5" fill="#fff" stroke="#2e7d32" stroke-width="1.5"/>
+<text x="608.0" y="96" font-family="'SF Mono','JetBrains Mono',Menlo,Consolas,monospace" font-size="15" fill="#2e7d32" text-anchor="middle" font-weight="normal">🛫 2026-09-20</text>
+<line x1="608.0" y1="110" x2="608.0" y2="120" stroke="#2e7d32" stroke-width="1" stroke-dasharray="2,2"/>
+<rect x="582.0" y="122" width="52.0" height="20" rx="10" fill="#fff" stroke="#2e7d32" stroke-width="1"/>
+<text x="608.0" y="136" font-family="'SF Mono','JetBrains Mono',Menlo,Consolas,monospace" font-size="11" fill="#2e7d32" text-anchor="middle" font-weight="normal">start</text>
+<rect x="681" y="70" width="126" height="40" rx="5" fill="#fff" stroke="#bf8803" stroke-width="1.5"/>
+<text x="744.0" y="96" font-family="'SF Mono','JetBrains Mono',Menlo,Consolas,monospace" font-size="15" fill="#bf8803" text-anchor="middle" font-weight="normal">⏳ 2026-09-22</text>
+<line x1="744.0" y1="110" x2="744.0" y2="150" stroke="#bf8803" stroke-width="1" stroke-dasharray="2,2"/>
+<rect x="703.6" y="152" width="80.8" height="20" rx="10" fill="#fff" stroke="#bf8803" stroke-width="1"/>
+<text x="744.0" y="166" font-family="'SF Mono','JetBrains Mono',Menlo,Consolas,monospace" font-size="11" fill="#bf8803" text-anchor="middle" font-weight="normal">scheduled</text>
+<rect x="813" y="70" width="134" height="40" rx="5" fill="#fff" stroke="#c72e2e" stroke-width="1.5"/>
+<text x="880.0" y="96" font-family="'SF Mono','JetBrains Mono',Menlo,Consolas,monospace" font-size="15" fill="#c72e2e" text-anchor="middle" font-weight="normal">📅 2026-09-25</text>
+<line x1="880.0" y1="110" x2="880.0" y2="180" stroke="#c72e2e" stroke-width="1" stroke-dasharray="2,2"/>
+<rect x="861.2" y="182" width="37.6" height="20" rx="10" fill="#fff" stroke="#c72e2e" stroke-width="1"/>
+<text x="880.0" y="196" font-family="'SF Mono','JetBrains Mono',Menlo,Consolas,monospace" font-size="11" fill="#c72e2e" text-anchor="middle" font-weight="normal">due</text>
+<rect x="953" y="70" width="98" height="40" rx="5" fill="#fff" stroke="#0066b8" stroke-width="1.5"/>
+<text x="1002.0" y="96" font-family="'SF Mono','JetBrains Mono',Menlo,Consolas,monospace" font-size="15" fill="#0066b8" text-anchor="middle" font-weight="normal">🆔 a1b2c3</text>
+<line x1="1002.0" y1="110" x2="1002.0" y2="120" stroke="#0066b8" stroke-width="1" stroke-dasharray="2,2"/>
+<rect x="986.8" y="122" width="30.4" height="20" rx="10" fill="#fff" stroke="#0066b8" stroke-width="1"/>
+<text x="1002.0" y="136" font-family="'SF Mono','JetBrains Mono',Menlo,Consolas,monospace" font-size="11" fill="#0066b8" text-anchor="middle" font-weight="normal">id</text>
+<rect x="1057" y="70" width="63" height="40" rx="5" fill="#fff" stroke="#6b6b6b" stroke-width="1.5"/>
+<text x="1088.5" y="96" font-family="'SF Mono','JetBrains Mono',Menlo,Consolas,monospace" font-size="15" fill="#6b6b6b" text-anchor="middle" font-weight="normal">^blk1</text>
+<line x1="1088.5" y1="110" x2="1088.5" y2="150" stroke="#6b6b6b" stroke-width="1" stroke-dasharray="2,2"/>
+<rect x="1048.1" y="152" width="80.8" height="20" rx="10" fill="#fff" stroke="#6b6b6b" stroke-width="1"/>
+<text x="1088.5" y="166" font-family="'SF Mono','JetBrains Mono',Menlo,Consolas,monospace" font-size="11" fill="#6b6b6b" text-anchor="middle" font-weight="normal">blockLink</text>
+<text x="20" y="245" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="12" fill="#6b6b6b" text-anchor="start" font-weight="normal">읽기: 줄 끝에서부터  blockLink → 날짜/ID/반복/우선순위 정규식을 반복 매칭  → 남은 텍스트 = description</text>
+<text x="20" y="270" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="12" fill="#6b6b6b" text-anchor="start" font-weight="normal">쓰기: description → priority → recurrence → 🏁 onCompletion → 🆔 id → ⛔ dependsOn → ➕ created → 🛫 start → ⏳ scheduled → 📅 due → ✅ done → ❌ cancelled → blockLink</text>
+<text x="20" y="305" font-family="'SF Mono','JetBrains Mono',Menlo,Consolas,monospace" font-size="10.5" fill="#6b6b6b" text-anchor="start" font-weight="normal">Dataview 포맷도 동일 구조:  - [ ] 보고서 작성 #work [priority:: high] [repeat:: every week] [start:: 2026-09-20] [scheduled:: 2026-09-22] [due:: 2026-09-25] [id:: a1b2c3]</text>
+<text x="20" y="340" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="12" fill="#0066b8" text-anchor="start" font-weight="normal">Task는 불변(immutable) — 변경은 새 Task를 만들어 직렬화 → 파일 쓰기 → 변경 이벤트로 재파싱</text>
+</svg>

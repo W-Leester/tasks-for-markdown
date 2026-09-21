@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="560" viewBox="0 0 760 560" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif"><title>7.3 편집 모달</title><defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#666"/></marker></defs><rect width="760" height="560" fill="#ffffff" rx="8"/>
+<rect x="10" y="10" width="740" height="540" rx="8" fill="#fff" stroke="#c8c8c8" stroke-width="1"/>
+<rect x="10" y="10" width="740" height="40" rx="8" fill="#f3f3f3" stroke="none" stroke-width="1"/>
+<text x="28" y="36" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="14" fill="#1f1f1f" text-anchor="start" font-weight="bold">Tasks: Create or edit</text>
+<text x="732" y="36" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="14" fill="#6b6b6b" text-anchor="end" font-weight="normal">✕</text>
+<text x="30" y="80" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="13" fill="#1f1f1f" text-anchor="start" font-weight="normal">설명</text>
+<text x="58" y="80" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11" fill="#6b6b6b" text-anchor="start" font-weight="normal">(D)</text>
+<rect x="150" y="64" width="570" height="26" rx="4" fill="#fff" stroke="#c8c8c8" stroke-width="1"/>
+<text x="158" y="82" font-family="'SF Mono','JetBrains Mono',Menlo,Consolas,monospace" font-size="12.5" fill="#1f1f1f" text-anchor="start" font-weight="normal">보고서 작성 #work</text>
+<text x="30" y="120" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="13" fill="#1f1f1f" text-anchor="start" font-weight="normal">우선순위</text>
+<text x="82" y="120" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11" fill="#6b6b6b" text-anchor="start" font-weight="normal">(P)</text>
+<circle cx="160" cy="116" r="6" fill="#fff" stroke="#0066b8"/>
+<text x="172" y="120" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="12.5" fill="#1f1f1f" text-anchor="start" font-weight="normal">최고</text>
+<circle cx="238" cy="116" r="6" fill="#fff" stroke="#0066b8"/>
+<circle cx="238" cy="116" r="3.5" fill="#0066b8" stroke="none"/>
+<text x="250" y="120" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="12.5" fill="#1f1f1f" text-anchor="start" font-weight="normal">높음</text>
+<circle cx="316" cy="116" r="6" fill="#fff" stroke="#0066b8"/>
+<text x="328" y="120" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="12.5" fill="#1f1f1f" text-anchor="start" font-weight="normal">중간</text>
+<circle cx="394" cy="116" r="6" fill="#fff" stroke="#0066b8"/>
+<text x="406" y="120" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="12.5" fill="#1f1f1f" text-anchor="start" font-weight="normal">없음</text>
+<circle cx="472" cy="116" r="6" fill="#fff" stroke="#0066b8"/>
+<text x="484" y="120" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="12.5" fill="#1f1f1f" text-anchor="start" font-weight="normal">낮음</text>
+<circle cx="550" cy="116" r="6" fill="#fff" stroke="#0066b8"/>
+<text x="562" y="120" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="12.5" fill="#1f1f1f" text-anchor="start" font-weight="normal">최저</text>
+<text x="30" y="160" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="13" fill="#1f1f1f" text-anchor="start" font-weight="normal">반복</text>
+<text x="58" y="160" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11" fill="#6b6b6b" text-anchor="start" font-weight="normal">(R)</text>
+<rect x="150" y="144" width="260" height="26" rx="4" fill="#fff" stroke="#c8c8c8" stroke-width="1"/>
+<text x="158" y="162" font-family="'SF Mono','JetBrains Mono',Menlo,Consolas,monospace" font-size="12.5" fill="#1f1f1f" text-anchor="start" font-weight="normal">every week</text>
+<text x="420" y="162" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#2e7d32" text-anchor="start" font-weight="normal">✓ 매주 월요일</text>
+<text x="150" y="190" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#6b6b6b" text-anchor="start" font-weight="normal">프리셋:</text>
+<rect x="200" y="177" width="34" height="18" rx="9" fill="#dbe9f7" stroke="none" stroke-width="1"/>
+<text x="217.0" y="189.6" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11" fill="#0066b8" text-anchor="middle" font-weight="normal">매일</text>
+<rect x="240" y="177" width="34" height="18" rx="9" fill="#dbe9f7" stroke="none" stroke-width="1"/>
+<text x="257.0" y="189.6" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11" fill="#0066b8" text-anchor="middle" font-weight="normal">평일</text>
+<rect x="280" y="177" width="34" height="18" rx="9" fill="#dbe9f7" stroke="none" stroke-width="1"/>
+<text x="297.0" y="189.6" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11" fill="#0066b8" text-anchor="middle" font-weight="normal">매주</text>
+<rect x="320" y="177" width="34" height="18" rx="9" fill="#dbe9f7" stroke="none" stroke-width="1"/>
+<text x="337.0" y="189.6" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11" fill="#0066b8" text-anchor="middle" font-weight="normal">매월</text>
+<rect x="360" y="177" width="34" height="18" rx="9" fill="#dbe9f7" stroke="none" stroke-width="1"/>
+<text x="377.0" y="189.6" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11" fill="#0066b8" text-anchor="middle" font-weight="normal">매년</text>
+<rect x="414" y="178" width="12" height="12" rx="2" fill="#fff" stroke="#c8c8c8" stroke-width="1"/>
+<text x="432" y="190" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start" font-weight="normal">when done</text>
+<text x="30" y="230" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="13" fill="#1f1f1f" text-anchor="start" font-weight="normal">시작</text>
+<text x="58" y="230" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11" fill="#6b6b6b" text-anchor="start" font-weight="normal">(S)</text>
+<rect x="150" y="214" width="150" height="26" rx="4" fill="#fff" stroke="#c8c8c8" stroke-width="1"/>
+<text x="158" y="232" font-family="'SF Mono','JetBrains Mono',Menlo,Consolas,monospace" font-size="12.5" fill="#1f1f1f" text-anchor="start" font-weight="normal">2026-09-20</text>
+<text x="290" y="232" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="12" fill="#6b6b6b" text-anchor="end" font-weight="normal">📆</text>
+<text x="350" y="230" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="13" fill="#1f1f1f" text-anchor="start" font-weight="normal">예정</text>
+<text x="378" y="230" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11" fill="#6b6b6b" text-anchor="start" font-weight="normal">(C)</text>
+<rect x="410" y="214" width="150" height="26" rx="4" fill="#fff" stroke="#c8c8c8" stroke-width="1"/>
+<text x="418" y="232" font-family="'SF Mono','JetBrains Mono',Menlo,Consolas,monospace" font-size="12.5" fill="#1f1f1f" text-anchor="start" font-weight="normal">2026-09-22</text>
+<text x="550" y="232" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="12" fill="#6b6b6b" text-anchor="end" font-weight="normal">📆</text>
+<text x="30" y="270" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="13" fill="#1f1f1f" text-anchor="start" font-weight="normal">마감</text>
+<text x="58" y="270" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11" fill="#6b6b6b" text-anchor="start" font-weight="normal">(U)</text>
+<rect x="150" y="254" width="150" height="26" rx="4" fill="#fff" stroke="#c8c8c8" stroke-width="1"/>
+<text x="158" y="272" font-family="'SF Mono','JetBrains Mono',Menlo,Consolas,monospace" font-size="12.5" fill="#1f1f1f" text-anchor="start" font-weight="normal">next friday</text>
+<text x="290" y="272" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="12" fill="#6b6b6b" text-anchor="end" font-weight="normal">📆</text>
+<text x="310" y="272" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#2e7d32" text-anchor="start" font-weight="normal">→ 2026-09-25 (금)</text>
+<text x="30" y="306" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="12" fill="#6b6b6b" text-anchor="start" font-weight="normal">▸ 생성 / 완료 / 취소일 (접힘)</text>
+<text x="30" y="342" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="13" fill="#1f1f1f" text-anchor="start" font-weight="normal">상태</text>
+<text x="58" y="342" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11" fill="#6b6b6b" text-anchor="start" font-weight="normal">(T)</text>
+<rect x="150" y="326" width="180" height="26" rx="4" fill="#fff" stroke="#c8c8c8" stroke-width="1"/>
+<text x="158" y="344" font-family="'SF Mono','JetBrains Mono',Menlo,Consolas,monospace" font-size="12.5" fill="#1f1f1f" text-anchor="start" font-weight="normal">[ ] Todo</text>
+<text x="320" y="344" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="12" fill="#6b6b6b" text-anchor="end" font-weight="normal">▾</text>
+<text x="30" y="382" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="13" fill="#1f1f1f" text-anchor="start" font-weight="normal">의존성</text>
+<text x="150" y="382" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#6b6b6b" text-anchor="start" font-weight="normal">이 태스크 전에:</text>
+<rect x="250" y="369" width="146" height="18" rx="9" fill="#eaeaea" stroke="none" stroke-width="1"/>
+<text x="323.0" y="381.6" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11" fill="#1f1f1f" text-anchor="middle" font-weight="normal">데이터 수집 (a1b2c3) ×</text>
+<rect x="402" y="367" width="160" height="22" rx="4" fill="#fff" stroke="#c8c8c8" stroke-width="1" stroke-dasharray="3,2"/>
+<text x="410" y="383" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#6b6b6b" text-anchor="start" font-weight="normal">검색…</text>
+<text x="150" y="410" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#6b6b6b" text-anchor="start" font-weight="normal">이 태스크 후에:</text>
+<rect x="250" y="397" width="122" height="18" rx="9" fill="#eaeaea" stroke="none" stroke-width="1"/>
+<text x="311.0" y="409.6" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11" fill="#1f1f1f" text-anchor="middle" font-weight="normal">배포 준비 (z9y8x7)</text>
+<text x="30" y="450" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="13" fill="#1f1f1f" text-anchor="start" font-weight="normal">완료 시</text>
+<circle cx="160" cy="446" r="6" fill="#fff" stroke="#0066b8"/>
+<circle cx="160" cy="446" r="3.5" fill="#0066b8" stroke="none"/>
+<text x="172" y="450" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="12.5" fill="#1f1f1f" text-anchor="start" font-weight="normal">유지</text>
+<circle cx="238" cy="446" r="6" fill="#fff" stroke="#0066b8"/>
+<text x="250" y="450" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="12.5" fill="#1f1f1f" text-anchor="start" font-weight="normal">삭제</text>
+<line x1="20" y1="480" x2="740" y2="480" stroke="#c8c8c8" stroke-width="1"/>
+<text x="30" y="504" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#6b6b6b" text-anchor="start" font-weight="normal">미리보기</text>
+<rect x="110" y="488" width="620" height="26" rx="4" fill="#f6f8fa" stroke="none" stroke-width="1"/>
+<text x="118" y="506" font-family="'SF Mono','JetBrains Mono',Menlo,Consolas,monospace" font-size="11" fill="#1f1f1f" text-anchor="start" font-weight="normal">- [ ] 보고서 작성 #work ⏫ 🔁 every week 🛫 2026-09-20 ⏳ 2026-09-22 📅 2026-09-25 🆔 a1b2c3</text>
+<rect x="510" y="528" width="100" height="30" rx="4" fill="#fff" stroke="#c8c8c8" stroke-width="1"/>
+<text x="560" y="548" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="12.5" fill="#1f1f1f" text-anchor="middle" font-weight="normal">취소 (Esc)</text>
+<rect x="622" y="528" width="108" height="30" rx="4" fill="#0066b8" stroke="none" stroke-width="1"/>
+<text x="676" y="548" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="12.5" fill="#fff" text-anchor="middle" font-weight="bold">적용 (⏎)</text>
+</svg>

@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="420" viewBox="0 0 1000 420" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif"><title>7.5 캘린더</title><defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#666"/></marker></defs><rect width="1000" height="420" fill="#ffffff" rx="8"/>
+<rect x="0" y="0" width="1000" height="44" rx="8" fill="#f3f3f3" stroke="none" stroke-width="1"/>
+<text x="16" y="28" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="12" fill="#6b6b6b" text-anchor="start" font-weight="normal">◀</text>
+<text x="40" y="28" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="14" fill="#1f1f1f" text-anchor="start" font-weight="bold">2026년 9월</text>
+<text x="130" y="28" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="12" fill="#6b6b6b" text-anchor="start" font-weight="normal">▶</text>
+<rect x="170" y="12" width="60" height="24" rx="4" fill="#0066b8" stroke="none" stroke-width="1"/>
+<text x="200" y="28" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="12" fill="#fff" text-anchor="middle" font-weight="normal">월간</text>
+<rect x="232" y="12" width="60" height="24" rx="4" fill="#fff" stroke="#c8c8c8" stroke-width="1"/>
+<text x="262" y="28" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="12" fill="#1f1f1f" text-anchor="middle" font-weight="normal">주간</text>
+<text x="320" y="28" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="12" fill="#6b6b6b" text-anchor="start" font-weight="normal">표시:</text>
+<rect x="360" y="17" width="12" height="12" rx="2" fill="#0066b8" stroke="#0066b8" stroke-width="1"/>
+<path d="M362.5 23 l3 3 l5 -6" fill="none" stroke="#fff" stroke-width="1.6"/>
+<text x="378" y="28" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start" font-weight="normal">📅 마감</text>
+<rect x="440" y="17" width="12" height="12" rx="2" fill="#0066b8" stroke="#0066b8" stroke-width="1"/>
+<path d="M442.5 23 l3 3 l5 -6" fill="none" stroke="#fff" stroke-width="1.6"/>
+<text x="458" y="28" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start" font-weight="normal">⏳ 예정</text>
+<rect x="520" y="17" width="12" height="12" rx="2" fill="#fff" stroke="#0066b8" stroke-width="1"/>
+<text x="538" y="28" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start" font-weight="normal">🛫 시작</text>
+<text x="660" y="28" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="12" fill="#6b6b6b" text-anchor="start" font-weight="normal">데이터:</text>
+<rect x="710" y="12" width="110" height="24" rx="4" fill="#fff" stroke="#c8c8c8" stroke-width="1"/>
+<text x="720" y="28" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start" font-weight="normal">전체 ▾</text>
+<rect x="850" y="12" width="134" height="24" rx="4" fill="#fff" stroke="#c8c8c8" stroke-width="1"/>
+<text x="917" y="28" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="12" fill="#1f1f1f" text-anchor="middle" font-weight="normal">오늘로 이동</text>
+<rect x="16.0" y="60" width="138.28571428571428" height="24" rx="0" fill="#e8e8e8" stroke="#c8c8c8" stroke-width="1"/>
+<text x="85.14285714285714" y="76" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="12" fill="#1f1f1f" text-anchor="middle" font-weight="bold">월</text>
+<rect x="154.28571428571428" y="60" width="138.28571428571428" height="24" rx="0" fill="#e8e8e8" stroke="#c8c8c8" stroke-width="1"/>
+<text x="223.42857142857142" y="76" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="12" fill="#1f1f1f" text-anchor="middle" font-weight="bold">화</text>
+<rect x="292.57142857142856" y="60" width="138.28571428571428" height="24" rx="0" fill="#e8e8e8" stroke="#c8c8c8" stroke-width="1"/>
+<text x="361.71428571428567" y="76" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="12" fill="#1f1f1f" text-anchor="middle" font-weight="bold">수</text>
+<rect x="430.85714285714283" y="60" width="138.28571428571428" height="24" rx="0" fill="#e8e8e8" stroke="#c8c8c8" stroke-width="1"/>
+<text x="500.0" y="76" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="12" fill="#1f1f1f" text-anchor="middle" font-weight="bold">목</text>
+<rect x="569.1428571428571" y="60" width="138.28571428571428" height="24" rx="0" fill="#e8e8e8" stroke="#c8c8c8" stroke-width="1"/>
+<text x="638.2857142857142" y="76" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="12" fill="#1f1f1f" text-anchor="middle" font-weight="bold">금</text>
+<rect x="707.4285714285713" y="60" width="138.28571428571428" height="24" rx="0" fill="#e8e8e8" stroke="#c8c8c8" stroke-width="1"/>
+<text x="776.5714285714284" y="76" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="12" fill="#1f1f1f" text-anchor="middle" font-weight="bold">토</text>
+<rect x="845.7142857142857" y="60" width="138.28571428571428" height="24" rx="0" fill="#e8e8e8" stroke="#c8c8c8" stroke-width="1"/>
+<text x="914.8571428571428" y="76" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="12" fill="#c72e2e" text-anchor="middle" font-weight="bold">일</text>
+<rect x="16.0" y="84" width="138.28571428571428" height="100" rx="0" fill="#fff" stroke="#c8c8c8" stroke-width="1"/>
+<text x="32.0" y="102" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#1f1f1f" text-anchor="middle" font-weight="normal">14</text>
+<rect x="154.28571428571428" y="84" width="138.28571428571428" height="100" rx="0" fill="#fff" stroke="#c8c8c8" stroke-width="1"/>
+<text x="170.28571428571428" y="102" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#1f1f1f" text-anchor="middle" font-weight="normal">15</text>
+<rect x="292.57142857142856" y="84" width="138.28571428571428" height="100" rx="0" fill="#fff" stroke="#c8c8c8" stroke-width="1"/>
+<text x="308.57142857142856" y="102" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#1f1f1f" text-anchor="middle" font-weight="normal">16</text>
+<rect x="430.85714285714283" y="84" width="138.28571428571428" height="100" rx="0" fill="#fff" stroke="#c8c8c8" stroke-width="1"/>
+<text x="446.85714285714283" y="102" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#1f1f1f" text-anchor="middle" font-weight="normal">17</text>
+<rect x="569.1428571428571" y="84" width="138.28571428571428" height="100" rx="0" fill="#fff" stroke="#c8c8c8" stroke-width="1"/>
+<text x="585.1428571428571" y="102" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#1f1f1f" text-anchor="middle" font-weight="normal">18</text>
+<rect x="574.1428571428571" y="112" width="128.28571428571428" height="18" rx="3" fill="#fde7e9" stroke="none" stroke-width="1"/>
+<text x="579.1428571428571" y="125" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10.5" fill="#c72e2e" text-anchor="start" font-weight="normal">📅 예산안</text>
+<rect x="707.4285714285713" y="84" width="138.28571428571428" height="100" rx="0" fill="#fff" stroke="#c8c8c8" stroke-width="1"/>
+<text x="723.4285714285713" y="102" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#1f1f1f" text-anchor="middle" font-weight="normal">19</text>
+<rect x="712.4285714285713" y="112" width="128.28571428571428" height="18" rx="3" fill="#fde7e9" stroke="none" stroke-width="1"/>
+<text x="717.4285714285713" y="125" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10.5" fill="#c72e2e" text-anchor="start" font-weight="normal">📅 계약서 검토</text>
+<rect x="845.7142857142857" y="84" width="138.28571428571428" height="100" rx="0" fill="#fff" stroke="#c8c8c8" stroke-width="1"/>
+<text x="861.7142857142857" y="102" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#1f1f1f" text-anchor="middle" font-weight="normal">20</text>
+<rect x="850.7142857142857" y="112" width="128.28571428571428" height="18" rx="3" fill="#e6f4ea" stroke="none" stroke-width="1"/>
+<text x="855.7142857142857" y="125" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10.5" fill="#2e7d32" text-anchor="start" font-weight="normal">🛫 보고서 작성</text>
+<rect x="16.0" y="184" width="138.28571428571428" height="100" rx="0" fill="#f0f6ff" stroke="#c8c8c8" stroke-width="1"/>
+<circle cx="32.0" cy="198" r="10" fill="#0066b8" stroke="none"/>
+<text x="32.0" y="202" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#fff" text-anchor="middle" font-weight="bold">21</text>
+<rect x="21.0" y="212" width="128.28571428571428" height="18" rx="3" fill="#eaeaea" stroke="none" stroke-width="1"/>
+<text x="26.0" y="225" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10.5" fill="#9a9a9a" text-anchor="start" font-weight="normal">📅 회의록 정리</text>
+<rect x="21.0" y="233" width="128.28571428571428" height="18" rx="3" fill="#fff4ce" stroke="none" stroke-width="1"/>
+<text x="26.0" y="246" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10.5" fill="#bf8803" text-anchor="start" font-weight="normal">⏳ 벤더 회신</text>
+<rect x="154.28571428571428" y="184" width="138.28571428571428" height="100" rx="0" fill="#fff" stroke="#c8c8c8" stroke-width="1"/>
+<text x="170.28571428571428" y="202" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#1f1f1f" text-anchor="middle" font-weight="normal">22</text>
+<rect x="159.28571428571428" y="212" width="128.28571428571428" height="18" rx="3" fill="#fff4ce" stroke="none" stroke-width="1"/>
+<text x="164.28571428571428" y="225" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10.5" fill="#bf8803" text-anchor="start" font-weight="normal">⏳ 보고서 작성</text>
+<rect x="292.57142857142856" y="184" width="138.28571428571428" height="100" rx="0" fill="#fff" stroke="#c8c8c8" stroke-width="1"/>
+<text x="308.57142857142856" y="202" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#1f1f1f" text-anchor="middle" font-weight="normal">23</text>
+<rect x="430.85714285714283" y="184" width="138.28571428571428" height="100" rx="0" fill="#fff" stroke="#c8c8c8" stroke-width="1"/>
+<text x="446.85714285714283" y="202" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#1f1f1f" text-anchor="middle" font-weight="normal">24</text>
+<rect x="435.85714285714283" y="212" width="128.28571428571428" height="18" rx="3" fill="#dbe9f7" stroke="none" stroke-width="1"/>
+<text x="440.85714285714283" y="225" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10.5" fill="#0066b8" text-anchor="start" font-weight="normal">📅 배포 준비</text>
+<rect x="569.1428571428571" y="184" width="138.28571428571428" height="100" rx="0" fill="#fff" stroke="#c8c8c8" stroke-width="1"/>
+<text x="585.1428571428571" y="202" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#1f1f1f" text-anchor="middle" font-weight="normal">25</text>
+<rect x="574.1428571428571" y="212" width="128.28571428571428" height="18" rx="3" fill="#dbe9f7" stroke="none" stroke-width="1"/>
+<text x="579.1428571428571" y="225" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10.5" fill="#0066b8" text-anchor="start" font-weight="normal">📅 보고서 작성</text>
+<rect x="574.1428571428571" y="233" width="128.28571428571428" height="18" rx="3" fill="#dbe9f7" stroke="none" stroke-width="1"/>
+<text x="579.1428571428571" y="246" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10.5" fill="#0066b8" text-anchor="start" font-weight="normal">📅 주간 보고</text>
+<text x="577.1428571428571" y="266" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10.5" fill="#6b6b6b" text-anchor="start" font-weight="normal">+2</text>
+<rect x="707.4285714285713" y="184" width="138.28571428571428" height="100" rx="0" fill="#fff" stroke="#c8c8c8" stroke-width="1"/>
+<text x="723.4285714285713" y="202" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#1f1f1f" text-anchor="middle" font-weight="normal">26</text>
+<rect x="845.7142857142857" y="184" width="138.28571428571428" height="100" rx="0" fill="#fff" stroke="#c8c8c8" stroke-width="1"/>
+<text x="861.7142857142857" y="202" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#1f1f1f" text-anchor="middle" font-weight="normal">27</text>
+<rect x="16.0" y="284" width="138.28571428571428" height="100" rx="0" fill="#fff" stroke="#c8c8c8" stroke-width="1"/>
+<text x="32.0" y="302" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#1f1f1f" text-anchor="middle" font-weight="normal">28</text>
+<rect x="21.0" y="312" width="128.28571428571428" height="18" rx="3" fill="#dbe9f7" stroke="none" stroke-width="1"/>
+<text x="26.0" y="325" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10.5" fill="#0066b8" text-anchor="start" font-weight="normal">📅 월간 결산</text>
+<rect x="154.28571428571428" y="284" width="138.28571428571428" height="100" rx="0" fill="#fff" stroke="#c8c8c8" stroke-width="1"/>
+<text x="170.28571428571428" y="302" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#1f1f1f" text-anchor="middle" font-weight="normal">29</text>
+<rect x="292.57142857142856" y="284" width="138.28571428571428" height="100" rx="0" fill="#fff" stroke="#c8c8c8" stroke-width="1"/>
+<text x="308.57142857142856" y="302" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#1f1f1f" text-anchor="middle" font-weight="normal">30</text>
+<rect x="430.85714285714283" y="284" width="138.28571428571428" height="100" rx="0" fill="#fff" stroke="#c8c8c8" stroke-width="1"/>
+<text x="446.85714285714283" y="302" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#6b6b6b" text-anchor="middle" font-weight="normal">1</text>
+<rect x="569.1428571428571" y="284" width="138.28571428571428" height="100" rx="0" fill="#fff" stroke="#c8c8c8" stroke-width="1"/>
+<text x="585.1428571428571" y="302" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#6b6b6b" text-anchor="middle" font-weight="normal">2</text>
+<rect x="574.1428571428571" y="312" width="128.28571428571428" height="18" rx="3" fill="#fff4ce" stroke="none" stroke-width="1"/>
+<text x="579.1428571428571" y="325" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10.5" fill="#bf8803" text-anchor="start" font-weight="normal">⏳ 벤더 회신</text>
+<rect x="707.4285714285713" y="284" width="138.28571428571428" height="100" rx="0" fill="#fff" stroke="#c8c8c8" stroke-width="1"/>
+<text x="723.4285714285713" y="302" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#6b6b6b" text-anchor="middle" font-weight="normal">3</text>
+<rect x="845.7142857142857" y="284" width="138.28571428571428" height="100" rx="0" fill="#fff" stroke="#c8c8c8" stroke-width="1"/>
+<text x="861.7142857142857" y="302" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#6b6b6b" text-anchor="middle" font-weight="normal">4</text>
+<rect x="715.4285714285713" y="232" width="122.28571428571428" height="18" rx="3" fill="#dbe9f7" stroke="#0066b8" stroke-width="1" stroke-dasharray="4,3"/>
+<text x="720.4285714285713" y="245" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10.5" fill="#0066b8" text-anchor="start" font-weight="normal">📅 주간 보고</text>
+<path d="M658.2857142857142 242 C 697.4285714285713 214, 685.4285714285713 224, 712.4285714285713 242" fill="none" stroke="#0066b8" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#arrow)"/>
+<text x="715.4285714285713" y="268" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10.5" fill="#0066b8" text-anchor="start" font-weight="normal">드래그 → 📅 변경</text>
+<text x="853.7142857142857" y="244" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10.5" fill="#6b6b6b" text-anchor="start" font-weight="normal" font-style="italic">빈 칸 더블클릭</text>
+<text x="853.7142857142857" y="258" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10.5" fill="#6b6b6b" text-anchor="start" font-weight="normal" font-style="italic">→ 새 태스크</text>
+<text x="16" y="410" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11" fill="#6b6b6b" text-anchor="start" font-weight="normal" font-style="italic">항목 클릭 → 편집 모달 · 더블클릭 → 원본 이동 · 색: 기한 초과(빨강) 마감(파랑) 예정(노랑) 시작(초록) 완료(회색)</text>
+</svg>

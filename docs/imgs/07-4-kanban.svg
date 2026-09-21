@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="420" viewBox="0 0 1000 420" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif"><title>7.4 칸반 / 컬럼 뷰</title><defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#666"/></marker></defs><rect width="1000" height="420" fill="#ffffff" rx="8"/>
+<rect x="0" y="0" width="1000" height="44" rx="8" fill="#f3f3f3" stroke="none" stroke-width="1"/>
+<text x="16" y="28" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="12" fill="#6b6b6b" text-anchor="start" font-weight="normal">컬럼 기준:</text>
+<rect x="86" y="12" width="56" height="24" rx="4" fill="#fff" stroke="#c8c8c8" stroke-width="1"/>
+<text x="96" y="28" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start" font-weight="normal">상태 ▾</text>
+<text x="162" y="28" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="12" fill="#6b6b6b" text-anchor="start" font-weight="normal">데이터:</text>
+<rect x="208" y="12" width="173" height="24" rx="4" fill="#fff" stroke="#c8c8c8" stroke-width="1"/>
+<text x="218" y="28" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start" font-weight="normal">저장된 쿼리: 이번 주 업무 ▾</text>
+<text x="401" y="28" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="12" fill="#6b6b6b" text-anchor="start" font-weight="normal">그룹:</text>
+<rect x="435" y="12" width="56" height="24" rx="4" fill="#fff" stroke="#c8c8c8" stroke-width="1"/>
+<text x="445" y="28" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start" font-weight="normal">파일 ▾</text>
+<rect x="800" y="12" width="184" height="24" rx="4" fill="#fff" stroke="#c8c8c8" stroke-width="1"/>
+<text x="810" y="28" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="12" fill="#6b6b6b" text-anchor="start" font-weight="normal">🔍 필터…</text>
+<rect x="16.0" y="60" width="233.0" height="344" rx="6" fill="#f3f3f3" stroke="#c8c8c8" stroke-width="1"/>
+<text x="28.0" y="82" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="13" fill="#1f1f1f" text-anchor="start" font-weight="bold">할 일</text>
+<rect x="71.0" y="69" width="24" height="16" rx="9" fill="#e8e8e8" stroke="none" stroke-width="1"/>
+<text x="83.0" y="80.2" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10" fill="#1f1f1f" text-anchor="middle" font-weight="normal">12</text>
+<rect x="24.0" y="100" width="217.0" height="66" rx="5" fill="#fff" stroke="#c8c8c8" stroke-width="1"/>
+<text x="32.0" y="122" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="12.5" fill="#1f1f1f" text-anchor="start" font-weight="normal">⏫ 보고서 작성</text>
+<rect x="32.0" y="136" width="52" height="17" rx="9" fill="#eaeaea" stroke="none" stroke-width="1"/>
+<text x="58.0" y="147.9" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10" fill="#1f1f1f" text-anchor="middle" font-weight="normal">📅 9/25</text>
+<rect x="89.0" y="136" width="42" height="17" rx="9" fill="#dbe9f7" stroke="none" stroke-width="1"/>
+<text x="110.0" y="147.9" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10" fill="#0066b8" text-anchor="middle" font-weight="normal">#work</text>
+<rect x="24.0" y="178" width="217.0" height="66" rx="5" fill="#fff" stroke="#c8c8c8" stroke-width="1"/>
+<text x="32.0" y="200" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="12.5" fill="#1f1f1f" text-anchor="start" font-weight="normal">예산안</text>
+<rect x="32.0" y="214" width="66" height="17" rx="9" fill="#fde7e9" stroke="none" stroke-width="1"/>
+<text x="65.0" y="225.9" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10" fill="#c72e2e" text-anchor="middle" font-weight="normal">⚠ 2일 지남</text>
+<rect x="24.0" y="256" width="217.0" height="66" rx="5" fill="#fff" stroke="#c8c8c8" stroke-width="1"/>
+<text x="32.0" y="278" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="12.5" fill="#1f1f1f" text-anchor="start" font-weight="normal">🔼 계약서 검토</text>
+<rect x="32.0" y="292" width="52" height="17" rx="9" fill="#fde7e9" stroke="none" stroke-width="1"/>
+<text x="58.0" y="303.9" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10" fill="#c72e2e" text-anchor="middle" font-weight="normal">📅 9/19</text>
+<rect x="261.0" y="60" width="233.0" height="344" rx="6" fill="#f3f3f3" stroke="#c8c8c8" stroke-width="1"/>
+<text x="273.0" y="82" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="13" fill="#1f1f1f" text-anchor="start" font-weight="bold">진행 중</text>
+<rect x="329.0" y="69" width="18" height="16" rx="9" fill="#e8e8e8" stroke="none" stroke-width="1"/>
+<text x="338.0" y="80.2" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10" fill="#1f1f1f" text-anchor="middle" font-weight="normal">3</text>
+<rect x="269.0" y="100" width="217.0" height="66" rx="5" fill="#fff" stroke="#c8c8c8" stroke-width="1"/>
+<text x="277.0" y="122" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="12.5" fill="#1f1f1f" text-anchor="start" font-weight="normal">배포 준비</text>
+<rect x="277.0" y="136" width="56" height="17" rx="9" fill="#fff4ce" stroke="none" stroke-width="1"/>
+<text x="305.0" y="147.9" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10" fill="#bf8803" text-anchor="middle" font-weight="normal">⛔ 대기 1</text>
+<rect x="506.0" y="60" width="233.0" height="344" rx="6" fill="#f3f3f3" stroke="#c8c8c8" stroke-width="1"/>
+<text x="518.0" y="82" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="13" fill="#1f1f1f" text-anchor="start" font-weight="bold">보류</text>
+<rect x="548.0" y="69" width="18" height="16" rx="9" fill="#e8e8e8" stroke="none" stroke-width="1"/>
+<text x="557.0" y="80.2" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10" fill="#1f1f1f" text-anchor="middle" font-weight="normal">1</text>
+<rect x="514.0" y="100" width="217.0" height="66" rx="5" fill="#fff" stroke="#c8c8c8" stroke-width="1"/>
+<text x="522.0" y="122" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="12.5" fill="#1f1f1f" text-anchor="start" font-weight="normal">🔽 벤더 회신 대기</text>
+<rect x="522.0" y="136" width="48" height="17" rx="9" fill="#eaeaea" stroke="none" stroke-width="1"/>
+<text x="546.0" y="147.9" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10" fill="#1f1f1f" text-anchor="middle" font-weight="normal">⏳ 10/2</text>
+<rect x="751.0" y="60" width="233.0" height="344" rx="6" fill="#f3f3f3" stroke="#c8c8c8" stroke-width="1"/>
+<text x="763.0" y="82" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="13" fill="#1f1f1f" text-anchor="start" font-weight="bold">완료</text>
+<rect x="793.0" y="69" width="18" height="16" rx="9" fill="#e8e8e8" stroke="none" stroke-width="1"/>
+<text x="802.0" y="80.2" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10" fill="#1f1f1f" text-anchor="middle" font-weight="normal">8</text>
+<rect x="759.0" y="100" width="217.0" height="66" rx="5" fill="#fff" stroke="#c8c8c8" stroke-width="1"/>
+<text x="767.0" y="122" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="12.5" fill="#9a9a9a" text-anchor="start" font-weight="normal">회의록 정리</text>
+<rect x="767.0" y="136" width="48" height="17" rx="9" fill="#e6f4ea" stroke="none" stroke-width="1"/>
+<text x="791.0" y="147.9" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10" fill="#2e7d32" text-anchor="middle" font-weight="normal">✅ 9/21</text>
+<rect x="759.0" y="178" width="217.0" height="66" rx="5" fill="#fff" stroke="#c8c8c8" stroke-width="1"/>
+<text x="767.0" y="200" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="12.5" fill="#9a9a9a" text-anchor="start" font-weight="normal">주간 데이터 수집</text>
+<rect x="767.0" y="214" width="48" height="17" rx="9" fill="#e6f4ea" stroke="none" stroke-width="1"/>
+<text x="791.0" y="225.9" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10" fill="#2e7d32" text-anchor="middle" font-weight="normal">✅ 9/20</text>
+<rect x="820.0" y="214" width="22" height="17" rx="9" fill="#ede7f6" stroke="none" stroke-width="1"/>
+<text x="831.0" y="225.9" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10" fill="#7c4dff" text-anchor="middle" font-weight="normal">🔁</text>
+<rect x="269.0" y="178" width="217.0" height="66" rx="5" fill="#fff" stroke="#0066b8" stroke-width="1" stroke-dasharray="4,3" opacity="0.9"/>
+<text x="277.0" y="200" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="12.5" fill="#0066b8" text-anchor="start" font-weight="normal">예산안</text>
+<rect x="277.0" y="214" width="66" height="17" rx="9" fill="#fde7e9" stroke="none" stroke-width="1"/>
+<text x="310.0" y="225.9" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10" fill="#c72e2e" text-anchor="middle" font-weight="normal">⚠ 2일 지남</text>
+<path d="M241.0 211 L267.0 211" fill="none" stroke="#0066b8" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#arrow)"/>
+<rect x="269.0" y="258" width="217.0" height="64" rx="5" fill="#fff" stroke="#0066b8" stroke-width="1"/>
+<text x="279.0" y="278" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#0066b8" text-anchor="start" font-weight="bold">놓으면 → task/setField</text>
+<text x="279.0" y="296" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10.5" fill="#6b6b6b" text-anchor="start" font-weight="normal">상태 컬럼 = status → [/]</text>
+<text x="279.0" y="312" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10.5" fill="#6b6b6b" text-anchor="start" font-weight="normal">마감 버킷 = due · 우선순위 = priority</text>
+<text x="16" y="414" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11" fill="#6b6b6b" text-anchor="start" font-weight="normal" font-style="italic">카드 클릭 → 편집 모달 · 더블클릭 → 원본으로 이동 · 사이드바 버전은 컬럼을 탭으로 전환</text>
+</svg>

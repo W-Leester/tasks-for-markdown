@@ -42,7 +42,7 @@ export function registerWebviewView(context: vscode.ExtensionContext, deps: Webv
   );
 }
 
-export function registerWebviews(context: vscode.ExtensionContext, deps: WebviewHostDeps): { openEdit: (target: EditTarget) => WebviewHost; openKanban: () => WebviewHost; openQueryBuilder: (id: string | null) => WebviewHost } {
+export function registerWebviews(context: vscode.ExtensionContext, deps: WebviewHostDeps): { openEdit: (target: EditTarget) => WebviewHost; openKanban: () => WebviewHost; openQueryBuilder: (id: string | null) => WebviewHost; openStats: () => WebviewHost } {
   const openEditPanel = createPanelOpener(deps, 'edit', vscode.l10n.t('Tasks: Create or edit'), 'edit');
   const openEdit = (target: EditTarget) => {
     const host = openEditPanel();
@@ -68,5 +68,7 @@ export function registerWebviews(context: vscode.ExtensionContext, deps: Webview
       return openQueryBuilder(q?.id ?? null);
     }),
   );
-  return { openEdit, openKanban, openQueryBuilder };
+  const openStats = createPanelOpener(deps, 'stats', vscode.l10n.t('Tasks: Statistics'), 'graph');
+  context.subscriptions.push(vscode.commands.registerCommand('tasksmd.openStats', () => openStats()));
+  return { openEdit, openKanban, openQueryBuilder, openStats };
 }

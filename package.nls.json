@@ -94,5 +94,6 @@
   "tasksmd.config.archive.file": "Workspace-relative file that archived tasks are appended to.",
   "tasksmd.config.archive.afterDays": "Archive completed (done/cancelled) tasks whose completion date is at least this many days old. 0 archives every completed task, including undated ones.",
   "tasksmd.config.archive.linkStyle": "How the archive links back to the source file: [[wiki]] links or [markdown](links).",
-  "tasksmd.archiveCompleted.title": "Archive completed tasks…"
+  "tasksmd.archiveCompleted.title": "Archive completed tasks…",
+  "tasksmd.openStats.title": "Open statistics"
 }

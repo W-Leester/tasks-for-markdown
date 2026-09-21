@@ -383,3 +383,12 @@ suite('archive', () => {
     assert.ok(archived.includes('- [x] Tidy meeting notes ✅ 2020-01-01'));
   });
 });
+
+suite('statistics', () => {
+  test('panel boots and receives weekly stats', async () => {
+    const api = await getApi();
+    const host = api.webviews.openStats();
+    await waitFor(() => host.received.includes('stats/request'), 8000, 'stats request');
+    await vscode.commands.executeCommand('workbench.action.closeAllEditors');
+  });
+});

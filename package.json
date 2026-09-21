@@ -232,6 +232,12 @@
         "title": "%tasksmd.archiveCompleted.title%",
         "category": "Tasks",
         "icon": "$(archive)"
+      },
+      {
+        "command": "tasksmd.openStats",
+        "title": "%tasksmd.openStats.title%",
+        "category": "Tasks",
+        "icon": "$(graph)"
       }
     ],
     "configuration": {

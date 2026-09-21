@@ -3,6 +3,7 @@ import { systemClock, type Clock } from '../core/dates';
 import type { TaskIndex } from '../core/index';
 import { DateField, type StatusRegistry, StatusType, Task, generateTaskId } from '../core/task';
 import { Recurrence } from '../core/recurrence';
+import { computeWeeklyStats } from '../core/stats';
 import { dependants } from '../core/index';
 import type { QueryService } from '../services/QueryService';
 import type { SavedQueryStore } from '../services/SavedQueryStore';
@@ -182,6 +183,11 @@ export class WebviewHost implements vscode.Disposable {
           if (!editor || editor.document.languageId !== 'markdown') throw new Error(vscode.l10n.t('Open a Markdown file to insert a query block.'));
           await editor.insertSnippet(new vscode.SnippetString('```tasks\n' + msg.query.trim().replace(/\$/g, '\\$') + '\n```\n$0'));
           await vscode.window.showTextDocument(editor.document, editor.viewColumn);
+          break;
+        }
+        case 'stats/request': {
+          const stats = computeWeeklyStats(this.deps.index.all(), { today: this.today(), weeks: msg.weeks, tag: msg.tag ?? undefined, folder: msg.folder ?? undefined });
+          this.send({ type: 'stats/result', requestId: msg.requestId, stats });
           break;
         }
         case 'recurrence/validate': {

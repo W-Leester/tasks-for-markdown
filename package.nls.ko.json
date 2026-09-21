@@ -94,5 +94,6 @@
   "tasksmd.config.archive.file": "아카이브한 태스크를 추가할 워크스페이스 상대 경로 파일.",
   "tasksmd.config.archive.afterDays": "완료(done/cancelled)된 지 이 일수 이상 지난 태스크를 아카이브합니다. 0이면 날짜 없는 것을 포함한 모든 완료 태스크.",
   "tasksmd.config.archive.linkStyle": "아카이브에서 원본 파일을 가리키는 링크 형식: [[위키]] 링크 또는 [마크다운](링크).",
-  "tasksmd.archiveCompleted.title": "완료 태스크 아카이브…"
+  "tasksmd.archiveCompleted.title": "완료 태스크 아카이브…",
+  "tasksmd.openStats.title": "통계 열기"
 }

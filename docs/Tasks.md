@@ -470,10 +470,10 @@
 - [x] 테스트: planner 단위 5건, 통합 1건(QuickPick 스텁; Undo는 수동 체크리스트)
 
 ### M7.3 주간 통계 (`core/stats/WeeklyStats.ts`, `webviews/stats/`)
-- [ ] `WeeklyStats` (core) — 월요일 시작 12주 버킷: 완료(✅), 신규(➕), 기한 초과, 주말 시점 잔량; 날짜 없는 태스크 수 (FR-10.9, FR-10.10)
-- [ ] 태그·폴더 필터
-- [ ] Svelte 차트(외부 차트 라이브러리 없이 SVG 직접 렌더 — 번들 최소화), 요약 타일 4개 (D§7.6)
-- [ ] 명령 `tasksmd.openStats`
+- [x] `WeeklyStats` (core) — 월요일 시작 12주 버킷: 완료(✅), 신규(➕), 기한 초과, 주말 시점 잔량; 날짜 없는 태스크 수 (FR-10.9, FR-10.10)
+- [x] 태그·폴더 필터
+- [x] Svelte 차트(외부 차트 라이브러리 없이 SVG 직접 렌더 — 번들 최소화), 요약 타일 4개 (D§7.6)
+- [x] 명령 `tasksmd.openStats`
 
 ### M7.4 캘린더 (`webviews/calendar/`)
 - [ ] 월간/주간 전환, 표시 필드 토글(📅 ⏳ 🛫), 주 시작 월요일 (FR-10.11)

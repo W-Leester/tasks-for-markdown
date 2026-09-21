@@ -73,6 +73,7 @@ export type ToWebview =
   | { type: 'recurrence/validated'; requestId: number; valid: boolean; canonical: string | null }
   | { type: 'query/explained'; requestId: number; explain: string; errors: string[]; matched: number }
   | { type: 'query/target'; id: string | null }
+  | { type: 'stats/result'; requestId: number; stats: StatsDto }
   | { type: 'error'; message: string };
 
 export interface GroupDto {
@@ -97,6 +98,7 @@ export type FromWebview =
   | { type: 'query/explain'; requestId: number; query: string }
   | { type: 'query/save'; id: string | null; name: string; query: string; destination: 'file' | 'settings' }
   | { type: 'query/insert'; query: string }
+  | { type: 'stats/request'; requestId: number; weeks: number; tag: string | null; folder: string | null }
   | { type: 'ui/close' }
   | { type: 'ui/notify'; level: 'info' | 'warn' | 'error'; message: string };
 
@@ -105,4 +107,12 @@ export interface WebviewApi {
   postMessage(msg: FromWebview): void;
   getState(): unknown;
   setState(s: unknown): void;
+}
+
+export interface StatsDto {
+  weeks: { start: string; end: string; label: string; completed: number; created: number; overdue: number; remaining: number; current: boolean }[];
+  excluded: number;
+  totalOpen: number;
+  tags: string[];
+  folders: string[];
 }

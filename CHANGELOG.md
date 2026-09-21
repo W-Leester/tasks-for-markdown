@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### M3 — recurrence, statuses, dependencies (2026-09-21)
+- Recurring tasks: completing a `🔁 every …` task inserts the next instance (Obsidian rules: reference date priority, relative dates, `when done`, short months, `🏁 delete`), configurable position / id handling / dependsOn copy.
+- Custom statuses via `tasksmd.statuses` with theme presets (Core, Minimal, ITS, Things); behaviour follows the status type.
+- Dependencies: blocked / blocking detection, cycle diagnostics, "Set dependencies…" picker that mints ids.
+- Urgency score (Obsidian formula) drives default ordering; recurrence picker with live validation.
+
 ### M2 — editor assistance (2026-09-21)
 - Decorations: relative-date hints, overdue / due-today backgrounds, dimmed completed tasks and metadata, gutter status icons.
 - CodeLens actions above the current task line (done, priority, due, scheduled, postpone, edit) and a hover card with command links.

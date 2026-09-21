@@ -152,5 +152,9 @@
   "Unrecognised recurrence rule \"{0}\". Examples: every day, every week on Monday, every month on the last.": "인식할 수 없는 반복 규칙 \"{0}\". 예: every day, every week on Monday, every month on the last.",
   "Circular dependency: {0}.": "순환 의존성: {0}.",
   "blocking": "다른 태스크를 막는 중",
-  "Urgency": "긴급도"
+  "Urgency": "긴급도",
+  "Repeat": "반복",
+  "every day · every week on monday, friday · every month on the 15th · … when done": "every day · every week on monday, friday · every month on the 15th · … when done",
+  "valid rule": "유효한 규칙",
+  "not a recognised rule": "인식할 수 없는 규칙"
 }

@@ -92,7 +92,8 @@ export class TaskCodeLensProvider implements vscode.CodeLensProvider, vscode.Dis
         : `📅 ${vscode.l10n.t('Due')} ▾`;
       out.push(lens(dueTitle, 'tasksmd.setDueDate'));
       if (task.scheduled?.date) out.push(lens(`⏳ ${task.scheduled.date.format('MMM D')} ▾`, 'tasksmd.setScheduledDate'));
-      if (task.recurrenceText) out.push(lens(`🔁 ${task.recurrenceText}`, 'tasksmd.createOrEdit'));
+      if (task.recurrenceText) out.push(lens(`🔁 ${task.recurrenceText} ▾`, 'tasksmd.setRecurrence'));
+      else if (task.due || task.scheduled || task.start) out.push(lens(`🔁 ${vscode.l10n.t('Repeat')} ▾`, 'tasksmd.setRecurrence'));
       if (task.due || task.scheduled) out.push(lens(`$(watch) ${vscode.l10n.t('Postpone')}`, 'tasksmd.postpone'));
     }
     out.push(lens(`$(edit) ${vscode.l10n.t('Edit')}`, 'tasksmd.createOrEdit'));

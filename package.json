@@ -157,6 +157,11 @@
         "command": "tasksmd.setDependencies",
         "title": "%tasksmd.setDependencies.title%",
         "category": "Tasks"
+      },
+      {
+        "command": "tasksmd.setRecurrence",
+        "title": "%tasksmd.setRecurrence.title%",
+        "category": "Tasks"
       }
     ],
     "configuration": {
@@ -478,6 +483,10 @@
         {
           "command": "tasksmd.setDependencies",
           "group": "2_fields@7"
+        },
+        {
+          "command": "tasksmd.setRecurrence",
+          "group": "2_fields@8"
         }
       ],
       "view/title": [
@@ -562,6 +571,11 @@
           "command": "tasksmd.setDependencies",
           "when": "view == tasksmd.tasks && viewItem =~ /^task/",
           "group": "3_fields@6"
+        },
+        {
+          "command": "tasksmd.setRecurrence",
+          "when": "view == tasksmd.tasks && viewItem =~ /^task/",
+          "group": "3_fields@7"
         }
       ]
     },

@@ -125,3 +125,49 @@ export async function pickPostpone(from: Dayjs, clock: Clock = systemClock): Pro
   );
   return picked?.date;
 }
+
+interface RecurrenceItem extends vscode.QuickPickItem {
+  value: string | null | undefined; // null = remove, undefined = not selectable
+}
+
+/**
+ * Recurrence picker: presets plus free text validated live with rrule ("every 2 weeks on
+ * friday when done"). Returns the rule text, `null` to remove, `undefined` when cancelled.
+ */
+export function pickRecurrence(current: string | null, isValid: (text: string) => boolean): Promise<string | null | undefined> {
+  const presets = (): RecurrenceItem[] => {
+    const list: RecurrenceItem[] = [
+      'every day', 'every weekday', 'every week', 'every 2 weeks', 'every month', 'every month on the last', 'every year', 'every week when done', 'every day when done',
+    ].map((r) => ({ label: `$(sync) ${r}`, value: r, description: r === current ? '$(check)' : undefined }));
+    if (current) list.push({ label: `$(trash) ${vscode.l10n.t('Remove recurrence')}`, value: null });
+    return list;
+  };
+  return new Promise((resolve) => {
+    const qp = vscode.window.createQuickPick<RecurrenceItem>();
+    qp.title = current ? `🔁 ${current}` : vscode.l10n.t('Repeat');
+    qp.placeholder = vscode.l10n.t('every day · every week on monday, friday · every month on the 15th · … when done');
+    qp.items = presets();
+    qp.onDidChangeValue((text) => {
+      const t = text.trim();
+      const typed: RecurrenceItem[] = t
+        ? isValid(t)
+          ? [{ label: `$(arrow-right) ${t}`, description: vscode.l10n.t('valid rule'), value: t, alwaysShow: true }]
+          : [{ label: `$(warning) ${t}`, description: vscode.l10n.t('not a recognised rule'), value: undefined, alwaysShow: true }]
+        : [];
+      qp.items = [...typed, ...presets()];
+    });
+    let done = false;
+    qp.onDidAccept(() => {
+      const sel = qp.selectedItems[0];
+      if (!sel || sel.value === undefined) return;
+      done = true;
+      qp.hide();
+      resolve(sel.value);
+    });
+    qp.onDidHide(() => {
+      if (!done) resolve(undefined);
+      qp.dispose();
+    });
+    qp.show();
+  });
+}

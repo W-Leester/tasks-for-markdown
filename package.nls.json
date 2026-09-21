@@ -62,5 +62,6 @@
   "tasksmd.config.statuses.type": "Semantic type that drives behaviour.",
   "tasksmd.loadStatusPreset.title": "Load status preset…",
   "tasksmd.changeStatusTo.title": "Change status to…",
-  "tasksmd.setDependencies.title": "Set dependencies…"
+  "tasksmd.setDependencies.title": "Set dependencies…",
+  "tasksmd.setRecurrence.title": "Set recurrence…"
 }

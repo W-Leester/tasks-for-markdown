@@ -2,7 +2,8 @@ import * as vscode from 'vscode';
 import { systemClock, type Clock } from '../core/dates';
 import { DateField, type DateFieldName, Task } from '../core/task';
 import { pickDependencies } from '../editor/quickpicks/dependencyPick';
-import { pickDate, pickPostpone, pickPriority, pickStatus } from '../editor/quickpicks/pickers';
+import { pickDate, pickPostpone, pickPriority, pickRecurrence, pickStatus } from '../editor/quickpicks/pickers';
+import { isValidRecurrenceText } from '../core/recurrence';
 import { generateTaskId } from '../core/task';
 import { type CommandDeps, resolveTargetTasks, runEdit } from './registerCommands';
 
@@ -68,6 +69,14 @@ export function registerEditCommands(context: vscode.ExtensionContext, deps: Com
         const f: DateFieldName = t.due ? 'due' : t.scheduled ? 'scheduled' : 'due';
         await deps.editService.update(t, { [f]: DateField.fromDate(date) });
       }
+    }),
+  );
+
+  register('tasksmd.setRecurrence', (arg) =>
+    forTargets(arg, async (tasks) => {
+      const value = await pickRecurrence(tasks[0]!.recurrenceText, isValidRecurrenceText);
+      if (value === undefined) return;
+      for (const t of tasks) await deps.editService.update(t, { recurrenceText: value });
     }),
   );
 

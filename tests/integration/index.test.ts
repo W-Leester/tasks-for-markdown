@@ -180,3 +180,26 @@ suite('auto-suggest', () => {
     assert.ok(items.some((i) => labelOf(i) === 'tomorrow'), 'presets present');
   });
 });
+
+suite('diagnostics', () => {
+  const guard = new FixtureGuard();
+  teardown(() => guard.restore());
+
+  test('reports invalid dates and unknown dependencies with quick fixes', async () => {
+    await getApi();
+    guard.protect('notes/project-a.md');
+    const doc = await vscode.workspace.openTextDocument(fixtureUri('notes/project-a.md'));
+    const editor = await vscode.window.showTextDocument(doc);
+    await editor.edit((eb) => eb.insert(new vscode.Position(doc.lineCount, 0), '\n- [ ] bad 📅 2026-13-40\n- [ ] dep ⛔ nope99\n- [ ] rec 🔁 every day'));
+    await waitFor(() => vscode.languages.getDiagnostics(doc.uri).filter((d) => d.source === 'Tasks').length === 3, 3000, 'three diagnostics');
+    const diags = vscode.languages.getDiagnostics(doc.uri).filter((d) => d.source === 'Tasks');
+    assert.deepEqual(diags.map((d) => d.code).sort(), ['invalid-date', 'recurring-without-date', 'unknown-dependency']);
+    const bad = diags.find((d) => d.code === 'invalid-date')!;
+    assert.equal(doc.getText(bad.range), '2026-13-40');
+    const actions = await vscode.commands.executeCommand<vscode.CodeAction[]>('vscode.executeCodeActionProvider', doc.uri, bad.range);
+    const remove = actions.find((a) => a.title.startsWith('Remove invalid'));
+    assert.ok(remove?.edit, 'quick fix with edit');
+    await vscode.workspace.applyEdit(remove!.edit!);
+    assert.equal(doc.lineAt(bad.range.start.line).text, '- [ ] bad');
+  });
+});

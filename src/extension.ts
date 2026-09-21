@@ -6,6 +6,7 @@ import { StatusRegistry } from './core/task';
 import { TaskCodeLensProvider } from './editor/TaskCodeLensProvider';
 import { TaskCompletionProvider } from './editor/TaskCompletionProvider';
 import { TaskDecorations } from './editor/TaskDecorations';
+import { TaskDiagnostics } from './editor/TaskDiagnostics';
 import { TaskHoverProvider } from './editor/TaskHoverProvider';
 import { TaskLineContext } from './editor/TaskLineContext';
 import { IndexService } from './index/IndexService';
@@ -48,6 +49,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<Extens
   context.subscriptions.push(vscode.languages.registerHoverProvider(markdown, new TaskHoverProvider({ index, settings, getStatusRegistry })));
   // Markdown has quickSuggestions off by default, so a space is the trigger (like Obsidian's auto-suggest).
   context.subscriptions.push(vscode.languages.registerCompletionItemProvider(markdown, new TaskCompletionProvider({ index, settings }), ' '));
+  const diagnostics = new TaskDiagnostics({ index, settings, getStatusRegistry });
+  context.subscriptions.push(diagnostics, vscode.languages.registerCodeActionsProvider(markdown, diagnostics, { providedCodeActionKinds: TaskDiagnostics.providedCodeActionKinds }));
 
   // Drives the welcome view: shown only when the index is ready and holds no tasks.
   const updateEmpty = () => void vscode.commands.executeCommand('setContext', 'tasksmd.indexEmpty', index.state === 'ready' && index.taskCount() === 0);

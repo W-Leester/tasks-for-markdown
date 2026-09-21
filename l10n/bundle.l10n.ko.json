@@ -129,5 +129,13 @@
   "next monday": "다음 월요일",
   "in 1 week": "1주 후",
   "in 2 weeks": "2주 후",
-  "next month": "다음 달"
+  "next month": "다음 달",
+  "Invalid {0} date \"{1}\" — expected YYYY-MM-DD.": "잘못된 {0} 날짜 \"{1}\" — YYYY-MM-DD 형식이어야 합니다.",
+  "No task has the id \"{0}\".": "id가 \"{0}\"인 태스크가 없습니다.",
+  "A recurring task needs a due, scheduled or start date to repeat from.": "반복 태스크는 기준이 될 마감·예정·시작일 중 하나가 필요합니다.",
+  "Set {0} date to today ({1})": "{0} 날짜를 오늘({1})로 설정",
+  "Remove invalid {0} date": "잘못된 {0} 날짜 제거",
+  "Remove dependency on \"{0}\"": "\"{0}\" 의존성 제거",
+  "Add due date today ({0})": "오늘({0}) 마감일 추가",
+  "Remove recurrence": "반복 제거"
 }

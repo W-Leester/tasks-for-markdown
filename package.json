@@ -617,8 +617,8 @@
       },
       {
         "command": "tasksmd.createOrEdit",
-        "key": "ctrl+t",
-        "mac": "ctrl+t",
+        "key": "ctrl+alt+t",
+        "mac": "cmd+alt+t",
         "when": "!terminalFocus && !inputFocus"
       },
       {

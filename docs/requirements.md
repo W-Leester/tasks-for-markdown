@@ -287,7 +287,7 @@ Obsidian Tasks 쿼리 문법과 호환되는 텍스트 기반 엔진. 한 줄 = 
 |---|---|---|
 | `tasksmd.toggleDone` | `Ctrl/Cmd+Enter` (마크다운 파일에서, 태스크 줄일 때) | 상태 순환(FR-1.18) |
 | `tasksmd.setStatus` | — | 상태 선택 QuickPick |
-| `tasksmd.createOrEdit` | `Ctrl+T` (모든 OS; Windows/Linux 기본 "워크스페이스 심볼 검색"을 덮음 — 사용자 결정) | 편집 모달 |
+| `tasksmd.createOrEdit` | `Cmd/Ctrl+Alt+T` (`when: !terminalFocus && !inputFocus`로 Preview 포커스에서도 우리 바인딩이 macOS 기본 "Close Other Editors"보다 우선) | 편집 모달 |
 | `tasksmd.setPriority` / `setDueDate` / `setScheduledDate` / `setStartDate` / `setRecurrence` / `setDependencies` | — | 개별 QuickPick |
 | `tasksmd.postpone` | — | 마감/예정일을 N일 미룸(내일/다음주/… 선택) |
 | `tasksmd.quickSearch` | `Ctrl/Cmd+Shift+;` | 빠른 검색 |

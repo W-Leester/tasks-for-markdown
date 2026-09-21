@@ -25,7 +25,7 @@ The extension indexes every `- [ ]` line in the workspace and lets you see, quer
 
 1. Install the extension (Marketplace / Open VSX / `.vsix`).
 2. Open a folder with Markdown files. The **Tasks** icon appears in the Activity Bar.
-3. Put the cursor on a checklist line and press `Cmd/Ctrl+Enter` to toggle it, or `Ctrl+T` to open the edit dialog.
+3. Put the cursor on a checklist line and press `Cmd/Ctrl+Enter` to toggle it, or `Cmd/Ctrl+Alt+T` to open the edit dialog.
 4. Type ` ```tasks ` in a note and open the Markdown preview:
 
 ````markdown
@@ -42,7 +42,7 @@ group by filename
 | Command | Default key |
 |---|---|
 | Toggle task done | `Cmd/Ctrl+Enter` (on a task line) |
-| Create or edit task | `Ctrl+T` |
+| Create or edit task | `Cmd/Ctrl+Alt+T` |
 | Quick search tasks | `Cmd/Ctrl+Shift+;` |
 | Set status / priority / due / scheduled / start / recurrence / dependencies, Postpone | — |
 | Open kanban board / calendar / statistics / query builder | — |

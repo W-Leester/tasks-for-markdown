@@ -1,51 +1,54 @@
-# Changelog
+# 변경 이력
 
 ## 1.0.0 — 2026-09-21
 
-First release. Built in milestones M0–M8 (see docs/Tasks.md).
+첫 릴리스. 마일스톤 M0–M8로 개발했습니다 (docs/Tasks.md 참고).
 
-### M7 — extras (2026-09-21)
-- Daily summary and due-soon notifications (VS Code toasts + native OS notifications, snooze).
-- "Archive completed tasks…" moves old completed tasks into `Archive.md` with links back, after a preview.
-- Weekly statistics panel (completed / created / overdue / remaining per ISO week, tag and folder filters).
-- Calendar panel (month / week) with drag-to-reschedule and inline task creation.
-- Optional update check for `.vsix` installs via `tasksmd.updateCheckUrl` (`latest.json`).
+### M8 — 마감
+- 한국어/영어 i18n 검사 테스트, 성능 측정(docs/perf.md), 포맷 변환 명령, 릴리스 워크플로.
 
-### M6 — webviews (2026-09-21)
-- Create or edit task dialog (`Cmd/Ctrl+Alt+T`): all fields, natural-language dates, recurrence validation, dependency picker, live preview line, access keys.
-- Kanban board in the sidebar and as an editor panel: columns by status / due date / priority / file, drag & drop edits, any saved query as data source.
-- Query builder: assemble filters, sorting, grouping and layout with dropdowns, see the explanation and match count live, save to `.tasks/queries/` or settings, insert into a note.
+### M7 — 부가 기능
+- 일일 요약과 마감 임박 알림 (VS Code 토스트 + OS 네이티브 알림, 스누즈).
+- "완료 태스크 아카이브…" — 오래된 완료 태스크를 미리보기 후 `Archive.md`로 이동(원본 링크 포함).
+- 주간 통계 패널 (ISO 주 단위 완료/생성/기한 초과/잔량, 태그·폴더 필터).
+- 캘린더 패널 (월간/주간), 드래그로 일정 변경, 셀에서 바로 태스크 생성.
+- `.vsix` 설치본용 업데이트 확인 (`tasksmd.updateCheckUrl`, `latest.json`).
 
-### M5 — Markdown preview (2026-09-21)
-- Built-in preview renders checklist items with checkboxes and metadata badges, and ```tasks blocks as live query results (groups, counts, explain, errors); previews refresh when tasks change anywhere.
-- Preview is render-only (the classic preview offers no channel back to extensions); toggling/editing stays in the sidebar, kanban and editor.
+### M6 — 웹뷰
+- 태스크 만들기/편집 대화상자 (`Cmd/Ctrl+Alt+T`): 모든 필드, 자연어 날짜, 반복 규칙 검증, 의존성 선택, 결과 줄 미리보기, 액세스 키.
+- 칸반 보드 (사이드바 + 에디터 패널): 상태 / 마감일 / 우선순위 / 파일 컬럼, 드래그앤드롭 편집, 저장된 쿼리를 데이터 소스로.
+- 쿼리 빌더: 드롭다운으로 필터·정렬·그룹·레이아웃 조립, 설명과 일치 수 실시간 표시, `.tasks/queries/` 또는 설정에 저장, 노트에 삽입.
 
-### M4 — query engine (2026-09-21)
-- Obsidian Tasks-compatible query language: status, date (single/range/natural language), priority, recurrence, dependency, text/regex, tag and boolean filters; sort by / group by every field with the plugin's default order; limits, layout instructions, `explain`.
-- `filter/sort/group by function` (opt-in, trusted workspaces only, time-budgeted).
-- Saved queries from `tasksmd.savedQueries` and `.tasks/queries/*.md`, shown in the sidebar with grouped results.
-- Quick search (`Cmd/Ctrl+Shift+;`), insert query block, explain query under cursor.
-- 50,000-task benchmark: representative queries under 100 ms.
+### M5 — 마크다운 미리보기
+- 내장 미리보기가 체크리스트를 체크박스와 뱃지로, ` ```tasks ` 블록을 실시간 쿼리 결과(그룹, 카운트, explain, 오류)로 렌더링. 태스크가 바뀌면 자동 갱신.
+- 미리보기는 표시 전용 (클래식 미리보기는 확장으로 클릭을 전달할 수 없음); 토글·편집은 사이드바, 칸반, 에디터에서.
 
-### M3 — recurrence, statuses, dependencies (2026-09-21)
-- Recurring tasks: completing a `🔁 every …` task inserts the next instance (Obsidian rules: reference date priority, relative dates, `when done`, short months, `🏁 delete`), configurable position / id handling / dependsOn copy.
-- Custom statuses via `tasksmd.statuses` with theme presets (Core, Minimal, ITS, Things); behaviour follows the status type.
-- Dependencies: blocked / blocking detection, cycle diagnostics, "Set dependencies…" picker that mints ids.
-- Urgency score (Obsidian formula) drives default ordering; recurrence picker with live validation.
+### M4 — 쿼리 엔진
+- Obsidian Tasks 호환 쿼리 언어: 상태, 날짜(단일/범위/자연어), 우선순위, 반복, 의존성, 텍스트/정규식, 태그, 불리언 필터; 모든 필드의 sort by / group by와 Obsidian 기본 정렬; 제한, 레이아웃, `explain`.
+- `filter/sort/group by function` (opt-in, 신뢰된 워크스페이스만, 시간 예산 제한).
+- `tasksmd.savedQueries`와 `.tasks/queries/*.md`의 저장된 쿼리를 사이드바에 그룹 결과로 표시.
+- 빠른 검색 (`Cmd/Ctrl+Shift+;`), 쿼리 블록 삽입, 커서 위치 쿼리 설명.
+- 50,000 태스크 벤치마크: 대표 쿼리 100ms 이내.
 
-### M2 — editor assistance (2026-09-21)
-- Decorations: relative-date hints, overdue / due-today backgrounds, dimmed completed tasks and metadata, gutter status icons.
-- CodeLens actions above the current task line (done, priority, due, scheduled, postpone, edit) and a hover card with command links.
-- Auto-suggest on task lines: keywords (due, priority, every week, id, depends on…) and natural-language dates ("next fri", "3일 후").
-- QuickPick commands for status, priority, dates, postpone; sequential create/edit flow (`Cmd/Ctrl+Alt+T`).
-- Diagnostics with quick fixes: invalid dates, unknown dependency ids, recurring tasks without a date.
+### M3 — 반복, 상태, 의존성
+- 반복 태스크: `🔁 every …` 태스크를 완료하면 다음 회차 삽입 (Obsidian 규칙: 기준 날짜 우선순위, 상대 날짜, `when done`, 짧은 달 보정, `🏁 delete`), 삽입 위치·id 처리·dependsOn 복사 설정.
+- `tasksmd.statuses`로 커스텀 상태와 테마 프리셋 (Core, Minimal, ITS, Things); 동작은 상태 타입을 따름.
+- 의존성: 차단/차단 중 감지, 순환 진단, id를 자동 발급하는 "의존성 설정…" 선택기.
+- 긴급도 점수(Obsidian 공식)로 기본 정렬; 실시간 검증이 있는 반복 선택기.
 
-### M1 — minimum usable (2026-09-21)
-- Workspace index of every `- [ ]` line in Markdown files (include/exclude globs, `files.exclude`, root `.gitignore`, size limit), kept live from the file watcher and open editors.
-- `Tasks: Toggle task done` (`Cmd/Ctrl+Enter` on a task line), mark done / cancelled / reopen, go to task.
-- Sidebar with smart views (Today, Next 7 days, Overdue, In progress, Blocked, All open, Done 30 days), grouping, filter, checkboxes.
-- Status bar summary with scan progress and skipped-file warnings.
-- Settings under `tasksmd.*` (task format, global filter, scan globs, date behaviour).
+### M2 — 에디터 보조
+- 장식: 상대 날짜 힌트, 기한 초과/오늘 마감 배경, 완료 태스크·메타데이터 흐리게, 거터 상태 아이콘.
+- 현재 태스크 줄 위의 CodeLens 액션(완료, 우선순위, 마감, 예정, 미루기, 편집)과 명령 링크가 있는 호버 카드.
+- 태스크 줄 자동완성: 키워드(due, priority, every week, id, depends on…)와 자연어 날짜("next fri", "3일 후").
+- 상태·우선순위·날짜·미루기 QuickPick 명령.
+- Quick Fix가 있는 진단: 잘못된 날짜, 없는 의존성 id, 날짜 없는 반복 태스크.
 
-### M0 — foundation (2026-09-21)
-- Project scaffolding, CI, core task model, emoji/Dataview parser and serializer compatible with Obsidian Tasks (ported test cases).
+### M1 — 최소 사용 가능
+- 워크스페이스의 모든 `- [ ]` 줄 인덱스 (include/exclude glob, `files.exclude`, 루트 `.gitignore`, 크기 제한), 파일 워처와 열린 편집기로 실시간 갱신.
+- `Tasks: 태스크 완료 토글` (`Cmd/Ctrl+Enter`), 완료/취소/다시 열기, 태스크로 이동.
+- 스마트 뷰 사이드바 (오늘, 예정 7일, 기한 초과, 진행 중, 차단됨, 미완료 전체, 완료 30일), 그룹, 필터, 체크박스.
+- 스캔 진행률과 건너뛴 파일 경고를 보여주는 상태바 요약.
+- `tasksmd.*` 설정 (태스크 포맷, 글로벌 필터, 스캔 glob, 날짜 동작).
+
+### M0 — 기반
+- 프로젝트 스캐폴딩, CI, 코어 태스크 모델, Obsidian Tasks와 호환되는 이모지/Dataview 파서·직렬화기 (원본 테스트 케이스 이식).

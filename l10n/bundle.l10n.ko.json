@@ -220,5 +220,11 @@
   "{0} tasks due within {1} days": "{1}일 이내 마감 {0}개",
   "Snooze until tomorrow": "내일까지 스누즈",
   "Snooze a week": "일주일 스누즈",
-  "Show today": "오늘 보기"
+  "Show today": "오늘 보기",
+  "Open a workspace folder first": "먼저 워크스페이스 폴더를 여세요",
+  "No completed tasks older than {0} days to archive.": "아카이브할 {0}일 이상 지난 완료 태스크가 없습니다.",
+  "Archive {0} completed tasks to {1}": "완료 태스크 {0}개를 {1}에 아카이브",
+  "Archive": "아카이브",
+  "Open archive": "아카이브 열기",
+  "Archived {0} tasks.": "태스크 {0}개를 아카이브했습니다."
 }

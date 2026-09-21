@@ -346,3 +346,40 @@ suite('query builder', () => {
     }
   });
 });
+
+suite('archive', () => {
+  const guard = new FixtureGuard();
+  teardown(async () => {
+    await guard.restore();
+    const archive = fixtureUri('Archive.md');
+    if (fs.existsSync(archive.fsPath)) fs.unlinkSync(archive.fsPath);
+  });
+
+  test('moves old completed tasks into Archive.md with a link back', async () => {
+    const api = await getApi();
+    guard.protect('notes/week-38.md');
+    const uri = fixtureUri('notes/week-38.md');
+    // Make the fixture's done task old enough (afterDays = 30 default).
+    const doc = await vscode.workspace.openTextDocument(uri);
+    const editor = await vscode.window.showTextDocument(doc);
+    const line = doc.getText().split('\n').findIndex((l) => l.includes('Tidy meeting notes'));
+    await editor.edit((eb) => eb.replace(doc.lineAt(line).range, '- [x] Tidy meeting notes ✅ 2020-01-01'));
+    await doc.save();
+    await vscode.commands.executeCommand('workbench.action.closeAllEditors');
+    await api.indexService.indexUri(uri);
+    // Bypass the QuickPick by driving the planner through the service internals is not possible
+    // here, so stub the picker: showQuickPick resolves with all items.
+    const original = vscode.window.showQuickPick;
+    (vscode.window as { showQuickPick: unknown }).showQuickPick = async (items: unknown) => (await items) as unknown[];
+    try {
+      await api.archive.run();
+    } finally {
+      (vscode.window as { showQuickPick: unknown }).showQuickPick = original;
+    }
+    const src = fs.readFileSync(uri.fsPath, 'utf8');
+    assert.ok(!src.includes('Tidy meeting notes'), 'removed from source');
+    const archived = fs.readFileSync(fixtureUri('Archive.md').fsPath, 'utf8');
+    assert.ok(archived.includes('[[notes/week-38#Work]]'), archived);
+    assert.ok(archived.includes('- [x] Tidy meeting notes ✅ 2020-01-01'));
+  });
+});

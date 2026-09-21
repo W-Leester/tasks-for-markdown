@@ -463,11 +463,11 @@
 - [x] Workspace Trust 없으면 OS 알림 비활성 (NFR-4)
 
 ### M7.2 아카이브 (`core/archive/ArchivePlanner.ts`, `services/ArchiveService.ts`)
-- [ ] `ArchivePlanner` (core) — 완료/취소 후 N일 지난 태스크 선별, 하위 항목 포함, 아카이브 텍스트 생성 (FR-10.5, FR-10.7)
-- [ ] 아카이브 파일 형식: `## YYYY-MM-DD` 헤딩 + 원본 링크(`[[파일#헤딩]]` 또는 상대 링크, 설정) + 원문 줄 (FR-10.6)
-- [ ] 명령 `tasksmd.archiveCompleted` — QuickPick 다중 선택(기본 전체 선택) → 하나의 `WorkspaceEdit`로 여러 파일 삭제 + 아카이브 추가 (FR-10.7, NFR-3)
-- [ ] 설정 `archive.file`, `archive.afterDays`, `archive.linkStyle`; 자동 실행 없음 (FR-10.8)
-- [ ] 테스트: planner 단위, 통합 Undo
+- [x] `ArchivePlanner` (core) — 완료/취소 후 N일 지난 태스크 선별, 하위 항목 포함, 아카이브 텍스트 생성 (FR-10.5, FR-10.7)
+- [x] 아카이브 파일 형식: `## YYYY-MM-DD` 헤딩 + 원본 링크(`[[파일#헤딩]]` 또는 상대 링크, 설정) + 원문 줄 (FR-10.6)
+- [x] 명령 `tasksmd.archiveCompleted` — QuickPick 다중 선택(기본 전체 선택) → 하나의 `WorkspaceEdit`로 여러 파일 삭제 + 아카이브 추가 (FR-10.7, NFR-3)
+- [x] 설정 `archive.file`, `archive.afterDays`, `archive.linkStyle`; 자동 실행 없음 (FR-10.8)
+- [x] 테스트: planner 단위 5건, 통합 1건(QuickPick 스텁; Undo는 수동 체크리스트)
 
 ### M7.3 주간 통계 (`core/stats/WeeklyStats.ts`, `webviews/stats/`)
 - [ ] `WeeklyStats` (core) — 월요일 시작 12주 버킷: 완료(✅), 신규(➕), 기한 초과, 주말 시점 잔량; 날짜 없는 태스크 수 (FR-10.9, FR-10.10)

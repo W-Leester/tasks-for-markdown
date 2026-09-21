@@ -226,6 +226,12 @@
         "title": "%tasksmd.savedQuery.openInBuilder.title%",
         "category": "Tasks",
         "icon": "$(tools)"
+      },
+      {
+        "command": "tasksmd.archiveCompleted",
+        "title": "%tasksmd.archiveCompleted.title%",
+        "category": "Tasks",
+        "icon": "$(archive)"
       }
     ],
     "configuration": {
@@ -547,6 +553,26 @@
           "minimum": 0,
           "maximum": 30,
           "description": "%tasksmd.config.notifications.dueWithinDays%"
+        },
+        "tasksmd.archive.file": {
+          "type": "string",
+          "default": "Archive.md",
+          "description": "%tasksmd.config.archive.file%"
+        },
+        "tasksmd.archive.afterDays": {
+          "type": "number",
+          "default": 30,
+          "minimum": 0,
+          "description": "%tasksmd.config.archive.afterDays%"
+        },
+        "tasksmd.archive.linkStyle": {
+          "type": "string",
+          "enum": [
+            "wiki",
+            "markdown"
+          ],
+          "default": "wiki",
+          "description": "%tasksmd.config.archive.linkStyle%"
         }
       }
     },

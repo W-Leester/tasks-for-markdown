@@ -12,6 +12,7 @@ import { TaskHoverProvider } from './editor/TaskHoverProvider';
 import { TaskLineContext } from './editor/TaskLineContext';
 import { IndexService } from './index/IndexService';
 import { PreviewIntegration } from './preview/PreviewIntegration';
+import { ArchiveService } from './services/ArchiveService';
 import { NotificationService } from './services/NotificationService';
 import { QueryService } from './services/QueryService';
 import { SavedQueryStore } from './services/SavedQueryStore';
@@ -34,6 +35,7 @@ export interface ExtensionApi {
   queries: QueryService;
   savedQueries: SavedQueryStore;
   settings: Settings;
+  archive: ArchiveService;
   /** Consumed by VS Code's built-in Markdown extension (contributes.markdown.markdownItPlugins). */
   extendMarkdownIt(md: import('markdown-it').MarkdownIt): import('markdown-it').MarkdownIt;
   webviews: { openEdit: (target: { key: string | null; line: number | null }) => WebviewHost; openKanban: () => WebviewHost; openQueryBuilder: (id: string | null) => WebviewHost };
@@ -87,13 +89,15 @@ export async function activate(context: vscode.ExtensionContext): Promise<Extens
   const preview = new PreviewIntegration({ index, queries, settings, getStatusRegistry });
   context.subscriptions.push(preview);
 
+  const archive = new ArchiveService({ index, indexService, settings, log });
+  context.subscriptions.push(vscode.commands.registerCommand('tasksmd.archiveCompleted', () => archive.run().catch((err) => { log(String(err)); void vscode.window.showErrorMessage(vscode.l10n.t('Tasks: {0}', err instanceof Error ? err.message : String(err))); })));
   const notifications = new NotificationService({ index, settings, state: context.globalState, log });
   context.subscriptions.push(notifications);
   // Not during tests: toasts would block the runner.
   if (context.extensionMode !== vscode.ExtensionMode.Test) notifications.start();
 
   void indexService.start();
-  return { index, indexService, editService, queries, savedQueries, settings, extendMarkdownIt: (md) => preview.extendMarkdownIt(md), webviews };
+  return { index, indexService, editService, queries, savedQueries, settings, archive, extendMarkdownIt: (md) => preview.extendMarkdownIt(md), webviews };
 }
 
 export function deactivate(): void {

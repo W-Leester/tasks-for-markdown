@@ -90,5 +90,9 @@
   "tasksmd.config.notifications.enabled": "일일 요약(오늘 마감 / 기한 초과)과 마감 임박 태스크 묶음 알림을 표시합니다.",
   "tasksmd.config.notifications.os": "OS 네이티브 알림도 보냅니다 (macOS 알림 센터, Windows 토스트, Linux notify-send). 신뢰된 워크스페이스에서만 동작합니다.",
   "tasksmd.config.notifications.dailyTime": "일일 요약 시각 (HH:MM). 오늘 아직 표시하지 않았다면 시작 시에도 표시합니다.",
-  "tasksmd.config.notifications.dueWithinDays": "묶음 알림에 포함할 마감 임박 범위(일). 0이면 오늘만."
+  "tasksmd.config.notifications.dueWithinDays": "묶음 알림에 포함할 마감 임박 범위(일). 0이면 오늘만.",
+  "tasksmd.config.archive.file": "아카이브한 태스크를 추가할 워크스페이스 상대 경로 파일.",
+  "tasksmd.config.archive.afterDays": "완료(done/cancelled)된 지 이 일수 이상 지난 태스크를 아카이브합니다. 0이면 날짜 없는 것을 포함한 모든 완료 태스크.",
+  "tasksmd.config.archive.linkStyle": "아카이브에서 원본 파일을 가리키는 링크 형식: [[위키]] 링크 또는 [마크다운](링크).",
+  "tasksmd.archiveCompleted.title": "완료 태스크 아카이브…"
 }

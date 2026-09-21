@@ -40,6 +40,9 @@ export interface SettingsSchema {
   'notifications.os': boolean;
   'notifications.dailyTime': string;
   'notifications.dueWithinDays': number;
+  'archive.file': string;
+  'archive.afterDays': number;
+  'archive.linkStyle': 'wiki' | 'markdown';
 }
 
 export const SETTINGS_SECTION = 'tasksmd';
@@ -79,6 +82,9 @@ export const SETTINGS_DEFAULTS: Readonly<SettingsSchema> = {
   'notifications.os': true,
   'notifications.dailyTime': '09:00',
   'notifications.dueWithinDays': 1,
+  'archive.file': 'Archive.md',
+  'archive.afterDays': 30,
+  'archive.linkStyle': 'wiki',
 };
 
 export type SettingsKey = keyof SettingsSchema;

@@ -119,13 +119,13 @@
 - [x] 타입 안전 접근 객체 `settings.get('taskFormat')` + `onDidChange(keys, cb)` (D§3.2)
 - [x] 설명 문자열은 전부 `%key%` → `package.nls*.json`
 
-### M1.2 파일 파서 (`src/index/FileParser.ts`)
-- [ ] 파일 텍스트 → `Task[]`; 코드블록(```` ``` ````, `~~~`), 프론트매터, `<!-- -->` 안의 줄 제외 (FR-1.3)
-- [ ] 가장 가까운 상위 헤딩 추적 → `location.heading` (FR-1.5)
-- [ ] 프론트매터 `tags:` 파싱 → `location.frontmatterTags`
-- [ ] 들여쓰기 깊이로 부모-자식 관계 계산 → `depth`, 부모 줄 번호 (FR-1.2)
-- [ ] 글로벌 필터 적용 (FR-1.4)
-- [ ] 테스트: 코드블록 안 `- [ ]` 무시, 헤딩 중첩, 탭/스페이스 혼합 들여쓰기
+### M1.2 파일 파서 (`src/core/file/FileParser.ts` — 순수 로직이라 core에 배치)
+- [x] 파일 텍스트 → `Task[]`; 코드블록(```` ``` ````, `~~~`), 프론트매터, `<!-- -->` 안의 줄 제외 (FR-1.3)
+- [x] 가장 가까운 상위 헤딩 추적 → `location.heading` (FR-1.5)
+- [x] 프론트매터 `tags:` 파싱 → `location.frontmatterTags`
+- [x] 들여쓰기 깊이로 부모-자식 관계 계산 → `depth`, 부모 줄 번호 (FR-1.2)
+- [x] 글로벌 필터 적용 (FR-1.4)
+- [x] 테스트: 코드블록 안 `- [ ]` 무시, 헤딩 중첩, 탭/스페이스 혼합 들여쓰기
 
 ### M1.3 인덱스 (`src/index/`)
 - [ ] `TaskIndex` — `Map<path, FileEntry>`, `all()`, `byPath()`, `byId()`, `version` 카운터 (D§5.1)

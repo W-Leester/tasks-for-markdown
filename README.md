@@ -9,6 +9,7 @@ Obsidian Tasks-compatible task management for Markdown files in VS Code and Curs
 
 - [Requirements](docs/requirements.md)
 - [Design](docs/design.md)
+- [Development checklist](docs/Tasks.md)
 
 ## Development
 

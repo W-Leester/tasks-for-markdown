@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { registerEditCommands } from './commands/editCommands';
 import { registerCommands } from './commands/registerCommands';
 import { TaskIndex } from './core/index';
 import { StatusRegistry } from './core/task';
@@ -32,7 +33,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<Extens
   const editService = new TaskEditService({ settings, indexService, getStatusRegistry });
 
   context.subscriptions.push(output, settings, indexService, new TaskLineContext(), { dispose: () => index.dispose() });
-  registerCommands(context, { index, indexService, editService, settings, getStatusRegistry, log });
+  const commandDeps = { index, indexService, editService, settings, getStatusRegistry, log };
+  registerCommands(context, commandDeps);
+  registerEditCommands(context, commandDeps);
   context.subscriptions.push(vscode.commands.registerCommand('tasksmd.showLogs', () => output.show()));
   registerTreeView(context, { index, settings, state: context.workspaceState, editService, log });
   context.subscriptions.push(new StatusBar(index), new TaskDecorations({ index, settings, getStatusRegistry }));

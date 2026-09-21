@@ -78,3 +78,36 @@ suite('toggle', () => {
     assert.equal(fs.readFileSync(uri.fsPath, 'utf8').split('\n')[task.location.line], '1. [ ] Numbered task');
   });
 });
+
+suite('edit service', () => {
+  const guard = new FixtureGuard();
+  teardown(() => guard.restore());
+
+  test('update() rewrites fields in canonical order', async () => {
+    const api = await getApi();
+    guard.protect('notes/project-a.md');
+    const uri = fixtureUri('notes/project-a.md');
+    const task = api.index.file(uri.toString())!.tasks.find((t) => t.description === 'Review contract')!;
+    const { DateField, Priority } = await import('../../src/core/task');
+    await api.editService.update(task, { priority: Priority.Highest, due: DateField.parse('2026-10-01'), scheduled: DateField.parse('2026-09-28') });
+    const line = fs.readFileSync(uri.fsPath, 'utf8').split('\n')[task.location.line];
+    assert.equal(line, '- [ ] Review contract 🔺 ⏳ 2026-09-28 📅 2026-10-01');
+  });
+
+  test('insertNewTask() replaces a blank line or inserts after a non-blank one', async () => {
+    const api = await getApi();
+    guard.protect('notes/project-a.md');
+    const uri = fixtureUri('notes/project-a.md');
+    const { Task } = await import('../../src/core/task');
+    const doc = await vscode.workspace.openTextDocument(uri);
+    await vscode.window.showTextDocument(doc);
+    // line 1 is blank in the fixture
+    const l1 = await api.editService.insertNewTask(uri, 1, Task.blank('inserted on blank'));
+    assert.equal(l1, 1);
+    assert.equal(doc.lineAt(1).text, '- [ ] inserted on blank');
+    const l2 = await api.editService.insertNewTask(uri, 0, Task.blank('after heading'));
+    assert.equal(l2, 1);
+    assert.equal(doc.lineAt(1).text, '- [ ] after heading');
+    assert.equal(doc.lineAt(2).text, '- [ ] inserted on blank');
+  });
+});

@@ -39,8 +39,16 @@ export class FixtureGuard {
     if (!this.saved.has(p)) this.saved.set(p, fs.readFileSync(p, 'utf8'));
   }
   async restore(): Promise<void> {
+    // Revert dirty buffers first, otherwise a lingering in-memory document would shadow the
+    // restored file (and later saves fail with "File Modified Since").
+    for (const doc of vscode.workspace.textDocuments) {
+      if (!doc.isDirty) continue;
+      await vscode.window.showTextDocument(doc, { preview: false });
+      await vscode.commands.executeCommand('workbench.action.revertAndCloseActiveEditor');
+    }
     await vscode.commands.executeCommand('workbench.action.closeAllEditors');
     for (const [p, text] of this.saved) fs.writeFileSync(p, text);
     this.saved.clear();
+    await sleep(150); // let the watcher re-index the restored files
   }
 }

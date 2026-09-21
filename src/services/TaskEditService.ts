@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { dayjs, type Dayjs } from '../core/dates/dayjs';
-import { type StatusRegistry, type Status, type Task, applyStatusChange, serializeTask } from '../core/task';
+import { type StatusRegistry, type Status, type Task, type TaskFields, applyStatusChange, serializeTask } from '../core/task';
 import type { IndexService } from '../index/IndexService';
 import type { Settings } from '../settings/Settings';
 
@@ -59,6 +59,47 @@ export class TaskEditService {
       : undefined;
     await this.replaceTask(task, result.task, insert);
     return result.task;
+  }
+
+  /** Change any fields (dates, priority, description…) and write the line back. */
+  async update(task: Task, changes: Partial<TaskFields>): Promise<Task> {
+    const updated = task.with(changes);
+    await this.replaceTask(task, updated);
+    return updated;
+  }
+
+  /**
+   * Insert a brand-new task line. If `line` is blank it is replaced; otherwise the task goes on
+   * a new line after it, inheriting the indentation of a list item on that line.
+   */
+  async insertNewTask(uri: vscode.Uri, line: number, task: Task): Promise<number> {
+    const doc = await vscode.workspace.openTextDocument(uri);
+    const format = this.deps.settings.get('taskFormat');
+    const visible = vscode.window.visibleTextEditors.some((e) => e.document.uri.toString() === uri.toString());
+    const shouldSave = !visible && !doc.isDirty;
+    const edit = new vscode.WorkspaceEdit();
+    const eol = doc.eol === vscode.EndOfLine.CRLF ? '\r\n' : '\n';
+    let targetLine: number;
+    if (doc.lineCount === 0 || line >= doc.lineCount) {
+      const end = doc.lineCount ? doc.lineAt(doc.lineCount - 1).range.end : new vscode.Position(0, 0);
+      edit.insert(uri, end, (doc.lineCount ? eol : '') + serializeTask(task, format));
+      targetLine = doc.lineCount;
+    } else {
+      const current = doc.lineAt(line);
+      if (current.text.trim().length === 0) {
+        edit.replace(uri, current.range, serializeTask(task.with({ indentation: current.text }), format));
+        targetLine = line;
+      } else {
+        const indent = /^[ \t]*/.exec(current.text)?.[0] ?? '';
+        edit.insert(uri, current.range.end, eol + serializeTask(task.with({ indentation: indent }), format));
+        targetLine = line + 1;
+      }
+    }
+    const ok = await vscode.workspace.applyEdit(edit);
+    if (!ok) throw new Error(`Could not edit ${uri.fsPath}`);
+    this.deps.indexService.indexText(uri, doc.getText());
+    if (shouldSave) await doc.save();
+    return targetLine;
   }
 
   /** Serialise `updated` over `original`'s line, optionally inserting lines next to it. */

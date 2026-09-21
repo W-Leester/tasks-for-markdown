@@ -33,5 +33,12 @@
   "tasksmd.color.overdueBackground": "기한 초과 태스크 줄 배경색.",
   "tasksmd.color.dueTodayBackground": "오늘 마감 태스크 줄 배경색.",
   "tasksmd.color.fieldForeground": "태스크 메타데이터(날짜, 우선순위, id…) 색.",
-  "tasksmd.color.hintForeground": "태스크 줄 뒤 상대 날짜 힌트 색."
+  "tasksmd.color.hintForeground": "태스크 줄 뒤 상대 날짜 힌트 색.",
+  "tasksmd.createOrEdit.title": "태스크 만들기 / 편집",
+  "tasksmd.setStatus.title": "상태 설정…",
+  "tasksmd.setPriority.title": "우선순위 설정…",
+  "tasksmd.setDueDate.title": "마감일 설정…",
+  "tasksmd.setScheduledDate.title": "예정일 설정…",
+  "tasksmd.setStartDate.title": "시작일 설정…",
+  "tasksmd.postpone.title": "미루기…"
 }

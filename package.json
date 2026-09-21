@@ -105,6 +105,43 @@
         "title": "%tasksmd.tree.clearFilter.title%",
         "category": "Tasks",
         "icon": "$(filter-filled)"
+      },
+      {
+        "command": "tasksmd.createOrEdit",
+        "title": "%tasksmd.createOrEdit.title%",
+        "category": "Tasks",
+        "icon": "$(edit)"
+      },
+      {
+        "command": "tasksmd.setStatus",
+        "title": "%tasksmd.setStatus.title%",
+        "category": "Tasks"
+      },
+      {
+        "command": "tasksmd.setPriority",
+        "title": "%tasksmd.setPriority.title%",
+        "category": "Tasks"
+      },
+      {
+        "command": "tasksmd.setDueDate",
+        "title": "%tasksmd.setDueDate.title%",
+        "category": "Tasks"
+      },
+      {
+        "command": "tasksmd.setScheduledDate",
+        "title": "%tasksmd.setScheduledDate.title%",
+        "category": "Tasks"
+      },
+      {
+        "command": "tasksmd.setStartDate",
+        "title": "%tasksmd.setStartDate.title%",
+        "category": "Tasks"
+      },
+      {
+        "command": "tasksmd.postpone",
+        "title": "%tasksmd.postpone.title%",
+        "category": "Tasks",
+        "icon": "$(watch)"
       }
     ],
     "configuration": {
@@ -214,6 +251,12 @@
         "key": "ctrl+enter",
         "mac": "cmd+enter",
         "when": "editorTextFocus && editorLangId == markdown && tasksmd.onTaskLine"
+      },
+      {
+        "command": "tasksmd.createOrEdit",
+        "key": "ctrl+alt+t",
+        "mac": "cmd+alt+t",
+        "when": "editorTextFocus && editorLangId == markdown"
       }
     ],
     "menus": {
@@ -250,6 +293,34 @@
         {
           "command": "tasksmd.markCancelled",
           "group": "1_edit@3"
+        },
+        {
+          "command": "tasksmd.createOrEdit",
+          "group": "0_edit@1"
+        },
+        {
+          "command": "tasksmd.setStatus",
+          "group": "2_fields@1"
+        },
+        {
+          "command": "tasksmd.setPriority",
+          "group": "2_fields@2"
+        },
+        {
+          "command": "tasksmd.setDueDate",
+          "group": "2_fields@3"
+        },
+        {
+          "command": "tasksmd.setScheduledDate",
+          "group": "2_fields@4"
+        },
+        {
+          "command": "tasksmd.setStartDate",
+          "group": "2_fields@5"
+        },
+        {
+          "command": "tasksmd.postpone",
+          "group": "2_fields@6"
         }
       ],
       "view/title": [
@@ -299,6 +370,36 @@
           "command": "tasksmd.openTask",
           "when": "view == tasksmd.tasks && viewItem =~ /^task/",
           "group": "2_nav@1"
+        },
+        {
+          "command": "tasksmd.createOrEdit",
+          "when": "view == tasksmd.tasks && viewItem =~ /^task/",
+          "group": "0_edit@1"
+        },
+        {
+          "command": "tasksmd.setPriority",
+          "when": "view == tasksmd.tasks && viewItem =~ /^task/",
+          "group": "3_fields@1"
+        },
+        {
+          "command": "tasksmd.setDueDate",
+          "when": "view == tasksmd.tasks && viewItem =~ /^task/",
+          "group": "3_fields@2"
+        },
+        {
+          "command": "tasksmd.setScheduledDate",
+          "when": "view == tasksmd.tasks && viewItem =~ /^task/",
+          "group": "3_fields@3"
+        },
+        {
+          "command": "tasksmd.postpone",
+          "when": "view == tasksmd.tasks && viewItem == task",
+          "group": "3_fields@4"
+        },
+        {
+          "command": "tasksmd.setStatus",
+          "when": "view == tasksmd.tasks && viewItem =~ /^task/",
+          "group": "3_fields@5"
         }
       ]
     },

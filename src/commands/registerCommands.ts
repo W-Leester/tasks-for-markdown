@@ -54,7 +54,7 @@ export function resolveTargetTasks(arg: unknown, deps: CommandDeps): Task[] {
   return editor ? tasksAtCursors(editor, deps) : [];
 }
 
-async function runEdit(deps: CommandDeps, action: () => Promise<void>): Promise<void> {
+export async function runEdit(deps: CommandDeps, action: () => Promise<void>): Promise<void> {
   try {
     await action();
   } catch (err) {

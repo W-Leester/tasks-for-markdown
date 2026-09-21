@@ -227,13 +227,13 @@
 - [ ] 트리거 문자 없이도 동작하도록 `triggerCharacters` + 24×7 제안 균형 조정 (사용감 테스트)
 
 ### M2.6 QuickPick (`src/editor/quickpicks/`)
-- [ ] `StatusPick` — 등록된 상태 목록, 현재 표시
-- [ ] `PriorityPick` — 6단계
-- [ ] `DatePick` — 입력란(자연어) + 후보(오늘/내일/이번 주 금요일/다음 주/날짜 없음), 해석 결과를 `detail`에 미리 표시
-- [ ] `PostponePick` — 내일/+2일/다음 주 월/다음 달 → 마감·예정일 이동 (FR-8 `tasksmd.postpone`)
-- [ ] 명령: `tasksmd.setStatus`, `setPriority`, `setDueDate`, `setScheduledDate`, `setStartDate`, `postpone`, `createOrEdit`(임시: QuickPick 순차) (FR-3.16)
-- [ ] 에디터 컨텍스트 메뉴 하위 메뉴 "Tasks" — `tasksmd.onTaskLine`일 때만 (FR-8.2)
-- [ ] 트리 컨텍스트 메뉴에 우선순위/날짜 항목 추가 (M1.6 보강)
+- [x] `StatusPick` — 등록된 상태 목록, 현재 표시
+- [x] `PriorityPick` — 6단계
+- [x] `DatePick` — 입력란(자연어) + 후보(오늘/내일/이번 주 금요일/다음 주/날짜 없음), 해석 결과를 `detail`에 미리 표시
+- [x] `PostponePick` — 내일/+2일/다음 주 월/다음 달 → 마감·예정일 이동 (FR-8 `tasksmd.postpone`)
+- [x] 명령: `tasksmd.setStatus`, `setPriority`, `setDueDate`, `setScheduledDate`, `setStartDate`, `postpone`, `createOrEdit`(임시: QuickPick 순차) (FR-3.16)
+- [x] 에디터 컨텍스트 메뉴 하위 메뉴 "Tasks" — `tasksmd.onTaskLine`일 때만 (FR-8.2)
+- [x] 트리 컨텍스트 메뉴에 우선순위/날짜/미루기/상태/편집 항목 추가 (M1.6 보강)
 
 ### M2.7 진단 (`src/editor/TaskDiagnostics.ts`)
 - [ ] `DiagnosticCollection` — 잘못된 날짜, (M3) 파싱 불가 반복, 없는 ID 참조, 순환 의존성, 날짜 없는 반복 (FR-3.17)

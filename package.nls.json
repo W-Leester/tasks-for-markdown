@@ -33,5 +33,12 @@
   "tasksmd.color.overdueBackground": "Background of overdue task lines.",
   "tasksmd.color.dueTodayBackground": "Background of task lines due today.",
   "tasksmd.color.fieldForeground": "Colour of task metadata (dates, priority, id…).",
-  "tasksmd.color.hintForeground": "Colour of the relative-date hint after task lines."
+  "tasksmd.color.hintForeground": "Colour of the relative-date hint after task lines.",
+  "tasksmd.createOrEdit.title": "Create or edit task",
+  "tasksmd.setStatus.title": "Set status…",
+  "tasksmd.setPriority.title": "Set priority…",
+  "tasksmd.setDueDate.title": "Set due date…",
+  "tasksmd.setScheduledDate.title": "Set scheduled date…",
+  "tasksmd.setStartDate.title": "Set start date…",
+  "tasksmd.postpone.title": "Postpone…"
 }

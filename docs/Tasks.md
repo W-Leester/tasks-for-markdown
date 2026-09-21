@@ -55,7 +55,7 @@
 - [x] `LICENSE`(MIT), `NOTICE.md`(Obsidian Tasks 고지), `CHANGELOG.md`, `README.md`
 - [x] `package.nls.json` / `package.nls.ko.json` 스텁
 - [x] `pnpm install` 실행 후 `pnpm-lock.yaml` 커밋
-- [x] `src/extension.ts` 최소 구현 — `activate()`에서 `tasks.reindex` 명령 등록(로그만), `deactivate()`
+- [x] `src/extension.ts` 최소 구현 — `activate()`에서 `tasksmd.reindex` 명령 등록(로그만), `deactivate()`
 - [x] `pnpm build` 로 `dist/extension.js` 생성 확인, F5로 확장 호스트 실행 확인
 - [x] ESLint에 `no-restricted-imports` 규칙 추가 — `src/core/**` 에서 `vscode` import 금지 (D§3.1 의존성 규칙)
 - [x] `l10n/bundle.l10n.json`, `l10n/bundle.l10n.ko.json` 빈 파일 생성 + `package.json`의 `l10n` 경로 확인
@@ -115,9 +115,9 @@
 - 통합 테스트(`@vscode/test-electron`)가 CI에서 돈다.
 
 ### M1.1 설정 (`src/settings/Settings.ts`)
-- [ ] `package.json` `contributes.configuration` — `taskFormat`, `globalFilter`, `globalFilter.removeFromDescription`, `include`, `exclude`, `respectGitignore`, `maxFileSizeKB`, `setCreatedDate`, `setDoneDate`, `setCancelledDate` (FR-9 표)
-- [ ] 타입 안전 접근 객체 `settings.get('taskFormat')` + `onDidChange(keys, cb)` (D§3.2)
-- [ ] 설명 문자열은 전부 `%key%` → `package.nls*.json`
+- [x] `package.json` `contributes.configuration` — `taskFormat`, `globalFilter`, `removeGlobalFilterFromDescription`, `include`, `exclude`, `respectGitignore`, `maxFileSizeKB`, `setCreatedDate`, `setDoneDate`, `setCancelledDate` (FR-9 표)
+- [x] 타입 안전 접근 객체 `settings.get('taskFormat')` + `onDidChange(keys, cb)` (D§3.2)
+- [x] 설명 문자열은 전부 `%key%` → `package.nls*.json`
 
 ### M1.2 파일 파서 (`src/index/FileParser.ts`)
 - [ ] 파일 텍스트 → `Task[]`; 코드블록(```` ``` ````, `~~~`), 프론트매터, `<!-- -->` 안의 줄 제외 (FR-1.3)
@@ -149,10 +149,10 @@
 - [ ] 테스트: 통합 — 토글 후 파일 내용, Undo, stale 감지
 
 ### M1.5 명령어 (`src/commands/`)
-- [ ] `tasks.toggleDone` — 활성 에디터 커서 줄 또는 트리 항목 인자 (FR-8 표)
-- [ ] 컨텍스트 키 `tasks.onTaskLine` — 커서가 태스크 줄일 때 true (`setContext`), 키바인딩 `when` 조건
-- [ ] 키바인딩 `Cmd/Ctrl+Enter` — `editorTextFocus && editorLangId == markdown && tasks.onTaskLine` (Q-13)
-- [ ] `tasks.reindex`, `tasks.openSidebar`
+- [ ] `tasksmd.toggleDone` — 활성 에디터 커서 줄 또는 트리 항목 인자 (FR-8 표)
+- [ ] 컨텍스트 키 `tasksmd.onTaskLine` — 커서가 태스크 줄일 때 true (`setContext`), 키바인딩 `when` 조건
+- [ ] 키바인딩 `Cmd/Ctrl+Enter` — `editorTextFocus && editorLangId == markdown && tasksmd.onTaskLine` (Q-13)
+- [ ] `tasksmd.reindex`, `tasksmd.openSidebar`
 - [ ] 모든 명령 `category: "Tasks"` + 제목 nls 키 (FR-8.1)
 
 ### M1.6 사이드바 트리 (`src/views/TaskTreeProvider.ts`)
@@ -206,7 +206,7 @@
 - [ ] 필드 부분(이모지+값) 옅은 색 — `display:none` 해킹 금지 (FR-3.5)
 - [ ] `visibleRanges` ±50줄만 계산, 100ms 디바운스, 활성 에디터 변경·인덱스 이벤트에 반응 (FR-3.6)
 - [ ] 설정 `decorations.relativeDates`, `decorations.overdueHighlight`, `decorations.strikeDone`, `decorations.gutterIcons`, `decorations.dimFields`
-- [ ] `contributes.colors` — `tasks.overdueBackground`, `tasks.dueTodayForeground` 등 커스텀 색 토큰
+- [ ] `contributes.colors` — `tasksmd.overdueBackground`, `tasksmd.dueTodayForeground` 등 커스텀 색 토큰
 
 ### M2.3 CodeLens (`src/editor/TaskCodeLensProvider.ts`)
 - [ ] 렌즈 항목: `✔ 완료` · `우선순위: 높음 ▾` · `📅 9/25 ▾` · `🔁 매주 ▾`(M3) · `✎ 편집` (FR-3.7)
@@ -230,9 +230,9 @@
 - [ ] `StatusPick` — 등록된 상태 목록, 현재 표시
 - [ ] `PriorityPick` — 6단계
 - [ ] `DatePick` — 입력란(자연어) + 후보(오늘/내일/이번 주 금요일/다음 주/날짜 없음), 해석 결과를 `detail`에 미리 표시
-- [ ] `PostponePick` — 내일/+2일/다음 주 월/다음 달 → 마감·예정일 이동 (FR-8 `tasks.postpone`)
-- [ ] 명령: `tasks.setStatus`, `setPriority`, `setDueDate`, `setScheduledDate`, `setStartDate`, `postpone`, `createOrEdit`(임시: QuickPick 순차) (FR-3.16)
-- [ ] 에디터 컨텍스트 메뉴 하위 메뉴 "Tasks" — `tasks.onTaskLine`일 때만 (FR-8.2)
+- [ ] `PostponePick` — 내일/+2일/다음 주 월/다음 달 → 마감·예정일 이동 (FR-8 `tasksmd.postpone`)
+- [ ] 명령: `tasksmd.setStatus`, `setPriority`, `setDueDate`, `setScheduledDate`, `setStartDate`, `postpone`, `createOrEdit`(임시: QuickPick 순차) (FR-3.16)
+- [ ] 에디터 컨텍스트 메뉴 하위 메뉴 "Tasks" — `tasksmd.onTaskLine`일 때만 (FR-8.2)
 - [ ] 트리 컨텍스트 메뉴에 우선순위/날짜 항목 추가 (M1.6 보강)
 
 ### M2.7 진단 (`src/editor/TaskDiagnostics.ts`)
@@ -271,9 +271,9 @@
 ### M3.3 커스텀 상태
 - [ ] 설정 `statuses[]` 스키마 — `{ symbol, name, nextSymbol, type }` (FR-1.16)
 - [ ] `StatusRegistry`가 설정에서 로드, 변경 시 재로드
-- [ ] 프리셋 Minimal / ITS / Things — 명령 `tasks.loadStatusPreset` (FR-1.17, Q-7)
+- [ ] 프리셋 Minimal / ITS / Things — 명령 `tasksmd.loadStatusPreset` (FR-1.17, Q-7)
 - [ ] `NON_TASK` 타입 심볼은 인덱스에서 기본 제외(쿼리 `status.type is NON_TASK`로만 조회) (FR-1.19)
-- [ ] 명령 `tasks.changeStatusTo…` — 등록된 상태마다 동적 명령 또는 QuickPick (Obsidian 7.24 동등)
+- [ ] 명령 `tasksmd.changeStatusTo…` — 등록된 상태마다 동적 명령 또는 QuickPick (Obsidian 7.24 동등)
 - [ ] 타입 전이 기반 날짜 처리 재검증 — `[X]`, `[>]` 등 커스텀 심볼에서도 ✅ 동작 (D§6.1)
 
 ### M3.4 의존성
@@ -281,7 +281,7 @@
 - [ ] 인덱스에 `idMap`, `blockedBy(task)`, `blocking(task)` 계산 — 완료/취소된 선행 태스크는 제외 (FR-1.20, FR-1.21)
 - [ ] 순환 의존성 감지 (FR-1.22) → 진단
 - [ ] `DependencyPick` — 설명 텍스트 퍼지 검색, 다중 선택, 선택 시 상대에 🆔 없으면 발급
-- [ ] 명령 `tasks.setDependencies`
+- [ ] 명령 `tasksmd.setDependencies`
 - [ ] 사이드바 "차단됨" 스마트 뷰 실제 동작, 장식 `⛔ 대기 중(N)`, Hover 링크
 
 ### M3.5 긴급도
@@ -343,16 +343,16 @@
 ### M4.5 QueryService · 저장된 쿼리
 - [ ] `QueryService.run(text, context)` — `(text, indexVersion)` 캐시, 인덱스 이벤트로 무효화 (FR-7.16, FR-7.17)
 - [ ] 열린 쿼리 결과 자동 재실행 200ms 디바운스
-- [ ] `SavedQueryStore` — (1) `tasks.savedQueries` 설정 (2) `.tasks/queries/*.md`(첫 ` ```tasks ` 블록) 병합, 파일 워처 (FR-5.5)
+- [ ] `SavedQueryStore` — (1) `tasksmd.savedQueries` 설정 (2) `.tasks/queries/*.md`(첫 ` ```tasks ` 블록) 병합, 파일 워처 (FR-5.5)
 - [ ] `SavedQueryTreeProvider` — 출처 아이콘 구분, 결과를 하위 노드로 펼침, 체크박스·이동·편집
 - [ ] 쿼리 편집: 텍스트(`InputBox` 멀티라인 대안 → 임시 문서 열기) + `explain` 미리보기 + 오류 줄 번호 (FR-5.7)
 - [ ] 쿼리 빌더(Webview, M6 인프라 선행 ⚠) — 필터 종류 드롭다운 조립 → 텍스트 생성 (FR-5.6); M6 전까지는 텍스트 편집만
 - [ ] 스마트 뷰 7종을 쿼리 텍스트로 재정의 (M1 하드코딩 제거)
 
 ### M4.6 빠른 검색·명령
-- [ ] `tasks.quickSearch` — QuickPick 퍼지 검색, 미완료 전체, 선택 시 이동 / 버튼으로 완료·편집 (FR-5.12), 키 `Cmd/Ctrl+Shift+;`
-- [ ] `tasks.insertQueryBlock` — ` ```tasks ` 스니펫
-- [ ] `tasks.explainQuery` — 커서가 있는 ` ```tasks ` 블록 설명을 출력 채널/알림으로
+- [ ] `tasksmd.quickSearch` — QuickPick 퍼지 검색, 미완료 전체, 선택 시 이동 / 버튼으로 완료·편집 (FR-5.12), 키 `Cmd/Ctrl+Shift+;`
+- [ ] `tasksmd.insertQueryBlock` — ` ```tasks ` 스니펫
+- [ ] `tasksmd.explainQuery` — 커서가 있는 ` ```tasks ` 블록 설명을 출력 채널/알림으로
 
 ### M4.7 테스트
 - [ ] 명령어별 단위 테스트 + `explain` 스냅샷
@@ -431,7 +431,7 @@
 - [ ] 데이터 소스: 저장된 쿼리 선택 (FR-5.11)
 - [ ] 두 호스트: 사이드바 `WebviewView`(컬럼을 탭으로) + 에디터 패널 `WebviewPanel`(전체 컬럼) — 같은 Svelte 컴포넌트 (Q-12)
 - [ ] 가상 스크롤(컬럼당 카드 500개 이상) (D§9)
-- [ ] 명령 `tasks.openKanban`, 마지막 컬럼 기준·쿼리를 `workspaceState`에 저장
+- [ ] 명령 `tasksmd.openKanban`, 마지막 컬럼 기준·쿼리를 `workspaceState`에 저장
 
 ### M6.4 쿼리 빌더 (`webviews/query-builder/`) — M4.5에서 미뤄둔 항목
 - [ ] 필터 행 추가/삭제, 종류별 입력 위젯(날짜·우선순위·텍스트·태그), 정렬/그룹/제한 섹션
@@ -462,7 +462,7 @@
 ### M7.2 아카이브 (`core/archive/ArchivePlanner.ts`, `services/ArchiveService.ts`)
 - [ ] `ArchivePlanner` (core) — 완료/취소 후 N일 지난 태스크 선별, 하위 항목 포함, 아카이브 텍스트 생성 (FR-10.5, FR-10.7)
 - [ ] 아카이브 파일 형식: `## YYYY-MM-DD` 헤딩 + 원본 링크(`[[파일#헤딩]]` 또는 상대 링크, 설정) + 원문 줄 (FR-10.6)
-- [ ] 명령 `tasks.archiveCompleted` — QuickPick 다중 선택(기본 전체 선택) → 하나의 `WorkspaceEdit`로 여러 파일 삭제 + 아카이브 추가 (FR-10.7, NFR-3)
+- [ ] 명령 `tasksmd.archiveCompleted` — QuickPick 다중 선택(기본 전체 선택) → 하나의 `WorkspaceEdit`로 여러 파일 삭제 + 아카이브 추가 (FR-10.7, NFR-3)
 - [ ] 설정 `archive.file`, `archive.afterDays`, `archive.linkStyle`; 자동 실행 없음 (FR-10.8)
 - [ ] 테스트: planner 단위, 통합 Undo
 
@@ -470,14 +470,14 @@
 - [ ] `WeeklyStats` (core) — 월요일 시작 12주 버킷: 완료(✅), 신규(➕), 기한 초과, 주말 시점 잔량; 날짜 없는 태스크 수 (FR-10.9, FR-10.10)
 - [ ] 태그·폴더 필터
 - [ ] Svelte 차트(외부 차트 라이브러리 없이 SVG 직접 렌더 — 번들 최소화), 요약 타일 4개 (D§7.6)
-- [ ] 명령 `tasks.openStats`
+- [ ] 명령 `tasksmd.openStats`
 
 ### M7.4 캘린더 (`webviews/calendar/`)
 - [ ] 월간/주간 전환, 표시 필드 토글(📅 ⏳ 🛫), 주 시작 월요일 (FR-10.11)
 - [ ] 항목 클릭 → 편집 모달, 더블클릭 → 원본, 드래그 → 해당 날짜 필드 `task/setField` (FR-10.12)
 - [ ] 빈 칸 더블클릭 → 마감일 채운 새 태스크, 대상 파일 `calendar.newTaskFile` (FR-10.13)
 - [ ] 데이터 소스 저장된 쿼리 (FR-10.14)
-- [ ] 명령 `tasks.openCalendar`, 마지막 위치 `workspaceState`
+- [ ] 명령 `tasksmd.openCalendar`, 마지막 위치 `workspaceState`
 
 ### M7.5 업데이트 확인 (`services/UpdateCheckService.ts`)
 - [ ] `updateCheckUrl`(파일 경로/HTTP) → `latest.json { version, vsix, notes }` 하루 1회 비교, 새 버전이면 토스트 + 경로 열기/복사 (FR-10.15)
@@ -515,11 +515,11 @@
 - [ ] 하이 컨트라스트 테마 스크린샷 점검 (에디터 장식, 미리보기, 웹뷰)
 - [ ] 웹뷰 키보드 탐색·ARIA 검토
 - [ ] Remote SSH / WSL / Codespaces 동작 확인 (NFR-1)
-- [ ] 오류 보고: 출력 채널 "Tasks for Markdown" + `tasks.showLogs` 명령
+- [ ] 오류 보고: 출력 채널 "Tasks for Markdown" + `tasksmd.showLogs` 명령
 
 ### M8.4 Dataview 쓰기 검증 (FR-1.9)
 - [ ] `taskFormat: dataview`에서 토글·편집·반복·아카이브 전 경로가 `[key:: value]`로 쓰는지 통합 테스트
-- [ ] 이모지 → Dataview 변환 명령 `tasks.convertFormat`(파일 단위, 선택 사항)
+- [ ] 이모지 → Dataview 변환 명령 `tasksmd.convertFormat`(파일 단위, 선택 사항)
 
 ### M8.5 문서
 - [ ] `README.md` — 기능 소개, 스크린샷/GIF, 설치, 문법 요약, 쿼리 요약, 설정 표, Obsidian 호환 범위

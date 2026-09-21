@@ -7,9 +7,9 @@ export function activate(context: vscode.ExtensionContext): void {
 
   context.subscriptions.push(
     output,
-    vscode.commands.registerCommand('tasks.reindex', () => {
+    vscode.commands.registerCommand('tasksmd.reindex', () => {
       // Real implementation lands with the index in M1.
-      output.appendLine('tasks.reindex: not implemented yet');
+      output.appendLine('tasksmd.reindex: not implemented yet');
       void vscode.window.showInformationMessage(vscode.l10n.t('Tasks: indexing is not implemented yet.'));
     }),
   );

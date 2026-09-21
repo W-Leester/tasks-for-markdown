@@ -1,5 +1,15 @@
 {
-  "tasks.reindex.title": "모든 태스크 다시 인덱싱",
-  "tasks.config.taskFormat": "태스크 필드를 쓸 때 사용할 포맷: emoji (📅 2024-01-01) 또는 dataview ([due:: 2024-01-01]). 읽기는 항상 둘 다 지원합니다.",
-  "tasks.config.globalFilter": "설정하면 이 문자열(예: #task)이 포함된 체크리스트 줄만 태스크로 취급합니다."
+  "tasksmd.reindex.title": "모든 태스크 다시 인덱싱",
+  "tasksmd.config.taskFormat": "태스크 필드를 쓸 때 사용할 포맷. 읽기는 항상 두 포맷 모두 지원합니다.",
+  "tasksmd.config.taskFormat.emoji": "이모지: 📅 2026-01-01 ⏫ 🔁 every week",
+  "tasksmd.config.taskFormat.dataview": "Dataview 인라인 필드: [due:: 2026-01-01] [priority:: high]",
+  "tasksmd.config.globalFilter": "설정하면(예: #task) 이 문자열이 포함된 체크리스트 줄만 태스크로 취급합니다.",
+  "tasksmd.config.removeGlobalFilterFromDescription": "태스크 설명을 표시할 때 글로벌 필터 문자열을 숨깁니다. 파일은 변경되지 않습니다.",
+  "tasksmd.config.include": "태스크를 스캔할 파일의 glob 패턴.",
+  "tasksmd.config.exclude": "스캔에서 제외할 glob 패턴 (files.exclude도 함께 적용됩니다).",
+  "tasksmd.config.respectGitignore": ".gitignore로 무시되는 파일을 건너뜁니다.",
+  "tasksmd.config.maxFileSizeKB": "이 크기(KB)를 넘는 파일은 건너뛰고 상태바에 표시합니다.",
+  "tasksmd.config.setCreatedDate": "확장으로 태스크를 만들 때 생성일(➕)을 추가합니다.",
+  "tasksmd.config.setDoneDate": "태스크가 DONE이 되면 완료일(✅)을 추가하고, DONE에서 벗어나면 제거합니다.",
+  "tasksmd.config.setCancelledDate": "태스크가 CANCELLED가 되면 취소일(❌)을 추가하고, CANCELLED에서 벗어나면 제거합니다."
 }

@@ -1,5 +1,15 @@
 {
-  "tasks.reindex.title": "Reindex all tasks",
-  "tasks.config.taskFormat": "Format used when writing task fields: emoji (📅 2024-01-01) or dataview ([due:: 2024-01-01]). Both are always read.",
-  "tasks.config.globalFilter": "If set, only checklist lines containing this text (e.g. #task) are treated as tasks."
+  "tasksmd.reindex.title": "Reindex all tasks",
+  "tasksmd.config.taskFormat": "Format used when writing task fields. Both formats are always read.",
+  "tasksmd.config.taskFormat.emoji": "Emoji: 📅 2026-01-01 ⏫ 🔁 every week",
+  "tasksmd.config.taskFormat.dataview": "Dataview inline fields: [due:: 2026-01-01] [priority:: high]",
+  "tasksmd.config.globalFilter": "If set (e.g. #task), only checklist lines containing this text are treated as tasks.",
+  "tasksmd.config.removeGlobalFilterFromDescription": "Hide the global filter text when displaying task descriptions. The file is never changed.",
+  "tasksmd.config.include": "Glob patterns of files to scan for tasks.",
+  "tasksmd.config.exclude": "Glob patterns to exclude from scanning (files.exclude is also respected).",
+  "tasksmd.config.respectGitignore": "Skip files ignored by .gitignore.",
+  "tasksmd.config.maxFileSizeKB": "Files larger than this (KB) are skipped and reported in the status bar.",
+  "tasksmd.config.setCreatedDate": "Add a created date (➕) when creating tasks through the extension.",
+  "tasksmd.config.setDoneDate": "Add a done date (✅) when a task becomes DONE, and remove it when it leaves DONE.",
+  "tasksmd.config.setCancelledDate": "Add a cancelled date (❌) when a task becomes CANCELLED, and remove it when it leaves CANCELLED."
 }

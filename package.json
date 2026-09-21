@@ -37,27 +37,84 @@
   "contributes": {
     "commands": [
       {
-        "command": "tasks.reindex",
-        "title": "%tasks.reindex.title%",
+        "command": "tasksmd.reindex",
+        "title": "%tasksmd.reindex.title%",
         "category": "Tasks"
       }
     ],
     "configuration": {
       "title": "Tasks for Markdown",
       "properties": {
-        "tasks.taskFormat": {
+        "tasksmd.taskFormat": {
           "type": "string",
           "enum": [
             "emoji",
             "dataview"
           ],
           "default": "emoji",
-          "description": "%tasks.config.taskFormat%"
+          "enumDescriptions": [
+            "%tasksmd.config.taskFormat.emoji%",
+            "%tasksmd.config.taskFormat.dataview%"
+          ],
+          "description": "%tasksmd.config.taskFormat%"
         },
-        "tasks.globalFilter": {
+        "tasksmd.globalFilter": {
           "type": "string",
           "default": "",
-          "description": "%tasks.config.globalFilter%"
+          "description": "%tasksmd.config.globalFilter%"
+        },
+        "tasksmd.removeGlobalFilterFromDescription": {
+          "type": "boolean",
+          "default": true,
+          "description": "%tasksmd.config.removeGlobalFilterFromDescription%"
+        },
+        "tasksmd.include": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "**/*.md",
+            "**/*.markdown"
+          ],
+          "description": "%tasksmd.config.include%"
+        },
+        "tasksmd.exclude": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "**/node_modules/**",
+            "**/.git/**"
+          ],
+          "description": "%tasksmd.config.exclude%"
+        },
+        "tasksmd.respectGitignore": {
+          "type": "boolean",
+          "default": true,
+          "description": "%tasksmd.config.respectGitignore%"
+        },
+        "tasksmd.maxFileSizeKB": {
+          "type": "number",
+          "default": 1024,
+          "minimum": 1,
+          "description": "%tasksmd.config.maxFileSizeKB%"
+        },
+        "tasksmd.setCreatedDate": {
+          "type": "boolean",
+          "default": false,
+          "description": "%tasksmd.config.setCreatedDate%"
+        },
+        "tasksmd.setDoneDate": {
+          "type": "boolean",
+          "default": true,
+          "description": "%tasksmd.config.setDoneDate%"
+        },
+        "tasksmd.setCancelledDate": {
+          "type": "boolean",
+          "default": true,
+          "description": "%tasksmd.config.setCancelledDate%"
         }
       }
     }

@@ -220,7 +220,7 @@ VS Code 기본 Markdown 미리보기(웹뷰)에 `markdown-it` 플러그인과 �
 
 ### 5-B. 저장된 쿼리 뷰
 
-- FR-5.5 사용자가 쿼리 텍스트(FR-7 문법)를 이름과 함께 저장하고, 각 쿼리가 트리 노드로 표시된다. 저장 위치는 두 가지를 모두 지원한다: (1) `tasks.savedQueries` 설정(사용자/워크스페이스), (2) 워크스페이스의 `.tasks/queries/*.md` 파일(파일 하나 = 쿼리 하나, 첫 ` ```tasks ` 블록을 사용, Git 공유 가능). 트리에서는 출처를 아이콘으로 구분한다.
+- FR-5.5 사용자가 쿼리 텍스트(FR-7 문법)를 이름과 함께 저장하고, 각 쿼리가 트리 노드로 표시된다. 저장 위치는 두 가지를 모두 지원한다: (1) `tasksmd.savedQueries` 설정(사용자/워크스페이스), (2) 워크스페이스의 `.tasks/queries/*.md` 파일(파일 하나 = 쿼리 하나, 첫 ` ```tasks ` 블록을 사용, Git 공유 가능). 트리에서는 출처를 아이콘으로 구분한다.
 - FR-5.6 쿼리 편집기: 텍스트 편집 + "쿼리 빌더"(필터 종류를 드롭다운으로 조립 → 텍스트 생성) 둘 다 제공.
 - FR-5.7 `explain` 결과 미리보기, 오류 시 줄 번호와 함께 표시.
 
@@ -285,19 +285,19 @@ Obsidian Tasks 쿼리 문법과 호환되는 텍스트 기반 엔진. 한 줄 = 
 
 | 명령 ID | 기본 키 | 동작 |
 |---|---|---|
-| `tasks.toggleDone` | `Ctrl/Cmd+Enter` (마크다운 파일에서, 태스크 줄일 때) | 상태 순환(FR-1.18) |
-| `tasks.setStatus` | — | 상태 선택 QuickPick |
-| `tasks.createOrEdit` | `Ctrl/Cmd+Shift+T` | 편집 모달 |
-| `tasks.setPriority` / `setDueDate` / `setScheduledDate` / `setStartDate` / `setRecurrence` / `setDependencies` | — | 개별 QuickPick |
-| `tasks.postpone` | — | 마감/예정일을 N일 미룸(내일/다음주/… 선택) |
-| `tasks.quickSearch` | `Ctrl/Cmd+Shift+;` | 빠른 검색 |
-| `tasks.archiveCompleted` | — | 완료 태스크 아카이브 (12.2) |
-| `tasks.openStats` / `openCalendar` | — | 통계 / 캘린더 패널 |
-| `tasks.checkForUpdates` | — | 사내 배포 경로에서 새 버전 확인 (12.5) |
-| `tasks.openSidebar` / `openKanban` | — | 뷰 열기 |
-| `tasks.reindex` | — | 강제 재스캔 |
-| `tasks.insertQueryBlock` | — | ` ```tasks ` 스니펫 삽입 |
-| `tasks.explainQuery` | — | 커서 위치 쿼리 설명 |
+| `tasksmd.toggleDone` | `Ctrl/Cmd+Enter` (마크다운 파일에서, 태스크 줄일 때) | 상태 순환(FR-1.18) |
+| `tasksmd.setStatus` | — | 상태 선택 QuickPick |
+| `tasksmd.createOrEdit` | `Ctrl/Cmd+Shift+T` | 편집 모달 |
+| `tasksmd.setPriority` / `setDueDate` / `setScheduledDate` / `setStartDate` / `setRecurrence` / `setDependencies` | — | 개별 QuickPick |
+| `tasksmd.postpone` | — | 마감/예정일을 N일 미룸(내일/다음주/… 선택) |
+| `tasksmd.quickSearch` | `Ctrl/Cmd+Shift+;` | 빠른 검색 |
+| `tasksmd.archiveCompleted` | — | 완료 태스크 아카이브 (12.2) |
+| `tasksmd.openStats` / `openCalendar` | — | 통계 / 캘린더 패널 |
+| `tasksmd.checkForUpdates` | — | 사내 배포 경로에서 새 버전 확인 (12.5) |
+| `tasksmd.openSidebar` / `openKanban` | — | 뷰 열기 |
+| `tasksmd.reindex` | — | 강제 재스캔 |
+| `tasksmd.insertQueryBlock` | — | ` ```tasks ` 스니펫 삽입 |
+| `tasksmd.explainQuery` | — | 커서 위치 쿼리 설명 |
 
 - FR-8.1 모든 명령은 명령 팔레트에 "Tasks: …" 접두사로 노출된다.
 - FR-8.2 에디터 컨텍스트 메뉴에 태스크 줄일 때만 하위 메뉴 "Tasks"를 노출한다.
@@ -306,13 +306,13 @@ Obsidian Tasks 쿼리 문법과 호환되는 텍스트 기반 엔진. 한 줄 = 
 
 ## 11. 설정 (FR-9)
 
-`tasks.*` 네임스페이스, 워크스페이스/사용자 단위 모두 지원.
+`tasksmd.*` 네임스페이스, 워크스페이스/사용자 단위 모두 지원. (`tasks.*`는 VS Code가 `tasks.json` 설정 섹션으로 예약하고 있어 `tasksmd`를 사용 — 명령·뷰·컨텍스트 키도 동일 접두사)
 
 | 키 | 기본값 | 설명 |
 |---|---|---|
 | `taskFormat` | `emoji` | 쓰기 포맷 (`emoji` / `dataview`) |
 | `globalFilter` | `""` | 글로벌 필터 문자열 |
-| `globalFilter.removeFromDescription` | `true` | 표시 시 글로벌 필터 숨김 |
+| `removeGlobalFilterFromDescription` | `true` | 표시 시 글로벌 필터 숨김 (`globalFilter`가 문자열 leaf라 하위 키를 둘 수 없음) |
 | `include` / `exclude` | `**/*.md` / `node_modules/**` 등 | 스캔 범위 |
 | `respectGitignore` | `true` | |
 | `maxFileSizeKB` | `1024` | |
@@ -367,7 +367,7 @@ Obsidian Tasks 쿼리 문법과 호환되는 텍스트 기반 엔진. 한 줄 = 
 
 ### 11-2.5 `.vsix` 배포 및 업데이트 확인 (Marketplace 보조 경로)
 
-- FR-10.15 `tasks.updateCheckUrl`(파일 경로 또는 HTTP URL)에 `latest.json`(`{ "version": "1.2.0", "vsix": "<경로/URL>", "notes": "..." }`)을 두면 확장 시작 시(하루 1회) 버전을 비교해 새 버전이 있으면 토스트로 알리고 `.vsix` 경로를 연다/복사한다. 설정이 비어 있으면 아무것도 하지 않는다.
+- FR-10.15 `tasksmd.updateCheckUrl`(파일 경로 또는 HTTP URL)에 `latest.json`(`{ "version": "1.2.0", "vsix": "<경로/URL>", "notes": "..." }`)을 두면 확장 시작 시(하루 1회) 버전을 비교해 새 버전이 있으면 토스트로 알리고 `.vsix` 경로를 연다/복사한다. 설정이 비어 있으면 아무것도 하지 않는다.
 - FR-10.16 릴리스 산출물: `tasks-for-markdown-<version>.vsix` + `latest.json` + `CHANGELOG.md`. 빌드 스크립트 `pnpm package`로 생성. Marketplace/Open VSX 게시는 `pnpm publish:vsce` / `pnpm publish:ovsx` (토큰은 환경변수). Marketplace로 설치된 경우 업데이트 확인 알림은 표시하지 않는다.
 
 ### 11-2.6 AI 연동 (v1.x, 범위 밖 — 기록용)
@@ -486,7 +486,7 @@ Obsidian Tasks처럼 `#task` 같은 글로벌 필터를 지원하되 기본은 �
 답변: 너가 추천해줘. 원본 위에 삽입, 🆔는 원본 ID 유지(의존 관계가 다음 회차로 이어지게; 완료된 태스크는 blocking 판정에서 빠지므로 ID 중복 무해), ⛔ 복사. 각각 설정으로 변경 가능. 이렇게 해주면 되겠다.
 
 **Q-10. 저장된 쿼리 저장 위치**
-(a) `settings.json`(`tasks.savedQueries`) — 워크스페이스·사용자 모두 가능
+(a) `settings.json`(`tasksmd.savedQueries`) — 워크스페이스·사용자 모두 가능
 (b) 워크스페이스 내 파일(예: `.vscode/tasks-queries.md` 또는 `.tasks/queries/*.md`) — Git으로 공유 가능, 마크다운 그대로
 (c) 둘 다
 추천: (c) 또는 (b).
@@ -558,7 +558,7 @@ Marketplace에 올리지 않아도 `package.json`의 `publisher` 필드는 필�
 
 **R-5. (Q-17 후속) 사내 배포 방식**
 - 소스 저장소: 사내 Git(GitLab/Bitbucket 등)이 있는지, 아니면 로컬 Git만 쓰는지
-- 자동 업데이트: Marketplace가 없으면 자동 업데이트가 안 됩니다. 사내 공유 경로(파일 서버/URL)에 `.vsix`와 버전 파일을 두고, 확장이 시작할 때 새 버전을 확인해 알려주는 기능을 넣을지 (추천: 넣음, 경로는 설정 `tasks.updateCheckUrl`)
+- 자동 업데이트: Marketplace가 없으면 자동 업데이트가 안 됩니다. 사내 공유 경로(파일 서버/URL)에 `.vsix`와 버전 파일을 두고, 확장이 시작할 때 새 버전을 확인해 알려주는 기능을 넣을지 (추천: 넣음, 경로는 설정 `tasksmd.updateCheckUrl`)
 - 사용자 수(대략)와 사용 에디터(VS Code / Cursor / 혼용)
 답변:
 

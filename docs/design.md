@@ -333,7 +333,7 @@ flowchart LR
 sequenceDiagram
     actor U as 사용자
     participant TV as TaskTreeProvider
-    participant CMD as commands/tasks.toggleDone
+    participant CMD as commands/tasksmd.toggleDone
     participant ES as TaskEditService
     participant CORE as core (Status/Recurrence/Serializer)
     participant VS as vscode.workspace
@@ -562,7 +562,7 @@ stateDiagram-v2
 flowchart LR
     T["태스크 줄에 커서"] --> CL["CodeLens 표시"]
     T --> AS["타이핑: 'due' → 자동완성 📅 + 날짜 후보"]
-    CL -->|"✔ 완료"| TG["tasks.toggleDone"]
+    CL -->|"✔ 완료"| TG["tasksmd.toggleDone"]
     CL -->|"⏫ 높음 ▾"| PP["PriorityPick (QuickPick)"]
     CL -->|"📅 9/25 ▾"| DP["DatePick<br/>입력란: 자연어 · 후보: 오늘/내일/다음주/…"]
     CL -->|"✎"| EM["편집 모달 (Webview)"]
@@ -674,7 +674,7 @@ flowchart TB
         Q[".tasks/queries/*.md — 저장된 쿼리(공유)"]
         AR["Archive.md — 아카이브"]
     end
-    subgraph Settings["settings.json (tasks.*)"]
+    subgraph Settings["settings.json (tasksmd.*)"]
         S1["taskFormat · globalFilter · include/exclude"]
         S2["statuses[] · recurrence.* · notifications.* · archive.*"]
         S3["savedQueries[] (개인)"]

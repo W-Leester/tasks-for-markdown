@@ -105,18 +105,47 @@ export function registerEditCommands(context: vscode.ExtensionContext, deps: Com
   );
 
   // Create or edit: opens the webview dialog (FR-6). Edits the task under the cursor / the tree
-  // argument, otherwise creates a new task at the cursor line of the active Markdown editor.
+  // argument. When the focus is elsewhere (Markdown preview, sidebar) there is no cursor, so the
+  // previewed / last used Markdown document's tasks are offered in a QuickPick instead.
+  let lastMarkdownDoc: vscode.TextDocument | undefined;
+  context.subscriptions.push(
+    vscode.window.onDidChangeActiveTextEditor((e) => {
+      if (e?.document.languageId === 'markdown') lastMarkdownDoc = e.document;
+    }),
+  );
   register('tasksmd.createOrEdit', (arg) =>
     runEdit(deps, async () => {
-      // With the preview or a sidebar focused there is no active text editor: fall back to a
-      // visible Markdown editor (e.g. the one next to the preview).
-      const editor = vscode.window.activeTextEditor?.document.languageId === 'markdown'
-        ? vscode.window.activeTextEditor
-        : vscode.window.visibleTextEditors.find((e) => e.document.languageId === 'markdown');
       const existing = resolveTargetTasks(arg, deps)[0];
-      if (existing) deps.openEdit({ key: existing.location.key, line: existing.location.line });
-      else if (editor) deps.openEdit({ key: editor.document.uri.toString(), line: editor.selection.active.line });
-      else deps.openEdit({ key: null, line: null });
+      if (existing) {
+        deps.openEdit({ key: existing.location.key, line: existing.location.line });
+        return;
+      }
+      const active = vscode.window.activeTextEditor;
+      if (active?.document.languageId === 'markdown') {
+        deps.openEdit({ key: active.document.uri.toString(), line: active.selection.active.line });
+        return;
+      }
+      const doc = vscode.window.visibleTextEditors.find((e) => e.document.languageId === 'markdown')?.document ?? (lastMarkdownDoc && !lastMarkdownDoc.isClosed ? lastMarkdownDoc : undefined);
+      if (!doc) {
+        deps.openEdit({ key: null, line: null });
+        return;
+      }
+      const key = doc.uri.toString();
+      const tasks = deps.index.file(key)?.tasks ?? [];
+      const fileName = doc.uri.path.split('/').pop() ?? '';
+      const picked = await vscode.window.showQuickPick(
+        [
+          { label: `$(add) ${t('New task at the end of {0}', fileName)}`, line: doc.lineCount, alwaysShow: true },
+          ...tasks.map((task) => ({
+            label: `${task.isCompleted ? '$(pass-filled)' : '$(circle-large-outline)'} ${task.description || t('(empty task)')}`,
+            description: [task.due ? `📅 ${task.due.format()}` : '', task.location.heading ? `› ${task.location.heading}` : ''].filter(Boolean).join('  '),
+            detail: t('line {0}', task.location.line + 1),
+            line: task.location.line,
+          })),
+        ],
+        { placeHolder: t('Which task in {0} do you want to edit?', fileName), matchOnDescription: true },
+      );
+      if (picked) deps.openEdit({ key, line: picked.line });
     }),
   );
 }

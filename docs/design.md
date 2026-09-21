@@ -802,7 +802,7 @@ GitHub Actions: PR마다 `typecheck + lint + test`, 태그 `v*` 푸시 시 패�
 |---|---|---|
 | D-1 | ~~기본 미리보기 ↔ 확장 간 양방향 메시지 채널~~ → **결정(M5.0 스파이크, VS Code 1.138 소스 분석)**: 클래식 미리보기(`markdown.showPreview`)에는 채널이 **없다**. 기여 스크립트는 `acquireVsCodeApi`를 얻을 수 없고(미리보기가 이미 획득), 웹뷰에 `enableCommandUris`가 없어 `command:` 링크도 실행되지 않으며, 확장이 처리하는 메시지는 `revealLine`/`didClick`/`openLink`뿐. 따라서 미리보기 연동은 **렌더 시점 통합**으로 한정: markdown-it 플러그인이 확장 프로세스에서 실행되므로 태스크 뱃지와 ` ```tasks ` 결과를 렌더 시 HTML로 생성하고, 인덱스 변경 시 `markdown.preview.refresh`로 갱신. 체크박스 클릭·편집은 사이드바/칸반/에디터에서. 태스크 링크는 `file.md#L12`(`markdown.preview.openMarkdownLinks: inEditor`일 때 줄로 이동). **참고**: VS Code 1.138에는 새 내장 "Markdown Editor"(WYSIWYG 커스텀 에디터)와 `markdown.codeBlockEditors` 확장 포인트(양방향 transport)가 있어 향후 ` ```tasks ` 블록을 상호작용형으로 렌더링할 수 있음 → v1.x 후보 | 완료 |
 | D-2 | ~~Cursor의 `markdown.previewScripts` 지원 여부~~ → **결정(M5.0)**: Cursor 3.12.10은 클래식 미리보기만 있고(`vscode.markdown.preview.editor`), `codeBlockEditors`/내장 Markdown Editor 없음. `markdownItPlugins`/`previewStyles`/`previewScripts` 계약은 동일 → 렌더 시점 통합이 VS Code·Cursor 공통 기준선 | 완료 |
-| D-3 | 칸반·캘린더의 드래그앤드롭 라이브러리(svelte-dnd-action vs 자체 구현) | M6 |
+| D-3 | ~~드래그앤드롭 라이브러리~~ → **결정(M6.3)**: 네이티브 HTML5 DnD(`dataTransfer` + `dragover/drop`), 라이브러리 없음. 카드는 `application/x-tfm-task` 페이로드로 `{key,line}` 전달, 컬럼이 `task/setField`로 변환 | 완료 |
 | D-4 | `rrule` 번들 크기(≈ 60KB)와 Obsidian Tasks의 반복 파서 이식 범위 | M3 |
 | D-5 | OS 알림의 Linux 지원 범위(`notify-send` 유무) | M7 |
 

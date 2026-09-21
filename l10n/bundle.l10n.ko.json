@@ -189,5 +189,11 @@
   "Loading…": "불러오는 중…",
   "The recurrence rule is not valid.": "반복 규칙이 유효하지 않습니다.",
   "A recurring task needs a due, scheduled or start date.": "반복 태스크는 마감·예정·시작일 중 하나가 필요합니다.",
-  "Remove": "제거"
+  "Remove": "제거",
+  "Tasks: Kanban": "Tasks: 칸반",
+  "Columns": "컬럼",
+  "Tasks": "태스크",
+  "All (incl. done)": "전체 (완료 포함)",
+  "Filter…": "필터…",
+  "Drop tasks here": "여기에 태스크를 놓으세요"
 }

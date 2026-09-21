@@ -306,3 +306,22 @@ suite('edit dialog', () => {
     await vscode.commands.executeCommand('workbench.action.closeAllEditors');
   });
 });
+
+suite('kanban', () => {
+  const guard = new FixtureGuard();
+  teardown(() => guard.restore());
+
+  test('panel boots, runs the default query and applies a drop as a field change', async () => {
+    const api = await getApi();
+    guard.protect('notes/project-a.md');
+    const uri = fixtureUri('notes/project-a.md');
+    const host = api.webviews.openKanban();
+    await waitFor(() => host.received.includes('query/run'), 8000, 'kanban query');
+    const task = await findTask(api, 'notes/project-a.md', 'Numbered task');
+    await (host as unknown as { handle(m: unknown): Promise<void> }).handle({ type: 'task/setField', key: task.location.key, line: task.location.line, field: 'status', value: '/' });
+    await (host as unknown as { handle(m: unknown): Promise<void> }).handle({ type: 'task/setField', key: task.location.key, line: task.location.line, field: 'due', value: '2026-09-22' });
+    const line = fs.readFileSync(uri.fsPath, 'utf8').split('\n')[task.location.line];
+    assert.equal(line, '1. [/] Numbered task 📅 2026-09-22');
+    await vscode.commands.executeCommand('workbench.action.closeAllEditors');
+  });
+});

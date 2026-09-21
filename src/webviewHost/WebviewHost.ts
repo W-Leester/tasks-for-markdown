@@ -137,6 +137,11 @@ export class WebviewHost implements vscode.Disposable {
           if (task) await vscode.commands.executeCommand('tasksmd.openTask', task);
           break;
         }
+        case 'task/edit': {
+          const task = this.deps.index.taskAt(msg.key, msg.line);
+          if (task) await vscode.commands.executeCommand('tasksmd.createOrEdit', task);
+          break;
+        }
         case 'task/load': {
           const today = this.today();
           const task = msg.key !== null && msg.line !== null ? this.deps.index.taskAt(msg.key, msg.line) : undefined;

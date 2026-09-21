@@ -29,7 +29,20 @@ export interface EditTarget {
   line: number | null;
 }
 
-export function registerWebviews(context: vscode.ExtensionContext, deps: WebviewHostDeps): { openEdit: (target: EditTarget) => WebviewHost } {
+/** Sidebar-hosted instance of an app (contributes.views type: webview). */
+export function registerWebviewView(context: vscode.ExtensionContext, deps: WebviewHostDeps, viewId: string, app: string, title: string): void {
+  context.subscriptions.push(
+    vscode.window.registerWebviewViewProvider(viewId, {
+      resolveWebviewView(view) {
+        const host = new WebviewHost(deps, { app, title });
+        host.attach(view.webview);
+        view.onDidDispose(() => host.dispose());
+      },
+    }),
+  );
+}
+
+export function registerWebviews(context: vscode.ExtensionContext, deps: WebviewHostDeps): { openEdit: (target: EditTarget) => WebviewHost; openKanban: () => WebviewHost } {
   const openEditPanel = createPanelOpener(deps, 'edit', vscode.l10n.t('Tasks: Create or edit'), 'edit');
   const openEdit = (target: EditTarget) => {
     const host = openEditPanel();
@@ -38,6 +51,8 @@ export function registerWebviews(context: vscode.ExtensionContext, deps: Webview
     host.send({ type: 'edit/target', key: target.key, line: target.line });
     return host;
   };
-  void context;
-  return { openEdit };
+  const openKanban = createPanelOpener(deps, 'kanban', vscode.l10n.t('Tasks: Kanban'), 'project');
+  registerWebviewView(context, deps, 'tasksmd.kanban', 'kanban', 'Kanban');
+  context.subscriptions.push(vscode.commands.registerCommand('tasksmd.openKanban', () => openKanban()));
+  return { openEdit, openKanban };
 }

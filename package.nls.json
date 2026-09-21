@@ -82,5 +82,7 @@
   "tasksmd.config.preview.enabled": "Render tasks (checkboxes, badges) and ```tasks query blocks in the Markdown preview.",
   "tasksmd.config.preview.renderBadges": "Show task metadata as badges in the preview instead of the raw emoji/Dataview text.",
   "tasksmd.config.editModal.accessKeys": "Enable Alt+letter access keys for the fields of the Create or edit task dialog.",
-  "tasksmd.config.editModal.hiddenFields": "Fields to hide in the Create or edit task dialog."
+  "tasksmd.config.editModal.hiddenFields": "Fields to hide in the Create or edit task dialog.",
+  "tasksmd.view.kanban": "Kanban",
+  "tasksmd.openKanban.title": "Open kanban board"
 }

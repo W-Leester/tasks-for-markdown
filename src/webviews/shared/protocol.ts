@@ -89,6 +89,7 @@ export type FromWebview =
   | { type: 'task/setFields'; key: string; line: number; fields: Partial<Record<TaskFieldName, string | string[] | null>> }
   | { type: 'task/create'; key: string | null; line: number | null; fields: Partial<Record<TaskFieldName, string | string[] | null>> }
   | { type: 'task/open'; key: string; line: number }
+  | { type: 'task/edit'; key: string; line: number }
   | { type: 'task/load'; requestId: number; key: string | null; line: number | null }
   | { type: 'recurrence/validate'; requestId: number; text: string }
   | { type: 'ui/close' }

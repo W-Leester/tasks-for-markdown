@@ -208,6 +208,12 @@
         "command": "tasksmd.explainQuery",
         "title": "%tasksmd.explainQuery.title%",
         "category": "Tasks"
+      },
+      {
+        "command": "tasksmd.openKanban",
+        "title": "%tasksmd.openKanban.title%",
+        "category": "Tasks",
+        "icon": "$(project)"
       }
     ],
     "configuration": {
@@ -651,6 +657,11 @@
           "command": "tasksmd.savedQuery.refresh",
           "when": "view == tasksmd.savedQueries",
           "group": "navigation@2"
+        },
+        {
+          "command": "tasksmd.openKanban",
+          "when": "view == tasksmd.kanban",
+          "group": "navigation@1"
         }
       ],
       "view/item/context": [
@@ -769,6 +780,14 @@
           "name": "%tasksmd.view.savedQueries%",
           "icon": "$(search)",
           "contextualTitle": "Saved queries"
+        },
+        {
+          "id": "tasksmd.kanban",
+          "type": "webview",
+          "name": "%tasksmd.view.kanban%",
+          "icon": "$(project)",
+          "contextualTitle": "Kanban",
+          "visibility": "collapsed"
         }
       ]
     },

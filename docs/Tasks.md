@@ -412,7 +412,7 @@
 - [x] `protocol.ts` — discriminated union 메시지 타입, 양쪽에서 import (D§5.6 표)
 - [x] `tokens.css` — `--vscode-*` 기반 우선순위/기한 색, editor/와 동일 매핑 (D§7.7)
 - [x] `state/init`에 l10n 번들 포함, Svelte `t(key)` (D§11)
-- [ ] 공통 컴포넌트: TaskCard, Chip, DateInput(자연어 해석 미리보기), StatusSelect (→ M6.2/M6.3에서 만들며 추출)
+- [x] 공통 컴포넌트: `TaskCard`, `DateInput`(자연어 해석 미리보기); 칩은 `tokens.css` 클래스
 - [x] `retainContextWhenHidden: false`, UI 상태는 `ui/state`로 `workspaceState`에 저장 (NFR-4)
 
 - [x] 웹뷰 왕복 검증은 편집 모달 통합 테스트로 (`ui/ready` → `state/init` → `task/load` → `task/setFields`)
@@ -427,14 +427,14 @@
 - [ ] 키보드 탐색·ARIA·포커스 트랩 점검 (NFR-5) — M8.3
 
 ### M6.3 칸반 / 컬럼 뷰 (`webviews/kanban/`)
-- [ ] D-3: DnD 라이브러리 결정(`svelte-dnd-action` vs 자체) → 기록
-- [ ] 컬럼 기준: 상태 / 마감 버킷(지남·오늘·이번주·다음주·이후·없음) / 우선순위 / 파일 (FR-5.8)
-- [ ] 드래그 → `task/setField` 변환 규칙 (상태→status, 버킷→due, 우선순위→priority) (FR-5.9)
-- [ ] 카드 클릭 → 편집 모달, 더블클릭 → 원본 이동 (FR-5.10)
-- [ ] 데이터 소스: 저장된 쿼리 선택 (FR-5.11)
-- [ ] 두 호스트: 사이드바 `WebviewView`(컬럼을 탭으로) + 에디터 패널 `WebviewPanel`(전체 컬럼) — 같은 Svelte 컴포넌트 (Q-12)
-- [ ] 가상 스크롤(컬럼당 카드 500개 이상) (D§9)
-- [ ] 명령 `tasksmd.openKanban`, 마지막 컬럼 기준·쿼리를 `workspaceState`에 저장
+- [x] D-3: **네이티브 HTML5 드래그앤드롭** 채택(의존성 없음, 웹뷰에서 안정적) — design.md D-3
+- [x] 컬럼 기준: 상태 / 마감 버킷(지남·오늘·이번주·다음주·이후·없음) / 우선순위 / 파일 (FR-5.8)
+- [x] 드래그 → `task/setField` 변환 규칙 (상태→status, 버킷→due, 우선순위→priority) (FR-5.9)
+- [x] 카드 클릭 → 편집 모달, 더블클릭 → 원본 이동 (FR-5.10)
+- [x] 데이터 소스: 저장된 쿼리 선택 (FR-5.11)
+- [x] 두 호스트: 사이드바 `WebviewView`(컬럼을 탭으로) + 에디터 패널 `WebviewPanel`(전체 컬럼) — 같은 Svelte 컴포넌트 (Q-12)
+- [ ] 가상 스크롤(컬럼당 카드 500개 이상) (D§9) — M8 성능 단계에서 필요 시
+- [x] 명령 `tasksmd.openKanban`, 마지막 컬럼 기준·쿼리를 `workspaceState`에 저장
 
 ### M6.4 쿼리 빌더 (`webviews/query-builder/`) — M4.5에서 미뤄둔 항목
 - [ ] 필터 행 추가/삭제, 종류별 입력 위젯(날짜·우선순위·텍스트·태그), 정렬/그룹/제한 섹션

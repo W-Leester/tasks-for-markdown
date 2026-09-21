@@ -82,5 +82,7 @@
   "tasksmd.config.preview.enabled": "마크다운 미리보기에서 태스크(체크박스, 뱃지)와 ```tasks 쿼리 블록을 렌더링합니다.",
   "tasksmd.config.preview.renderBadges": "미리보기에서 태스크 메타데이터를 원본 이모지/Dataview 텍스트 대신 뱃지로 표시합니다.",
   "tasksmd.config.editModal.accessKeys": "태스크 만들기/편집 대화상자에서 Alt+글자 액세스 키를 사용합니다.",
-  "tasksmd.config.editModal.hiddenFields": "태스크 만들기/편집 대화상자에서 숨길 필드."
+  "tasksmd.config.editModal.hiddenFields": "태스크 만들기/편집 대화상자에서 숨길 필드.",
+  "tasksmd.view.kanban": "칸반",
+  "tasksmd.openKanban.title": "칸반 보드 열기"
 }

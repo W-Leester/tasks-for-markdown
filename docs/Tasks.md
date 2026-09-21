@@ -254,14 +254,14 @@
 - `⛔`로 막힌 태스크가 사이드바 "차단됨"에 나타나고, 선행 태스크를 완료하면 사라진다.
 
 ### M3.1 반복 엔진 (`src/core/recurrence/`)
-- [ ] `rrule` 도입 + 번들 크기 측정 (D-4); 대안 검토 후 결정 기록
-- [ ] `every …` 문법 파서 — day/days/weekday/week on Mon,Fri/2 weeks/month on the 15th/month on the last/month on the last Friday/year/January on the 4th (FR-1.10)
-- [ ] `when done` 플래그 (FR-1.12)
-- [ ] `next(referenceDates, today)` — 기준일 due → scheduled → start, 나머지 날짜 상대 간격 유지 (FR-1.11)
-- [ ] 새 인스턴스 생성 규칙 — `[ ]`, ✅/❌ 제거, ➕ 갱신(설정), 🆔 `keep|new|remove`(기본 keep), ⛔ 복사(기본 true) (FR-1.13)
-- [ ] `🏁 delete` — 완료 시 원본 삭제 + 새 인스턴스만 삽입 (D§5.3)
-- [ ] 날짜 없는 반복 태스크 경고 (FR-1.14)
-- [ ] 테스트: Obsidian Tasks `tests/Recurrence*.test.ts` 이식 + 표 기반 케이스
+- [x] `rrule` 도입 (D-4: 번들 측정은 M3.2 빌드 후 기록); Obsidian `Recurrence.ts`/`Occurrence.ts` 이식, UTC 자정 Date로 시간대 문제 회피, rrule이 무시하는 오타 단어 검출 추가
+- [x] `every …` 문법 파서 — day/days/weekday/week on Mon,Fri/2 weeks/month on the 15th/month on the last/month on the last Friday/year/January on the 4th (FR-1.10)
+- [x] `when done` 플래그 (FR-1.12)
+- [x] `next(referenceDates, today)` — 기준일 due → scheduled → start, 나머지 날짜 상대 간격 유지 (FR-1.11)
+- [x] 새 인스턴스 생성 규칙 — `[ ]`, ✅/❌ 제거, ➕ 갱신(설정), 🆔 `keep|new|remove`(기본 keep), ⛔ 복사(기본 true) (FR-1.13)
+- [x] `🏁 delete` — 완료 시 원본 삭제 + 새 인스턴스만 삽입 (D§5.3)
+- [x] 날짜 없는 반복 태스크 경고 (FR-1.14) — M2.7 진단에 이미 포함
+- [x] 테스트: Obsidian Tasks `tests/Recurrence*.test.ts` 이식 + 표 기반 케이스
 
 ### M3.2 편집 서비스 확장
 - [ ] `toggle()`에서 DONE 진입 + 반복 → `insertLines(above|below)` (설정 `recurrence.insertPosition`)

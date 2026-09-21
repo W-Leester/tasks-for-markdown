@@ -68,8 +68,12 @@ export class TaskEditService {
   }
 
   async replaceLine(uri: vscode.Uri, line: number, expectedOriginal: string, newText: string, insert?: LineInsert): Promise<void> {
-    const wasOpen = vscode.workspace.textDocuments.some((d) => d.uri.toString() === uri.toString());
     const doc = await vscode.workspace.openTextDocument(uri);
+    // Save afterwards only when nobody is editing this file: not shown in any editor and not
+    // dirty. (Closed editors keep their TextDocument around for a while, so "is it in
+    // workspace.textDocuments" is not a reliable signal.)
+    const visible = vscode.window.visibleTextEditors.some((e) => e.document.uri.toString() === uri.toString());
+    const shouldSave = !visible && !doc.isDirty;
     const strip = (s: string) => (s.endsWith('\r') ? s.slice(0, -1) : s);
     const actual = line < doc.lineCount ? doc.lineAt(line).text : '';
     if (strip(actual) !== strip(expectedOriginal)) {
@@ -91,6 +95,6 @@ export class TaskEditService {
 
     // Keep the index exact immediately instead of waiting for the debounced document event.
     this.deps.indexService.indexText(uri, doc.getText());
-    if (!wasOpen) await doc.save();
+    if (shouldSave) await doc.save();
   }
 }

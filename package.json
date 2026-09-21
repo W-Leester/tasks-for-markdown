@@ -188,18 +188,25 @@
     "package": "pnpm build && vsce package --no-dependencies",
     "publish:vsce": "vsce publish --no-dependencies",
     "publish:ovsx": "ovsx publish --no-dependencies",
-    "vscode:prepublish": "pnpm build"
+    "vscode:prepublish": "pnpm build",
+    "test:integration": "tsc -p tsconfig.integration.json && vscode-test",
+    "test:all": "pnpm test && pnpm build && pnpm test:integration"
   },
   "dependencies": {
     "dayjs": "^1.11.13",
     "ignore": "^7.0.9"
   },
   "devDependencies": {
+    "@types/mocha": "^10.0.10",
     "@types/node": "^22.0.0",
     "@types/vscode": "^1.90.0",
+    "@vscode/test-cli": "^0.0.15",
+    "@vscode/test-electron": "^3.1.0",
     "@vscode/vsce": "^3.0.0",
     "esbuild": "^0.24.0",
     "eslint": "^9.0.0",
+    "glob": "^13.0.6",
+    "mocha": "^12.0.2",
     "ovsx": "^0.10.0",
     "prettier": "^3.3.0",
     "typescript": "^5.6.0",

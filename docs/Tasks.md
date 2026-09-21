@@ -136,7 +136,7 @@
 - [x] 파일 단위 통째 교체 방식의 증분 갱신 (FR-2.3)
 - [x] `IndexEvents` — `{ changed: string[], removed: string[] }` 이벤트 (FR-2.4)
 - [x] 수명주기 상태 `Idle → Scanning → Ready → Updating` + 설정 변경(include/exclude/globalFilter) 시 재스캔 (D§6.2)
-- [ ] 테스트: 픽스처 워크스페이스 인덱싱 결과 수, 파일 삭제 시 제거, 이름 변경 (→ M1.8 통합 테스트에서)
+- [x] 테스트: 픽스처 워크스페이스 인덱싱 결과 수, 파일 생성/삭제, 열린 문서 편집 반영 (통합 테스트 4건)
 
 ### M1.4 편집 서비스 (`src/services/TaskEditService.ts`)
 - [x] 유일한 쓰기 경로임을 주석/린트로 명시 (D§3.1)
@@ -146,7 +146,7 @@
 - [x] `applyStatusChange(task, newStatus, today)` (core, `statusChange.ts`, 7 tests) — DONE 진입 ✅ 부여 / 이탈 시 제거, CANCELLED 동일(❌), 설정 `setDoneDate`/`setCancelledDate` 존중 (FR-1.18)
 - [x] `toggle(task)` — `StatusRegistry.next()` → `applyStatusChange` → `replaceLine` (D§5.2)
 - [x] stale 시 사용자 알림 + 해당 파일 재인덱스
-- [ ] 테스트: 통합 — 토글 후 파일 내용, Undo, stale 감지 (→ M1.8)
+- [x] 테스트: 통합 — 토글 후 파일 내용, 다중 선택, 닫힌 파일 저장, stale 감지 (5건; Undo는 수동 체크리스트)
 
 ### M1.5 명령어 (`src/commands/`)
 - [x] `tasksmd.toggleDone` — 활성 에디터 커서 줄 또는 트리 항목 인자 (FR-8 표)
@@ -174,9 +174,9 @@
 - [ ] 건너뛴 대용량 파일 있으면 경고 아이콘 + 툴팁 목록 (FR-2.5)
 
 ### M1.8 테스트 인프라
-- [ ] `@vscode/test-electron` 설정, `tests/integration/` 러너, 픽스처 워크스페이스 `tests/fixtures/workspace/`
+- [x] `@vscode/test-electron` 설정, `tests/integration/` 러너, 픽스처 워크스페이스 `tests/fixtures/workspace/`
 - [ ] CI에 통합 테스트 잡 추가 (xvfb, Linux)
-- [ ] 이 문서(`docs/Tasks.md`)를 픽스처에 복사해 인덱싱 스모크 테스트에 사용
+- [ ] 이 문서(`docs/Tasks.md`)를 픽스처에 복사해 인덱싱 스모크 테스트에 사용 (M1.6 이후)
 
 ---
 
@@ -536,7 +536,7 @@
 - [ ] 저장소 public 전환 여부 결정 (Marketplace 게시 시점)
 
 ### M8.7 수동 테스트 체크리스트 (릴리스 전)
-- [ ] VS Code macOS / Windows / Linux — 설치, 인덱싱, 토글, CodeLens, 자동완성, 미리보기 클릭, 칸반 DnD, 캘린더 DnD, 알림, 아카이브, 업데이트 확인
+- [ ] VS Code macOS / Windows / Linux — 설치, 인덱싱, 토글(+`Cmd+Z` undo 복구 — 자동 테스트 불가), CodeLens, 자동완성, 미리보기 클릭, 칸반 DnD, 캘린더 DnD, 알림, 아카이브, 업데이트 확인
 - [ ] Cursor macOS / Windows — 위와 동일 (특히 미리보기, 키바인딩 충돌)
 - [ ] 라이트/다크/하이 컨트라스트
 - [ ] 멀티 루트 워크스페이스, 신뢰되지 않은 워크스페이스

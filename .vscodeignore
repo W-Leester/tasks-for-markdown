@@ -13,3 +13,6 @@ tsconfig.json
 .gitignore
 pnpm-lock.yaml
 History.md
+dist/tests/**
+tsconfig.integration.json
+.vscode-test.mjs

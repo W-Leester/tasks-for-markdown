@@ -15,6 +15,11 @@ export interface SettingsSchema {
   setCreatedDate: boolean;
   setDoneDate: boolean;
   setCancelledDate: boolean;
+  'decorations.relativeDates': boolean;
+  'decorations.overdueHighlight': boolean;
+  'decorations.strikeDone': boolean;
+  'decorations.dimFields': boolean;
+  'decorations.gutterIcons': boolean;
 }
 
 export const SETTINGS_SECTION = 'tasksmd';
@@ -30,6 +35,11 @@ export const SETTINGS_DEFAULTS: Readonly<SettingsSchema> = {
   setCreatedDate: false,
   setDoneDate: true,
   setCancelledDate: true,
+  'decorations.relativeDates': true,
+  'decorations.overdueHighlight': true,
+  'decorations.strikeDone': true,
+  'decorations.dimFields': true,
+  'decorations.gutterIcons': true,
 };
 
 export type SettingsKey = keyof SettingsSchema;

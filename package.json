@@ -180,6 +180,31 @@
           "type": "boolean",
           "default": true,
           "description": "%tasksmd.config.setCancelledDate%"
+        },
+        "tasksmd.decorations.relativeDates": {
+          "type": "boolean",
+          "default": true,
+          "description": "%tasksmd.config.decorations.relativeDates%"
+        },
+        "tasksmd.decorations.overdueHighlight": {
+          "type": "boolean",
+          "default": true,
+          "description": "%tasksmd.config.decorations.overdueHighlight%"
+        },
+        "tasksmd.decorations.strikeDone": {
+          "type": "boolean",
+          "default": true,
+          "description": "%tasksmd.config.decorations.strikeDone%"
+        },
+        "tasksmd.decorations.dimFields": {
+          "type": "boolean",
+          "default": true,
+          "description": "%tasksmd.config.decorations.dimFields%"
+        },
+        "tasksmd.decorations.gutterIcons": {
+          "type": "boolean",
+          "default": true,
+          "description": "%tasksmd.config.decorations.gutterIcons%"
         }
       }
     },
@@ -307,6 +332,48 @@
         "view": "tasksmd.tasks",
         "contents": "%tasksmd.view.tasks.welcome%",
         "when": "tasksmd.indexEmpty"
+      }
+    ],
+    "colors": [
+      {
+        "id": "tasksmd.overdueBackground",
+        "description": "%tasksmd.color.overdueBackground%",
+        "defaults": {
+          "dark": "#f1454533",
+          "light": "#f1454522",
+          "highContrast": "#f1454566",
+          "highContrastLight": "#f1454566"
+        }
+      },
+      {
+        "id": "tasksmd.dueTodayBackground",
+        "description": "%tasksmd.color.dueTodayBackground%",
+        "defaults": {
+          "dark": "#d9a30033",
+          "light": "#d9a30022",
+          "highContrast": "#d9a30066",
+          "highContrastLight": "#d9a30066"
+        }
+      },
+      {
+        "id": "tasksmd.fieldForeground",
+        "description": "%tasksmd.color.fieldForeground%",
+        "defaults": {
+          "dark": "#9d9d9d",
+          "light": "#6e6e6e",
+          "highContrast": "#bbbbbb",
+          "highContrastLight": "#444444"
+        }
+      },
+      {
+        "id": "tasksmd.hintForeground",
+        "description": "%tasksmd.color.hintForeground%",
+        "defaults": {
+          "dark": "#8b8b8b",
+          "light": "#7a7a7a",
+          "highContrast": "#cccccc",
+          "highContrastLight": "#333333"
+        }
       }
     ]
   },

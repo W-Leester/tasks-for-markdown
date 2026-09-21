@@ -41,5 +41,17 @@
   "**Tasks for Markdown** — {0} files, {1} tasks": "**Tasks for Markdown** — 파일 {0}개, 태스크 {1}개",
   "Open": "미완료",
   "Skipped (larger than tasksmd.maxFileSizeKB):": "건너뜀 (tasksmd.maxFileSizeKB 초과):",
-  "Click to open the Tasks sidebar.": "클릭하면 Tasks 사이드바가 열립니다."
+  "Click to open the Tasks sidebar.": "클릭하면 Tasks 사이드바가 열립니다.",
+  "today": "오늘",
+  "tomorrow": "내일",
+  "yesterday": "어제",
+  "{0} days left": "{0}일 남음",
+  "{0} days ago": "{0}일 전",
+  "{0} weeks left": "{0}주 남음",
+  "{0} weeks ago": "{0}주 전",
+  "1 day overdue": "1일 지남",
+  "{0} days overdue": "{0}일 지남",
+  "{0} weeks overdue": "{0}주 지남",
+  "blocked ({0})": "대기 중 ({0})",
+  "invalid date": "잘못된 날짜"
 }

@@ -24,5 +24,14 @@
   "tasksmd.tree.refresh.title": "Refresh",
   "tasksmd.tree.groupBy.title": "Group by…",
   "tasksmd.tree.filter.title": "Filter tasks",
-  "tasksmd.tree.clearFilter.title": "Clear filter"
+  "tasksmd.tree.clearFilter.title": "Clear filter",
+  "tasksmd.config.decorations.relativeDates": "Show relative dates (e.g. '3 days left', '2 days overdue') at the end of task lines.",
+  "tasksmd.config.decorations.overdueHighlight": "Highlight the background of overdue and due-today task lines.",
+  "tasksmd.config.decorations.strikeDone": "Strike through and dim completed (done/cancelled) tasks.",
+  "tasksmd.config.decorations.dimFields": "Render task metadata (dates, priority, id…) in a muted colour so the description stands out.",
+  "tasksmd.config.decorations.gutterIcons": "Show a status icon in the gutter of every task line.",
+  "tasksmd.color.overdueBackground": "Background of overdue task lines.",
+  "tasksmd.color.dueTodayBackground": "Background of task lines due today.",
+  "tasksmd.color.fieldForeground": "Colour of task metadata (dates, priority, id…).",
+  "tasksmd.color.hintForeground": "Colour of the relative-date hint after task lines."
 }

@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import { registerCommands } from './commands/registerCommands';
 import { TaskIndex } from './core/index';
 import { StatusRegistry } from './core/task';
+import { TaskDecorations } from './editor/TaskDecorations';
 import { TaskLineContext } from './editor/TaskLineContext';
 import { IndexService } from './index/IndexService';
 import { TaskEditService } from './services/TaskEditService';
@@ -34,7 +35,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<Extens
   registerCommands(context, { index, indexService, editService, settings, getStatusRegistry, log });
   context.subscriptions.push(vscode.commands.registerCommand('tasksmd.showLogs', () => output.show()));
   registerTreeView(context, { index, settings, state: context.workspaceState, editService, log });
-  context.subscriptions.push(new StatusBar(index));
+  context.subscriptions.push(new StatusBar(index), new TaskDecorations({ index, settings, getStatusRegistry }));
 
   // Drives the welcome view: shown only when the index is ready and holds no tasks.
   const updateEmpty = () => void vscode.commands.executeCommand('setContext', 'tasksmd.indexEmpty', index.state === 'ready' && index.taskCount() === 0);

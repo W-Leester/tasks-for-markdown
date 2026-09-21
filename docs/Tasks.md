@@ -199,14 +199,14 @@
 - [x] 테스트: 고정 `today`로 표 기반 케이스 50개 이상
 
 ### M2.2 Decoration (`src/editor/TaskDecorations.ts`)
-- [ ] 줄 끝 가상 텍스트 — 상대 날짜(`📅 3일 남음`), 기한 초과(`⚠ 2일 지남`), 반복 요약, 차단(M3) (FR-3.1)
-- [ ] 기한 초과 줄 배경/텍스트 색, 오늘 마감 별도 색 — `ThemeColor` 사용 (FR-3.2, D§7.7)
-- [ ] DONE/CANCELLED 취소선 또는 흐리게 (FR-3.3)
-- [ ] 거터 상태 아이콘 (FR-3.4)
-- [ ] 필드 부분(이모지+값) 옅은 색 — `display:none` 해킹 금지 (FR-3.5)
-- [ ] `visibleRanges` ±50줄만 계산, 100ms 디바운스, 활성 에디터 변경·인덱스 이벤트에 반응 (FR-3.6)
-- [ ] 설정 `decorations.relativeDates`, `decorations.overdueHighlight`, `decorations.strikeDone`, `decorations.gutterIcons`, `decorations.dimFields`
-- [ ] `contributes.colors` — `tasksmd.overdueBackground`, `tasksmd.dueTodayForeground` 등 커스텀 색 토큰
+- [x] 줄 끝 가상 텍스트 — 상대 날짜(`📅 3일 남음`), 기한 초과(`⚠ 2일 지남`), 반복 요약, 차단(M3) (FR-3.1)
+- [x] 기한 초과 줄 배경/텍스트 색, 오늘 마감 별도 색 — `ThemeColor` 사용 (FR-3.2, D§7.7)
+- [x] DONE/CANCELLED 취소선 또는 흐리게 (FR-3.3)
+- [x] 거터 상태 아이콘 (FR-3.4)
+- [x] 필드 부분(이모지+값) 옅은 색 — `display:none` 해킹 금지 (FR-3.5)
+- [x] `visibleRanges` ±50줄만 계산, 100ms 디바운스, 활성 에디터 변경·인덱스 이벤트에 반응 (FR-3.6)
+- [x] 설정 `decorations.relativeDates`, `decorations.overdueHighlight`, `decorations.strikeDone`, `decorations.gutterIcons`, `decorations.dimFields`
+- [x] `contributes.colors` — `tasksmd.overdueBackground`, `tasksmd.dueTodayForeground` 등 커스텀 색 토큰
 
 ### M2.3 CodeLens (`src/editor/TaskCodeLensProvider.ts`)
 - [ ] 렌즈 항목: `✔ 완료` · `우선순위: 높음 ▾` · `📅 9/25 ▾` · `🔁 매주 ▾`(M3) · `✎ 편집` (FR-3.7)

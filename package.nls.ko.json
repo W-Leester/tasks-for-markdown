@@ -24,5 +24,14 @@
   "tasksmd.tree.refresh.title": "새로 고침",
   "tasksmd.tree.groupBy.title": "그룹 기준…",
   "tasksmd.tree.filter.title": "태스크 필터",
-  "tasksmd.tree.clearFilter.title": "필터 지우기"
+  "tasksmd.tree.clearFilter.title": "필터 지우기",
+  "tasksmd.config.decorations.relativeDates": "태스크 줄 끝에 상대 날짜(예: '3일 남음', '2일 지남')를 표시합니다.",
+  "tasksmd.config.decorations.overdueHighlight": "기한 초과·오늘 마감 태스크 줄의 배경을 강조합니다.",
+  "tasksmd.config.decorations.strikeDone": "완료(done/cancelled)된 태스크에 취소선을 긋고 흐리게 표시합니다.",
+  "tasksmd.config.decorations.dimFields": "설명이 돋보이도록 태스크 메타데이터(날짜, 우선순위, id…)를 옅은 색으로 표시합니다.",
+  "tasksmd.config.decorations.gutterIcons": "모든 태스크 줄의 거터에 상태 아이콘을 표시합니다.",
+  "tasksmd.color.overdueBackground": "기한 초과 태스크 줄 배경색.",
+  "tasksmd.color.dueTodayBackground": "오늘 마감 태스크 줄 배경색.",
+  "tasksmd.color.fieldForeground": "태스크 메타데이터(날짜, 우선순위, id…) 색.",
+  "tasksmd.color.hintForeground": "태스크 줄 뒤 상대 날짜 힌트 색."
 }

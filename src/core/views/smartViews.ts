@@ -1,6 +1,7 @@
 import type { Dayjs } from '../dates/dayjs';
-import { type TaskIndex, isBlocked } from '../index';
-import { type Task, StatusType, priorityNumber, urgency } from '../task';
+import { type TaskIndex } from '../index';
+import { Query } from '../query';
+import { type Task, priorityNumber, urgency } from '../task';
 
 export type SmartViewId = 'today' | 'upcoming' | 'overdue' | 'inProgress' | 'blocked' | 'open' | 'doneRecent';
 
@@ -27,38 +28,28 @@ export interface SmartViewContext {
 }
 
 /**
- * Hard-coded filters for the sidebar's built-in views. M4 re-expresses these as query text on
- * top of the query engine; the semantics defined here are the contract.
+ * The built-in sidebar views, expressed in the query language so that the sidebar, the status
+ * bar and user queries share one set of semantics (FR-5.1).
  */
-export function smartViewFilter(id: SmartViewId, ctx: SmartViewContext): (task: Task) => boolean {
-  const { today } = ctx;
-  const endOfToday = today.endOf('day');
-  const in7 = today.add(7, 'day').endOf('day');
-  switch (id) {
-    case 'today':
-      return (t) => !t.isCompleted && !!t.happens()?.date && !t.happens()!.date!.isAfter(endOfToday);
-    case 'upcoming':
-      return (t) => {
-        const h = t.happens()?.date;
-        return !t.isCompleted && !!h && h.isAfter(endOfToday) && !h.isAfter(in7);
-      };
-    case 'overdue':
-      return (t) => !t.isCompleted && !!t.due?.date && t.due.date.isBefore(today.startOf('day'));
-    case 'inProgress':
-      return (t) => t.status.type === StatusType.IN_PROGRESS;
-    case 'blocked':
-      return (t) => !t.isCompleted && isBlocked(t, ctx.index);
-    case 'open':
-      return (t) => !t.isCompleted && t.status.type !== StatusType.NON_TASK;
-    case 'doneRecent': {
-      const since = today.subtract(30, 'day').startOf('day');
-      return (t) => {
-        if (!t.isCompleted) return false;
-        const d = t.done?.date ?? t.cancelled?.date;
-        return !!d && !d.isBefore(since);
-      };
-    }
+export const SMART_VIEW_QUERIES: Readonly<Record<SmartViewId, string>> = {
+  today: 'not done\nhappens on or before today',
+  upcoming: 'not done\nhappens after today\nhappens on or before in 7 days',
+  overdue: 'not done\ndue before today',
+  inProgress: 'status.type is IN_PROGRESS',
+  blocked: 'not done\nis blocked',
+  open: 'not done',
+  doneRecent: 'done\n(done on or after 30 days ago) OR (cancelled on or after 30 days ago)',
+};
+
+const compiled = new Map<SmartViewId, Query>();
+export function smartViewQuery(id: SmartViewId): Query {
+  let q = compiled.get(id);
+  if (!q) {
+    q = Query.parse(SMART_VIEW_QUERIES[id]);
+    if (q.errors.length) throw new Error(`smart view ${id}: ${q.errors[0]!.message}`);
+    compiled.set(id, q);
   }
+  return q;
 }
 
 /** Default ordering (Obsidian): urgency desc, then due (missing last), priority, file/line. */
@@ -77,8 +68,6 @@ export function compareTasksDefault(a: Task, b: Task, now?: Dayjs): number {
   return a.location.line - b.location.line;
 }
 
-/** NON_TASK checkboxes (decorative symbols) never appear in smart views (FR-1.19). */
 export function runSmartView(id: SmartViewId, ctx: SmartViewContext): Task[] {
-  const filter = smartViewFilter(id, ctx);
-  return ctx.index.all().filter((t) => t.status.type !== StatusType.NON_TASK && filter(t)).sort((a, b) => compareTasksDefault(a, b, ctx.today));
+  return smartViewQuery(id).run({ index: ctx.index, today: ctx.today, allowFunctions: false }).root.tasks;
 }

@@ -66,5 +66,14 @@
   "tasksmd.setRecurrence.title": "반복 설정…",
   "tasksmd.config.query.allowFunctions": "쿼리에서 `filter by function`, `sort by function`, `group by function`을 허용합니다. 노트에 적힌 JavaScript를 실행하므로 기본은 꺼져 있고, 신뢰되지 않은 워크스페이스에서는 절대 실행되지 않습니다.",
   "tasksmd.capabilities.untrusted": "신뢰되지 않은 워크스페이스에서는 커스텀 JavaScript 쿼리 함수, OS 알림, 업데이트 확인이 비활성화됩니다.",
-  "tasksmd.capabilities.virtual": "태스크 인덱싱에는 파일 시스템이 필요합니다. 가상 워크스페이스는 읽기 전용입니다."
+  "tasksmd.capabilities.virtual": "태스크 인덱싱에는 파일 시스템이 필요합니다. 가상 워크스페이스는 읽기 전용입니다.",
+  "tasksmd.config.savedQueries": "사이드바에 표시할 저장된 쿼리 (워크스페이스의 `.tasks/queries/*.md` 파일도 함께 읽습니다).",
+  "tasksmd.config.savedQueries.query": "쿼리 텍스트, 한 줄에 명령 하나 (\\n 사용).",
+  "tasksmd.view.savedQueries": "저장된 쿼리",
+  "tasksmd.view.savedQueries.welcome": "저장된 쿼리가 없습니다.\n\n[새 쿼리](command:tasksmd.savedQuery.new)를 누르면 `.tasks/queries/<이름>.md`에 ```tasks 블록이 만들어지고, 노트처럼 편집할 수 있습니다.",
+  "tasksmd.savedQuery.new.title": "새 저장 쿼리",
+  "tasksmd.savedQuery.edit.title": "쿼리 편집",
+  "tasksmd.savedQuery.delete.title": "쿼리 삭제",
+  "tasksmd.savedQuery.explain.title": "쿼리 설명",
+  "tasksmd.savedQuery.refresh.title": "쿼리 새로 고침"
 }

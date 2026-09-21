@@ -1,9 +1,10 @@
 import * as vscode from 'vscode';
 import { dayjs } from '../core/dates/dayjs';
 import type { TaskIndex } from '../core/index';
-import { PRIORITY_EMOJI, Priority, type Task } from '../core/task';
+import type { Task } from '../core/task';
 import { GROUP_MODES, type GroupMode, SMART_VIEWS, type SmartViewId, groupTasks, runSmartView } from '../core/views';
 import type { Settings } from '../settings/Settings';
+import { taskTreeItem } from './taskItem';
 
 export const TREE_VIEW_ID = 'tasksmd.tasks';
 const MAX_VISIBLE = 1000;
@@ -138,50 +139,7 @@ export class TaskTreeProvider implements vscode.TreeDataProvider<Node>, vscode.D
   }
 
   private taskItem(task: Task): vscode.TreeItem {
-    const item = new vscode.TreeItem(this.displayDescription(task), vscode.TreeItemCollapsibleState.None);
-    item.id = `task:${task.location.key}#${task.location.line}`;
-    item.checkboxState = task.isCompleted ? vscode.TreeItemCheckboxState.Checked : vscode.TreeItemCheckboxState.Unchecked;
-    item.contextValue = task.isCompleted ? 'task.completed' : 'task';
-    item.description = this.secondary(task);
-    item.tooltip = this.tooltip(task);
-    item.command = { command: 'tasksmd.openTask', title: 'Open', arguments: [task] };
-    if (task.priority !== Priority.None) item.iconPath = new vscode.ThemeIcon(PRIORITY_ICON[task.priority]!, PRIORITY_COLOR[task.priority]);
-    return item;
-  }
-
-  private displayDescription(task: Task): string {
-    let d = task.description;
-    const gf = this.deps.settings.get('globalFilter');
-    if (gf && this.deps.settings.get('removeGlobalFilterFromDescription')) d = d.replace(gf, '').replace(/\s{2,}/g, ' ').trim();
-    return d || vscode.l10n.t('(empty task)');
-  }
-
-  private secondary(task: Task): string {
-    const parts: string[] = [];
-    if (task.due) parts.push(`📅 ${task.due.format()}`);
-    else if (task.scheduled) parts.push(`⏳ ${task.scheduled.format()}`);
-    else if (task.start) parts.push(`🛫 ${task.start.format()}`);
-    if (task.recurrenceText) parts.push('🔁');
-    if (task.dependsOn.length) parts.push('⛔');
-    if (this.groupMode !== 'file') parts.push(task.location.path.split('/').pop() ?? task.location.path);
-    return parts.join(' · ');
-  }
-
-  private tooltip(task: Task): vscode.MarkdownString {
-    const md = new vscode.MarkdownString();
-    md.appendMarkdown(`**${task.description || '(empty)'}**\n\n`);
-    const rows: string[] = [];
-    rows.push(`Status: \`[${task.status.symbol}]\` ${task.status.name}`);
-    if (task.priority !== Priority.None) rows.push(`Priority: ${PRIORITY_EMOJI[task.priority]} ${task.priority}`);
-    for (const [label, f] of [['Created', task.created], ['Start', task.start], ['Scheduled', task.scheduled], ['Due', task.due], ['Done', task.done], ['Cancelled', task.cancelled]] as const) {
-      if (f) rows.push(`${label}: ${f.format()}${f.valid ? '' : ' ⚠ invalid'}`);
-    }
-    if (task.recurrenceText) rows.push(`Repeats: ${task.recurrenceText}`);
-    if (task.id) rows.push(`Id: ${task.id}`);
-    if (task.dependsOn.length) rows.push(`Depends on: ${task.dependsOn.join(', ')}`);
-    md.appendMarkdown(rows.map((r) => `- ${r}`).join('\n'));
-    md.appendMarkdown(`\n\n${task.location.path}:${task.location.line + 1}`);
-    return md;
+    return taskTreeItem(task, this.deps.settings, { showFile: this.groupMode !== 'file' });
   }
 
   getParent(): Node | undefined {
@@ -195,23 +153,5 @@ export class TaskTreeProvider implements vscode.TreeDataProvider<Node>, vscode.D
   }
 }
 
-const PRIORITY_ICON: Partial<Record<Priority, string>> = {
-  [Priority.Highest]: 'triangle-up',
-  [Priority.High]: 'arrow-up',
-  [Priority.Medium]: 'arrow-small-up',
-  [Priority.Low]: 'arrow-small-down',
-  [Priority.Lowest]: 'arrow-down',
-};
-const PRIORITY_COLOR: Partial<Record<Priority, vscode.ThemeColor>> = {
-  [Priority.Highest]: new vscode.ThemeColor('errorForeground'),
-  [Priority.High]: new vscode.ThemeColor('editorWarning.foreground'),
-  [Priority.Medium]: new vscode.ThemeColor('editorInfo.foreground'),
-  [Priority.Low]: new vscode.ThemeColor('descriptionForeground'),
-  [Priority.Lowest]: new vscode.ThemeColor('disabledForeground'),
-};
-
-export function isTaskNode(node: unknown): node is { kind: 'task'; task: Task } {
-  return !!node && typeof node === 'object' && (node as { kind?: string }).kind === 'task';
-}
-
 export { GROUP_MODES };
+export { isTaskNode } from './taskItem';

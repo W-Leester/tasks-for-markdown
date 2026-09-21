@@ -55,8 +55,9 @@ describe('smart views', () => {
     expect(names('blocked')).toEqual(['blocked']);
     expect(isBlocked(idx.all().find((t) => t.description === 'free #tag1 #tag2')!, idx)).toBe(false);
   });
-  it('open = everything not completed, sorted by urgency (Obsidian formula)', () => {
+  it('open = everything not completed, in Obsidian default order (status.type, urgency, …)', () => {
     expect(names('open')).toEqual([
+      'doing', // IN_PROGRESS sorts before TODO
       'overdue',
       'due today',
       'tomorrow',
@@ -65,14 +66,13 @@ describe('smart views', () => {
       'in 8 days',
       'scheduled today', // scheduled today (+5) outranks a due date 9 days out
       'blocked',
-      'doing',
       'no dates #tag1',
       'blocker',
       'free #tag1 #tag2',
     ]);
   });
   it('doneRecent = completed within 30 days by done/cancelled date', () => {
-    expect(names('doneRecent')).toEqual(['done recently', 'cancelled recently', 'finished dep']);
+    expect(names('doneRecent')).toEqual(['done recently', 'finished dep', 'cancelled recently']); // DONE before CANCELLED
   });
 });
 
@@ -98,7 +98,7 @@ describe('groupTasks', () => {
   });
   it('by heading and by status', () => {
     expect(groupTasks(open, 'heading', today).map((x) => x.id)).toEqual(['A', '(no heading)']);
-    expect(groupTasks(open, 'status', today).map((x) => x.label)).toEqual(['Todo', 'In Progress']);
+    expect(groupTasks(open, 'status', today).map((x) => x.label)).toEqual(['In Progress', 'Todo']);
   });
   it('none returns a single group', () => {
     expect(groupTasks(open, 'none', today)).toHaveLength(1);

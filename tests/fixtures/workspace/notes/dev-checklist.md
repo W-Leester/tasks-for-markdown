@@ -341,13 +341,13 @@
 - [x] `capabilities.untrustedWorkspaces: { supported: 'limited' }` 선언
 
 ### M4.5 QueryService · 저장된 쿼리
-- [ ] `QueryService.run(text, context)` — `(text, indexVersion)` 캐시, 인덱스 이벤트로 무효화 (FR-7.16, FR-7.17)
-- [ ] 열린 쿼리 결과 자동 재실행 200ms 디바운스
-- [ ] `SavedQueryStore` — (1) `tasksmd.savedQueries` 설정 (2) `.tasks/queries/*.md`(첫 ` ```tasks ` 블록) 병합, 파일 워처 (FR-5.5)
-- [ ] `SavedQueryTreeProvider` — 출처 아이콘 구분, 결과를 하위 노드로 펼침, 체크박스·이동·편집
-- [ ] 쿼리 편집: 텍스트(`InputBox` 멀티라인 대안 → 임시 문서 열기) + `explain` 미리보기 + 오류 줄 번호 (FR-5.7)
-- [ ] 쿼리 빌더(Webview, M6 인프라 선행 ⚠) — 필터 종류 드롭다운 조립 → 텍스트 생성 (FR-5.6); M6 전까지는 텍스트 편집만
-- [ ] 스마트 뷰 7종을 쿼리 텍스트로 재정의 (M1 하드코딩 제거)
+- [x] `QueryService.run(text, context)` — `(text, indexVersion)` 캐시, 인덱스 이벤트로 무효화 (FR-7.16, FR-7.17)
+- [x] 열린 쿼리 결과 자동 재실행 200ms 디바운스
+- [x] `SavedQueryStore` — (1) `tasksmd.savedQueries` 설정 (2) `.tasks/queries/*.md`(첫 ` ```tasks ` 블록) 병합, 파일 워처 (FR-5.5)
+- [x] `SavedQueryTreeProvider` — 출처 아이콘 구분, 결과(중첩 그룹)를 하위 노드로 펼침, 체크박스·이동·컨텍스트 메뉴, 오류 노드
+- [x] 쿼리 편집: 파일 기반은 `.md` 열기, 설정 기반은 settings.json; `explain`은 출력 채널; 오류는 트리에 줄 번호와 함께 (FR-5.7)
+- [ ] 쿼리 빌더(Webview, M6 인프라 선행 ⚠ → M6.4) — 필터 종류 드롭다운 조립 → 텍스트 생성 (FR-5.6); M6 전까지는 텍스트 편집만
+- [x] 스마트 뷰 7종을 쿼리 텍스트로 재정의 (`SMART_VIEW_QUERIES`; 하드코딩 필터 제거)
 
 ### M4.6 빠른 검색·명령
 - [ ] `tasksmd.quickSearch` — QuickPick 퍼지 검색, 미완료 전체, 선택 시 이동 / 버튼으로 완료·편집 (FR-5.12), 키 `Cmd/Ctrl+Shift+;`

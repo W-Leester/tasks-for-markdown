@@ -31,6 +31,7 @@ export interface SettingsSchema {
   'recurrence.removeScheduledDate': boolean;
   statuses: StatusConfig[];
   'query.allowFunctions': boolean;
+  savedQueries: { name: string; query: string }[];
 }
 
 export const SETTINGS_SECTION = 'tasksmd';
@@ -61,6 +62,7 @@ export const SETTINGS_DEFAULTS: Readonly<SettingsSchema> = {
   'recurrence.removeScheduledDate': false,
   statuses: [...DEFAULT_STATUSES],
   'query.allowFunctions': false,
+  savedQueries: [],
 };
 
 export type SettingsKey = keyof SettingsSchema;

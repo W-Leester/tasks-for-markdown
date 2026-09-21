@@ -221,3 +221,31 @@ suite('dependencies', () => {
     assert.ok(codes.includes('invalid-recurrence'), codes.join(','));
   });
 });
+
+suite('queries', () => {
+  test('QueryService runs query text against the live index', async () => {
+    const api = await getApi();
+    const r = api.queries.run('not done\npath includes notes/project-a.md\nsort by description');
+    assert.equal(r.errors.length, 0);
+    assert.ok(r.matched >= 4, `matched ${r.matched}`);
+    assert.ok(r.root.tasks[0]!.description.localeCompare(r.root.tasks[1]!.description) <= 0);
+    assert.ok(api.queries.explain('due before next week').includes('due date is before'));
+  });
+
+  test('saved queries come from .tasks/queries/*.md and settings', async () => {
+    const api = await getApi();
+    await api.savedQueries.reload();
+    const file = api.savedQueries.all().find((q) => q.source === 'file');
+    assert.ok(file, 'file query found');
+    assert.equal(file.name, 'This week');
+    assert.ok(file.query.includes('group by filename'));
+    await api.settings.update('savedQueries', [{ name: 'From settings', query: 'not done' }], vscode.ConfigurationTarget.Workspace);
+    try {
+      await waitFor(() => api.savedQueries.all().some((q) => q.name === 'From settings'), 3000, 'settings query');
+      const r = api.queries.run(api.savedQueries.all().find((q) => q.name === 'From settings')!.query);
+      assert.ok(r.matched > 0);
+    } finally {
+      await api.settings.update('savedQueries', undefined, vscode.ConfigurationTarget.Workspace);
+    }
+  });
+});

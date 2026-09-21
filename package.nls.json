@@ -66,5 +66,14 @@
   "tasksmd.setRecurrence.title": "Set recurrence…",
   "tasksmd.config.query.allowFunctions": "Allow `filter by function`, `sort by function` and `group by function` in queries. These run JavaScript from your notes, so they are off by default and never run in untrusted workspaces.",
   "tasksmd.capabilities.untrusted": "Custom JavaScript query functions, OS notifications and update checks are disabled in untrusted workspaces.",
-  "tasksmd.capabilities.virtual": "Task indexing needs a file system; virtual workspaces are read-only."
+  "tasksmd.capabilities.virtual": "Task indexing needs a file system; virtual workspaces are read-only.",
+  "tasksmd.config.savedQueries": "Saved queries shown in the sidebar (also picked up from `.tasks/queries/*.md` files in the workspace).",
+  "tasksmd.config.savedQueries.query": "Query text, one instruction per line (use \\n).",
+  "tasksmd.view.savedQueries": "Saved queries",
+  "tasksmd.view.savedQueries.welcome": "No saved queries yet.\n\n[New query](command:tasksmd.savedQuery.new) creates `.tasks/queries/<name>.md` with a ```tasks block you can edit like any note.",
+  "tasksmd.savedQuery.new.title": "New saved query",
+  "tasksmd.savedQuery.edit.title": "Edit query",
+  "tasksmd.savedQuery.delete.title": "Delete query",
+  "tasksmd.savedQuery.explain.title": "Explain query",
+  "tasksmd.savedQuery.refresh.title": "Refresh queries"
 }

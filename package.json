@@ -162,6 +162,36 @@
         "command": "tasksmd.setRecurrence",
         "title": "%tasksmd.setRecurrence.title%",
         "category": "Tasks"
+      },
+      {
+        "command": "tasksmd.savedQuery.new",
+        "title": "%tasksmd.savedQuery.new.title%",
+        "category": "Tasks",
+        "icon": "$(add)"
+      },
+      {
+        "command": "tasksmd.savedQuery.edit",
+        "title": "%tasksmd.savedQuery.edit.title%",
+        "category": "Tasks",
+        "icon": "$(edit)"
+      },
+      {
+        "command": "tasksmd.savedQuery.delete",
+        "title": "%tasksmd.savedQuery.delete.title%",
+        "category": "Tasks",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "tasksmd.savedQuery.explain",
+        "title": "%tasksmd.savedQuery.explain.title%",
+        "category": "Tasks",
+        "icon": "$(info)"
+      },
+      {
+        "command": "tasksmd.savedQuery.refresh",
+        "title": "%tasksmd.savedQuery.refresh.title%",
+        "category": "Tasks",
+        "icon": "$(refresh)"
       }
     ],
     "configuration": {
@@ -405,6 +435,27 @@
           "type": "boolean",
           "default": false,
           "markdownDescription": "%tasksmd.config.query.allowFunctions%"
+        },
+        "tasksmd.savedQueries": {
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "query"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "query": {
+                "type": "string",
+                "description": "%tasksmd.config.savedQueries.query%"
+              }
+            }
+          },
+          "markdownDescription": "%tasksmd.config.savedQueries%"
         }
       }
     },
@@ -434,6 +485,22 @@
         },
         {
           "command": "tasksmd.tree.clearFilter",
+          "when": "false"
+        },
+        {
+          "command": "tasksmd.savedQuery.edit",
+          "when": "false"
+        },
+        {
+          "command": "tasksmd.savedQuery.delete",
+          "when": "false"
+        },
+        {
+          "command": "tasksmd.savedQuery.explain",
+          "when": "false"
+        },
+        {
+          "command": "tasksmd.savedQuery.refresh",
           "when": "false"
         }
       ],
@@ -514,73 +581,103 @@
           "command": "tasksmd.tree.refresh",
           "when": "view == tasksmd.tasks",
           "group": "navigation@3"
+        },
+        {
+          "command": "tasksmd.savedQuery.new",
+          "when": "view == tasksmd.savedQueries",
+          "group": "navigation@1"
+        },
+        {
+          "command": "tasksmd.savedQuery.refresh",
+          "when": "view == tasksmd.savedQueries",
+          "group": "navigation@2"
         }
       ],
       "view/item/context": [
         {
           "command": "tasksmd.openTask",
-          "when": "view == tasksmd.tasks && viewItem =~ /^task/",
+          "when": "(view == tasksmd.tasks || view == tasksmd.savedQueries) && viewItem =~ /^task/",
           "group": "inline@1"
         },
         {
           "command": "tasksmd.markDone",
-          "when": "view == tasksmd.tasks && viewItem == task",
+          "when": "(view == tasksmd.tasks || view == tasksmd.savedQueries) && viewItem == task",
           "group": "1_status@1"
         },
         {
           "command": "tasksmd.markCancelled",
-          "when": "view == tasksmd.tasks && viewItem == task",
+          "when": "(view == tasksmd.tasks || view == tasksmd.savedQueries) && viewItem == task",
           "group": "1_status@2"
         },
         {
           "command": "tasksmd.reopen",
-          "when": "view == tasksmd.tasks && viewItem == task.completed",
+          "when": "(view == tasksmd.tasks || view == tasksmd.savedQueries) && viewItem == task.completed",
           "group": "1_status@1"
         },
         {
           "command": "tasksmd.openTask",
-          "when": "view == tasksmd.tasks && viewItem =~ /^task/",
+          "when": "(view == tasksmd.tasks || view == tasksmd.savedQueries) && viewItem =~ /^task/",
           "group": "2_nav@1"
         },
         {
           "command": "tasksmd.createOrEdit",
-          "when": "view == tasksmd.tasks && viewItem =~ /^task/",
+          "when": "(view == tasksmd.tasks || view == tasksmd.savedQueries) && viewItem =~ /^task/",
           "group": "0_edit@1"
         },
         {
           "command": "tasksmd.setPriority",
-          "when": "view == tasksmd.tasks && viewItem =~ /^task/",
+          "when": "(view == tasksmd.tasks || view == tasksmd.savedQueries) && viewItem =~ /^task/",
           "group": "3_fields@1"
         },
         {
           "command": "tasksmd.setDueDate",
-          "when": "view == tasksmd.tasks && viewItem =~ /^task/",
+          "when": "(view == tasksmd.tasks || view == tasksmd.savedQueries) && viewItem =~ /^task/",
           "group": "3_fields@2"
         },
         {
           "command": "tasksmd.setScheduledDate",
-          "when": "view == tasksmd.tasks && viewItem =~ /^task/",
+          "when": "(view == tasksmd.tasks || view == tasksmd.savedQueries) && viewItem =~ /^task/",
           "group": "3_fields@3"
         },
         {
           "command": "tasksmd.postpone",
-          "when": "view == tasksmd.tasks && viewItem == task",
+          "when": "(view == tasksmd.tasks || view == tasksmd.savedQueries) && viewItem == task",
           "group": "3_fields@4"
         },
         {
           "command": "tasksmd.setStatus",
-          "when": "view == tasksmd.tasks && viewItem =~ /^task/",
+          "when": "(view == tasksmd.tasks || view == tasksmd.savedQueries) && viewItem =~ /^task/",
           "group": "3_fields@5"
         },
         {
           "command": "tasksmd.setDependencies",
-          "when": "view == tasksmd.tasks && viewItem =~ /^task/",
+          "when": "(view == tasksmd.tasks || view == tasksmd.savedQueries) && viewItem =~ /^task/",
           "group": "3_fields@6"
         },
         {
           "command": "tasksmd.setRecurrence",
-          "when": "view == tasksmd.tasks && viewItem =~ /^task/",
+          "when": "(view == tasksmd.tasks || view == tasksmd.savedQueries) && viewItem =~ /^task/",
           "group": "3_fields@7"
+        },
+        {
+          "command": "tasksmd.savedQuery.edit",
+          "when": "view == tasksmd.savedQueries && viewItem =~ /^savedQuery/",
+          "group": "inline@1"
+        },
+        {
+          "command": "tasksmd.savedQuery.explain",
+          "when": "view == tasksmd.savedQueries && viewItem =~ /^savedQuery/",
+          "group": "1_q@1"
+        },
+        {
+          "command": "tasksmd.savedQuery.edit",
+          "when": "view == tasksmd.savedQueries && viewItem =~ /^savedQuery/",
+          "group": "1_q@2"
+        },
+        {
+          "command": "tasksmd.savedQuery.delete",
+          "when": "view == tasksmd.savedQueries && viewItem =~ /^savedQuery/",
+          "group": "1_q@3"
         }
       ]
     },
@@ -606,6 +703,12 @@
           "name": "%tasksmd.view.tasks%",
           "icon": "$(checklist)",
           "contextualTitle": "Tasks"
+        },
+        {
+          "id": "tasksmd.savedQueries",
+          "name": "%tasksmd.view.savedQueries%",
+          "icon": "$(search)",
+          "contextualTitle": "Saved queries"
         }
       ]
     },
@@ -614,6 +717,11 @@
         "view": "tasksmd.tasks",
         "contents": "%tasksmd.view.tasks.welcome%",
         "when": "tasksmd.indexEmpty"
+      },
+      {
+        "view": "tasksmd.savedQueries",
+        "contents": "%tasksmd.view.savedQueries.welcome%",
+        "when": "tasksmd.savedQueriesEmpty"
       }
     ],
     "colors": [

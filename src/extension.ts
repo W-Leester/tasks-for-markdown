@@ -10,9 +10,12 @@ import { TaskDiagnostics } from './editor/TaskDiagnostics';
 import { TaskHoverProvider } from './editor/TaskHoverProvider';
 import { TaskLineContext } from './editor/TaskLineContext';
 import { IndexService } from './index/IndexService';
+import { QueryService } from './services/QueryService';
+import { SavedQueryStore } from './services/SavedQueryStore';
 import { TaskEditService } from './services/TaskEditService';
 import { Settings } from './settings/Settings';
 import { statusRegistryFromSettings } from './settings/statusRegistryFromSettings';
+import { registerSavedQueryView } from './views/registerSavedQueryView';
 import { registerTreeView } from './views/registerTreeView';
 import { StatusBar } from './views/StatusBar';
 
@@ -23,6 +26,8 @@ export interface ExtensionApi {
   index: TaskIndex;
   indexService: IndexService;
   editService: TaskEditService;
+  queries: QueryService;
+  savedQueries: SavedQueryStore;
   settings: Settings;
 }
 
@@ -35,6 +40,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<Extens
   const getStatusRegistry = () => statusRegistry;
   const indexService = new IndexService({ index, settings, getStatusRegistry, log });
   const editService = new TaskEditService({ settings, indexService, index, getStatusRegistry });
+  const queries = new QueryService(index, settings);
+  const savedQueries = new SavedQueryStore(settings);
+  context.subscriptions.push(queries, savedQueries);
 
   context.subscriptions.push(output, settings, indexService, new TaskLineContext(), { dispose: () => index.dispose() });
   const commandDeps = { index, indexService, editService, settings, getStatusRegistry, log };
@@ -50,6 +58,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<Extens
   );
   context.subscriptions.push(vscode.commands.registerCommand('tasksmd.showLogs', () => output.show()));
   registerTreeView(context, { index, settings, state: context.workspaceState, editService, log });
+  registerSavedQueryView(context, { store: savedQueries, queries, settings, editService, log });
   context.subscriptions.push(new StatusBar(index), new TaskDecorations({ index, settings, getStatusRegistry }));
   const markdown: vscode.DocumentSelector = { language: 'markdown' };
   const codeLens = new TaskCodeLensProvider({ settings, getStatusRegistry });
@@ -66,7 +75,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<Extens
   index.onDidChangeProgress(updateEmpty);
 
   void indexService.start();
-  return { index, indexService, editService, settings };
+  return { index, indexService, editService, queries, savedQueries, settings };
 }
 
 export function deactivate(): void {

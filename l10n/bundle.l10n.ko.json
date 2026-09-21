@@ -156,5 +156,13 @@
   "Repeat": "반복",
   "every day · every week on monday, friday · every month on the 15th · … when done": "every day · every week on monday, friday · every month on the 15th · … when done",
   "valid rule": "유효한 규칙",
-  "not a recognised rule": "인식할 수 없는 규칙"
+  "not a recognised rule": "인식할 수 없는 규칙",
+  "Line {0}: {1} — {2}": "{0}행: {1} — {2}",
+  "… {0} more": "… {0}개 더",
+  "Name of the new query": "새 쿼리 이름",
+  "e.g. This week": "예: 이번 주",
+  "Delete saved query \"{0}\"?": "저장된 쿼리 \"{0}\"을(를) 삭제할까요?",
+  "Delete": "삭제",
+  "Settings-based queries are edited in settings.json.": "설정 기반 쿼리는 settings.json에서 편집합니다.",
+  "Query explanation": "쿼리 설명"
 }

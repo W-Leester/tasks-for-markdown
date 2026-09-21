@@ -1,4 +1,5 @@
-import type { TaskFormat } from '../core/task';
+import type { StatusConfig, TaskFormat } from '../core/task';
+import { DEFAULT_STATUSES } from '../core/task';
 
 /**
  * Typed mirror of `contributes.configuration` in package.json (namespace `tasksmd`).
@@ -28,6 +29,7 @@ export interface SettingsSchema {
   'recurrence.idHandling': 'keep' | 'new' | 'remove';
   'recurrence.copyDependsOn': boolean;
   'recurrence.removeScheduledDate': boolean;
+  statuses: StatusConfig[];
 }
 
 export const SETTINGS_SECTION = 'tasksmd';
@@ -56,6 +58,7 @@ export const SETTINGS_DEFAULTS: Readonly<SettingsSchema> = {
   'recurrence.idHandling': 'keep',
   'recurrence.copyDependsOn': true,
   'recurrence.removeScheduledDate': false,
+  statuses: [...DEFAULT_STATUSES],
 };
 
 export type SettingsKey = keyof SettingsSchema;

@@ -78,6 +78,8 @@ export function compareTasksDefault(a: Task, b: Task): number {
   return a.location.line - b.location.line;
 }
 
+/** NON_TASK checkboxes (decorative symbols) never appear in smart views (FR-1.19). */
 export function runSmartView(id: SmartViewId, ctx: SmartViewContext): Task[] {
-  return ctx.index.all().filter(smartViewFilter(id, ctx)).sort(compareTasksDefault);
+  const filter = smartViewFilter(id, ctx);
+  return ctx.index.all().filter((t) => t.status.type !== StatusType.NON_TASK && filter(t)).sort(compareTasksDefault);
 }

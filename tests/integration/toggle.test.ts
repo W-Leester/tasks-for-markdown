@@ -1,7 +1,7 @@
 import * as assert from 'node:assert/strict';
 import * as fs from 'node:fs';
 import * as vscode from 'vscode';
-import { FixtureGuard, findTask, fixtureUri, getApi, sleep } from './helpers';
+import { FixtureGuard, findTask, fixtureUri, getApi, sleep, waitFor } from './helpers';
 
 const today = () => new Date().toISOString().slice(0, 10);
 
@@ -156,6 +156,37 @@ suite('recurrence', () => {
       assert.equal(lines.filter((l) => l.includes('disposable')).length, 1);
     } finally {
       await api.settings.update('recurrence.insertPosition', undefined, vscode.ConfigurationTarget.Workspace);
+    }
+  });
+});
+
+suite('custom statuses', () => {
+  const guard = new FixtureGuard();
+  teardown(() => guard.restore());
+
+  test('tasksmd.statuses drives toggling and done dates by type', async () => {
+    const api = await getApi();
+    guard.protect('notes/project-a.md');
+    const uri = fixtureUri('notes/project-a.md');
+    const its = [
+      { symbol: ' ', name: 'Unchecked', nextSymbol: '/', type: 'TODO' },
+      { symbol: '/', name: 'Half Done', nextSymbol: 'X', type: 'IN_PROGRESS' },
+      { symbol: 'X', name: 'Checked', nextSymbol: ' ', type: 'DONE' },
+    ];
+    await api.settings.update('statuses', its as import('../../src/core/task').StatusConfig[], vscode.ConfigurationTarget.Workspace);
+    try {
+      await waitFor(() => api.index.state === 'ready', 5000, 'rescan');
+      let task = await findTask(api, 'notes/project-a.md', 'Numbered task');
+      await api.editService.toggle(task); // ' ' -> '/'
+      let line = fs.readFileSync(uri.fsPath, 'utf8').split('\n')[task.location.line];
+      assert.equal(line, '1. [/] Numbered task');
+      task = api.index.taskAt(uri.toString(), task.location.line)!;
+      await api.editService.toggle(task); // '/' -> 'X' (DONE) gains ✅
+      line = fs.readFileSync(uri.fsPath, 'utf8').split('\n')[task.location.line];
+      assert.equal(line, `1. [X] Numbered task ✅ ${today()}`);
+    } finally {
+      await api.settings.update('statuses', undefined, vscode.ConfigurationTarget.Workspace);
+      await waitFor(() => api.index.state === 'ready', 5000, 'rescan back');
     }
   });
 });

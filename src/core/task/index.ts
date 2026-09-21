@@ -10,3 +10,4 @@ export type { TaskFormat } from './formats/types';
 export { serializeTask, serializeTaskBody } from './TaskSerializer';
 export { applyStatusChange, nextInstance, type RecurrenceSettings, type StatusChangeOptions, type StatusChangeResult } from './statusChange';
 export { generateTaskId } from './ids';
+export { STATUS_PRESETS, presetStatuses, type StatusPresetName } from './statusPresets';

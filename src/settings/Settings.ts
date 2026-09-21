@@ -41,7 +41,8 @@ export class Settings implements vscode.Disposable {
     });
   }
 
-  async update<K extends SettingsKey>(key: K, value: SettingsSchema[K], target?: vscode.ConfigurationTarget): Promise<void> {
+  /** `undefined` removes the override (back to default / inherited scope). */
+  async update<K extends SettingsKey>(key: K, value: SettingsSchema[K] | undefined, target?: vscode.ConfigurationTarget): Promise<void> {
     await vscode.workspace.getConfiguration(SETTINGS_SECTION).update(key, value, target);
   }
 

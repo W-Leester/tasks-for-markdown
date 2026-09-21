@@ -142,6 +142,16 @@
         "title": "%tasksmd.postpone.title%",
         "category": "Tasks",
         "icon": "$(watch)"
+      },
+      {
+        "command": "tasksmd.loadStatusPreset",
+        "title": "%tasksmd.loadStatusPreset.title%",
+        "category": "Tasks"
+      },
+      {
+        "command": "tasksmd.changeStatusTo",
+        "title": "%tasksmd.changeStatusTo.title%",
+        "category": "Tasks"
       }
     ],
     "configuration": {
@@ -310,6 +320,76 @@
           "type": "boolean",
           "default": false,
           "description": "%tasksmd.config.recurrence.removeScheduledDate%"
+        },
+        "tasksmd.statuses": {
+          "type": "array",
+          "default": [
+            {
+              "symbol": " ",
+              "name": "Todo",
+              "nextSymbol": "x",
+              "type": "TODO"
+            },
+            {
+              "symbol": "x",
+              "name": "Done",
+              "nextSymbol": " ",
+              "type": "DONE"
+            },
+            {
+              "symbol": "/",
+              "name": "In Progress",
+              "nextSymbol": "x",
+              "type": "IN_PROGRESS"
+            },
+            {
+              "symbol": "-",
+              "name": "Cancelled",
+              "nextSymbol": " ",
+              "type": "CANCELLED"
+            }
+          ],
+          "items": {
+            "type": "object",
+            "required": [
+              "symbol",
+              "name",
+              "nextSymbol",
+              "type"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "symbol": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1,
+                "description": "%tasksmd.config.statuses.symbol%"
+              },
+              "name": {
+                "type": "string",
+                "description": "%tasksmd.config.statuses.name%"
+              },
+              "nextSymbol": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1,
+                "description": "%tasksmd.config.statuses.nextSymbol%"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "TODO",
+                  "IN_PROGRESS",
+                  "ON_HOLD",
+                  "DONE",
+                  "CANCELLED",
+                  "NON_TASK"
+                ],
+                "description": "%tasksmd.config.statuses.type%"
+              }
+            }
+          },
+          "markdownDescription": "%tasksmd.config.statuses%"
         }
       }
     },

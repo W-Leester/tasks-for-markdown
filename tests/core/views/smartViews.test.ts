@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { dayjs } from '../../../src/core/dates/dayjs';
 import { parseFile } from '../../../src/core/file';
 import { TaskIndex } from '../../../src/core/index';
-import { StatusRegistry } from '../../../src/core/task';
+import { StatusRegistry, StatusType } from '../../../src/core/task';
 import { groupTasks, isBlocked, runSmartView } from '../../../src/core/views';
 
 const statusRegistry = StatusRegistry.default();
@@ -102,5 +102,21 @@ describe('groupTasks', () => {
   });
   it('none returns a single group', () => {
     expect(groupTasks(open, 'none', today)).toHaveLength(1);
+  });
+});
+
+describe('NON_TASK statuses', () => {
+  it('are excluded from every smart view', () => {
+    const reg = new StatusRegistry([
+      { symbol: ' ', name: 'Todo', nextSymbol: 'x', type: StatusType.TODO },
+      { symbol: 'x', name: 'Done', nextSymbol: ' ', type: StatusType.DONE },
+      { symbol: '~', name: 'Decorative', nextSymbol: '~', type: StatusType.NON_TASK },
+    ]);
+    const i = new TaskIndex();
+    const r = parseFile('- [~] not a task 📅 2026-09-19\n- [ ] real 📅 2026-09-19', { path: 'n.md', statusRegistry: reg });
+    i.setFile({ key: 'n.md', path: 'n.md', tasks: r.tasks, headings: r.headings, frontmatterTags: [] }, true);
+    for (const id of ['today', 'overdue', 'open'] as const) {
+      expect(runSmartView(id, { index: i, today }).map((t) => t.description)).toEqual(['real']);
+    }
   });
 });

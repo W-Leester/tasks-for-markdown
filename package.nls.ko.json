@@ -54,5 +54,12 @@
   "tasksmd.config.recurrence.idHandling.new": "새 id 발급",
   "tasksmd.config.recurrence.idHandling.remove": "id 제거",
   "tasksmd.config.recurrence.copyDependsOn": "반복 태스크의 다음 인스턴스에 ⛔ 의존성을 복사합니다.",
-  "tasksmd.config.recurrence.removeScheduledDate": "시작일이나 마감일이 함께 있으면 다음 인스턴스에서 ⏳ 예정일을 제거합니다."
+  "tasksmd.config.recurrence.removeScheduledDate": "시작일이나 마감일이 함께 있으면 다음 인스턴스에서 ⏳ 예정일을 제거합니다.",
+  "tasksmd.config.statuses": "체크박스 상태: `[`와 `]` 사이의 문자, 이름, 토글 시 이동할 심볼, 타입(TODO, IN_PROGRESS, ON_HOLD, DONE, CANCELLED, NON_TASK). 동작(완료일, 반복)은 타입을 따릅니다. `Tasks: 상태 프리셋 불러오기…`로 테마 세트를 가져올 수 있습니다.",
+  "tasksmd.config.statuses.symbol": "대괄호 안의 한 글자.",
+  "tasksmd.config.statuses.name": "표시 이름.",
+  "tasksmd.config.statuses.nextSymbol": "토글 시 이동할 심볼.",
+  "tasksmd.config.statuses.type": "동작을 결정하는 타입.",
+  "tasksmd.loadStatusPreset.title": "상태 프리셋 불러오기…",
+  "tasksmd.changeStatusTo.title": "상태 변경…"
 }

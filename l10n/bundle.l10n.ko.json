@@ -137,5 +137,14 @@
   "Remove invalid {0} date": "잘못된 {0} 날짜 제거",
   "Remove dependency on \"{0}\"": "\"{0}\" 의존성 제거",
   "Add due date today ({0})": "오늘({0}) 마감일 추가",
-  "Remove recurrence": "반복 제거"
+  "Remove recurrence": "반복 제거",
+  "Core (default 4 statuses)": "기본 (4개 상태)",
+  "Minimal theme": "Minimal 테마",
+  "ITS theme": "ITS 테마",
+  "Things theme": "Things 테마",
+  "Load which status set?": "어떤 상태 세트를 불러올까요?",
+  "Replace all statuses": "모든 상태 교체",
+  "Add missing statuses": "없는 상태만 추가",
+  "Loaded {0} statuses from {1}.": "{1}에서 상태 {0}개를 불러왔습니다.",
+  "Ignoring invalid status entry in tasksmd.statuses: {0}": "tasksmd.statuses의 잘못된 항목을 무시합니다: {0}"
 }

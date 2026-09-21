@@ -269,12 +269,12 @@
 - [ ] 하나의 `WorkspaceEdit`로 치환+삽입 원자 적용, Undo 한 번에 되돌아오는지 검증
 
 ### M3.3 커스텀 상태
-- [ ] 설정 `statuses[]` 스키마 — `{ symbol, name, nextSymbol, type }` (FR-1.16)
-- [ ] `StatusRegistry`가 설정에서 로드, 변경 시 재로드
-- [ ] 프리셋 Minimal / ITS / Things — 명령 `tasksmd.loadStatusPreset` (FR-1.17, Q-7)
-- [ ] `NON_TASK` 타입 심볼은 인덱스에서 기본 제외(쿼리 `status.type is NON_TASK`로만 조회) (FR-1.19)
-- [ ] 명령 `tasksmd.changeStatusTo…` — 등록된 상태마다 동적 명령 또는 QuickPick (Obsidian 7.24 동등)
-- [ ] 타입 전이 기반 날짜 처리 재검증 — `[X]`, `[>]` 등 커스텀 심볼에서도 ✅ 동작 (D§6.1)
+- [x] 설정 `statuses[]` 스키마 — `{ symbol, name, nextSymbol, type }` (FR-1.16)
+- [x] `StatusRegistry`가 설정에서 로드, 변경 시 재로드
+- [x] 프리셋 Core / Minimal / ITS / Things — 명령 `tasksmd.loadStatusPreset` (추가 또는 교체) (FR-1.17, Q-7)
+- [x] `NON_TASK` 타입 심볼은 스마트 뷰·상태바에서 제외, 인덱스에는 유지(쿼리 `status.type is NON_TASK`로 조회 가능) (FR-1.19)
+- [x] 명령 `tasksmd.changeStatusTo` — QuickPick (Obsidian 7.24 동등)
+- [x] 타입 전이 기반 날짜 처리 재검증 — `[X]`, `[>]` 등 커스텀 심볼에서도 ✅ 동작 (D§6.1)
 
 ### M3.4 의존성
 - [ ] ID 생성기 — 영숫자 6자, 인덱스 내 중복 회피

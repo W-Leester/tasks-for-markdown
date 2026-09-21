@@ -54,5 +54,12 @@
   "tasksmd.config.recurrence.idHandling.new": "Generate a new id",
   "tasksmd.config.recurrence.idHandling.remove": "Remove the id",
   "tasksmd.config.recurrence.copyDependsOn": "Copy ⛔ dependencies to the next instance of a recurring task.",
-  "tasksmd.config.recurrence.removeScheduledDate": "Drop the ⏳ scheduled date on the next instance when the task also has a start or due date."
+  "tasksmd.config.recurrence.removeScheduledDate": "Drop the ⏳ scheduled date on the next instance when the task also has a start or due date.",
+  "tasksmd.config.statuses": "Checkbox statuses: the character between `[` and `]`, its name, the symbol it toggles to, and its type (TODO, IN_PROGRESS, ON_HOLD, DONE, CANCELLED, NON_TASK). Behaviour (done dates, recurrence) follows the type. Use `Tasks: Load status preset…` to import a theme's set.",
+  "tasksmd.config.statuses.symbol": "Single character inside the brackets.",
+  "tasksmd.config.statuses.name": "Display name.",
+  "tasksmd.config.statuses.nextSymbol": "Symbol the task moves to when toggled.",
+  "tasksmd.config.statuses.type": "Semantic type that drives behaviour.",
+  "tasksmd.loadStatusPreset.title": "Load status preset…",
+  "tasksmd.changeStatusTo.title": "Change status to…"
 }

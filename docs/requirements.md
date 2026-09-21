@@ -333,7 +333,7 @@ Obsidian Tasks 쿼리 문법과 호환되는 텍스트 기반 엔진. 한 줄 = 
 | `archive.file` / `archive.afterDays` | `Archive.md` / `30` | 12.2 |
 | `updateCheckUrl` | `""` | 12.5 (비어 있으면 확인 안 함) |
 | `dateLocale` / `weekStart` | 시스템 / `monday` | 상대 날짜 표기·주 계산 |
-| `language` | `auto` | UI 언어 |
+| ~~`language`~~ | — | (삭제) `vscode.l10n`은 VS Code 표시 언어를 따르며 확장별 재정의가 불가 |
 
 ---
 

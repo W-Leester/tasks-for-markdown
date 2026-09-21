@@ -501,17 +501,17 @@
 - `vsce publish`, `ovsx publish`가 CI 태그 푸시로 실행되고 Release에 `.vsix` + `latest.json`이 첨부된다.
 
 ### M8.1 국제화 (NFR-6)
-- [ ] 확장 측 모든 사용자 문자열 `vscode.l10n.t()` 로 교체, `bundle.l10n.ko.json` 완성
-- [ ] `package.nls.ko.json` 완성(명령·설정·뷰 이름)
-- [ ] 웹뷰 `t()` 키 전부 채움
-- [ ] 상대 날짜 표기 ko/en (`3일 남음` / `in 3 days`), 요일·월 이름
-- [ ] 설정 `language: auto | en | ko` (VS Code 로케일 우선)
+- [x] 확장 측 모든 사용자 문자열 `vscode.l10n.t()`, `bundle.l10n.ko.json` 완성 — `tests/l10n-coverage.test.ts`가 소스의 226개 키 전부에 번역이 있는지·플레이스홀더가 맞는지 검사
+- [x] `package.nls.ko.json` 완성(명령·설정·뷰 이름) — `tests/settings/schema.test.ts`가 `%key%` 누락 검사
+- [x] 웹뷰 `t()` 키 전부 채움 (같은 검사에 포함)
+- [x] 상대 날짜 표기 ko/en (`3일 남음` / `in 3 days`), 요일·월 이름
+- [-] 설정 `language` — `vscode.l10n`은 VS Code 표시 언어를 따르며 확장별 재정의 API가 없어 제외 (요구사항 표에서 삭제)
 
 ### M8.2 성능 (NFR-2, D§9)
-- [ ] 합성 워크스페이스 생성 스크립트(5,000 파일/50,000 태스크)
-- [ ] 초기 스캔·파일 갱신·쿼리·장식 시간 측정 스크립트, 결과를 `docs/perf.md`에 기록
-- [ ] 병목 프로파일링 후 튜닝 (파서 프리체크, 캐시, 청크 크기)
-- [ ] 메모리 상한 확인 (Task ≈ 1KB × 50,000)
+- [x] 합성 워크스페이스(5,000 파일/65,000 태스크) — `tests/perf/parse.bench.test.ts`
+- [x] 파싱·재인덱스·쿼리 측정 → `docs/perf.md` (265 ms / 0.12 ms / 21~105 ms)
+- [x] 병목 튜닝 — 정렬 키 사전 계산, 그룹명 캐시, urgency 할당 제거 (M4.7)
+- [x] 메모리 확인 — 65k 태스크 ≈ 60 MB
 
 ### M8.3 접근성·안정성 (NFR-3, NFR-5)
 - [ ] 색상만으로 정보 전달하는 곳 없는지 점검 (아이콘/텍스트 병행)

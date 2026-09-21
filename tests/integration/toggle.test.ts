@@ -48,11 +48,14 @@ suite('toggle', () => {
     guard.protect('notes/project-a.md');
     const doc = await vscode.workspace.openTextDocument(fixtureUri('notes/project-a.md'));
     const editor = await vscode.window.showTextDocument(doc);
-    editor.selection = new vscode.Selection(2, 0, 4, 5); // three tasks
+    editor.selection = new vscode.Selection(2, 0, 4, 5); // three tasks; line 2 is recurring
     await sleep(50);
     await vscode.commands.executeCommand('tasksmd.toggleDone');
-    for (const l of [2, 3, 4]) assert.ok(doc.lineAt(l).text.startsWith('- [x] '), doc.lineAt(l).text);
-    assert.ok(doc.lineAt(5).text.startsWith('* [ ] '), 'line outside selection untouched');
+    // Bottom-up processing: the recurring task's next instance is inserted above it (line 2),
+    // pushing the completed original to line 3; the other two follow.
+    assert.ok(doc.lineAt(2).text.startsWith('- [ ] Collect weekly data'), doc.lineAt(2).text);
+    for (const l of [3, 4, 5]) assert.ok(doc.lineAt(l).text.startsWith('- [x] '), doc.lineAt(l).text);
+    assert.ok(doc.lineAt(6).text.startsWith('* [ ] '), 'line outside selection untouched');
   });
 
   test('toggling a task from the index writes and saves a file that is not open', async () => {
@@ -109,5 +112,50 @@ suite('edit service', () => {
     assert.equal(l2, 1);
     assert.equal(doc.lineAt(1).text, '- [ ] after heading');
     assert.equal(doc.lineAt(2).text, '- [ ] inserted on blank');
+  });
+});
+
+suite('recurrence', () => {
+  const guard = new FixtureGuard();
+  teardown(() => guard.restore());
+
+  test('completing a recurring task inserts the next instance above it', async () => {
+    const api = await getApi();
+    guard.protect('notes/week-38.md');
+    const uri = fixtureUri('notes/week-38.md');
+    const task = await findTask(api, 'notes/week-38.md', 'Buy milk'); // 🔁 every week 📅 2026-09-22
+    await api.editService.toggle(task);
+    const lines = fs.readFileSync(uri.fsPath, 'utf8').split('\n');
+    assert.equal(lines[task.location.line], '- [ ] Buy milk 🔁 every week 📅 2026-09-29');
+    assert.equal(lines[task.location.line + 1], `- [x] Buy milk 🔁 every week 📅 2026-09-22 ✅ ${today()}`);
+    const indexed = api.index.file(uri.toString())!.tasks.filter((t) => t.description === 'Buy milk');
+    assert.equal(indexed.length, 2);
+  });
+
+  test('insert position below and 🏁 delete', async () => {
+    const api = await getApi();
+    guard.protect('notes/project-a.md');
+    const uri = fixtureUri('notes/project-a.md');
+    await api.settings.update('recurrence.insertPosition', 'below', vscode.ConfigurationTarget.Workspace);
+    try {
+      let task = await findTask(api, 'notes/project-a.md', 'Collect weekly data'); // 🆔 a1b2c3 🔁 every week 📅 2026-09-24
+      await api.editService.toggle(task);
+      let lines = fs.readFileSync(uri.fsPath, 'utf8').split('\n');
+      assert.equal(lines[task.location.line], `- [x] Collect weekly data 🆔 a1b2c3 🔁 every week 📅 2026-09-24 ✅ ${today()}`);
+      assert.equal(lines[task.location.line + 1], '- [ ] Collect weekly data 🆔 a1b2c3 🔁 every week 📅 2026-10-01');
+
+      // 🏁 delete: original disappears, only the next instance remains
+      const doc = await vscode.workspace.openTextDocument(uri);
+      const editor = await vscode.window.showTextDocument(doc);
+      await editor.edit((eb) => eb.insert(new vscode.Position(doc.lineCount, 0), '\n- [ ] disposable 🔁 every day 🏁 delete 📅 2026-09-25'));
+      await doc.save();
+      task = await findTask(api, 'notes/project-a.md', 'disposable');
+      await api.editService.toggle(task);
+      lines = doc.getText().split('\n');
+      assert.equal(lines[task.location.line], '- [ ] disposable 🔁 every day 🏁 delete 📅 2026-09-26');
+      assert.equal(lines.filter((l) => l.includes('disposable')).length, 1);
+    } finally {
+      await api.settings.update('recurrence.insertPosition', undefined, vscode.ConfigurationTarget.Workspace);
+    }
   });
 });

@@ -276,6 +276,40 @@
           "minimum": 3,
           "maximum": 20,
           "description": "%tasksmd.config.autoSuggest.maxItems%"
+        },
+        "tasksmd.recurrence.insertPosition": {
+          "type": "string",
+          "enum": [
+            "above",
+            "below"
+          ],
+          "default": "above",
+          "description": "%tasksmd.config.recurrence.insertPosition%"
+        },
+        "tasksmd.recurrence.idHandling": {
+          "type": "string",
+          "enum": [
+            "keep",
+            "new",
+            "remove"
+          ],
+          "default": "keep",
+          "enumDescriptions": [
+            "%tasksmd.config.recurrence.idHandling.keep%",
+            "%tasksmd.config.recurrence.idHandling.new%",
+            "%tasksmd.config.recurrence.idHandling.remove%"
+          ],
+          "description": "%tasksmd.config.recurrence.idHandling%"
+        },
+        "tasksmd.recurrence.copyDependsOn": {
+          "type": "boolean",
+          "default": true,
+          "description": "%tasksmd.config.recurrence.copyDependsOn%"
+        },
+        "tasksmd.recurrence.removeScheduledDate": {
+          "type": "boolean",
+          "default": false,
+          "description": "%tasksmd.config.recurrence.removeScheduledDate%"
         }
       }
     },

@@ -47,5 +47,12 @@
   "tasksmd.config.codeLens.mode.all": "보이는 모든 태스크 줄 위에",
   "tasksmd.config.autoSuggest.enabled": "태스크 줄에서 입력할 때 필드 제안(due, priority, every week, id…)을 표시합니다.",
   "tasksmd.config.autoSuggest.minMatch": "키워드 제안이 자동으로 나타나기 전에 입력해야 하는 최소 글자 수 (0 = 스페이스 직후). Ctrl+Space로는 항상 표시됩니다.",
-  "tasksmd.config.autoSuggest.maxItems": "표시할 키워드 제안의 최대 개수."
+  "tasksmd.config.autoSuggest.maxItems": "표시할 키워드 제안의 최대 개수.",
+  "tasksmd.config.recurrence.insertPosition": "완료한 반복 태스크의 다음 인스턴스를 삽입할 위치.",
+  "tasksmd.config.recurrence.idHandling": "반복 태스크의 다음 인스턴스에서 🆔를 어떻게 처리할지.",
+  "tasksmd.config.recurrence.idHandling.keep": "같은 id 유지 (의존 관계가 계속 이어짐)",
+  "tasksmd.config.recurrence.idHandling.new": "새 id 발급",
+  "tasksmd.config.recurrence.idHandling.remove": "id 제거",
+  "tasksmd.config.recurrence.copyDependsOn": "반복 태스크의 다음 인스턴스에 ⛔ 의존성을 복사합니다.",
+  "tasksmd.config.recurrence.removeScheduledDate": "시작일이나 마감일이 함께 있으면 다음 인스턴스에서 ⏳ 예정일을 제거합니다."
 }

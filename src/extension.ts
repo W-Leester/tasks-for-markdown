@@ -34,7 +34,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<Extens
   const statusRegistry = StatusRegistry.default();
   const getStatusRegistry = () => statusRegistry;
   const indexService = new IndexService({ index, settings, getStatusRegistry, log });
-  const editService = new TaskEditService({ settings, indexService, getStatusRegistry });
+  const editService = new TaskEditService({ settings, indexService, index, getStatusRegistry });
 
   context.subscriptions.push(output, settings, indexService, new TaskLineContext(), { dispose: () => index.dispose() });
   const commandDeps = { index, indexService, editService, settings, getStatusRegistry, log };

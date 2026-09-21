@@ -24,6 +24,10 @@ export interface SettingsSchema {
   'autoSuggest.enabled': boolean;
   'autoSuggest.minMatch': number;
   'autoSuggest.maxItems': number;
+  'recurrence.insertPosition': 'above' | 'below';
+  'recurrence.idHandling': 'keep' | 'new' | 'remove';
+  'recurrence.copyDependsOn': boolean;
+  'recurrence.removeScheduledDate': boolean;
 }
 
 export const SETTINGS_SECTION = 'tasksmd';
@@ -48,6 +52,10 @@ export const SETTINGS_DEFAULTS: Readonly<SettingsSchema> = {
   'autoSuggest.enabled': true,
   'autoSuggest.minMatch': 0,
   'autoSuggest.maxItems': 8,
+  'recurrence.insertPosition': 'above',
+  'recurrence.idHandling': 'keep',
+  'recurrence.copyDependsOn': true,
+  'recurrence.removeScheduledDate': false,
 };
 
 export type SettingsKey = keyof SettingsSchema;

@@ -47,5 +47,12 @@
   "tasksmd.config.codeLens.mode.all": "Above every visible task line",
   "tasksmd.config.autoSuggest.enabled": "Offer task field suggestions (due, priority, every week, id…) while typing on a task line.",
   "tasksmd.config.autoSuggest.minMatch": "Minimum typed characters before keyword suggestions appear automatically (0 = right after a space). Ctrl+Space always shows them.",
-  "tasksmd.config.autoSuggest.maxItems": "Maximum number of keyword suggestions shown."
+  "tasksmd.config.autoSuggest.maxItems": "Maximum number of keyword suggestions shown.",
+  "tasksmd.config.recurrence.insertPosition": "Where the next instance of a completed recurring task is inserted.",
+  "tasksmd.config.recurrence.idHandling": "What happens to the 🆔 of a recurring task on its next instance.",
+  "tasksmd.config.recurrence.idHandling.keep": "Keep the same id (dependencies keep pointing at the recurring task)",
+  "tasksmd.config.recurrence.idHandling.new": "Generate a new id",
+  "tasksmd.config.recurrence.idHandling.remove": "Remove the id",
+  "tasksmd.config.recurrence.copyDependsOn": "Copy ⛔ dependencies to the next instance of a recurring task.",
+  "tasksmd.config.recurrence.removeScheduledDate": "Drop the ⏳ scheduled date on the next instance when the task also has a start or due date."
 }

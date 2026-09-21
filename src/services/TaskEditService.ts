@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { dayjs, type Dayjs } from '../core/dates/dayjs';
-import { type StatusRegistry, type Status, type Task, type TaskFields, applyStatusChange, serializeTask } from '../core/task';
+import { StatusType, type StatusRegistry, type Status, type Task, type TaskFields, applyStatusChange, generateTaskId, serializeTask } from '../core/task';
+import type { TaskIndex } from '../core/index';
 import type { IndexService } from '../index/IndexService';
 import type { Settings } from '../settings/Settings';
 
@@ -18,6 +19,7 @@ export class StaleLineError extends Error {
 export interface TaskEditDeps {
   settings: Settings;
   indexService: IndexService;
+  index: TaskIndex;
   getStatusRegistry(): StatusRegistry;
   /** Injectable clock for tests. */
   today?: () => Dayjs;
@@ -48,16 +50,25 @@ export class TaskEditService {
 
   async setStatus(task: Task, status: Status): Promise<Task> {
     const settings = this.deps.settings;
+    const registry = this.deps.getStatusRegistry();
     const result = applyStatusChange(task, status, {
       today: this.today(),
       setDoneDate: settings.get('setDoneDate'),
       setCancelledDate: settings.get('setCancelledDate'),
+      recurrence: {
+        todoStatus: registry.firstOfType(StatusType.TODO) ?? registry.bySymbol(' '),
+        setCreatedDate: settings.get('setCreatedDate'),
+        idHandling: settings.get('recurrence.idHandling'),
+        copyDependsOn: settings.get('recurrence.copyDependsOn'),
+        removeScheduledDateOnRecurrence: settings.get('recurrence.removeScheduledDate'),
+        generateId: () => generateTaskId((id) => this.deps.index.byId(id).length > 0),
+      },
     });
     const format = settings.get('taskFormat');
     const insert: LineInsert | undefined = result.newTasks.length
-      ? { position: 'above', lines: result.newTasks.map((t) => serializeTask(t, format)) }
+      ? { position: settings.get('recurrence.insertPosition'), lines: result.newTasks.map((t) => serializeTask(t, format)) }
       : undefined;
-    await this.replaceTask(task, result.task, insert);
+    await this.replaceTask(task, result.task, insert, result.deleteOriginal);
     return result.task;
   }
 
@@ -102,13 +113,16 @@ export class TaskEditService {
     return targetLine;
   }
 
-  /** Serialise `updated` over `original`'s line, optionally inserting lines next to it. */
-  async replaceTask(original: Task, updated: Task, insert?: LineInsert): Promise<void> {
+  /**
+   * Serialise `updated` over `original`'s line, optionally inserting lines next to it. With
+   * `deleteOriginal` (🏁 delete) the original line is removed and only the inserted lines remain.
+   */
+  async replaceTask(original: Task, updated: Task, insert?: LineInsert, deleteOriginal = false): Promise<void> {
     const text = serializeTask(updated, this.deps.settings.get('taskFormat'));
-    await this.replaceLine(vscode.Uri.parse(original.location.key), original.location.line, original.originalMarkdown, text, insert);
+    await this.replaceLine(vscode.Uri.parse(original.location.key), original.location.line, original.originalMarkdown, text, insert, deleteOriginal);
   }
 
-  async replaceLine(uri: vscode.Uri, line: number, expectedOriginal: string, newText: string, insert?: LineInsert): Promise<void> {
+  async replaceLine(uri: vscode.Uri, line: number, expectedOriginal: string, newText: string, insert?: LineInsert, deleteOriginal = false): Promise<void> {
     const doc = await vscode.workspace.openTextDocument(uri);
     // Save afterwards only when nobody is editing this file: not shown in any editor and not
     // dirty. (Closed editors keep their TextDocument around for a while, so "is it in
@@ -124,12 +138,17 @@ export class TaskEditService {
 
     const edit = new vscode.WorkspaceEdit();
     const range = doc.lineAt(line).range;
-    edit.replace(uri, range, newText);
-    if (insert?.lines.length) {
-      const eol = doc.eol === vscode.EndOfLine.CRLF ? '\r\n' : '\n';
-      const block = insert.lines.join(eol);
-      if (insert.position === 'above') edit.insert(uri, range.start, block + eol);
-      else edit.insert(uri, range.end, eol + block);
+    const eol = doc.eol === vscode.EndOfLine.CRLF ? '\r\n' : '\n';
+    if (deleteOriginal && insert?.lines.length) {
+      // One atomic replacement keeps a single undo stop.
+      edit.replace(uri, range, insert.lines.join(eol));
+    } else {
+      edit.replace(uri, range, newText);
+      if (insert?.lines.length) {
+        const block = insert.lines.join(eol);
+        if (insert.position === 'above') edit.insert(uri, range.start, block + eol);
+        else edit.insert(uri, range.end, eol + block);
+      }
     }
     const ok = await vscode.workspace.applyEdit(edit);
     if (!ok) throw new Error(`Could not edit ${uri.fsPath}`);

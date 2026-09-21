@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { describeRelative, systemClock, type Clock } from '../core/dates';
 import type { TaskIndex } from '../core/index';
-import { PRIORITY_EMOJI, PRIORITY_NAME, Priority, type DateFieldName, type StatusRegistry, type Task, isTaskLine, parseTaskLine } from '../core/task';
+import { PRIORITY_EMOJI, PRIORITY_NAME, Priority, type DateFieldName, type StatusRegistry, type Task, isTaskLine, parseTaskLine, urgency } from '../core/task';
 import { isBlocked, isBlocking } from '../core/index';
 import type { Settings } from '../settings/Settings';
 import { overdueText, relativeText } from './relativeText';
@@ -69,6 +69,7 @@ export class TaskHoverProvider implements vscode.HoverProvider {
       rows.push(`⛔ ${vscode.l10n.t('Depends on')}: ${items.join('; ')}` + (isBlocked(task, this.deps.index) ? ` — **${vscode.l10n.t('blocked')}**` : ''));
     }
     if (task.tags.length) rows.push(`🏷 ${task.tags.map(escape).join(' ')}`);
+    if (!task.isCompleted) rows.push(`🔥 ${vscode.l10n.t('Urgency')}: ${urgency(task, today).toFixed(2)}`);
     md.appendMarkdown(rows.map((r) => `- ${r}`).join('\n') + '\n\n');
 
     const actions = task.isCompleted

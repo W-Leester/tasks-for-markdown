@@ -55,7 +55,7 @@ describe('smart views', () => {
     expect(names('blocked')).toEqual(['blocked']);
     expect(isBlocked(idx.all().find((t) => t.description === 'free #tag1 #tag2')!, idx)).toBe(false);
   });
-  it('open = everything not completed, sorted by due then priority', () => {
+  it('open = everything not completed, sorted by urgency (Obsidian formula)', () => {
     expect(names('open')).toEqual([
       'overdue',
       'due today',
@@ -63,9 +63,9 @@ describe('smart views', () => {
       'friday',
       'in 7 days',
       'in 8 days',
+      'scheduled today', // scheduled today (+5) outranks a due date 9 days out
       'blocked',
       'doing',
-      'scheduled today',
       'no dates #tag1',
       'blocker',
       'free #tag1 #tag2',

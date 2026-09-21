@@ -1,6 +1,6 @@
 import type { Dayjs } from '../dates/dayjs';
 import { type TaskIndex, isBlocked } from '../index';
-import { type Task, StatusType, priorityNumber } from '../task';
+import { type Task, StatusType, priorityNumber, urgency } from '../task';
 
 export type SmartViewId = 'today' | 'upcoming' | 'overdue' | 'inProgress' | 'blocked' | 'open' | 'doneRecent';
 
@@ -61,8 +61,12 @@ export function smartViewFilter(id: SmartViewId, ctx: SmartViewContext): (task: 
   }
 }
 
-/** Default ordering until urgency (M3): due date first (missing last), then priority, then file/line. */
-export function compareTasksDefault(a: Task, b: Task): number {
+/** Default ordering (Obsidian): urgency desc, then due (missing last), priority, file/line. */
+export function compareTasksDefault(a: Task, b: Task, now?: Dayjs): number {
+  if (now) {
+    const ua = urgency(a, now), ub = urgency(b, now);
+    if (ua !== ub) return ub - ua;
+  }
   const ad = a.due?.date?.valueOf() ?? Number.POSITIVE_INFINITY;
   const bd = b.due?.date?.valueOf() ?? Number.POSITIVE_INFINITY;
   if (ad !== bd) return ad - bd;
@@ -76,5 +80,5 @@ export function compareTasksDefault(a: Task, b: Task): number {
 /** NON_TASK checkboxes (decorative symbols) never appear in smart views (FR-1.19). */
 export function runSmartView(id: SmartViewId, ctx: SmartViewContext): Task[] {
   const filter = smartViewFilter(id, ctx);
-  return ctx.index.all().filter((t) => t.status.type !== StatusType.NON_TASK && filter(t)).sort(compareTasksDefault);
+  return ctx.index.all().filter((t) => t.status.type !== StatusType.NON_TASK && filter(t)).sort((a, b) => compareTasksDefault(a, b, ctx.today));
 }

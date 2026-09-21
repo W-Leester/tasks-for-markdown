@@ -128,15 +128,15 @@
 - [x] 테스트: 코드블록 안 `- [ ]` 무시, 헤딩 중첩, 탭/스페이스 혼합 들여쓰기
 
 ### M1.3 인덱스 (`src/index/`)
-- [ ] `TaskIndex` — `Map<path, FileEntry>`, `all()`, `byPath()`, `byId()`, `version` 카운터 (D§5.1)
-- [ ] `WorkspaceScanner` — `workspace.findFiles(include, exclude)`, 멀티 루트, `.gitignore`/`files.exclude` 존중 (FR-2.1)
-- [ ] 50파일 청크 + `await` 양보, 진행률 콜백 (NFR-2, D§9)
-- [ ] `maxFileSizeKB` 초과 파일 건너뛰기 + 목록 보관 (FR-2.5)
-- [ ] `FileWatcher` — `FileSystemWatcher`(create/change/delete) + `onDidChangeTextDocument` 300ms 디바운스; 열린 문서는 `getText()` 우선 (FR-2.2)
-- [ ] 파일 단위 통째 교체 방식의 증분 갱신 (FR-2.3)
-- [ ] `IndexEvents` — `{ changed: string[], removed: string[] }` 이벤트 (FR-2.4)
-- [ ] 수명주기 상태 `Idle → Scanning → Ready → Updating` + 설정 변경(include/exclude/globalFilter) 시 재스캔 (D§6.2)
-- [ ] 테스트: 픽스처 워크스페이스 인덱싱 결과 수, 파일 삭제 시 제거, 이름 변경
+- [x] `TaskIndex` (`src/core/index/`, 순수) — `Map<key, FileEntry>`, `all()`, `byPath()`, `byId()`, `version` 카운터 (D§5.1)
+- [x] `WorkspaceScanner` — `workspace.findFiles(include, exclude)`, 멀티 루트, `.gitignore`/`files.exclude` 존중 (FR-2.1)
+- [x] 50파일 청크 + `await` 양보, 진행률 콜백 (NFR-2, D§9)
+- [x] `maxFileSizeKB` 초과 파일 건너뛰기 + 목록 보관 (FR-2.5)
+- [x] `FileWatcher` — `FileSystemWatcher`(create/change/delete) + `onDidChangeTextDocument` 300ms 디바운스; 열린 문서는 `getText()` 우선 (FR-2.2)
+- [x] 파일 단위 통째 교체 방식의 증분 갱신 (FR-2.3)
+- [x] `IndexEvents` — `{ changed: string[], removed: string[] }` 이벤트 (FR-2.4)
+- [x] 수명주기 상태 `Idle → Scanning → Ready → Updating` + 설정 변경(include/exclude/globalFilter) 시 재스캔 (D§6.2)
+- [ ] 테스트: 픽스처 워크스페이스 인덱싱 결과 수, 파일 삭제 시 제거, 이름 변경 (→ M1.8 통합 테스트에서)
 
 ### M1.4 편집 서비스 (`src/services/TaskEditService.ts`)
 - [ ] 유일한 쓰기 경로임을 주석/린트로 명시 (D§3.1)

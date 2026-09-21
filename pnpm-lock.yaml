@@ -169,6 +169,9 @@ importers:
       dayjs:
         specifier: ^1.11.13
         version: 1.11.23
+      ignore:
+        specifier: ^7.0.9
+        version: 7.0.9
     devDependencies:
       '@types/node':
         specifier: ^22.0.0

@@ -11,5 +11,6 @@
   "tasksmd.config.maxFileSizeKB": "이 크기(KB)를 넘는 파일은 건너뛰고 상태바에 표시합니다.",
   "tasksmd.config.setCreatedDate": "확장으로 태스크를 만들 때 생성일(➕)을 추가합니다.",
   "tasksmd.config.setDoneDate": "태스크가 DONE이 되면 완료일(✅)을 추가하고, DONE에서 벗어나면 제거합니다.",
-  "tasksmd.config.setCancelledDate": "태스크가 CANCELLED가 되면 취소일(❌)을 추가하고, CANCELLED에서 벗어나면 제거합니다."
+  "tasksmd.config.setCancelledDate": "태스크가 CANCELLED가 되면 취소일(❌)을 추가하고, CANCELLED에서 벗어나면 제거합니다.",
+  "tasksmd.showLogs.title": "로그 보기"
 }

@@ -40,6 +40,11 @@
         "command": "tasksmd.reindex",
         "title": "%tasksmd.reindex.title%",
         "category": "Tasks"
+      },
+      {
+        "command": "tasksmd.showLogs",
+        "title": "%tasksmd.showLogs.title%",
+        "category": "Tasks"
       }
     ],
     "configuration": {
@@ -133,7 +138,8 @@
     "vscode:prepublish": "pnpm build"
   },
   "dependencies": {
-    "dayjs": "^1.11.13"
+    "dayjs": "^1.11.13",
+    "ignore": "^7.0.9"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

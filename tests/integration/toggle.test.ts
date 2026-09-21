@@ -190,3 +190,48 @@ suite('custom statuses', () => {
     }
   });
 });
+
+suite('dataview format', () => {
+  const guard = new FixtureGuard();
+  teardown(() => guard.restore());
+
+  test('every write path emits [key:: value] fields when taskFormat is dataview', async () => {
+    const api = await getApi();
+    guard.protect('notes/project-a.md');
+    const uri = fixtureUri('notes/project-a.md');
+    await api.settings.update('taskFormat', 'dataview', vscode.ConfigurationTarget.Workspace);
+    try {
+      let task = await findTask(api, 'notes/project-a.md', 'Collect weekly data'); // recurring with emoji fields
+      await api.editService.toggle(task);
+      let lines = fs.readFileSync(uri.fsPath, 'utf8').split('\n');
+      assert.equal(lines[task.location.line], '- [ ] Collect weekly data [id:: a1b2c3] [repeat:: every week] [due:: 2026-10-01]');
+      assert.equal(lines[task.location.line + 1], `- [x] Collect weekly data [id:: a1b2c3] [repeat:: every week] [due:: 2026-09-24] [completion:: ${today()}]`);
+      task = await findTask(api, 'notes/project-a.md', 'Budget proposal');
+      const { DateField, Priority } = await import('../../src/core/task');
+      await api.editService.update(task, { priority: Priority.High, scheduled: DateField.parse('2026-09-30') });
+      lines = fs.readFileSync(uri.fsPath, 'utf8').split('\n');
+      assert.equal(lines[task.location.line], '- [ ] Budget proposal [priority:: high] [scheduled:: 2026-09-30] [due:: 2026-09-16]');
+    } finally {
+      await api.settings.update('taskFormat', undefined, vscode.ConfigurationTarget.Workspace);
+    }
+  });
+
+  test('convert command rewrites a whole file', async () => {
+    const api = await getApi();
+    guard.protect('notes/week-38.md');
+    const doc = await vscode.workspace.openTextDocument(fixtureUri('notes/week-38.md'));
+    await vscode.window.showTextDocument(doc);
+    const original = vscode.window.showQuickPick;
+    (vscode.window as { showQuickPick: unknown }).showQuickPick = async (items: unknown) => ((await items) as { format: string }[])[1];
+    try {
+      await vscode.commands.executeCommand('tasksmd.convertFormat');
+    } finally {
+      (vscode.window as { showQuickPick: unknown }).showQuickPick = original;
+    }
+    const text = doc.getText();
+    assert.ok(text.includes('- [ ] Write report #work [priority:: high] [due:: 2026-09-25]'), text);
+    assert.ok(text.includes('- [ ] Buy milk [repeat:: every week] [due:: 2026-09-22]'));
+    assert.ok(text.includes('```\n- [ ] not a task (code block)\n```'), 'code block untouched');
+    void api;
+  });
+});

@@ -514,15 +514,15 @@
 - [x] 메모리 확인 — 65k 태스크 ≈ 60 MB
 
 ### M8.3 접근성·안정성 (NFR-3, NFR-5)
-- [ ] 색상만으로 정보 전달하는 곳 없는지 점검 (아이콘/텍스트 병행)
-- [ ] 하이 컨트라스트 테마 스크린샷 점검 (에디터 장식, 미리보기, 웹뷰)
-- [ ] 웹뷰 키보드 탐색·ARIA 검토
-- [ ] Remote SSH / WSL / Codespaces 동작 확인 (NFR-1)
-- [ ] 오류 보고: 출력 채널 "Tasks for Markdown" + `tasksmd.showLogs` 명령
+- [x] 색상만으로 정보 전달하는 곳 없는지 점검 — 뱃지·칩·장식 모두 이모지/텍스트 병행, 기한 초과는 ⚠ 텍스트
+- [ ] 하이 컨트라스트 테마 스크린샷 점검 (에디터 장식, 미리보기, 웹뷰) — 수동(색은 모두 `--vscode-*`/`ThemeColor`, `contributes.colors`에 hc 기본값 정의)
+- [x] 웹뷰 키보드 탐색·ARIA — 카드/항목 `role=button tabindex=0` + Enter/Space, 모달 Esc/Enter·label·radiogroup, 칸반 탭 `role=tablist`; Svelte a11y 경고 0
+- [ ] Remote SSH / WSL / Codespaces 동작 확인 (NFR-1) — 수동; 코드상 `workspace.fs`·`Uri` 기반이라 원격 호환
+- [x] 오류 보고: 출력 채널 "Tasks for Markdown"(활성화 환경 정보 기록) + `tasksmd.showLogs` 명령
 
 ### M8.4 Dataview 쓰기 검증 (FR-1.9)
-- [ ] `taskFormat: dataview`에서 토글·편집·반복·아카이브 전 경로가 `[key:: value]`로 쓰는지 통합 테스트
-- [ ] 이모지 → Dataview 변환 명령 `tasksmd.convertFormat`(파일 단위, 선택 사항)
+- [x] `taskFormat: dataview`에서 토글·편집·반복·아카이브 전 경로가 `[key:: value]`로 쓰는지 통합 테스트
+- [x] 이모지 ↔ Dataview 변환 명령 `tasksmd.convertFormat`(파일 단위, 코드블록 제외)
 
 ### M8.5 문서
 - [ ] `README.md` — 기능 소개, 스크린샷/GIF, 설치, 문법 요약, 쿼리 요약, 설정 표, Obsidian 호환 범위

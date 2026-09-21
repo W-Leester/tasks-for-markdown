@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { registerConvertCommand } from './commands/convertCommand';
 import { registerEditCommands } from './commands/editCommands';
 import { registerQueryCommands } from './commands/queryCommands';
 import { registerCommands } from './commands/registerCommands';
@@ -43,7 +44,7 @@ export interface ExtensionApi {
 }
 
 export async function activate(context: vscode.ExtensionContext): Promise<ExtensionApi> {
-  log(`activate ${context.extension.packageJSON.version}`);
+  log(`activate ${context.extension.packageJSON.version} (${vscode.env.appName} ${vscode.version}, ${vscode.env.language}, trusted=${vscode.workspace.isTrusted})`);
 
   const settings = new Settings();
   const index = new TaskIndex();
@@ -61,6 +62,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<Extens
   registerCommands(context, commandDeps);
   registerEditCommands(context, { ...commandDeps, openEdit: (target) => webviews.openEdit(target) });
   registerStatusCommands(context, commandDeps);
+  registerConvertCommand(context, commandDeps);
   registerQueryCommands(context, { ...commandDeps, queries });
   // Status types decide isDone/isCompleted, so a change means every file must be re-parsed.
   context.subscriptions.push(

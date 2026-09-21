@@ -271,5 +271,10 @@
   "Tasks for Markdown {0} is up to date.": "Tasks for Markdown {0}은(는) 최신입니다.",
   "Open .vsix location": ".vsix 위치 열기",
   "Skip this version": "이 버전 건너뛰기",
-  "Tasks for Markdown {0} is available (you have {1}).": "Tasks for Markdown {0}이(가) 있습니다 (현재 {1})."
+  "Tasks for Markdown {0} is available (you have {1}).": "Tasks for Markdown {0}이(가) 있습니다 (현재 {1}).",
+  "Open a Markdown file first.": "먼저 마크다운 파일을 여세요.",
+  "Emoji format": "이모지 포맷",
+  "Dataview format": "Dataview 포맷",
+  "Convert all task lines in this file to…": "이 파일의 모든 태스크 줄을 다음 포맷으로 변환…",
+  "Converted {0} task lines.": "태스크 줄 {0}개를 변환했습니다."
 }

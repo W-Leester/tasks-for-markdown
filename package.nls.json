@@ -99,5 +99,6 @@
   "tasksmd.config.calendar.newTaskFile": "Workspace-relative Markdown file that receives tasks created from the calendar (and other views without a target). Empty = the active Markdown editor.",
   "tasksmd.openCalendar.title": "Open calendar",
   "tasksmd.config.updateCheckUrl": "For .vsix installs: path or URL of a latest.json ({ version, vsix, notes }). Checked once a day; empty disables the check. Ignored for marketplace installs.",
-  "tasksmd.checkForUpdates.title": "Check for updates (.vsix)"
+  "tasksmd.checkForUpdates.title": "Check for updates (.vsix)",
+  "tasksmd.convertFormat.title": "Convert task format in this file…"
 }

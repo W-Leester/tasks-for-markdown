@@ -249,6 +249,11 @@
         "command": "tasksmd.checkForUpdates",
         "title": "%tasksmd.checkForUpdates.title%",
         "category": "Tasks"
+      },
+      {
+        "command": "tasksmd.convertFormat",
+        "title": "%tasksmd.convertFormat.title%",
+        "category": "Tasks"
       }
     ],
     "configuration": {
@@ -712,6 +717,10 @@
         {
           "command": "tasksmd.setRecurrence",
           "group": "2_fields@8"
+        },
+        {
+          "command": "tasksmd.convertFormat",
+          "group": "9_file@1"
         }
       ],
       "view/title": [

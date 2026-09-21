@@ -21,6 +21,9 @@ export interface SettingsSchema {
   'decorations.dimFields': boolean;
   'decorations.gutterIcons': boolean;
   'codeLens.mode': 'off' | 'cursorLine' | 'all';
+  'autoSuggest.enabled': boolean;
+  'autoSuggest.minMatch': number;
+  'autoSuggest.maxItems': number;
 }
 
 export const SETTINGS_SECTION = 'tasksmd';
@@ -42,6 +45,9 @@ export const SETTINGS_DEFAULTS: Readonly<SettingsSchema> = {
   'decorations.dimFields': true,
   'decorations.gutterIcons': true,
   'codeLens.mode': 'cursorLine',
+  'autoSuggest.enabled': true,
+  'autoSuggest.minMatch': 0,
+  'autoSuggest.maxItems': 8,
 };
 
 export type SettingsKey = keyof SettingsSchema;

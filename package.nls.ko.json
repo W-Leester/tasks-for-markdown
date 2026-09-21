@@ -44,5 +44,8 @@
   "tasksmd.config.codeLens.mode": "태스크 액션 CodeLens(완료 · 우선순위 · 마감일 · 편집)를 표시할 위치.",
   "tasksmd.config.codeLens.mode.off": "표시 안 함",
   "tasksmd.config.codeLens.mode.cursorLine": "커서가 있는 태스크 줄 위에만",
-  "tasksmd.config.codeLens.mode.all": "보이는 모든 태스크 줄 위에"
+  "tasksmd.config.codeLens.mode.all": "보이는 모든 태스크 줄 위에",
+  "tasksmd.config.autoSuggest.enabled": "태스크 줄에서 입력할 때 필드 제안(due, priority, every week, id…)을 표시합니다.",
+  "tasksmd.config.autoSuggest.minMatch": "키워드 제안이 자동으로 나타나기 전에 입력해야 하는 최소 글자 수 (0 = 스페이스 직후). Ctrl+Space로는 항상 표시됩니다.",
+  "tasksmd.config.autoSuggest.maxItems": "표시할 키워드 제안의 최대 개수."
 }

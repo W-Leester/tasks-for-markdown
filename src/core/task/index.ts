@@ -9,3 +9,4 @@ export { TASK_LINE_RE, isTaskLine, parseTaskLine, splitTaskLine, type ParseOptio
 export type { TaskFormat } from './formats/types';
 export { serializeTask, serializeTaskBody } from './TaskSerializer';
 export { applyStatusChange, type StatusChangeOptions, type StatusChangeResult } from './statusChange';
+export { generateTaskId } from './ids';

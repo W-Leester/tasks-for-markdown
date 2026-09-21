@@ -44,5 +44,8 @@
   "tasksmd.config.codeLens.mode": "Where to show task action CodeLenses (Done · Priority · Due · Edit).",
   "tasksmd.config.codeLens.mode.off": "Never",
   "tasksmd.config.codeLens.mode.cursorLine": "Only above the task line that has the cursor",
-  "tasksmd.config.codeLens.mode.all": "Above every visible task line"
+  "tasksmd.config.codeLens.mode.all": "Above every visible task line",
+  "tasksmd.config.autoSuggest.enabled": "Offer task field suggestions (due, priority, every week, id…) while typing on a task line.",
+  "tasksmd.config.autoSuggest.minMatch": "Minimum typed characters before keyword suggestions appear automatically (0 = right after a space). Ctrl+Space always shows them.",
+  "tasksmd.config.autoSuggest.maxItems": "Maximum number of keyword suggestions shown."
 }

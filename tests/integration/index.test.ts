@@ -139,3 +139,44 @@ suite('editor providers', () => {
     assert.equal(none.filter((h) => (h.contents[0] as vscode.MarkdownString).value.includes('tasksmd')).length, 0);
   });
 });
+
+suite('auto-suggest', () => {
+  const guard = new FixtureGuard();
+  teardown(() => guard.restore());
+
+  async function complete(doc: vscode.TextDocument, line: number, character: number): Promise<vscode.CompletionItem[]> {
+    const list = await vscode.commands.executeCommand<vscode.CompletionList>('vscode.executeCompletionItemProvider', doc.uri, new vscode.Position(line, character), ' ');
+    // Only our items carry these kinds; other providers (paths, words) use different ones.
+    return list.items.filter((i) => i.kind === vscode.CompletionItemKind.Event || i.kind === vscode.CompletionItemKind.Value);
+  }
+  const labelOf = (i: vscode.CompletionItem) => (typeof i.label === 'string' ? i.label : i.label.label);
+
+  test('keyword mode on a task line, none on a plain line', async () => {
+    await getApi();
+    guard.protect('notes/project-a.md');
+    const doc = await vscode.workspace.openTextDocument(fixtureUri('notes/project-a.md'));
+    const editor = await vscode.window.showTextDocument(doc);
+    await editor.edit((eb) => eb.insert(new vscode.Position(doc.lineCount, 0), '\n- [ ] new thing due\nplain text due'));
+    const taskLine = doc.lineCount - 2;
+    const items = await complete(doc, taskLine, doc.lineAt(taskLine).text.length);
+    assert.ok(items.some((i) => labelOf(i).includes('📅')), 'due suggestion present: ' + items.map(labelOf).join(','));
+    assert.ok(!items.some((i) => labelOf(i).includes('every year')), 'non-matching keywords filtered out');
+    const plain = await complete(doc, taskLine + 1, doc.lineAt(taskLine + 1).text.length);
+    assert.equal(plain.length, 0);
+  });
+
+  test('date mode after 📅 parses the typed text', async () => {
+    await getApi();
+    guard.protect('notes/project-a.md');
+    const doc = await vscode.workspace.openTextDocument(fixtureUri('notes/project-a.md'));
+    const editor = await vscode.window.showTextDocument(doc);
+    await editor.edit((eb) => eb.insert(new vscode.Position(doc.lineCount, 0), '\n- [ ] dated 📅 in 3 days'));
+    const line = doc.lineCount - 1;
+    const items = await complete(doc, line, doc.lineAt(line).text.length);
+    const first = items.find((i) => labelOf(i).startsWith('→'));
+    assert.ok(first, 'parsed date item present');
+    const expected = new Date(Date.now() + 3 * 86400000).toISOString().slice(0, 10);
+    assert.equal(first!.insertText, expected);
+    assert.ok(items.some((i) => labelOf(i) === 'tomorrow'), 'presets present');
+  });
+});

@@ -219,12 +219,12 @@
 - [x] 의존성 링크 클릭 → 해당 태스크 위치로 이동
 
 ### M2.5 자동완성 (`src/editor/TaskCompletionProvider.ts`)
-- [ ] 태스크 줄에서만 활성 (FR-3.11)
-- [ ] 키워드 제안: due/scheduled/start/created/priority(5종)/every…/id/depends on/on completion (FR-3.12)
-- [ ] 날짜 이모지 뒤: today/tomorrow/next monday/in 3 days/next week 등 → 절대 날짜로 치환 (FR-3.13)
-- [ ] `autoSuggest.enabled`, `autoSuggest.minMatch`(0–3), `autoSuggest.maxItems`(3–20) (FR-3.14)
-- [ ] `taskFormat: dataview`면 `[due:: ]` 형태로 삽입 (FR-3.15)
-- [ ] 트리거 문자 없이도 동작하도록 `triggerCharacters` + 24×7 제안 균형 조정 (사용감 테스트)
+- [x] 태스크 줄에서만 활성 (FR-3.11)
+- [x] 키워드 제안: due/scheduled/start/created/priority(5종)/every…/id/depends on/on completion (FR-3.12)
+- [x] 날짜 이모지 뒤: today/tomorrow/next monday/in 3 days/next week 등 → 절대 날짜로 치환 (FR-3.13)
+- [x] `autoSuggest.enabled`, `autoSuggest.minMatch`(0–3), `autoSuggest.maxItems`(3–20) (FR-3.14)
+- [x] `taskFormat: dataview`면 `[due:: ]` 형태로 삽입 (FR-3.15)
+- [x] 마크다운은 `quickSuggestions`가 기본 off → 스페이스를 트리거 문자로 등록(Obsidian과 유사), `Ctrl+Space`는 항상 동작. 키워드는 뒤쪽 1~3단어로 매칭("every w", "on completion d")
 
 ### M2.6 QuickPick (`src/editor/quickpicks/`)
 - [x] `StatusPick` — 등록된 상태 목록, 현재 표시

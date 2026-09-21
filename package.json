@@ -257,6 +257,25 @@
             "%tasksmd.config.codeLens.mode.all%"
           ],
           "description": "%tasksmd.config.codeLens.mode%"
+        },
+        "tasksmd.autoSuggest.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "%tasksmd.config.autoSuggest.enabled%"
+        },
+        "tasksmd.autoSuggest.minMatch": {
+          "type": "number",
+          "default": 0,
+          "minimum": 0,
+          "maximum": 3,
+          "description": "%tasksmd.config.autoSuggest.minMatch%"
+        },
+        "tasksmd.autoSuggest.maxItems": {
+          "type": "number",
+          "default": 8,
+          "minimum": 3,
+          "maximum": 20,
+          "description": "%tasksmd.config.autoSuggest.maxItems%"
         }
       }
     },
@@ -505,8 +524,8 @@
     "publish:vsce": "vsce publish --no-dependencies",
     "publish:ovsx": "ovsx publish --no-dependencies",
     "vscode:prepublish": "pnpm build",
-    "test:integration": "node -e \"require('fs').rmSync('dist/tests',{recursive:true,force:true})\" && tsc -p tsconfig.integration.json && vscode-test",
-    "test:all": "pnpm test && pnpm build && pnpm test:integration"
+    "test:integration": "pnpm build && node -e \"require('fs').rmSync('dist/tests',{recursive:true,force:true})\" && tsc -p tsconfig.integration.json && vscode-test",
+    "test:all": "pnpm test && pnpm test:integration"
   },
   "dependencies": {
     "dayjs": "^1.11.13",

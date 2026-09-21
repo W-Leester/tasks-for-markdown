@@ -1,0 +1,5 @@
+{
+  "tasks.reindex.title": "모든 태스크 다시 인덱싱",
+  "tasks.config.taskFormat": "태스크 필드를 쓸 때 사용할 포맷: emoji (📅 2024-01-01) 또는 dataview ([due:: 2024-01-01]). 읽기는 항상 둘 다 지원합니다.",
+  "tasks.config.globalFilter": "설정하면 이 문자열(예: #task)이 포함된 체크리스트 줄만 태스크로 취급합니다."
+}

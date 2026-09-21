@@ -1,0 +1,5 @@
+{
+  "tasks.reindex.title": "Reindex all tasks",
+  "tasks.config.taskFormat": "Format used when writing task fields: emoji (📅 2024-01-01) or dataview ([due:: 2024-01-01]). Both are always read.",
+  "tasks.config.globalFilter": "If set, only checklist lines containing this text (e.g. #task) are treated as tasks."
+}

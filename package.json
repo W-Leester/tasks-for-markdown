@@ -1,0 +1,84 @@
+{
+  "name": "tasks-for-markdown",
+  "displayName": "Tasks for Markdown",
+  "description": "Obsidian Tasks-compatible task management for Markdown files in VS Code and Cursor.",
+  "version": "0.0.1",
+  "publisher": "HMCVECDT",
+  "license": "MIT",
+  "private": true,
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "markdown",
+    "tasks",
+    "todo",
+    "obsidian",
+    "checklist"
+  ],
+  "activationEvents": [
+    "onLanguage:markdown",
+    "workspaceContains:**/*.md"
+  ],
+  "main": "./dist/extension.js",
+  "l10n": "./l10n",
+  "contributes": {
+    "commands": [
+      {
+        "command": "tasks.reindex",
+        "title": "%tasks.reindex.title%",
+        "category": "Tasks"
+      }
+    ],
+    "configuration": {
+      "title": "Tasks for Markdown",
+      "properties": {
+        "tasks.taskFormat": {
+          "type": "string",
+          "enum": [
+            "emoji",
+            "dataview"
+          ],
+          "default": "emoji",
+          "description": "%tasks.config.taskFormat%"
+        },
+        "tasks.globalFilter": {
+          "type": "string",
+          "default": "",
+          "description": "%tasks.config.globalFilter%"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "node esbuild.config.mjs",
+    "watch": "node esbuild.config.mjs --watch",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint src tests",
+    "format": "prettier --write .",
+    "package": "pnpm build && vsce package --no-dependencies",
+    "publish:vsce": "vsce publish --no-dependencies",
+    "publish:ovsx": "ovsx publish --no-dependencies",
+    "vscode:prepublish": "pnpm build"
+  },
+  "dependencies": {
+    "dayjs": "^1.11.13"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/vscode": "^1.90.0",
+    "@vscode/vsce": "^3.0.0",
+    "esbuild": "^0.24.0",
+    "eslint": "^9.0.0",
+    "ovsx": "^0.10.0",
+    "prettier": "^3.3.0",
+    "typescript": "^5.6.0",
+    "typescript-eslint": "^8.0.0",
+    "vitest": "^2.1.0"
+  }
+}

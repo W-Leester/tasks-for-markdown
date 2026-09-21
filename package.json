@@ -37,9 +37,27 @@
   "contributes": {
     "commands": [
       {
+        "command": "tasksmd.toggleDone",
+        "title": "%tasksmd.toggleDone.title%",
+        "category": "Tasks",
+        "icon": "$(check)"
+      },
+      {
+        "command": "tasksmd.openTask",
+        "title": "%tasksmd.openTask.title%",
+        "category": "Tasks",
+        "icon": "$(go-to-file)"
+      },
+      {
+        "command": "tasksmd.openSidebar",
+        "title": "%tasksmd.openSidebar.title%",
+        "category": "Tasks"
+      },
+      {
         "command": "tasksmd.reindex",
         "title": "%tasksmd.reindex.title%",
-        "category": "Tasks"
+        "category": "Tasks",
+        "icon": "$(refresh)"
       },
       {
         "command": "tasksmd.showLogs",
@@ -122,7 +140,42 @@
           "description": "%tasksmd.config.setCancelledDate%"
         }
       }
-    }
+    },
+    "keybindings": [
+      {
+        "command": "tasksmd.toggleDone",
+        "key": "ctrl+enter",
+        "mac": "cmd+enter",
+        "when": "editorTextFocus && editorLangId == markdown && tasksmd.onTaskLine"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "tasksmd.openTask",
+          "when": "false"
+        }
+      ],
+      "editor/context": [
+        {
+          "submenu": "tasksmd.editorContext",
+          "group": "tasksmd@1",
+          "when": "editorLangId == markdown && tasksmd.onTaskLine"
+        }
+      ],
+      "tasksmd.editorContext": [
+        {
+          "command": "tasksmd.toggleDone",
+          "group": "1_edit@1"
+        }
+      ]
+    },
+    "submenus": [
+      {
+        "id": "tasksmd.editorContext",
+        "label": "Tasks"
+      }
+    ]
   },
   "scripts": {
     "build": "node esbuild.config.mjs",

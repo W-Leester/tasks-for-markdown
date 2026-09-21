@@ -12,5 +12,8 @@
   "tasksmd.config.setCreatedDate": "Add a created date (➕) when creating tasks through the extension.",
   "tasksmd.config.setDoneDate": "Add a done date (✅) when a task becomes DONE, and remove it when it leaves DONE.",
   "tasksmd.config.setCancelledDate": "Add a cancelled date (❌) when a task becomes CANCELLED, and remove it when it leaves CANCELLED.",
-  "tasksmd.showLogs.title": "Show logs"
+  "tasksmd.showLogs.title": "Show logs",
+  "tasksmd.toggleDone.title": "Toggle task done",
+  "tasksmd.openTask.title": "Go to task",
+  "tasksmd.openSidebar.title": "Open Tasks sidebar"
 }

@@ -1,7 +1,10 @@
 import * as vscode from 'vscode';
+import { registerCommands } from './commands/registerCommands';
 import { TaskIndex } from './core/index';
 import { StatusRegistry } from './core/task';
+import { TaskLineContext } from './editor/TaskLineContext';
 import { IndexService } from './index/IndexService';
+import { TaskEditService } from './services/TaskEditService';
 import { Settings } from './settings/Settings';
 
 const output = vscode.window.createOutputChannel('Tasks for Markdown');
@@ -10,6 +13,7 @@ const log = (msg: string) => output.appendLine(`[${new Date().toISOString()}] ${
 export interface ExtensionApi {
   index: TaskIndex;
   indexService: IndexService;
+  editService: TaskEditService;
   settings: Settings;
 }
 
@@ -20,19 +24,16 @@ export async function activate(context: vscode.ExtensionContext): Promise<Extens
   const index = new TaskIndex();
   // M3 replaces this with a registry built from settings.
   const statusRegistry = StatusRegistry.default();
-  const indexService = new IndexService({ index, settings, getStatusRegistry: () => statusRegistry, log });
+  const getStatusRegistry = () => statusRegistry;
+  const indexService = new IndexService({ index, settings, getStatusRegistry, log });
+  const editService = new TaskEditService({ settings, indexService, getStatusRegistry });
 
-  context.subscriptions.push(
-    output,
-    settings,
-    indexService,
-    { dispose: () => index.dispose() },
-    vscode.commands.registerCommand('tasksmd.reindex', () => indexService.rescan()),
-    vscode.commands.registerCommand('tasksmd.showLogs', () => output.show()),
-  );
+  context.subscriptions.push(output, settings, indexService, new TaskLineContext(), { dispose: () => index.dispose() });
+  registerCommands(context, { index, indexService, editService, settings, getStatusRegistry, log });
+  context.subscriptions.push(vscode.commands.registerCommand('tasksmd.showLogs', () => output.show()));
 
   void indexService.start();
-  return { index, indexService, settings };
+  return { index, indexService, editService, settings };
 }
 
 export function deactivate(): void {

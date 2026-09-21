@@ -149,11 +149,11 @@
 - [ ] 테스트: 통합 — 토글 후 파일 내용, Undo, stale 감지 (→ M1.8)
 
 ### M1.5 명령어 (`src/commands/`)
-- [ ] `tasksmd.toggleDone` — 활성 에디터 커서 줄 또는 트리 항목 인자 (FR-8 표)
-- [ ] 컨텍스트 키 `tasksmd.onTaskLine` — 커서가 태스크 줄일 때 true (`setContext`), 키바인딩 `when` 조건
-- [ ] 키바인딩 `Cmd/Ctrl+Enter` — `editorTextFocus && editorLangId == markdown && tasksmd.onTaskLine` (Q-13)
-- [ ] `tasksmd.reindex`, `tasksmd.openSidebar`
-- [ ] 모든 명령 `category: "Tasks"` + 제목 nls 키 (FR-8.1)
+- [x] `tasksmd.toggleDone` — 활성 에디터 커서 줄 또는 트리 항목 인자 (FR-8 표)
+- [x] 컨텍스트 키 `tasksmd.onTaskLine` — 커서가 태스크 줄일 때 true (`setContext`), 키바인딩 `when` 조건
+- [x] 키바인딩 `Cmd/Ctrl+Enter` — `editorTextFocus && editorLangId == markdown && tasksmd.onTaskLine` (Q-13)
+- [x] `tasksmd.reindex`, `tasksmd.openSidebar`
+- [x] 모든 명령 `category: "Tasks"` + 제목 nls 키 (FR-8.1)
 
 ### M1.6 사이드바 트리 (`src/views/TaskTreeProvider.ts`)
 - [ ] `contributes.viewsContainers.activitybar` — Tasks 아이콘(코디콘 `checklist` 또는 커스텀 SVG) + `views` 등록

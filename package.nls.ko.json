@@ -12,5 +12,8 @@
   "tasksmd.config.setCreatedDate": "확장으로 태스크를 만들 때 생성일(➕)을 추가합니다.",
   "tasksmd.config.setDoneDate": "태스크가 DONE이 되면 완료일(✅)을 추가하고, DONE에서 벗어나면 제거합니다.",
   "tasksmd.config.setCancelledDate": "태스크가 CANCELLED가 되면 취소일(❌)을 추가하고, CANCELLED에서 벗어나면 제거합니다.",
-  "tasksmd.showLogs.title": "로그 보기"
+  "tasksmd.showLogs.title": "로그 보기",
+  "tasksmd.toggleDone.title": "태스크 완료 토글",
+  "tasksmd.openTask.title": "태스크로 이동",
+  "tasksmd.openSidebar.title": "Tasks 사이드바 열기"
 }

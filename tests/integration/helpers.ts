@@ -69,3 +69,10 @@ export async function findTask(api: ExtensionApi, rel: string, description: stri
   }, 3000, `task "${description}" in ${rel}`);
   return found!;
 }
+
+/** Today's date in *local* time as YYYY-MM-DD — the extension writes local dates, never UTC. */
+export function localToday(offsetDays = 0): string {
+  const d = new Date();
+  d.setDate(d.getDate() + offsetDays);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}

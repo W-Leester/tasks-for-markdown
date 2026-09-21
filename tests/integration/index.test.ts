@@ -1,7 +1,7 @@
 import * as assert from 'node:assert/strict';
 import * as fs from 'node:fs';
 import * as vscode from 'vscode';
-import { FixtureGuard, findTask, fixtureUri, getApi, sleep, waitFor } from './helpers';
+import { FixtureGuard, findTask, fixtureUri, getApi, localToday, sleep, waitFor } from './helpers';
 
 suite('index', () => {
   const guard = new FixtureGuard();
@@ -175,7 +175,7 @@ suite('auto-suggest', () => {
     const items = await complete(doc, line, doc.lineAt(line).text.length);
     const first = items.find((i) => labelOf(i).startsWith('→'));
     assert.ok(first, 'parsed date item present');
-    const expected = new Date(Date.now() + 3 * 86400000).toISOString().slice(0, 10);
+    const expected = localToday(3);
     assert.equal(first!.insertText, expected);
     assert.ok(items.some((i) => labelOf(i) === 'tomorrow'), 'presets present');
   });

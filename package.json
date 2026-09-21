@@ -618,8 +618,8 @@
       {
         "command": "tasksmd.createOrEdit",
         "key": "ctrl+alt+t",
-        "mac": "cmd+alt+t",
-        "when": "editorTextFocus && editorLangId == markdown"
+        "mac": "ctrl+t",
+        "when": "!terminalFocus && !inputFocus"
       },
       {
         "command": "tasksmd.quickSearch",

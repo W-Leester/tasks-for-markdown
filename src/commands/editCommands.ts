@@ -107,10 +107,14 @@ export function registerEditCommands(context: vscode.ExtensionContext, deps: Com
   // argument, otherwise creates a new task at the cursor line of the active Markdown editor.
   register('tasksmd.createOrEdit', (arg) =>
     runEdit(deps, async () => {
-      const editor = vscode.window.activeTextEditor;
+      // With the preview or a sidebar focused there is no active text editor: fall back to a
+      // visible Markdown editor (e.g. the one next to the preview).
+      const editor = vscode.window.activeTextEditor?.document.languageId === 'markdown'
+        ? vscode.window.activeTextEditor
+        : vscode.window.visibleTextEditors.find((e) => e.document.languageId === 'markdown');
       const existing = resolveTargetTasks(arg, deps)[0];
       if (existing) deps.openEdit({ key: existing.location.key, line: existing.location.line });
-      else if (editor && editor.document.languageId === 'markdown') deps.openEdit({ key: editor.document.uri.toString(), line: editor.selection.active.line });
+      else if (editor) deps.openEdit({ key: editor.document.uri.toString(), line: editor.selection.active.line });
       else deps.openEdit({ key: null, line: null });
     }),
   );

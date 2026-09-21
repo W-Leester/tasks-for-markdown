@@ -64,3 +64,37 @@ suite('index', () => {
     await sleep(100);
   });
 });
+
+suite('tree view', () => {
+  test('commands from the sidebar are registered and the view container exists', async () => {
+    await getApi();
+    const cmds = await vscode.commands.getCommands(true);
+    for (const id of ['tasksmd.toggleDone', 'tasksmd.markDone', 'tasksmd.markCancelled', 'tasksmd.reopen', 'tasksmd.tree.groupBy', 'tasksmd.tree.filter', 'tasksmd.openSidebar']) {
+      assert.ok(cmds.includes(id), `missing command ${id}`);
+    }
+    await vscode.commands.executeCommand('tasksmd.openSidebar');
+  });
+
+  test('markDone / reopen from a task argument', async () => {
+    const api = await getApi();
+    const guard = new FixtureGuard();
+    guard.protect('notes/project-a.md');
+    try {
+      const uri = fixtureUri('notes/project-a.md');
+      let task = api.index.file(uri.toString())!.tasks.find((t) => t.description === 'Budget proposal')!;
+      await vscode.commands.executeCommand('tasksmd.markDone', task);
+      task = api.index.taskAt(uri.toString(), task.location.line)!;
+      assert.equal(task.isDone, true);
+      assert.ok(task.done, 'done date set');
+      await vscode.commands.executeCommand('tasksmd.reopen', task);
+      task = api.index.taskAt(uri.toString(), task.location.line)!;
+      assert.equal(task.isDone, false);
+      assert.equal(task.done, null);
+      await vscode.commands.executeCommand('tasksmd.markCancelled', task);
+      task = api.index.taskAt(uri.toString(), task.location.line)!;
+      assert.equal(task.isCancelled, true);
+    } finally {
+      await guard.restore();
+    }
+  });
+});

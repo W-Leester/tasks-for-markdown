@@ -15,5 +15,14 @@
   "tasksmd.showLogs.title": "Show logs",
   "tasksmd.toggleDone.title": "Toggle task done",
   "tasksmd.openTask.title": "Go to task",
-  "tasksmd.openSidebar.title": "Open Tasks sidebar"
+  "tasksmd.openSidebar.title": "Open Tasks sidebar",
+  "tasksmd.view.tasks": "Tasks",
+  "tasksmd.view.tasks.welcome": "No tasks found yet.\n\nAdd checklist lines like `- [ ] Write report 📅 2026-09-25` to any Markdown file in this workspace.\n\n[Reindex](command:tasksmd.reindex)",
+  "tasksmd.markDone.title": "Mark as done",
+  "tasksmd.markCancelled.title": "Mark as cancelled",
+  "tasksmd.reopen.title": "Reopen task",
+  "tasksmd.tree.refresh.title": "Refresh",
+  "tasksmd.tree.groupBy.title": "Group by…",
+  "tasksmd.tree.filter.title": "Filter tasks",
+  "tasksmd.tree.clearFilter.title": "Clear filter"
 }

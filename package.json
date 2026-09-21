@@ -63,6 +63,48 @@
         "command": "tasksmd.showLogs",
         "title": "%tasksmd.showLogs.title%",
         "category": "Tasks"
+      },
+      {
+        "command": "tasksmd.markDone",
+        "title": "%tasksmd.markDone.title%",
+        "category": "Tasks",
+        "icon": "$(check)"
+      },
+      {
+        "command": "tasksmd.markCancelled",
+        "title": "%tasksmd.markCancelled.title%",
+        "category": "Tasks",
+        "icon": "$(circle-slash)"
+      },
+      {
+        "command": "tasksmd.reopen",
+        "title": "%tasksmd.reopen.title%",
+        "category": "Tasks",
+        "icon": "$(debug-restart)"
+      },
+      {
+        "command": "tasksmd.tree.refresh",
+        "title": "%tasksmd.tree.refresh.title%",
+        "category": "Tasks",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "tasksmd.tree.groupBy",
+        "title": "%tasksmd.tree.groupBy.title%",
+        "category": "Tasks",
+        "icon": "$(group-by-ref-type)"
+      },
+      {
+        "command": "tasksmd.tree.filter",
+        "title": "%tasksmd.tree.filter.title%",
+        "category": "Tasks",
+        "icon": "$(filter)"
+      },
+      {
+        "command": "tasksmd.tree.clearFilter",
+        "title": "%tasksmd.tree.clearFilter.title%",
+        "category": "Tasks",
+        "icon": "$(filter-filled)"
       }
     ],
     "configuration": {
@@ -154,6 +196,14 @@
         {
           "command": "tasksmd.openTask",
           "when": "false"
+        },
+        {
+          "command": "tasksmd.tree.refresh",
+          "when": "false"
+        },
+        {
+          "command": "tasksmd.tree.clearFilter",
+          "when": "false"
         }
       ],
       "editor/context": [
@@ -167,6 +217,63 @@
         {
           "command": "tasksmd.toggleDone",
           "group": "1_edit@1"
+        },
+        {
+          "command": "tasksmd.markDone",
+          "group": "1_edit@2"
+        },
+        {
+          "command": "tasksmd.markCancelled",
+          "group": "1_edit@3"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "tasksmd.tree.filter",
+          "when": "view == tasksmd.tasks && !tasksmd.tree.filterActive",
+          "group": "navigation@1"
+        },
+        {
+          "command": "tasksmd.tree.clearFilter",
+          "when": "view == tasksmd.tasks && tasksmd.tree.filterActive",
+          "group": "navigation@1"
+        },
+        {
+          "command": "tasksmd.tree.groupBy",
+          "when": "view == tasksmd.tasks",
+          "group": "navigation@2"
+        },
+        {
+          "command": "tasksmd.tree.refresh",
+          "when": "view == tasksmd.tasks",
+          "group": "navigation@3"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "tasksmd.openTask",
+          "when": "view == tasksmd.tasks && viewItem =~ /^task/",
+          "group": "inline@1"
+        },
+        {
+          "command": "tasksmd.markDone",
+          "when": "view == tasksmd.tasks && viewItem == task",
+          "group": "1_status@1"
+        },
+        {
+          "command": "tasksmd.markCancelled",
+          "when": "view == tasksmd.tasks && viewItem == task",
+          "group": "1_status@2"
+        },
+        {
+          "command": "tasksmd.reopen",
+          "when": "view == tasksmd.tasks && viewItem == task.completed",
+          "group": "1_status@1"
+        },
+        {
+          "command": "tasksmd.openTask",
+          "when": "view == tasksmd.tasks && viewItem =~ /^task/",
+          "group": "2_nav@1"
         }
       ]
     },
@@ -174,6 +281,32 @@
       {
         "id": "tasksmd.editorContext",
         "label": "Tasks"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "tasksmd",
+          "title": "Tasks",
+          "icon": "$(checklist)"
+        }
+      ]
+    },
+    "views": {
+      "tasksmd": [
+        {
+          "id": "tasksmd.tasks",
+          "name": "%tasksmd.view.tasks%",
+          "icon": "$(checklist)",
+          "contextualTitle": "Tasks"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "tasksmd.tasks",
+        "contents": "%tasksmd.view.tasks.welcome%",
+        "when": "tasksmd.indexEmpty"
       }
     ]
   },
@@ -189,7 +322,7 @@
     "publish:vsce": "vsce publish --no-dependencies",
     "publish:ovsx": "ovsx publish --no-dependencies",
     "vscode:prepublish": "pnpm build",
-    "test:integration": "tsc -p tsconfig.integration.json && vscode-test",
+    "test:integration": "node -e \"require('fs').rmSync('dist/tests',{recursive:true,force:true})\" && tsc -p tsconfig.integration.json && vscode-test",
     "test:all": "pnpm test && pnpm build && pnpm test:integration"
   },
   "dependencies": {

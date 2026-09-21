@@ -77,6 +77,11 @@ export class StatusRegistry {
     return [...this.bySymbolMap.values()];
   }
 
+  /** First registered status of the given type (registration order), if any. */
+  firstOfType(type: StatusType): Status | undefined {
+    return this.all().find((s) => s.type === type);
+  }
+
   static default(): StatusRegistry {
     return new StatusRegistry(DEFAULT_STATUSES);
   }

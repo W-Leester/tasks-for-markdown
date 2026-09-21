@@ -156,17 +156,17 @@
 - [x] 모든 명령 `category: "Tasks"` + 제목 nls 키 (FR-8.1)
 
 ### M1.6 사이드바 트리 (`src/views/TaskTreeProvider.ts`)
-- [ ] `contributes.viewsContainers.activitybar` — Tasks 아이콘(코디콘 `checklist` 또는 커스텀 SVG) + `views` 등록
-- [ ] 스마트 뷰 7종: 오늘 / 예정 7일 / 기한 초과 / 진행 중 / 차단됨(M3 전까지 빈 목록) / 미완료 전체 / 완료 30일 (FR-5.1) — M4 전까지는 하드코딩 필터
-- [ ] 각 스마트 뷰 카운트 뱃지(`description`)
-- [ ] 그룹 전환: 파일별 / 마감일별 / 우선순위별 / 태그별 / 헤딩별 / 상태별 — 뷰 타이틀 메뉴 (FR-5.2)
-- [ ] `TreeItemCheckboxState` 체크박스 → `toggleDone` (FR-5.3)
-- [ ] 항목 클릭 → 해당 파일·줄로 이동(`showTextDocument` + `revealRange`)
-- [ ] 컨텍스트 메뉴: 완료 / 취소 / 원본 열기 (우선순위·날짜·편집·삭제는 M2/M6에서 추가) (FR-5.3)
-- [ ] 필터 입력(뷰 타이틀 액션 → `InputBox`) 설명 텍스트 검색 (FR-5.4)
-- [ ] `IndexEvents` 구독 → 200ms 디바운스 refresh (D§5.1)
-- [ ] 그룹 노드 lazy `getChildren`, 5,000개 초과 시 "더 보기" 노드 (D§9)
-- [ ] 마지막 선택 스마트 뷰·그룹 기준을 `workspaceState`에 저장 (D§8)
+- [x] `contributes.viewsContainers.activitybar` — Tasks 아이콘(코디콘 `checklist` 또는 커스텀 SVG) + `views` 등록
+- [x] 스마트 뷰 7종: 오늘 / 예정 7일 / 기한 초과 / 진행 중 / 차단됨(⛔ 기반, 이미 동작) / 미완료 전체 / 완료 30일 (FR-5.1) — `core/views/smartViews.ts`, M4 전까지 하드코딩 필터 (12 tests)
+- [x] 각 스마트 뷰 카운트 뱃지(`description`)
+- [x] 그룹 전환: 파일별 / 마감일별 / 우선순위별 / 태그별 / 헤딩별 / 상태별 — 뷰 타이틀 메뉴 (FR-5.2)
+- [x] `TreeItemCheckboxState` 체크박스 → `toggleDone` (FR-5.3)
+- [x] 항목 클릭 → 해당 파일·줄로 이동(`showTextDocument` + `revealRange`)
+- [x] 컨텍스트 메뉴: 완료 / 취소 / 다시 열기 / 원본 열기 (`markDone`·`markCancelled`·`reopen` 명령; 우선순위·날짜·편집·삭제는 M2/M6에서 추가) (FR-5.3)
+- [x] 필터 입력(뷰 타이틀 액션 → `InputBox`) 설명 텍스트 검색 (FR-5.4)
+- [x] `IndexEvents` 구독 → 200ms 디바운스 refresh (D§5.1)
+- [x] 그룹 노드 lazy `getChildren`, 5,000개 초과 시 "더 보기" 노드 (D§9)
+- [x] 마지막 선택 스마트 뷰·그룹 기준을 `workspaceState`에 저장 (D§8)
 
 ### M1.7 상태바 (`src/views/StatusBar.ts`)
 - [ ] `$(checklist) 미완료 N · 오늘 M · 초과 K`, 클릭 → 사이드바 (FR-2.6)

@@ -15,5 +15,14 @@
   "tasksmd.showLogs.title": "로그 보기",
   "tasksmd.toggleDone.title": "태스크 완료 토글",
   "tasksmd.openTask.title": "태스크로 이동",
-  "tasksmd.openSidebar.title": "Tasks 사이드바 열기"
+  "tasksmd.openSidebar.title": "Tasks 사이드바 열기",
+  "tasksmd.view.tasks": "태스크",
+  "tasksmd.view.tasks.welcome": "아직 태스크가 없습니다.\n\n이 워크스페이스의 마크다운 파일에 `- [ ] 보고서 작성 📅 2026-09-25` 같은 체크리스트 줄을 추가하세요.\n\n[다시 인덱싱](command:tasksmd.reindex)",
+  "tasksmd.markDone.title": "완료로 표시",
+  "tasksmd.markCancelled.title": "취소로 표시",
+  "tasksmd.reopen.title": "태스크 다시 열기",
+  "tasksmd.tree.refresh.title": "새로 고침",
+  "tasksmd.tree.groupBy.title": "그룹 기준…",
+  "tasksmd.tree.filter.title": "태스크 필터",
+  "tasksmd.tree.clearFilter.title": "필터 지우기"
 }

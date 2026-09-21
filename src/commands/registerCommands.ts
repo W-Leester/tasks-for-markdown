@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import type { TaskIndex } from '../core/index';
-import { type StatusRegistry, Task, isTaskLine, parseTaskLine } from '../core/task';
+import { type StatusRegistry, StatusType, Task, isTaskLine, parseTaskLine } from '../core/task';
 import type { IndexService } from '../index/IndexService';
 import type { Settings } from '../settings/Settings';
 import { StaleLineError, type TaskEditService } from '../services/TaskEditService';
@@ -86,6 +86,22 @@ export function registerCommands(context: vscode.ExtensionContext, deps: Command
       }
     }),
   );
+
+  const setStatusOfType = (type: StatusType) => (arg: unknown) =>
+    runEdit(deps, async () => {
+      const status = deps.getStatusRegistry().firstOfType(type);
+      if (!status) {
+        void vscode.window.showWarningMessage(vscode.l10n.t('No status of type {0} is configured.', type));
+        return;
+      }
+      const targets = resolveTargetTasks(arg, deps);
+      for (const task of [...targets].sort((a, b) => b.location.line - a.location.line)) {
+        if (task.status.type !== type) await deps.editService.setStatus(task, status);
+      }
+    });
+  register('tasksmd.markDone', setStatusOfType(StatusType.DONE));
+  register('tasksmd.markCancelled', setStatusOfType(StatusType.CANCELLED));
+  register('tasksmd.reopen', setStatusOfType(StatusType.TODO));
 
   register('tasksmd.openSidebar', () => vscode.commands.executeCommand(`workbench.view.extension.${VIEW_CONTAINER_ID}`));
 

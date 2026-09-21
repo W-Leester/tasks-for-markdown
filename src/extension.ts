@@ -12,6 +12,7 @@ import { TaskHoverProvider } from './editor/TaskHoverProvider';
 import { TaskLineContext } from './editor/TaskLineContext';
 import { IndexService } from './index/IndexService';
 import { PreviewIntegration } from './preview/PreviewIntegration';
+import { NotificationService } from './services/NotificationService';
 import { QueryService } from './services/QueryService';
 import { SavedQueryStore } from './services/SavedQueryStore';
 import { TaskEditService } from './services/TaskEditService';
@@ -85,6 +86,11 @@ export async function activate(context: vscode.ExtensionContext): Promise<Extens
 
   const preview = new PreviewIntegration({ index, queries, settings, getStatusRegistry });
   context.subscriptions.push(preview);
+
+  const notifications = new NotificationService({ index, settings, state: context.globalState, log });
+  context.subscriptions.push(notifications);
+  // Not during tests: toasts would block the runner.
+  if (context.extensionMode !== vscode.ExtensionMode.Test) notifications.start();
 
   void indexService.start();
   return { index, indexService, editService, queries, savedQueries, settings, extendMarkdownIt: (md) => preview.extendMarkdownIt(md), webviews };

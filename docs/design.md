@@ -804,7 +804,7 @@ GitHub Actions: PR마다 `typecheck + lint + test`, 태그 `v*` 푸시 시 패�
 | D-2 | ~~Cursor의 `markdown.previewScripts` 지원 여부~~ → **결정(M5.0)**: Cursor 3.12.10은 클래식 미리보기만 있고(`vscode.markdown.preview.editor`), `codeBlockEditors`/내장 Markdown Editor 없음. `markdownItPlugins`/`previewStyles`/`previewScripts` 계약은 동일 → 렌더 시점 통합이 VS Code·Cursor 공통 기준선 | 완료 |
 | D-3 | ~~드래그앤드롭 라이브러리~~ → **결정(M6.3)**: 네이티브 HTML5 DnD(`dataTransfer` + `dragover/drop`), 라이브러리 없음. 카드는 `application/x-tfm-task` 페이로드로 `{key,line}` 전달, 컬럼이 `task/setField`로 변환 | 완료 |
 | D-4 | `rrule` 번들 크기(≈ 60KB)와 Obsidian Tasks의 반복 파서 이식 범위 | M3 |
-| D-5 | OS 알림의 Linux 지원 범위(`notify-send` 유무) | M7 |
+| D-5 | ~~OS 알림의 Linux 지원 범위~~ → **결정(M7.1)**: `notify-send`가 있으면 사용, 실패(미설치 등) 시 로그만 남기고 토스트로 대체. macOS `osascript`, Windows PowerShell 토스트 동일 정책 | 완료 |
 
 ---
 

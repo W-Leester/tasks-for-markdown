@@ -456,11 +456,11 @@
 - `updateCheckUrl`에 더 높은 버전의 `latest.json`을 두면 알림이 뜬다.
 
 ### M7.1 알림 (`services/NotificationService.ts`)
-- [ ] 시작 시 + 매일 `notifications.dailyTime`(기본 09:00) 요약 토스트, "오늘 보기" 버튼 → 사이드바 (FR-10.1, FR-10.2)
-- [ ] OS 알림 — macOS `osascript`, Windows PowerShell 토스트, Linux `notify-send`; `execFile` 인자 배열, 실패 시 조용히 토스트만 (FR-10.2, D§10, D-5)
-- [ ] 마감 임박(D-N) 일 1회 묶음 알림, 태스크별 스누즈(내일/다음주) → `globalState` (FR-10.3)
-- [ ] 설정 `notifications.enabled|os|dailyTime|dueWithinDays` (FR-10.4)
-- [ ] Workspace Trust 없으면 OS 알림 비활성 (NFR-4)
+- [x] 시작 시 + 매일 `notifications.dailyTime`(기본 09:00) 요약 토스트, "오늘 보기" 버튼 → 사이드바 (FR-10.1, FR-10.2)
+- [x] OS 알림 — macOS `osascript`, Windows PowerShell 토스트, Linux `notify-send`; `execFile` 인자 배열, 실패 시 조용히 토스트만 (FR-10.2, D§10, D-5)
+- [x] 마감 임박(D-N) 일 1회 묶음 알림, 스누즈(내일/일주일; 묶음 단위) → `globalState` (FR-10.3)
+- [x] 설정 `notifications.enabled|os|dailyTime|dueWithinDays` (FR-10.4)
+- [x] Workspace Trust 없으면 OS 알림 비활성 (NFR-4)
 
 ### M7.2 아카이브 (`core/archive/ArchivePlanner.ts`, `services/ArchiveService.ts`)
 - [ ] `ArchivePlanner` (core) — 완료/취소 후 N일 지난 태스크 선별, 하위 항목 포함, 아카이브 텍스트 생성 (FR-10.5, FR-10.7)

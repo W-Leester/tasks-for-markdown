@@ -212,5 +212,13 @@
   "Add filter": "필터 추가",
   "Sort, group, layout": "정렬·그룹·레이아웃",
   "Add": "추가",
-  "{0} tasks match": "{0}개 일치"
+  "{0} tasks match": "{0}개 일치",
+  "Tasks for today": "오늘의 태스크",
+  "{0} due today or earlier, {1} overdue": "오늘까지 {0}개, 기한 초과 {1}개",
+  "{0} due today or earlier": "오늘까지 {0}개",
+  "Upcoming tasks": "마감 임박 태스크",
+  "{0} tasks due within {1} days": "{1}일 이내 마감 {0}개",
+  "Snooze until tomorrow": "내일까지 스누즈",
+  "Snooze a week": "일주일 스누즈",
+  "Show today": "오늘 보기"
 }

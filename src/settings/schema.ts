@@ -36,6 +36,10 @@ export interface SettingsSchema {
   'preview.renderBadges': boolean;
   'editModal.accessKeys': boolean;
   'editModal.hiddenFields': string[];
+  'notifications.enabled': boolean;
+  'notifications.os': boolean;
+  'notifications.dailyTime': string;
+  'notifications.dueWithinDays': number;
 }
 
 export const SETTINGS_SECTION = 'tasksmd';
@@ -71,6 +75,10 @@ export const SETTINGS_DEFAULTS: Readonly<SettingsSchema> = {
   'preview.renderBadges': true,
   'editModal.accessKeys': true,
   'editModal.hiddenFields': [],
+  'notifications.enabled': true,
+  'notifications.os': true,
+  'notifications.dailyTime': '09:00',
+  'notifications.dueWithinDays': 1,
 };
 
 export type SettingsKey = keyof SettingsSchema;

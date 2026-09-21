@@ -524,6 +524,29 @@
             ]
           },
           "description": "%tasksmd.config.editModal.hiddenFields%"
+        },
+        "tasksmd.notifications.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "%tasksmd.config.notifications.enabled%"
+        },
+        "tasksmd.notifications.os": {
+          "type": "boolean",
+          "default": true,
+          "description": "%tasksmd.config.notifications.os%"
+        },
+        "tasksmd.notifications.dailyTime": {
+          "type": "string",
+          "default": "09:00",
+          "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
+          "description": "%tasksmd.config.notifications.dailyTime%"
+        },
+        "tasksmd.notifications.dueWithinDays": {
+          "type": "number",
+          "default": 1,
+          "minimum": 0,
+          "maximum": 30,
+          "description": "%tasksmd.config.notifications.dueWithinDays%"
         }
       }
     },
@@ -923,7 +946,8 @@
       "supported": "limited",
       "description": "%tasksmd.capabilities.untrusted%",
       "restrictedConfigurations": [
-        "tasksmd.query.allowFunctions"
+        "tasksmd.query.allowFunctions",
+        "tasksmd.notifications.os"
       ]
     },
     "virtualWorkspaces": {

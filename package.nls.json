@@ -86,5 +86,9 @@
   "tasksmd.view.kanban": "Kanban",
   "tasksmd.openKanban.title": "Open kanban board",
   "tasksmd.openQueryBuilder.title": "Open query builder",
-  "tasksmd.savedQuery.openInBuilder.title": "Open in query builder"
+  "tasksmd.savedQuery.openInBuilder.title": "Open in query builder",
+  "tasksmd.config.notifications.enabled": "Show a daily summary (due today / overdue) and a digest of tasks due soon.",
+  "tasksmd.config.notifications.os": "Also send native OS notifications (macOS Notification Center, Windows toast, Linux notify-send). Trusted workspaces only.",
+  "tasksmd.config.notifications.dailyTime": "Time of day (HH:MM) for the daily summary; also shown on startup if not yet shown today.",
+  "tasksmd.config.notifications.dueWithinDays": "Include tasks due within this many days in the digest (0 = only today)."
 }

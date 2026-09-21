@@ -86,5 +86,9 @@
   "tasksmd.view.kanban": "칸반",
   "tasksmd.openKanban.title": "칸반 보드 열기",
   "tasksmd.openQueryBuilder.title": "쿼리 빌더 열기",
-  "tasksmd.savedQuery.openInBuilder.title": "쿼리 빌더에서 열기"
+  "tasksmd.savedQuery.openInBuilder.title": "쿼리 빌더에서 열기",
+  "tasksmd.config.notifications.enabled": "일일 요약(오늘 마감 / 기한 초과)과 마감 임박 태스크 묶음 알림을 표시합니다.",
+  "tasksmd.config.notifications.os": "OS 네이티브 알림도 보냅니다 (macOS 알림 센터, Windows 토스트, Linux notify-send). 신뢰된 워크스페이스에서만 동작합니다.",
+  "tasksmd.config.notifications.dailyTime": "일일 요약 시각 (HH:MM). 오늘 아직 표시하지 않았다면 시작 시에도 표시합니다.",
+  "tasksmd.config.notifications.dueWithinDays": "묶음 알림에 포함할 마감 임박 범위(일). 0이면 오늘만."
 }

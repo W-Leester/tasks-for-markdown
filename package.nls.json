@@ -63,5 +63,8 @@
   "tasksmd.loadStatusPreset.title": "Load status preset…",
   "tasksmd.changeStatusTo.title": "Change status to…",
   "tasksmd.setDependencies.title": "Set dependencies…",
-  "tasksmd.setRecurrence.title": "Set recurrence…"
+  "tasksmd.setRecurrence.title": "Set recurrence…",
+  "tasksmd.config.query.allowFunctions": "Allow `filter by function`, `sort by function` and `group by function` in queries. These run JavaScript from your notes, so they are off by default and never run in untrusted workspaces.",
+  "tasksmd.capabilities.untrusted": "Custom JavaScript query functions, OS notifications and update checks are disabled in untrusted workspaces.",
+  "tasksmd.capabilities.virtual": "Task indexing needs a file system; virtual workspaces are read-only."
 }

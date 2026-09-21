@@ -63,5 +63,8 @@
   "tasksmd.loadStatusPreset.title": "상태 프리셋 불러오기…",
   "tasksmd.changeStatusTo.title": "상태 변경…",
   "tasksmd.setDependencies.title": "의존성 설정…",
-  "tasksmd.setRecurrence.title": "반복 설정…"
+  "tasksmd.setRecurrence.title": "반복 설정…",
+  "tasksmd.config.query.allowFunctions": "쿼리에서 `filter by function`, `sort by function`, `group by function`을 허용합니다. 노트에 적힌 JavaScript를 실행하므로 기본은 꺼져 있고, 신뢰되지 않은 워크스페이스에서는 절대 실행되지 않습니다.",
+  "tasksmd.capabilities.untrusted": "신뢰되지 않은 워크스페이스에서는 커스텀 JavaScript 쿼리 함수, OS 알림, 업데이트 확인이 비활성화됩니다.",
+  "tasksmd.capabilities.virtual": "태스크 인덱싱에는 파일 시스템이 필요합니다. 가상 워크스페이스는 읽기 전용입니다."
 }

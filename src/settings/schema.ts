@@ -30,6 +30,7 @@ export interface SettingsSchema {
   'recurrence.copyDependsOn': boolean;
   'recurrence.removeScheduledDate': boolean;
   statuses: StatusConfig[];
+  'query.allowFunctions': boolean;
 }
 
 export const SETTINGS_SECTION = 'tasksmd';
@@ -59,6 +60,7 @@ export const SETTINGS_DEFAULTS: Readonly<SettingsSchema> = {
   'recurrence.copyDependsOn': true,
   'recurrence.removeScheduledDate': false,
   statuses: [...DEFAULT_STATUSES],
+  'query.allowFunctions': false,
 };
 
 export type SettingsKey = keyof SettingsSchema;

@@ -334,11 +334,11 @@
 - [x] `QueryResult { root: GroupNode, totalCount, explain, errors }`
 
 ### M4.4 JS 함수 (`filter|sort|group by function`)
-- [ ] 설정 `query.allowFunctions`(기본 false) + `workspace.isTrusted` 둘 다 참일 때만 컴파일 (FR-7.7, NFR-4)
-- [ ] `new Function('task','query', …)`; `task`는 읽기 전용 프록시 (D§10)
-- [ ] 태스크당 실행 시간 상한(5ms) 초과 시 함수 비활성 + 경고
-- [ ] 예외는 해당 태스크만 제외하고 오류 목록에 누적
-- [ ] `capabilities.untrustedWorkspaces: { supported: 'limited' }` 선언
+- [x] 설정 `query.allowFunctions`(기본 false) + `workspace.isTrusted` 둘 다 참일 때만 컴파일 (FR-7.7, NFR-4)
+- [x] `new Function('task','query', …)`; `task`는 읽기 전용 프록시 (D§10)
+- [x] 쿼리 실행당 누적 시간 상한(2s) 초과 시 함수 비활성 + 경고 (태스크당이 아닌 실행당 예산으로 변경)
+- [x] 예외는 해당 태스크만 제외하고 오류 목록에 누적
+- [x] `capabilities.untrustedWorkspaces: { supported: 'limited' }` 선언
 
 ### M4.5 QueryService · 저장된 쿼리
 - [ ] `QueryService.run(text, context)` — `(text, indexVersion)` 캐시, 인덱스 이벤트로 무효화 (FR-7.16, FR-7.17)

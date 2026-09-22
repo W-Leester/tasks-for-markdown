@@ -65,18 +65,9 @@ function decorateTaskLines(state: StateCore, deps: PluginDeps): void {
       const open = tokens[i]!;
       if (open.type !== 'list_item_open' || tokens[i + 1]!.type !== 'paragraph_open' || tokens[i + 2]!.type !== 'inline') continue;
       const inline = tokens[i + 2]!;
-      if (!inline.children?.length) continue;
-      // markdown-it-task-lists (Markdown All in One) strips "[ ] " from the content and prepends
-      // its own <input>; recover the symbol from that checkbox so the line parses again.
-      let line: string;
-      const c0 = inline.children[0]!;
-      if (c0.type === 'html_inline' && FOREIGN_CHECKBOX_RE.test(c0.content)) {
-        const symbol = /\bchecked\b/i.test(c0.content) ? 'x' : ' ';
-        line = `- [${symbol}] ${inline.content.trimStart()}`;
-      } else {
-        if (!TASK_START.test(inline.content)) continue;
-        line = `- ${inline.content}`;
-      }
+      const m = TASK_START.exec(inline.content);
+      if (!m || !inline.children?.length) continue;
+      const line = `- ${inline.content}`;
       const task = parseTaskLine(line, { statusRegistry: registry, globalFilter: deps.globalFilter() });
       if (!task) continue;
 
@@ -86,11 +77,7 @@ function decorateTaskLines(state: StateCore, deps: PluginDeps): void {
 
       // 1. Replace the leading "[x] " in the first text child with a checkbox. If another
       //    task-list plugin already turned it into an <input>, drop that and use ours.
-      if (inline.children[0]!.type === 'html_inline' && FOREIGN_CHECKBOX_RE.test(inline.children[0]!.content)) {
-        inline.children.shift();
-        const after = inline.children[0];
-        if (after?.type === 'text') after.content = after.content.replace(/^\s+/, '');
-      }
+      if (inline.children[0]!.type === 'html_inline' && FOREIGN_CHECKBOX_RE.test(inline.children[0]!.content)) inline.children.shift();
       const first = inline.children[0];
       if (first?.type === 'text' && TASK_START.test(first.content)) first.content = first.content.replace(TASK_START, '');
       if (!inline.children.length) inline.children.push(Object.assign(new state.Token('text', '', 0), { content: '' }));

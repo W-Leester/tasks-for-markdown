@@ -18,7 +18,7 @@ The extension indexes every `- [ ]` line in the workspace and lets you see, quer
 - **Sidebar** — Today / Next 7 days / Overdue / In progress / Blocked / All open / Done, grouping, filter, checkboxes; saved queries with grouped results.
 - **Query language** — the Obsidian Tasks query language in ` ```tasks ` blocks (rendered in the Markdown preview), in saved queries and in a visual query builder. Filters, boolean logic, sort by, group by, limits, layout options, `explain`, and optional `filter/sort/group by function`.
 - **Recurrence, statuses, dependencies** — `🔁 every month on the last`, `when done`, custom checkbox statuses with theme presets (Minimal, ITS, Things), `🆔`/`⛔` dependencies with blocked detection and cycle diagnostics, Obsidian's urgency score.
-- **More views** — Create/edit dialog, kanban (drag & drop), calendar (month/week, drag to reschedule), weekly statistics, archive of completed tasks, daily notifications.
+- **More views** — Create/edit dialog, kanban (drag & drop), calendar (month/week, full screen, drag to reschedule), weekly statistics, archive of completed tasks, daily notifications.
 - **Works in Cursor** — only stable VS Code APIs; also published to Open VSX.
 
 ## Getting started
@@ -68,6 +68,7 @@ group by filename
 | `notifications.*` | on, `09:00`, 1 day | Daily summary and due-soon digest, OS notifications |
 | `archive.file` / `afterDays` / `linkStyle` | `Archive.md` / 30 / `wiki` | Archive command |
 | `calendar.newTaskFile` | `""` | File that receives tasks created from the calendar |
+| `calendar.fullScreen` | `maximize` | Full screen button: maximize the editor group only, or `window` for the whole window |
 | `updateCheckUrl` | `""` | `latest.json` location for `.vsix` installs |
 
 ## Notes on the Markdown preview

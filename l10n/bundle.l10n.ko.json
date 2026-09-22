@@ -281,5 +281,8 @@
   "Tasks: reload the window to apply the language change.": "Tasks: 언어 변경을 적용하려면 창을 리로드하세요.",
   "New task at the end of {0}": "{0} 끝에 새 태스크",
   "line {0}": "{0}행",
-  "Which task in {0} do you want to edit?": "{0}의 어떤 태스크를 편집할까요?"
+  "Which task in {0} do you want to edit?": "{0}의 어떤 태스크를 편집할까요?",
+  "Full screen": "전체 화면",
+  "Exit full screen": "전체 화면 해제",
+  "Esc": "Esc"
 }

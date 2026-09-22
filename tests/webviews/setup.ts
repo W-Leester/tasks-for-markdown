@@ -13,5 +13,5 @@ export const posted: FromWebview[] = [];
 export function receive(msg: ToWebview): void {
   window.dispatchEvent(new MessageEvent('message', { data: msg }));
 }
-vi.stubGlobal('ResizeObserver', class { observe() {} disconnect() {} });
-afterEach(() => cleanup());
+vi.stubGlobal('ResizeObserver', class { observe() {} unobserve() {} disconnect() {} });
+afterEach(() => { cleanup(); posted.length = 0; });

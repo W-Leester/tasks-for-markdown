@@ -16,6 +16,8 @@
   let source = $state('open');
   let creating: string | null = $state(null); // ISO date of the cell with the inline input
   let newText = $state('');
+  let fullscreen = $state(false);
+  let gridHeight = $state(0);
   let request = 0;
 
   const ICON: Record<Field, string> = { due: '📅', scheduled: '⏳', start: '🛫' };
@@ -57,6 +59,8 @@
     return map;
   });
   const title = $derived(view === 'month' ? monthLabel(cursor) : `${days[0]} – ${days[6]}`);
+  /** How many items fit in a month cell: grows with the panel height (full screen shows more). */
+  const maxItems = $derived(view === 'week' ? Infinity : Math.max(2, Math.floor(((gridHeight - 26) / 6 - 28) / 18.5)));
 
   function move(n: number) {
     if (view === 'week') cursor = addDays(cursor, 7 * n);
@@ -83,12 +87,14 @@
     const off = onMessage((m) => {
       if (m.type === 'state/init') {
         init = m.state; setBundle(m.state.l10n); cursor = m.state.today;
-        const ui = m.state.uiState as { view?: 'month' | 'week'; show?: Record<Field, boolean>; source?: string };
+        const ui = m.state.uiState as { view?: 'month' | 'week'; show?: Record<Field, boolean>; source?: string; fullscreen?: boolean };
         if (ui.view) view = ui.view; if (ui.show) show = ui.show; if (ui.source) source = ui.source;
+        fullscreen = ui.fullscreen === true;
         run();
       } else if (m.type === 'state/patch') { init = { ...(init as InitState), ...m.state }; run(); }
       else if (m.type === 'query/result' && m.requestId === request) tasks = m.groups ? flatten(m.groups) : m.tasks;
       else if (m.type === 'index/changed') run();
+      else if (m.type === 'ui/fullscreen') fullscreen = m.on;
     });
     post({ type: 'ui/ready' });
     return off;
@@ -99,6 +105,8 @@
     return out;
   }
 </script>
+
+<svelte:window onkeydown={(e) => { if (e.key === 'Escape' && fullscreen && !creating) { e.preventDefault(); post({ type: 'ui/fullscreen', on: false }); } }} />
 
 <main>
   <header>
@@ -119,10 +127,12 @@
       <option value="open">{t('All open')}</option><option value="all">{t('All (incl. done)')}</option>
       {#each init?.savedQueries ?? [] as q (q.id)}<option value={q.id}>{q.name}</option>{/each}
     </select></label>
+    <button class="nav fs" onclick={() => post({ type: 'ui/fullscreen', on: !fullscreen })} aria-pressed={fullscreen}
+      title={fullscreen ? `${t('Exit full screen')} (${t('Esc')})` : t('Full screen')}>{fullscreen ? '⤡' : '⤢'} {fullscreen ? t('Exit full screen') : t('Full screen')}</button>
   </header>
 
   {#if init}
-    <div class="grid" class:week={view === 'week'}>
+    <div class="grid" class:week={view === 'week'} bind:clientHeight={gridHeight}>
       {#each DOW as d, i (d)}<div class="dow" class:weekend={i >= 5}>{t(d)}</div>{/each}
       {#each days as day (day)}
         {@const inMonth = view === 'week' || day.slice(0, 7) === cursor.slice(0, 7)}
@@ -130,8 +140,8 @@
         <div class="cell" class:today={day === init.today} class:muted={!inMonth} class:weekend={isoWeekday(day) >= 5} role="gridcell" tabindex="-1"
           ondragover={(e) => { e.preventDefault(); e.dataTransfer!.dropEffect = 'move'; }} ondrop={(e) => onDrop(e, day)}
           ondblclick={(e) => { if (e.target === e.currentTarget) startCreate(day); }}>
-          <div class="day"><span class="num">{Number(day.slice(8))}</span>{#if items.length > 3 && view === 'month'}<span class="tfm-muted more">+{items.length - 3}</span>{/if}</div>
-          {#each view === 'month' ? items.slice(0, 3) : items as item (item.task.key + item.task.line + item.field)}
+          <div class="day"><span class="num">{Number(day.slice(8))}</span>{#if items.length > maxItems}<span class="tfm-muted more">+{items.length - maxItems}</span>{/if}</div>
+          {#each view === 'month' ? items.slice(0, maxItems) : items as item (item.task.key + item.task.line + item.field)}
             <div class="item {item.field}" class:done={item.task.isCompleted} class:overdue={!item.task.isCompleted && item.field === 'due' && daysBetween(init.today, item.date) < 0}
               draggable="true" role="button" tabindex="0" title={`${item.task.description}\n${item.task.path}:${item.task.line + 1}`}
               ondragstart={(e) => onDragStart(e, item)}
@@ -161,8 +171,10 @@
   .modes button:first-child { border-radius: 4px 0 0 4px; } .modes button:last-child { border-radius: 0 4px 4px 0; }
   .modes button.active { background: var(--vscode-list-activeSelectionBackground); color: var(--vscode-list-activeSelectionForeground); }
   .toggles { display: inline-flex; gap: 10px; } .toggles label { display: inline-flex; gap: 4px; align-items: center; }
-  .grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); grid-auto-rows: minmax(90px, 1fr); gap: 2px; flex: 1; min-height: 0; }
-  .grid.week { grid-auto-rows: 1fr; }
+  .fs { margin-left: auto; }
+  .grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); grid-template-rows: auto repeat(6, minmax(90px, 1fr)); gap: 2px; flex: 1; min-height: 0; }
+  .grid.week { grid-template-rows: auto 1fr; }
+  .grid.week .cell { overflow: auto; }
   .dow { text-align: center; font-size: 0.85em; padding: 4px 0; background: var(--tfm-panel); border-radius: 3px; }
   .dow.weekend { color: var(--tfm-muted); }
   .cell { border: 1px solid var(--tfm-border); border-radius: 4px; padding: 3px 4px; overflow: hidden; display: flex; flex-direction: column; gap: 2px; background: var(--tfm-bg); }

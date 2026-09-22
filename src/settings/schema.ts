@@ -44,6 +44,7 @@ export interface SettingsSchema {
   'archive.afterDays': number;
   'archive.linkStyle': 'wiki' | 'markdown';
   'calendar.newTaskFile': string;
+  'calendar.fullScreen': 'maximize' | 'window';
   updateCheckUrl: string;
   language: 'auto' | 'en' | 'ko';
 }
@@ -89,6 +90,7 @@ export const SETTINGS_DEFAULTS: Readonly<SettingsSchema> = {
   'archive.afterDays': 30,
   'archive.linkStyle': 'wiki',
   'calendar.newTaskFile': '',
+  'calendar.fullScreen': 'maximize',
   updateCheckUrl: '',
   language: 'auto',
 };

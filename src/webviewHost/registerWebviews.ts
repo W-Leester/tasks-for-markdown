@@ -1,27 +1,42 @@
 import * as vscode from 'vscode';
 import { WebviewHost, type WebviewHostDeps } from './WebviewHost';
+import { PanelFullscreen } from './PanelFullscreen';
 import { t } from '../l10n';
 
-/** Opens (or reveals) a singleton editor-area panel for the given app. */
-export function createPanelOpener(deps: WebviewHostDeps, app: string, title: string, icon: string, column: vscode.ViewColumn = vscode.ViewColumn.Active): () => WebviewHost {
+export interface PanelHandle {
+  host: WebviewHost;
+  fullscreen: PanelFullscreen;
+}
+
+/** Opens (or reveals) a singleton editor-area panel for the given app. Every panel can go full screen. */
+export function createPanelOpener(deps: WebviewHostDeps, app: string, title: string, icon: string, column: vscode.ViewColumn = vscode.ViewColumn.Active): () => PanelHandle {
   let panel: vscode.WebviewPanel | null = null;
-  let host: WebviewHost | null = null;
+  let handle: PanelHandle | null = null;
   return () => {
-    if (panel && host) {
+    if (panel && handle) {
       panel.reveal();
-      return host;
+      return handle;
     }
     panel = vscode.window.createWebviewPanel(`tasksmd.${app}`, title, { viewColumn: column, preserveFocus: false }, { enableScripts: true, retainContextWhenHidden: false });
     panel.iconPath = new vscode.ThemeIcon(icon);
-    host = new WebviewHost(deps, { app, title });
+    const host = new WebviewHost(deps, { app, title });
+    const fullscreen = new PanelFullscreen(panel, () => deps.settings.get('calendar.fullScreen'), deps.log);
     host.attach(panel.webview);
     host.onClose = () => panel?.dispose();
+    host.onFullscreen = async (on) => {
+      await fullscreen.set(on);
+      // uiState survives a webview reload (retainContextWhenHidden is off); the message updates a live app.
+      host.extras.fullscreen = fullscreen.active;
+      host.send({ type: 'ui/fullscreen', on: fullscreen.active });
+    };
+    handle = { host, fullscreen };
     panel.onDidDispose(() => {
-      host?.dispose();
+      fullscreen.dispose();
+      host.dispose();
       panel = null;
-      host = null;
+      handle = null;
     });
-    return host;
+    return handle;
   };
 }
 
@@ -47,19 +62,20 @@ export function registerWebviews(context: vscode.ExtensionContext, deps: Webview
   // Beside, not on top of the editor: the user keeps seeing the note the task goes into.
   const openEditPanel = createPanelOpener(deps, 'edit', t('Tasks: Create or edit'), 'edit', vscode.ViewColumn.Beside);
   const openEdit = (target: EditTarget) => {
-    const host = openEditPanel();
-    host.extras = { editTarget: target };
+    const { host } = openEditPanel();
+    host.extras = { ...host.extras, editTarget: target };
     // If the panel was already open, tell the running app to switch target.
     host.send({ type: 'edit/target', key: target.key, line: target.line });
     return host;
   };
-  const openKanban = createPanelOpener(deps, 'kanban', t('Tasks: Kanban'), 'project');
+  const openKanbanPanel = createPanelOpener(deps, 'kanban', t('Tasks: Kanban'), 'project');
+  const openKanban = () => openKanbanPanel().host;
   registerWebviewView(context, deps, 'tasksmd.kanban', 'kanban', 'Kanban');
   context.subscriptions.push(vscode.commands.registerCommand('tasksmd.openKanban', () => openKanban()));
   const openBuilderPanel = createPanelOpener(deps, 'query-builder', t('Tasks: Query builder'), 'search');
   const openQueryBuilder = (id: string | null) => {
-    const host = openBuilderPanel();
-    host.extras = { queryTarget: id };
+    const { host } = openBuilderPanel();
+    host.extras = { ...host.extras, queryTarget: id };
     host.send({ type: 'query/target', id });
     return host;
   };
@@ -70,9 +86,23 @@ export function registerWebviews(context: vscode.ExtensionContext, deps: Webview
       return openQueryBuilder(q?.id ?? null);
     }),
   );
-  const openStats = createPanelOpener(deps, 'stats', t('Tasks: Statistics'), 'graph');
+  const openStatsPanel = createPanelOpener(deps, 'stats', t('Tasks: Statistics'), 'graph');
+  const openStats = () => openStatsPanel().host;
   context.subscriptions.push(vscode.commands.registerCommand('tasksmd.openStats', () => openStats()));
-  const openCalendar = createPanelOpener(deps, 'calendar', t('Tasks: Calendar'), 'calendar');
-  context.subscriptions.push(vscode.commands.registerCommand('tasksmd.openCalendar', () => openCalendar()));
+  const openCalendarPanel = createPanelOpener(deps, 'calendar', t('Tasks: Calendar'), 'calendar');
+  const openCalendar = () => openCalendarPanel().host;
+  context.subscriptions.push(
+    vscode.commands.registerCommand('tasksmd.openCalendar', () => openCalendar()),
+    vscode.commands.registerCommand('tasksmd.openCalendarFullScreen', async () => {
+      const { host } = openCalendarPanel();
+      await host.onFullscreen?.(true);
+      return host;
+    }),
+    vscode.commands.registerCommand('tasksmd.toggleFullScreen', async () => {
+      const { host, fullscreen } = openCalendarPanel();
+      await host.onFullscreen?.(!fullscreen.active);
+      return host;
+    }),
+  );
   return { openEdit, openKanban, openQueryBuilder, openStats, openCalendar };
 }

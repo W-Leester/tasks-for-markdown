@@ -74,6 +74,8 @@ export type ToWebview =
   | { type: 'query/explained'; requestId: number; explain: string; errors: string[]; matched: number }
   | { type: 'query/target'; id: string | null }
   | { type: 'stats/result'; requestId: number; stats: StatsDto }
+  /** Host-confirmed full-screen state of the panel (also sent after a command toggled it). */
+  | { type: 'ui/fullscreen'; on: boolean }
   | { type: 'error'; message: string };
 
 export interface GroupDto {
@@ -100,6 +102,8 @@ export type FromWebview =
   | { type: 'query/insert'; query: string }
   | { type: 'stats/request'; requestId: number; weeks: number; tag: string | null; folder: string | null }
   | { type: 'ui/close' }
+  /** Ask the host to maximize the panel (hide side bars/panel) or restore the layout. */
+  | { type: 'ui/fullscreen'; on: boolean }
   | { type: 'ui/notify'; level: 'info' | 'warn' | 'error'; message: string };
 
 /** Minimal typed wrapper around acquireVsCodeApi() for the webview side. */

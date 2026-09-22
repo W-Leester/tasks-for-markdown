@@ -253,6 +253,9 @@ export class WebviewHost implements vscode.Disposable {
         case 'ui/close':
           this.onClose?.();
           break;
+        case 'ui/fullscreen':
+          await this.onFullscreen?.(msg.on);
+          break;
       }
     } catch (err) {
       const message = err instanceof StaleLineError ? t('The file changed since it was indexed; it has been re-read. Please try again.') : err instanceof Error ? err.message : String(err);
@@ -263,6 +266,8 @@ export class WebviewHost implements vscode.Disposable {
   }
 
   onClose?: () => void;
+  /** Set by panel openers: maximize/restore the panel's layout (see PanelFullscreen). */
+  onFullscreen?: (on: boolean) => Promise<void>;
 
   private withFields(task: Task, fields: Partial<Record<TaskFieldName, string | string[] | null>>): Task {
     const registry = this.deps.getStatusRegistry();

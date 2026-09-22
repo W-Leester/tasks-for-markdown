@@ -2,7 +2,7 @@
   "name": "tasks-for-markdown",
   "displayName": "Tasks for Markdown",
   "description": "VS Code와 Cursor에서 쓰는 Obsidian Tasks 호환 마크다운 할 일 관리. Obsidian Tasks-compatible task management for Markdown files.",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "publisher": "HMCVECDT",
   "license": "MIT",
   "repository": {
@@ -244,6 +244,18 @@
         "title": "%tasksmd.openCalendar.title%",
         "category": "Tasks",
         "icon": "$(calendar)"
+      },
+      {
+        "command": "tasksmd.openCalendarFullScreen",
+        "title": "%tasksmd.openCalendarFullScreen.title%",
+        "category": "Tasks",
+        "icon": "$(screen-full)"
+      },
+      {
+        "command": "tasksmd.toggleFullScreen",
+        "title": "%tasksmd.toggleFullScreen.title%",
+        "category": "Tasks",
+        "icon": "$(screen-full)"
       },
       {
         "command": "tasksmd.checkForUpdates",
@@ -600,6 +612,19 @@
           "type": "string",
           "default": "",
           "description": "%tasksmd.config.calendar.newTaskFile%"
+        },
+        "tasksmd.calendar.fullScreen": {
+          "type": "string",
+          "enum": [
+            "maximize",
+            "window"
+          ],
+          "enumDescriptions": [
+            "%tasksmd.config.calendar.fullScreen.maximize%",
+            "%tasksmd.config.calendar.fullScreen.window%"
+          ],
+          "default": "maximize",
+          "description": "%tasksmd.config.calendar.fullScreen%"
         },
         "tasksmd.updateCheckUrl": {
           "type": "string",

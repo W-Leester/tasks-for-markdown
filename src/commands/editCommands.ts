@@ -130,7 +130,12 @@ export function registerEditCommands(context: vscode.ExtensionContext, deps: Com
         deps.openEdit({ key: editor.document.uri.toString(), line: editor.selection.active.line });
         return;
       }
-      const doc = lastMarkdownDoc && !lastMarkdownDoc.isClosed ? lastMarkdownDoc : undefined;
+      // No text editor visible (e.g. Cursor's own Markdown render mode, which is a custom editor
+      // without a cursor): use the file shown in the active tab, else the last Markdown document.
+      const tabUri = (vscode.window.tabGroups.activeTabGroup.activeTab?.input as { uri?: vscode.Uri } | undefined)?.uri;
+      const doc = tabUri && /\.(md|markdown)$/i.test(tabUri.path)
+        ? await vscode.workspace.openTextDocument(tabUri)
+        : lastMarkdownDoc && !lastMarkdownDoc.isClosed ? lastMarkdownDoc : undefined;
       if (!doc) {
         deps.openEdit({ key: null, line: null });
         return;

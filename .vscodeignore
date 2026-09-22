@@ -19,3 +19,4 @@ pnpm-lock.yaml
 pnpm-workspace.yaml
 History.md
 dist/latest.json
+.vscode-test.cursor.mjs

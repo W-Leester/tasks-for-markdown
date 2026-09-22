@@ -127,9 +127,11 @@ export function registerEditCommands(context: vscode.ExtensionContext, deps: Com
         ? vscode.window.activeTextEditor
         : vscode.window.visibleTextEditors.find((e) => e.document.languageId === 'markdown');
       if (editor) {
+        deps.log(`createOrEdit: ${vscode.window.activeTextEditor === editor ? 'active' : 'visible'} editor ${editor.document.uri.toString()} line ${editor.selection.active.line}`);
         deps.openEdit({ key: editor.document.uri.toString(), line: editor.selection.active.line });
         return;
       }
+      deps.log(`createOrEdit: no markdown editor; active tab = ${String((vscode.window.tabGroups.activeTabGroup.activeTab?.input as { uri?: vscode.Uri } | undefined)?.uri)}`);
       // No text editor visible (e.g. Cursor's own Markdown render mode, which is a custom editor
       // without a cursor): use the file shown in the active tab, else the last Markdown document.
       const tabUri = (vscode.window.tabGroups.activeTabGroup.activeTab?.input as { uri?: vscode.Uri } | undefined)?.uri;

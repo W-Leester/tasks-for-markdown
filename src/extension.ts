@@ -66,7 +66,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<Extens
   context.subscriptions.push(queries, savedQueries);
 
   context.subscriptions.push(output, settings, indexService, new TaskLineContext(), { dispose: () => index.dispose() });
-  const webviews = registerWebviews(context, { context, index, settings, queries, savedQueries, editService, getStatusRegistry, log });
+  const webviews = registerWebviews(context, { context, index, settings, queries, savedQueries, editService, indexService, getStatusRegistry, log });
   const commandDeps = { index, indexService, editService, settings, getStatusRegistry, log };
   registerCommands(context, commandDeps);
   registerEditCommands(context, { ...commandDeps, openEdit: (target) => webviews.openEdit(target) });

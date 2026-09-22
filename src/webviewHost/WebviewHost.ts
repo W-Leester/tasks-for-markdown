@@ -1,10 +1,11 @@
 import * as vscode from 'vscode';
 import { systemClock, type Clock } from '../core/dates';
 import type { TaskIndex } from '../core/index';
-import { DateField, type StatusRegistry, StatusType, Task, generateTaskId } from '../core/task';
+import { DateField, type StatusRegistry, StatusType, Task, generateTaskId, parseTaskLine } from '../core/task';
 import { Recurrence } from '../core/recurrence';
 import { computeWeeklyStats } from '../core/stats';
 import { dependants } from '../core/index';
+import type { IndexService } from '../index/IndexService';
 import type { QueryService } from '../services/QueryService';
 import type { SavedQueryStore } from '../services/SavedQueryStore';
 import { StaleLineError, type TaskEditService } from '../services/TaskEditService';
@@ -20,6 +21,7 @@ export interface WebviewHostDeps {
   queries: QueryService;
   savedQueries: SavedQueryStore;
   editService: TaskEditService;
+  indexService?: IndexService;
   getStatusRegistry(): StatusRegistry;
   log(m: string): void;
   clock?: Clock;
@@ -159,7 +161,27 @@ export class WebviewHost implements vscode.Disposable {
         }
         case 'task/load': {
           const today = this.today();
-          const task = msg.key !== null && msg.line !== null ? this.deps.index.taskAt(msg.key, msg.line) : undefined;
+          let task = msg.key !== null && msg.line !== null ? this.deps.index.taskAt(msg.key, msg.line) : undefined;
+          if (!task && msg.key !== null && msg.line !== null) {
+            // The index may lag behind the editor (debounce) — read the line straight from the document.
+            try {
+              const doc = await vscode.workspace.openTextDocument(vscode.Uri.parse(msg.key));
+              if (msg.line < doc.lineCount) {
+                const parsed = parseTaskLine(doc.lineAt(msg.line).text, {
+                  statusRegistry: this.deps.getStatusRegistry(),
+                  globalFilter: this.deps.settings.get('globalFilter') || undefined,
+                  location: { key: msg.key, path: vscode.workspace.asRelativePath(doc.uri, false), line: msg.line, heading: null, frontmatterTags: [], depth: 0, parentLine: null },
+                });
+                if (parsed) {
+                  task = parsed;
+                  this.deps.indexService?.indexText(doc.uri, doc.getText());
+                }
+              }
+            } catch (err) {
+              this.deps.log(`task/load: could not read ${msg.key}: ${err instanceof Error ? err.message : String(err)}`);
+            }
+          }
+          this.deps.log(`task/load key=${msg.key} line=${msg.line} -> ${task ? 'edit "' + task.description + '"' : 'new task'}`);
           const candidates = this.deps.index.all().filter((t) => !t.isCompleted && t !== task).map((t) => toTaskDto(t, this.deps.index, today));
           const deps = task ? dependants(task, this.deps.index).map((t) => toTaskDto(t, this.deps.index, today)) : [];
           this.send({ type: 'task/loaded', requestId: msg.requestId, task: task ? toTaskDto(task, this.deps.index, today) : null, candidates, dependants: deps });

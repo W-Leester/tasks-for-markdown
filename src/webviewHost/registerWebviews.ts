@@ -3,7 +3,7 @@ import { WebviewHost, type WebviewHostDeps } from './WebviewHost';
 import { t } from '../l10n';
 
 /** Opens (or reveals) a singleton editor-area panel for the given app. */
-export function createPanelOpener(deps: WebviewHostDeps, app: string, title: string, icon: string): () => WebviewHost {
+export function createPanelOpener(deps: WebviewHostDeps, app: string, title: string, icon: string, column: vscode.ViewColumn = vscode.ViewColumn.Active): () => WebviewHost {
   let panel: vscode.WebviewPanel | null = null;
   let host: WebviewHost | null = null;
   return () => {
@@ -11,7 +11,7 @@ export function createPanelOpener(deps: WebviewHostDeps, app: string, title: str
       panel.reveal();
       return host;
     }
-    panel = vscode.window.createWebviewPanel(`tasksmd.${app}`, title, vscode.ViewColumn.Active, { enableScripts: true, retainContextWhenHidden: false });
+    panel = vscode.window.createWebviewPanel(`tasksmd.${app}`, title, { viewColumn: column, preserveFocus: false }, { enableScripts: true, retainContextWhenHidden: false });
     panel.iconPath = new vscode.ThemeIcon(icon);
     host = new WebviewHost(deps, { app, title });
     host.attach(panel.webview);
@@ -44,7 +44,8 @@ export function registerWebviewView(context: vscode.ExtensionContext, deps: Webv
 }
 
 export function registerWebviews(context: vscode.ExtensionContext, deps: WebviewHostDeps): { openEdit: (target: EditTarget) => WebviewHost; openKanban: () => WebviewHost; openQueryBuilder: (id: string | null) => WebviewHost; openStats: () => WebviewHost; openCalendar: () => WebviewHost } {
-  const openEditPanel = createPanelOpener(deps, 'edit', t('Tasks: Create or edit'), 'edit');
+  // Beside, not on top of the editor: the user keeps seeing the note the task goes into.
+  const openEditPanel = createPanelOpener(deps, 'edit', t('Tasks: Create or edit'), 'edit', vscode.ViewColumn.Beside);
   const openEdit = (target: EditTarget) => {
     const host = openEditPanel();
     host.extras = { editTarget: target };

@@ -38,6 +38,13 @@ export interface WebviewAppOptions {
  * typed message protocol, `state/init` on ready, `index/changed` pushes, and the edit
  * operations routed through TaskEditService. Works for both WebviewPanel and WebviewView.
  */
+/** Last Markdown document that had focus — the fallback target for tasks created from a panel. */
+let lastMarkdownDoc: vscode.TextDocument | undefined;
+vscode.window.onDidChangeActiveTextEditor((e) => {
+  if (e?.document.languageId === 'markdown') lastMarkdownDoc = e.document;
+});
+if (vscode.window.activeTextEditor?.document.languageId === 'markdown') lastMarkdownDoc = vscode.window.activeTextEditor.document;
+
 export class WebviewHost implements vscode.Disposable {
   private readonly disposables: vscode.Disposable[] = [];
   private webview: vscode.Webview | null = null;
@@ -140,12 +147,19 @@ export class WebviewHost implements vscode.Disposable {
               target = vscode.Uri.joinPath(folder.uri, ...inbox.split(/[\\/]/));
               try { await vscode.workspace.fs.stat(target); } catch { await vscode.workspace.fs.writeFile(target, Buffer.from(`# ${inbox.split('/').pop()!.replace(/\.md$/, '')}\n\n`, 'utf8')); }
             } else {
-              const editor = vscode.window.activeTextEditor ?? vscode.window.visibleTextEditors.find((e) => e.document.languageId === 'markdown');
-              if (!editor || editor.document.languageId !== 'markdown') throw new Error(t('Open a Markdown file to create a task, or set tasksmd.calendar.newTaskFile.'));
-              target = editor.document.uri;
-              line = msg.line ?? editor.selection.active.line;
+              const editor = vscode.window.activeTextEditor?.document.languageId === 'markdown'
+                ? vscode.window.activeTextEditor
+                : vscode.window.visibleTextEditors.find((e) => e.document.languageId === 'markdown');
+              if (editor) {
+                target = editor.document.uri;
+                line = msg.line ?? editor.selection.active.line;
+              } else if (lastMarkdownDoc && !lastMarkdownDoc.isClosed) {
+                target = lastMarkdownDoc.uri;
+                line = msg.line ?? lastMarkdownDoc.lineCount;
+              } else throw new Error(t('Open a Markdown file to create a task, or set tasksmd.calendar.newTaskFile.'));
             }
           }
+          this.deps.log(`task/create -> ${target.toString()} line ${line}: ${task.description}`);
           await this.deps.editService.insertNewTask(target, line, task);
           break;
         }

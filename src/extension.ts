@@ -13,6 +13,7 @@ import { TaskHoverProvider } from './editor/TaskHoverProvider';
 import { TaskLineContext } from './editor/TaskLineContext';
 import { IndexService } from './index/IndexService';
 import { PreviewIntegration } from './preview/PreviewIntegration';
+import { registerRenderedView } from './preview/RenderedView';
 import { ArchiveService } from './services/ArchiveService';
 import { NotificationService } from './services/NotificationService';
 import { QueryService } from './services/QueryService';
@@ -99,6 +100,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<Extens
   index.onDidChangeProgress(updateEmpty);
 
   const preview = new PreviewIntegration({ index, queries, settings, getStatusRegistry, log });
+  registerRenderedView(context, { context, index, indexService, editService, settings, preview, getStatusRegistry, log });
   context.subscriptions.push(preview);
 
   const archive = new ArchiveService({ index, indexService, settings, log });

@@ -2,7 +2,7 @@
   "name": "tasks-for-markdown",
   "displayName": "Tasks for Markdown",
   "description": "VS Code와 Cursor에서 쓰는 Obsidian Tasks 호환 마크다운 할 일 관리. Obsidian Tasks-compatible task management for Markdown files.",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "publisher": "HMCVECDT",
   "license": "MIT",
   "repository": {
@@ -250,6 +250,24 @@
         "title": "%tasksmd.openCalendar.title%",
         "category": "Tasks",
         "icon": "$(calendar)"
+      },
+      {
+        "command": "tasksmd.openRendered",
+        "title": "%tasksmd.openRendered.title%",
+        "category": "Tasks",
+        "icon": "$(open-preview)"
+      },
+      {
+        "command": "tasksmd.openRenderedToSide",
+        "title": "%tasksmd.openRenderedToSide.title%",
+        "category": "Tasks",
+        "icon": "$(open-preview)"
+      },
+      {
+        "command": "tasksmd.openSource",
+        "title": "%tasksmd.openSource.title%",
+        "category": "Tasks",
+        "icon": "$(go-to-file)"
       },
       {
         "command": "tasksmd.openCalendarFullScreen",
@@ -678,6 +696,12 @@
         "command": "tasksmd.quickSearch",
         "key": "ctrl+shift+;",
         "mac": "cmd+shift+;"
+      },
+      {
+        "command": "tasksmd.openRendered",
+        "key": "ctrl+shift+r",
+        "mac": "ctrl+shift+r",
+        "when": "!terminalFocus && (editorTextFocus && editorLangId == markdown || activeCustomEditorId == tasksmd.rendered || !inputFocus && resourceExtname =~ /\\.(md|markdown)$/)"
       }
     ],
     "menus": {
@@ -713,6 +737,10 @@
         {
           "command": "tasksmd.savedQuery.openInBuilder",
           "when": "false"
+        },
+        {
+          "command": "tasksmd.openSource",
+          "when": "activeCustomEditorId == tasksmd.rendered"
         }
       ],
       "editor/context": [
@@ -919,6 +947,18 @@
           "when": "view == tasksmd.savedQueries && viewItem =~ /^savedQuery/",
           "group": "1_q@0"
         }
+      ],
+      "editor/title": [
+        {
+          "command": "tasksmd.openRendered",
+          "when": "resourceExtname =~ /\\.(md|markdown)$/ && activeCustomEditorId != tasksmd.rendered",
+          "group": "navigation@9"
+        },
+        {
+          "command": "tasksmd.openSource",
+          "when": "activeCustomEditorId == tasksmd.rendered",
+          "group": "navigation@9"
+        }
       ]
     },
     "submenus": [
@@ -970,6 +1010,21 @@
         "view": "tasksmd.savedQueries",
         "contents": "%tasksmd.view.savedQueries.welcome%",
         "when": "tasksmd.savedQueriesEmpty"
+      }
+    ],
+    "customEditors": [
+      {
+        "viewType": "tasksmd.rendered",
+        "displayName": "%tasksmd.rendered.displayName%",
+        "selector": [
+          {
+            "filenamePattern": "*.md"
+          },
+          {
+            "filenamePattern": "*.markdown"
+          }
+        ],
+        "priority": "option"
       }
     ],
     "colors": [
@@ -1039,6 +1094,7 @@
   "dependencies": {
     "dayjs": "^1.11.13",
     "ignore": "^7.0.9",
+    "markdown-it": "^15.0.2",
     "rrule": "^2.8.1"
   },
   "devDependencies": {
@@ -1055,7 +1111,6 @@
     "eslint": "^9.0.0",
     "glob": "^13.0.6",
     "jsdom": "^30.1.0",
-    "markdown-it": "^15.0.2",
     "markdown-it-task-lists": "^2.1.1",
     "mocha": "^12.0.2",
     "ovsx": "^0.10.0",

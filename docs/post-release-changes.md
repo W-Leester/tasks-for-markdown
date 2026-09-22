@@ -40,6 +40,8 @@
 | 25 | `c8ad128` | 09-22 15:31 | 기능 | 캘린더 전체 화면, 칸 높이에 맞춘 표시 개수, **1.0.2** |
 | 26 | `30d72cc` | 09-22 15:35 | 기능 | `tasksmd.calendar.fontSize` |
 | 27 | `7fb8cc7` | 09-22 15:43 | 기능 | 쿼리 결과 패널 + 블록 위 CodeLens, **1.0.3** |
+| 28 | `6d4db7b`, `b32239a` | 09-22 | 문서 | 이 문서 작성, Cursor `Cmd+Shift+V` 바인딩 정정 |
+| 29 | (다음) | 09-22 | 기능 | **렌더 보기**(상호작용 커스텀 에디터), **1.0.4** |
 
 ---
 
@@ -189,6 +191,24 @@
 - `src/editor/TaskCodeLensProvider.ts`: 모든 ```tasks 펜스 줄 위에 `▶ 결과 보기 · ? 설명` CodeLens(코드렌즈 모드가 `off`가 아니면 항상, 최대 20,000줄 검사).
 - 테스트: `tests/webviews/QueryResultsApp.test.ts`(source 전달·그룹 렌더링, 커서 따라가기 메시지·카드 토글), 통합 테스트(펜스 두 개의 CodeLens 위치, 명령이 그 블록을 대상으로 패널을 여는지, 커서 이동 시 대상 교체).
 - 문서: user-guide 4장을 "패널/표준 미리보기" 두 경로로 재작성하고 FAQ에 Cursor Preview 항목 추가, README·README.en·`examples/쿼리-예시.md` 안내 문구 수정.
+
+### 2.12 렌더 보기: 상호작용 커스텀 에디터 (#29, 1.0.4)
+
+**배경.** 사용자가 "Preview | Markdown 토글에서 렌더링되지 않으면 별 의미가 없다"고 했습니다.
+
+**조사.** Cursor 번들(`workbench.desktop.main.js`)을 분석한 결과, 그 Preview는 워크벤치 렌더러 안의 Tiptap/ProseMirror 컴포넌트(remark/micromark로 파싱)이고, 확장 호스트 번들(`extensionHostProcess.js`)에는 `markdownEditor` 관련 API가 0건입니다. mermaid 블록만 코드에 하드코딩된 특별 처리입니다. 확장은 별도 프로세스에서 실행되어 워크벤치 DOM에 접근할 수 없으므로, **그 토글 안에 결과를 그리는 것은 어떤 확장도 불가능**합니다.
+
+**결정.** 같은 자리를 차지하는 확장 자체의 렌더 보기를 만들었습니다. `.md` 파일을 여는 또 하나의 에디터(`customEditors`, viewType `tasksmd.rendered`, priority `option`)로 등록되어 탭 안에서 Preview 토글처럼 쓸 수 있고, 미리보기와 달리 상호작용이 됩니다. 처음 요구사항에서 제외한 "편집기 대체"(본문 WYSIWYG 편집)는 아니며, 읽기 + 태스크 조작 뷰입니다.
+
+**변경.**
+- `src/preview/renderDocument.ts`: vscode 의존 없는 순수 함수 `renderDocumentHtml()`. 자체 `markdown-it` 인스턴스(`html: false`로 원문 HTML은 이스케이프, `linkify`)에 기존 미리보기 플러그인을 걸어 렌더링. YAML front matter는 **줄 수를 유지한 채** 비워 `data-tfm-line`이 문서 줄과 일치. 체크박스의 `disabled` 제거. 상대 경로 이미지를 webview URI로 치환(절대 URL·data:·앵커는 제외).
+- `src/preview/RenderedView.ts`: `RenderedViewProvider implements CustomTextEditorProvider`. 문서 변경(250ms)·인덱스 변경(400ms)·설정 변경 시 재렌더 후 `doc/html` 전송. 메시지 처리: `doc/toggle`(문서 줄 또는 쿼리 결과 행의 path+line → 인덱스에서 태스크를 찾고, 없으면 문서 줄을 직접 파싱 → `TaskEditService.toggle`), `doc/edit`(`tasksmd.createOrEdit`), `doc/link`(외부 URL은 `openExternal`, 상대 경로는 문서 기준으로 열고 `#L<n>`이면 해당 줄로), `doc/openSource`(`vscode.openWith … default`). 오류 시 알림 + 재렌더로 체크박스 상태 되돌림. 활성 렌더 보기 문서를 추적해 `tasksmd.openSource`가 동작.
+- `src/webviews/rendered/main.ts`: 프레임워크 없는 1.5KB 페이지 스크립트(초기에는 공용 헬퍼를 썼다가 Svelte 런타임이 딸려와 135KB가 되어 교체). 클릭/더블클릭 위임, 재렌더 시 스크롤 위치 유지.
+- 명령 `tasksmd.openRendered`(`Ctrl+Shift+R`), `tasksmd.openRenderedToSide`, `tasksmd.openSource`. 에디터 제목 표시줄 아이콘(마크다운 파일이면 렌더 보기, 렌더 보기 안이면 소스 편집). 같은 키가 두 방향 전환에 쓰입니다.
+- `markdown-it`을 devDependencies에서 dependencies로 이동. `PreviewIntegration.pluginDeps()` 분리.
+- 테스트: `tests/preview-renderDocument.test.ts`(front matter 줄 번호 유지, 체크박스 활성, 쿼리 결과, 상대 이미지만 치환, 원문 HTML 이스케이프), 통합 테스트(커스텀 에디터 탭이 열리고 소스로 돌아옴).
+
+**남은 제한.** 본문 텍스트 편집은 소스 편집으로 전환해야 합니다. 렌더 보기는 실행 취소 스택을 갖지 않으며(편집은 모두 `TaskEditService`가 원본 파일에 적용) 미리보기 CSS(`media/preview.css`)를 공유하므로 스타일 변경은 두 곳에 함께 반영됩니다.
 
 ---
 

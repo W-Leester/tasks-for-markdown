@@ -445,3 +445,17 @@ suite('query results panel', () => {
     }
   });
 });
+
+suite('rendered view', () => {
+  test('opens a Markdown note as a custom editor and switches back to the source', async () => {
+    const uri = fixtureUri('notes/dev-checklist.md');
+    try {
+      await vscode.commands.executeCommand('tasksmd.openRendered', uri);
+      await waitFor(() => vscode.window.tabGroups.all.some((g) => g.tabs.some((t) => t.input instanceof vscode.TabInputCustom && t.input.viewType === 'tasksmd.rendered')), 8000, 'rendered tab');
+      await vscode.commands.executeCommand('tasksmd.openSource', uri);
+      await waitFor(() => vscode.window.activeTextEditor?.document.uri.toString() === uri.toString(), 8000, 'source editor');
+    } finally {
+      await vscode.commands.executeCommand('workbench.action.closeAllEditors');
+    }
+  });
+});

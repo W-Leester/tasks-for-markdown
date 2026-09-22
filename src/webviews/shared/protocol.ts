@@ -85,6 +85,8 @@ export type ToWebview =
   | { type: 'query/explained'; requestId: number; explain: string; errors: string[]; matched: number }
   | { type: 'query/target'; id: string | null }
   | { type: 'results/query'; target: QueryTargetDto }
+  /** Rendered view: the whole note as HTML. */
+  | { type: 'doc/html'; html: string }
   | { type: 'stats/result'; requestId: number; stats: StatsDto }
   /** Host-confirmed full-screen state of the panel (also sent after a command toggled it). */
   | { type: 'ui/fullscreen'; on: boolean }
@@ -116,6 +118,11 @@ export type FromWebview =
   | { type: 'ui/close' }
   /** Ask the host to maximize the panel (hide side bars/panel) or restore the layout. */
   | { type: 'ui/fullscreen'; on: boolean }
+  // Rendered view. `path` is the task's workspace path for query-result rows, null for the note itself.
+  | { type: 'doc/toggle'; path: string | null; line: number }
+  | { type: 'doc/edit'; path: string | null; line: number }
+  | { type: 'doc/link'; href: string }
+  | { type: 'doc/openSource' }
   | { type: 'ui/notify'; level: 'info' | 'warn' | 'error'; message: string };
 
 /** Minimal typed wrapper around acquireVsCodeApi() for the webview side. */

@@ -9,7 +9,7 @@ import type { StatusRegistry, Task } from '../core/task';
 import { overdueText, relativeText } from '../editor/relativeText';
 import type { QueryService } from '../services/QueryService';
 import type { Settings } from '../settings/Settings';
-import { tasksMarkdownItPlugin } from './markdownItPlugin';
+import { type PluginDeps, tasksMarkdownItPlugin } from './markdownItPlugin';
 import { t } from '../l10n';
 
 const REFRESH_DEBOUNCE_MS = 500;
@@ -44,7 +44,13 @@ export class PreviewIntegration implements vscode.Disposable {
   extendMarkdownIt(md: MarkdownIt): MarkdownIt {
     this.extendCalls++;
     this.deps.log?.(`extendMarkdownIt called (${this.extendCalls})`);
-    tasksMarkdownItPlugin(md, {
+    tasksMarkdownItPlugin(md, this.pluginDeps());
+    return md;
+  }
+
+  /** The plugin's hooks into the extension — shared with the rendered view. */
+  pluginDeps(): PluginDeps {
+    return {
       getStatusRegistry: () => this.deps.getStatusRegistry(),
       runQuery: (text, source) => this.deps.queries.run(text, source),
       parseQuery: (text, source) => this.deps.queries.parse(text, source),
@@ -56,8 +62,7 @@ export class PreviewIntegration implements vscode.Disposable {
       globalFilter: () => this.deps.settings.get('globalFilter') || undefined,
       enabled: () => this.deps.settings.get('preview.enabled'),
       log: (m) => this.deps.log?.(m),
-    });
-    return md;
+    };
   }
 
   private renderOptions(source?: QuerySource): RenderOptions {

@@ -260,7 +260,7 @@
 - 레이아웃 읽기 API 부재: 전체 화면 해제가 이전 상태를 정확히 복원하지 못함(2.10).
 
 **미검증**
-- 사용자 Cursor에서 `Cmd+Shift+V` 표준 미리보기가 여전히 비어 보이는지(사용자가 무시하기로 함). 재확인 권장: 1.0.1 이후 예외 격리로 해결됐을 가능성.
+- 사용자 Cursor에서 VS Code 표준 미리보기가 비어 보이던 증상(사용자가 무시하기로 함). **추가 발견(09-22):** Cursor는 `Cmd+Shift+V`를 자체 `markdownEditor.toggleMode`(weight 600, `markdownEditorActive`일 때)에 묶어 두어 Markdown 확장의 `markdown.showPreview`(같은 키)를 덮습니다. 즉 Cursor에서 `Cmd+Shift+V`는 VS Code 미리보기가 아니라 Cursor WYSIWYG 토글입니다. VS Code 미리보기는 `Cmd+K V`(`markdown.showPreviewToSide`) 또는 명령 팔레트로 엽니다. 이 키로는 미검증.
 - 한국어 UI가 리로드 후 실제로 표시되는지에 대한 사용자 확인.
 
 **사용자 결정 대기(제안만 한 상태)**

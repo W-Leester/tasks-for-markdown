@@ -50,7 +50,7 @@ Obsidian Tasks 플러그인과 같은 문법으로 VS Code / Cursor 안에서 �
 노트에 ` ```tasks ` 블록을 쓰면 결과를 두 곳에서 볼 수 있습니다.
 
 - **쿼리 결과 패널** — 블록 위 CodeLens `▶ 결과 보기`(또는 커서를 블록 안에 두고 `Tasks: 커서 위치 쿼리 결과 보기`)를 누르면 에디터 옆에 결과 목록이 열립니다. "커서 따라가기"가 켜져 있으면 커서를 다른 블록으로 옮기거나 블록을 고칠 때 자동으로 갱신됩니다. 카드 클릭은 편집, 더블클릭은 원본, 체크박스는 완료 전환입니다. 어떤 편집기에서든 동작합니다.
-- **VS Code 마크다운 미리보기**(`Cmd/Ctrl+Shift+V`, `Markdown: Open Preview`) — 블록 자리에 결과가 표시 전용으로 렌더링됩니다. **Cursor의 "Preview" 토글(WYSIWYG 편집기)은 확장 렌더러를 쓰지 않으므로 블록이 코드로만 보입니다.** 그 경우 위 패널을 쓰세요.
+- **VS Code 마크다운 미리보기**(`Markdown: Open Preview to the Side`, 키 `Cmd/Ctrl+K V`) — 블록 자리에 결과가 표시 전용으로 렌더링됩니다. **Cursor의 "Preview" 토글(WYSIWYG 편집기)은 확장 렌더러를 쓰지 않으므로 블록이 코드로만 보입니다.** Cursor에서는 `Cmd+Shift+V`가 이 토글에 묶여 있어 VS Code 미리보기가 열리지 않으니, `Cmd+K V`나 명령 팔레트를 쓰세요. 그래도 안 되면 위 패널을 쓰세요.
 
 `Tasks: 쿼리 블록 삽입`, `Tasks: 커서 위치 쿼리 설명`(CodeLens `? 설명`)도 있습니다.
 
@@ -95,6 +95,6 @@ short mode
 
 - **Obsidian과 같은 폴더를 써도 되나요?** 문법이 같고 필드 순서도 동일하게 쓰므로 호환됩니다. 다만 이 확장의 공식 지원 범위는 전용 폴더입니다.
 - **미리보기에서 체크가 안 돼요.** 의도된 제한입니다(4장). 에디터에서 `Cmd/Ctrl+Enter`를 쓰거나 쿼리 결과 패널의 체크박스를 쓰세요.
-- **Cursor에서 쿼리 블록이 그냥 코드로 보여요.** Cursor의 Preview 토글은 자체 WYSIWYG 편집기라 확장이 개입할 수 없습니다. 블록 위 `▶ 결과 보기` CodeLens로 결과 패널을 여세요.
+- **Cursor에서 쿼리 블록이 그냥 코드로 보여요.** 오른쪽 위 "Preview | Markdown" 토글의 Preview는 Cursor 자체 WYSIWYG 편집기라 확장이 개입할 수 없고, `Cmd+Shift+V`도 이 토글에 묶여 있습니다. "Markdown"으로 전환한 뒤 블록 위 `▶ 결과 보기` CodeLens로 결과 패널을 열거나, `Cmd+K V`(Markdown: Open Preview to the Side)로 VS Code 미리보기를 여세요.
 - **`.vsix`로 설치했는데 업데이트는?** `tasksmd.updateCheckUrl`에 사내 `latest.json` 경로를 넣으면 하루 1회 새 버전을 알려줍니다.
 - **로그는 어디에?** `Tasks: 로그 보기` (출력 채널 "Tasks for Markdown").

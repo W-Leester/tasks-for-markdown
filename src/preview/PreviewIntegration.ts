@@ -55,7 +55,6 @@ export class PreviewIntegration implements vscode.Disposable {
       },
       globalFilter: () => this.deps.settings.get('globalFilter') || undefined,
       enabled: () => this.deps.settings.get('preview.enabled'),
-      log: (m) => this.deps.log?.(m),
     });
     return md;
   }

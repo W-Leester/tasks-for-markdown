@@ -105,8 +105,9 @@ export function registerEditCommands(context: vscode.ExtensionContext, deps: Com
   );
 
   // Create or edit: opens the webview dialog (FR-6). Edits the task under the cursor / the tree
-  // argument. When the focus is elsewhere (Markdown preview, sidebar) there is no cursor, so the
-  // previewed / last used Markdown document's tasks are offered in a QuickPick instead.
+  // argument, else the cursor line of the active or visible Markdown editor (the preview is
+  // usually beside one). With no Markdown editor visible at all, the last used document's
+  // tasks are offered in a QuickPick.
   let lastMarkdownDoc: vscode.TextDocument | undefined;
   context.subscriptions.push(
     vscode.window.onDidChangeActiveTextEditor((e) => {
@@ -120,12 +121,16 @@ export function registerEditCommands(context: vscode.ExtensionContext, deps: Com
         deps.openEdit({ key: existing.location.key, line: existing.location.line });
         return;
       }
-      const active = vscode.window.activeTextEditor;
-      if (active?.document.languageId === 'markdown') {
-        deps.openEdit({ key: active.document.uri.toString(), line: active.selection.active.line });
+      // The active editor, or — when the preview / a sidebar has focus — the Markdown editor
+      // still visible next to it: its cursor line decides (edit that task, or create there).
+      const editor = vscode.window.activeTextEditor?.document.languageId === 'markdown'
+        ? vscode.window.activeTextEditor
+        : vscode.window.visibleTextEditors.find((e) => e.document.languageId === 'markdown');
+      if (editor) {
+        deps.openEdit({ key: editor.document.uri.toString(), line: editor.selection.active.line });
         return;
       }
-      const doc = vscode.window.visibleTextEditors.find((e) => e.document.languageId === 'markdown')?.document ?? (lastMarkdownDoc && !lastMarkdownDoc.isClosed ? lastMarkdownDoc : undefined);
+      const doc = lastMarkdownDoc && !lastMarkdownDoc.isClosed ? lastMarkdownDoc : undefined;
       if (!doc) {
         deps.openEdit({ key: null, line: null });
         return;

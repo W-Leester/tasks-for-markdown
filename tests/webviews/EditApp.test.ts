@@ -7,7 +7,7 @@ import { posted, receive } from './setup';
 const init: InitState = {
   locale: 'en', l10n: {}, today: '2026-09-22', taskFormat: 'emoji', savedQueries: [], uiState: { editTarget: { key: 'file:///n.md', line: 36 } },
   statuses: [{ symbol: ' ', name: 'Todo', type: 'TODO', nextSymbol: 'x' }, { symbol: 'x', name: 'Done', type: 'DONE', nextSymbol: ' ' }],
-  editModal: { accessKeys: true, hiddenFields: [] }, globalFilter: '',
+  editModal: { accessKeys: true, hiddenFields: [] }, globalFilter: '', calendarFontSize: 13,
 };
 
 async function boot() {

@@ -626,6 +626,13 @@
           "default": "maximize",
           "description": "%tasksmd.config.calendar.fullScreen%"
         },
+        "tasksmd.calendar.fontSize": {
+          "type": "number",
+          "minimum": 9,
+          "maximum": 24,
+          "default": 13,
+          "description": "%tasksmd.config.calendar.fontSize%"
+        },
         "tasksmd.updateCheckUrl": {
           "type": "string",
           "default": "",

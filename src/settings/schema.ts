@@ -45,6 +45,7 @@ export interface SettingsSchema {
   'archive.linkStyle': 'wiki' | 'markdown';
   'calendar.newTaskFile': string;
   'calendar.fullScreen': 'maximize' | 'window';
+  'calendar.fontSize': number;
   updateCheckUrl: string;
   language: 'auto' | 'en' | 'ko';
 }
@@ -91,6 +92,7 @@ export const SETTINGS_DEFAULTS: Readonly<SettingsSchema> = {
   'archive.linkStyle': 'wiki',
   'calendar.newTaskFile': '',
   'calendar.fullScreen': 'maximize',
+  'calendar.fontSize': 13,
   updateCheckUrl: '',
   language: 'auto',
 };

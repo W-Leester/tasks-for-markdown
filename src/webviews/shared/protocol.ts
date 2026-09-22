@@ -59,6 +59,8 @@ export interface InitState {
   uiState: Record<string, unknown>;
   editModal: { accessKeys: boolean; hiddenFields: string[] };
   globalFilter: string;
+  /** Pixel font size of calendar items (tasksmd.calendar.fontSize). */
+  calendarFontSize: number;
 }
 
 export type TaskFieldName = 'status' | 'priority' | 'due' | 'scheduled' | 'start' | 'created' | 'done' | 'cancelled' | 'description' | 'recurrence' | 'onCompletion' | 'id' | 'dependsOn';

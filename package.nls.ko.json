@@ -100,6 +100,7 @@
   "tasksmd.openCalendar.title": "캘린더 열기",
   "tasksmd.openCalendarFullScreen.title": "캘린더 열기(전체 화면)",
   "tasksmd.toggleFullScreen.title": "캘린더: 전체 화면 전환",
+  "tasksmd.config.calendar.fontSize": "캘린더 칸에 표시되는 태스크의 글자 크기(px).",
   "tasksmd.config.calendar.fullScreen": "캘린더의 전체 화면 버튼이 하는 일.",
   "tasksmd.config.calendar.fullScreen.maximize": "사이드바와 하단 패널을 숨기고 캘린더의 에디터 그룹을 최대화합니다.",
   "tasksmd.config.calendar.fullScreen.window": "추가로 창 전체를 전체 화면으로 전환합니다.",

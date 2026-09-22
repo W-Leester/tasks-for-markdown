@@ -89,6 +89,7 @@ export class WebviewHost implements vscode.Disposable {
       uiState: { ...this.deps.context.workspaceState.get<Record<string, unknown>>(`webview.${this.options.app}`, {}), ...this.extras },
       editModal: { accessKeys: this.deps.settings.get('editModal.accessKeys'), hiddenFields: this.deps.settings.get('editModal.hiddenFields') },
       globalFilter: this.deps.settings.get('globalFilter'),
+      calendarFontSize: this.deps.settings.get('calendar.fontSize'),
     };
   }
 

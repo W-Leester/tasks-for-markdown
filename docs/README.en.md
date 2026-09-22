@@ -68,6 +68,7 @@ group by filename
 | `notifications.*` | on, `09:00`, 1 day | Daily summary and due-soon digest, OS notifications |
 | `archive.file` / `afterDays` / `linkStyle` | `Archive.md` / 30 / `wiki` | Archive command |
 | `calendar.newTaskFile` | `""` | File that receives tasks created from the calendar |
+| `calendar.fontSize` | `13` | Font size (px) of tasks in calendar cells |
 | `calendar.fullScreen` | `maximize` | Full screen button: maximize the editor group only, or `window` for the whole window |
 | `updateCheckUrl` | `""` | `latest.json` location for `.vsix` installs |
 

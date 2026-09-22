@@ -59,8 +59,11 @@
     return map;
   });
   const title = $derived(view === 'month' ? monthLabel(cursor) : `${days[0]} – ${days[6]}`);
+  const fontSize = $derived(Math.min(24, Math.max(9, init?.calendarFontSize ?? 13)));
+  /** Rendered height of one item row: font × line-height + padding + grid gap (keep in sync with .item CSS). */
+  const itemHeight = $derived(fontSize * 1.35 + 2 + 2);
   /** How many items fit in a month cell: grows with the panel height (full screen shows more). */
-  const maxItems = $derived(view === 'week' ? Infinity : Math.max(2, Math.floor(((gridHeight - 26) / 6 - 28) / 18.5)));
+  const maxItems = $derived(view === 'week' ? Infinity : Math.max(2, Math.floor(((gridHeight - 26) / 6 - 28) / itemHeight)));
 
   function move(n: number) {
     if (view === 'week') cursor = addDays(cursor, 7 * n);
@@ -132,7 +135,7 @@
   </header>
 
   {#if init}
-    <div class="grid" class:week={view === 'week'} bind:clientHeight={gridHeight}>
+    <div class="grid" class:week={view === 'week'} bind:clientHeight={gridHeight} style:--tfm-cal-font={fontSize + 'px'}>
       {#each DOW as d, i (d)}<div class="dow" class:weekend={i >= 5}>{t(d)}</div>{/each}
       {#each days as day (day)}
         {@const inMonth = view === 'week' || day.slice(0, 7) === cursor.slice(0, 7)}
@@ -184,7 +187,7 @@
   .cell.today .num { background: var(--tfm-accent); color: var(--vscode-button-foreground); border-radius: 50%; width: 1.5em; height: 1.5em; display: inline-flex; align-items: center; justify-content: center; }
   .num { font-size: 0.85em; }
   .more { font-size: 0.75em; }
-  .item { font-size: 0.82em; line-height: 1.35; padding: 1px 5px; border-radius: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: grab; }
+  .item { font-size: var(--tfm-cal-font, 13px); line-height: 1.35; padding: 1px 5px; border-radius: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: grab; }
   .item.due { background: color-mix(in srgb, var(--vscode-charts-blue, #3794ff) 22%, transparent); }
   .item.scheduled { background: color-mix(in srgb, var(--vscode-charts-yellow, #cca700) 25%, transparent); }
   .item.start { background: color-mix(in srgb, var(--vscode-charts-green, #89d185) 25%, transparent); }

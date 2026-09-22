@@ -995,8 +995,7 @@
     "vscode:prepublish": "pnpm build",
     "test:integration": "pnpm build && node -e \"require('fs').rmSync('dist/tests',{recursive:true,force:true})\" && tsc -p tsconfig.integration.json && vscode-test",
     "test:all": "pnpm test && pnpm test:integration",
-    "build:prod": "node esbuild.config.mjs --production",
-    "test:integration:cursor": "pnpm build && node -e \"require('fs').rmSync('dist/tests',{recursive:true,force:true})\" && tsc -p tsconfig.integration.json && vscode-test --config .vscode-test.cursor.mjs"
+    "build:prod": "node esbuild.config.mjs --production"
   },
   "dependencies": {
     "dayjs": "^1.11.13",

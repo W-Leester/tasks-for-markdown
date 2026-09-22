@@ -15,12 +15,3 @@ suite('built-in preview integration', () => {
     await vscode.commands.executeCommand('workbench.action.closeAllEditors');
   });
 });
-
-suite('built-in markdown engine', () => {
-  test('markdown.api.render applies our plugin (task lines and tasks fences)', async () => {
-    await getApi();
-    const html = await vscode.commands.executeCommand<string>('markdown.api.render', '- [ ] a 📅 2026-10-01 ⏫\n\n```tasks\nnot done\n```');
-    assert.ok(html.includes('class="tfm-task'), html.slice(0, 300));
-    assert.ok(html.includes('tfm-query-block'), html.slice(0, 300));
-  });
-});

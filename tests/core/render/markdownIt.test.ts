@@ -87,3 +87,44 @@ describe('markdown-it plugin — ```tasks blocks', () => {
     expect(md.render('```tasks\ndescription includes nothing-here\n```')).toContain('No tasks match this query.');
   });
 });
+
+describe('coexistence with markdown-it-task-lists (Markdown All in One)', () => {
+  it('replaces the foreign checkbox and still renders badges, in either plugin order', async () => {
+    const taskLists = (await import('markdown-it-task-lists')).default as (md: ReturnType<typeof MarkdownIt>, o?: unknown) => void;
+    const deps = {
+      getStatusRegistry: () => reg,
+      runQuery: (text: string) => Query.parse(text).run({ index, today, allowFunctions: false }),
+      parseQuery: (text: string) => Query.parse(text),
+      renderOptions: () => ({ today }),
+      sourceFromEnv: () => undefined,
+      globalFilter: () => undefined,
+      enabled: () => true,
+    };
+    for (const order of ['theirs-first', 'ours-first'] as const) {
+      const m = new MarkdownIt();
+      if (order === 'theirs-first') { taskLists(m, { enabled: true }); tasksMarkdownItPlugin(m, deps); } else { tasksMarkdownItPlugin(m, deps); taskLists(m, { enabled: true }); }
+      const html = m.render('- [ ] write report ⏫ 📅 2026-09-19\n- [x] done ✅ 2026-09-20');
+      expect((html.match(/tfm-check/g) ?? []).length, order).toBe(2);
+      expect(html, order).toContain('tfm-pri-high');
+      expect(html, order).not.toMatch(/task-list-item-checkbox[^>]*>[^<]*<input/); // no double checkbox
+    }
+  });
+  it('never lets a plugin error blank the preview', () => {
+    const logs: string[] = [];
+    const m = new MarkdownIt();
+    tasksMarkdownItPlugin(m, {
+      getStatusRegistry: () => reg,
+      runQuery: () => { throw new Error('boom'); },
+      parseQuery: (text) => Query.parse(text),
+      renderOptions: () => ({ today }),
+      sourceFromEnv: () => undefined,
+      globalFilter: () => undefined,
+      enabled: () => true,
+      log: (msg) => logs.push(msg),
+    });
+    const html = m.render('# T\n\n```tasks\nnot done\n```\n\n- [ ] a');
+    expect(html).toContain('<h1>T</h1>');
+    expect(html).toContain('<pre><code class="language-tasks">');
+    expect(logs[0]).toContain('boom');
+  });
+});

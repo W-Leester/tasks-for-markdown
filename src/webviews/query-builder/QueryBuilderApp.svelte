@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import { setBundle, t } from '../shared/l10n';
   import type { InitState } from '../shared/protocol';
-  import { nextRequestId, onMessage, post } from '../shared/vscode';
+  import { nextRequestId, onMessage, post } from '../shared/vscode.svelte';
   import { DATE_FIELDS, DATE_OPS, FLAGS, GROUP_FIELDS, LAYOUTS, PRIORITIES, SORT_FIELDS, type Row, rowsToText, textToRows } from './rows';
 
   let init: InitState | null = $state(null);

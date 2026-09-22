@@ -1,7 +1,7 @@
 <script lang="ts">
   import { PRIORITY_EMOJI, relativeLabel, shortDate } from '../format';
   import type { TaskDto } from '../protocol';
-  import { post } from '../vscode';
+  import { post } from '../vscode.svelte';
 
   let { task, today, draggable = true, showFile = true }: { task: TaskDto; today: string; draggable?: boolean; showFile?: boolean } = $props();
   const overdue = $derived(!task.isCompleted && !!task.due && task.due < today);

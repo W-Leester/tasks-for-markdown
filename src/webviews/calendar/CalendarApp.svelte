@@ -3,7 +3,7 @@
   import { daysBetween } from '../shared/format';
   import { setBundle, t } from '../shared/l10n';
   import type { InitState, TaskDto } from '../shared/protocol';
-  import { nextRequestId, onMessage, post } from '../shared/vscode';
+  import { nextRequestId, onMessage, post } from '../shared/vscode.svelte';
 
   type Field = 'due' | 'scheduled' | 'start';
   interface Item { task: TaskDto; field: Field; date: string }

@@ -10,7 +10,7 @@
   import { PRIORITY_EMOJI, PRIORITY_LABELS } from '../shared/format';
   import { setBundle, t } from '../l10n-bridge';
   import type { InitState, TaskDto, TaskFieldName } from '../shared/protocol';
-  import { nextRequestId, onMessage, post } from '../shared/vscode';
+  import { nextRequestId, onMessage, post } from '../shared/vscode.svelte';
 
   let init: InitState | null = $state(null);
   let target: { key: string | null; line: number | null } = $state({ key: null, line: null });

@@ -4,7 +4,7 @@
   import { daysBetween } from '../shared/format';
   import { setBundle, t } from '../shared/l10n';
   import type { InitState, StatusDto, TaskDto, TaskFieldName } from '../shared/protocol';
-  import { nextRequestId, onMessage, post } from '../shared/vscode';
+  import { nextRequestId, onMessage, post } from '../shared/vscode.svelte';
 
   type Mode = 'status' | 'due' | 'priority' | 'file';
   interface Column { id: string; label: string; tasks: TaskDto[]; drop: ((task: TaskDto) => { field: TaskFieldName; value: string | null } | null) | null }

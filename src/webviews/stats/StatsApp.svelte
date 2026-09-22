@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import { setBundle, t } from '../shared/l10n';
   import type { InitState, StatsDto } from '../shared/protocol';
-  import { nextRequestId, onMessage, post } from '../shared/vscode';
+  import { nextRequestId, onMessage, post } from '../shared/vscode.svelte';
 
   let init: InitState | null = $state(null);
   let stats: StatsDto | null = $state(null);

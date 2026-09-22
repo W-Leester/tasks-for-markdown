@@ -1,5 +1,17 @@
 # 변경 이력
 
+## 1.0.1 — 2026-09-22
+
+### 수정
+- 만들기/편집 대화상자에서 **적용**을 눌러도 아무 일도 일어나지 않던 문제. 웹뷰가 호스트로 보내는 메시지에 Svelte 상태 프록시(태그 배열)가 섞여 있어 `postMessage`가 `DataCloneError`로 실패했습니다. 이제 모든 메시지를 스냅샷 후 전송합니다.
+- 편집 대화상자가 에디터 옆 열에 열립니다. 패널(칸반·캘린더 등)에서 새 태스크를 만들 때 마지막으로 본 Markdown 문서로 대상이 결정됩니다.
+- Markdown All in One(markdown-it-task-lists)과 미리보기 플러그인이 공존합니다. 상태 기호를 복구하고 미리보기가 비는 일이 없도록 예외를 격리했습니다.
+- 렌더(WYSIWYG) 모드에서 `Ctrl+Shift+C`를 누르면 해당 파일의 태스크 목록에서 골라 편집할 수 있습니다.
+- `tasksmd.language` 설정으로 UI 언어를 강제할 수 있습니다. `tasksmd.setCreatedDate`로 ➕ 생성일을 자동 기록합니다.
+
+### 내부
+- 웹뷰 컴포넌트 테스트(`pnpm test:webviews`, jsdom + @testing-library/svelte). 가짜 `postMessage`가 실제처럼 structured clone을 수행해 위 회귀를 잡습니다.
+
 ## 1.0.0 — 2026-09-21
 
 첫 릴리스. 마일스톤 M0–M8로 개발했습니다 (docs/Tasks.md 참고).

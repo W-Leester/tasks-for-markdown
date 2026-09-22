@@ -8,7 +8,8 @@
     "types": []
   },
   "include": [
-    "src/webviews"
+    "src/webviews",
+    "tests/webviews"
   ],
   "exclude": []
 }

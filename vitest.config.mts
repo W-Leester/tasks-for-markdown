@@ -4,6 +4,6 @@ export default defineConfig({
   test: {
     include: ['tests/**/*.test.ts'],
     // Integration tests need a real VS Code (pnpm test:integration).
-    exclude: ['tests/integration/**', 'node_modules/**'],
+    exclude: ['tests/webviews/**', 'tests/integration/**', 'node_modules/**'],
   },
 });

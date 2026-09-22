@@ -8,8 +8,12 @@ export function vscode(): WebviewApi {
   return api;
 }
 
+/**
+ * postMessage structured-clones its argument, and Svelte 5 `$state` values are proxies that
+ * cannot be cloned (DataCloneError). Snapshot everything first so callers can pass state freely.
+ */
 export function post(msg: FromWebview): void {
-  vscode().postMessage(msg);
+  vscode().postMessage($state.snapshot(msg));
 }
 
 export function onMessage(handler: (msg: ToWebview) => void): () => void {

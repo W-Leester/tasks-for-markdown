@@ -2,7 +2,7 @@
   "name": "tasks-for-markdown",
   "displayName": "Tasks for Markdown",
   "description": "VS Code와 Cursor에서 쓰는 Obsidian Tasks 호환 마크다운 할 일 관리. Obsidian Tasks-compatible task management for Markdown files.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "publisher": "HMCVECDT",
   "license": "MIT",
   "repository": {
@@ -995,7 +995,8 @@
     "vscode:prepublish": "pnpm build",
     "test:integration": "pnpm build && node -e \"require('fs').rmSync('dist/tests',{recursive:true,force:true})\" && tsc -p tsconfig.integration.json && vscode-test",
     "test:all": "pnpm test && pnpm test:integration",
-    "build:prod": "node esbuild.config.mjs --production"
+    "build:prod": "node esbuild.config.mjs --production",
+    "test:webviews": "vitest run --config vitest.webviews.config.mts"
   },
   "dependencies": {
     "dayjs": "^1.11.13",
@@ -1003,6 +1004,8 @@
     "rrule": "^2.8.1"
   },
   "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^5.1.1",
+    "@testing-library/svelte": "^5.4.2",
     "@types/mocha": "^10.0.10",
     "@types/node": "^22.0.0",
     "@types/vscode": "^1.90.0",
@@ -1013,6 +1016,7 @@
     "esbuild-svelte": "^0.9.5",
     "eslint": "^9.0.0",
     "glob": "^13.0.6",
+    "jsdom": "^30.1.0",
     "markdown-it": "^15.0.2",
     "markdown-it-task-lists": "^2.1.1",
     "mocha": "^12.0.2",

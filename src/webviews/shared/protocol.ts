@@ -33,6 +33,15 @@ export interface TaskDto {
   originalMarkdown: string;
 }
 
+/** A ```tasks block whose results a panel shows: its text, the note it lives in, and a label. */
+export interface QueryTargetDto {
+  text: string;
+  /** Workspace-relative path of the note (for {{query.file.*}} placeholders). */
+  source: string;
+  /** e.g. "notes/todo.md:12" */
+  label: string;
+}
+
 export interface StatusDto {
   symbol: string;
   name: string;
@@ -75,6 +84,7 @@ export type ToWebview =
   | { type: 'recurrence/validated'; requestId: number; valid: boolean; canonical: string | null }
   | { type: 'query/explained'; requestId: number; explain: string; errors: string[]; matched: number }
   | { type: 'query/target'; id: string | null }
+  | { type: 'results/query'; target: QueryTargetDto }
   | { type: 'stats/result'; requestId: number; stats: StatsDto }
   /** Host-confirmed full-screen state of the panel (also sent after a command toggled it). */
   | { type: 'ui/fullscreen'; on: boolean }
@@ -90,7 +100,7 @@ export interface GroupDto {
 export type FromWebview =
   | { type: 'ui/ready' }
   | { type: 'ui/state'; state: Record<string, unknown> }
-  | { type: 'query/run'; requestId: number; query: string }
+  | { type: 'query/run'; requestId: number; query: string; source?: string | null }
   | { type: 'task/toggle'; key: string; line: number }
   | { type: 'task/setField'; key: string; line: number; field: TaskFieldName; value: string | string[] | null }
   | { type: 'task/setFields'; key: string; line: number; fields: Partial<Record<TaskFieldName, string | string[] | null>> }

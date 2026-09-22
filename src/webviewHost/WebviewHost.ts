@@ -104,7 +104,7 @@ export class WebviewHost implements vscode.Disposable {
           await this.deps.context.workspaceState.update(`webview.${this.options.app}`, msg.state);
           break;
         case 'query/run': {
-          const r = this.deps.queries.run(msg.query);
+          const r = this.deps.queries.run(msg.query, msg.source ? { path: msg.source } : undefined);
           const today = this.today();
           this.send({
             type: 'query/result',

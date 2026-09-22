@@ -26,7 +26,34 @@ export function queryBlockAt(doc: vscode.TextDocument, line: number): { text: st
   return null;
 }
 
-export function registerQueryCommands(context: vscode.ExtensionContext, deps: CommandDeps & { queries: QueryService }): void {
+/** Argument CodeLenses pass to the query commands: the note and a line inside (or on) the fence. */
+export interface QueryBlockRef {
+  uri: string;
+  line: number;
+}
+
+export interface QueryTarget {
+  text: string;
+  source: string;
+  label: string;
+}
+
+/** The ```tasks block a command should act on: from an explicit ref (CodeLens) or the cursor. */
+export function resolveQueryBlock(arg: unknown): { doc: vscode.TextDocument; block: NonNullable<ReturnType<typeof queryBlockAt>> } | null {
+  const ref = arg && typeof arg === 'object' && 'uri' in arg && 'line' in arg ? (arg as QueryBlockRef) : null;
+  const doc = ref ? vscode.workspace.textDocuments.find((d) => d.uri.toString() === ref.uri) : vscode.window.activeTextEditor?.document;
+  const line = ref ? ref.line : vscode.window.activeTextEditor?.selection.active.line;
+  if (!doc || line === undefined) return null;
+  const block = queryBlockAt(doc, line);
+  return block ? { doc, block } : null;
+}
+
+export function queryTargetFor(doc: vscode.TextDocument, block: { text: string; start: number }): QueryTarget {
+  const source = vscode.workspace.asRelativePath(doc.uri);
+  return { text: block.text, source, label: `${source}:${block.start + 1}` };
+}
+
+export function registerQueryCommands(context: vscode.ExtensionContext, deps: CommandDeps & { queries: QueryService; openQueryResults: (target: QueryTarget | null) => void }): void {
   const explainOut = vscode.window.createOutputChannel('Tasks: Query explain');
   context.subscriptions.push(
     explainOut,
@@ -70,14 +97,21 @@ export function registerQueryCommands(context: vscode.ExtensionContext, deps: Co
       const snippet = new vscode.SnippetString('```tasks\n${1:not done}\n${2:due before next week}\n${3:sort by urgency}\n```\n');
       await editor.insertSnippet(snippet);
     }),
-    vscode.commands.registerCommand('tasksmd.explainQuery', async () => {
-      const editor = vscode.window.activeTextEditor;
-      const block = editor ? queryBlockAt(editor.document, editor.selection.active.line) : null;
-      if (!block) {
+    // Live results of the block under the cursor, in a panel beside the editor (works where the
+    // preview cannot render, e.g. Cursor's WYSIWYG mode).
+    vscode.commands.registerCommand('tasksmd.runQueryAtCursor', (arg?: unknown) => {
+      const found = resolveQueryBlock(arg);
+      if (!found) void vscode.window.showInformationMessage(t('Place the cursor inside a ```tasks block.'));
+      deps.openQueryResults(found ? queryTargetFor(found.doc, found.block) : null);
+    }),
+    vscode.commands.registerCommand('tasksmd.explainQuery', async (arg?: unknown) => {
+      const found = resolveQueryBlock(arg);
+      if (!found) {
         void vscode.window.showInformationMessage(t('Place the cursor inside a ```tasks block.'));
         return;
       }
-      const source = { path: vscode.workspace.asRelativePath(editor!.document.uri) };
+      const { block } = found;
+      const source = { path: vscode.workspace.asRelativePath(found.doc.uri) };
       const result = deps.queries.run(block.text, source);
       explainOut.clear();
       explainOut.appendLine(block.text.trimEnd());

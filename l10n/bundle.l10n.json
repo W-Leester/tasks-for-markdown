@@ -1,5 +1,14 @@
 {
   "Full screen": "Full screen",
   "Exit full screen": "Exit full screen",
-  "Esc": "Esc"
+  "Esc": "Esc",
+  "Tasks: Query results": "Tasks: Query results",
+  "Follow cursor": "Follow cursor",
+  "Query": "Query",
+  "Refresh": "Refresh",
+  "No tasks match.": "No tasks match.",
+  "Click: edit · Double-click: open · Checkbox: toggle done": "Click: edit · Double-click: open · Checkbox: toggle done",
+  "Show results": "Show results",
+  "Explain": "Explain",
+  "Open the results of this query in a panel beside the editor": "Open the results of this query in a panel beside the editor"
 }

@@ -417,3 +417,31 @@ suite('calendar', () => {
     }
   });
 });
+
+suite('query results panel', () => {
+  test('CodeLens above a ```tasks fence; the command targets that block and the panel follows the cursor', async () => {
+    const api = await getApi();
+    const doc = await vscode.workspace.openTextDocument({ language: 'markdown', content: '# Q\n\n```tasks\nnot done\n```\n\ntext\n\n```tasks\ndone\n```\n' });
+    const editor = await vscode.window.showTextDocument(doc);
+    try {
+      let lenses: vscode.CodeLens[] = [];
+      for (let i = 0; i < 80 && !lenses.some((x) => x.command?.command === 'tasksmd.runQueryAtCursor'); i++) {
+        lenses = (await vscode.commands.executeCommand<vscode.CodeLens[]>('vscode.executeCodeLensProvider', doc.uri)) ?? [];
+        if (!lenses.length) await sleep(100);
+      }
+      const runLenses = lenses.filter((x) => x.command?.command === 'tasksmd.runQueryAtCursor');
+      assert.deepStrictEqual(runLenses.map((x) => x.range.start.line), [2, 8]);
+
+      await vscode.commands.executeCommand('tasksmd.runQueryAtCursor', runLenses[0]!.command!.arguments![0]);
+      const host = api.webviews.openQueryResults(null);
+      assert.strictEqual((host.extras.queryTarget as { text: string }).text, 'not done\n');
+
+      // Moving the cursor into the second block re-targets the panel.
+      editor.selection = new vscode.Selection(9, 0, 9, 0);
+      await waitFor(() => (host.extras.queryTarget as { text: string }).text === 'done\n', 3000, 'follow cursor');
+    } finally {
+      await vscode.commands.executeCommand('workbench.action.revertAndCloseActiveEditor');
+      await vscode.commands.executeCommand('workbench.action.closeAllEditors');
+    }
+  });
+});

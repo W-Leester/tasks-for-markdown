@@ -42,7 +42,7 @@ export interface ExtensionApi {
   preview: PreviewIntegration;
   /** Consumed by VS Code's built-in Markdown extension (contributes.markdown.markdownItPlugins). */
   extendMarkdownIt(md: import('markdown-it').MarkdownIt): import('markdown-it').MarkdownIt;
-  webviews: { openEdit: (target: { key: string | null; line: number | null }) => WebviewHost; openKanban: () => WebviewHost; openQueryBuilder: (id: string | null) => WebviewHost; openStats: () => WebviewHost; openCalendar: () => WebviewHost };
+  webviews: { openEdit: (target: { key: string | null; line: number | null }) => WebviewHost; openKanban: () => WebviewHost; openQueryBuilder: (id: string | null) => WebviewHost; openStats: () => WebviewHost; openCalendar: () => WebviewHost; openQueryResults: (target: { text: string; source: string; label: string } | null) => WebviewHost };
 }
 
 export async function activate(context: vscode.ExtensionContext): Promise<ExtensionApi> {
@@ -72,7 +72,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<Extens
   registerEditCommands(context, { ...commandDeps, openEdit: (target) => webviews.openEdit(target) });
   registerStatusCommands(context, commandDeps);
   registerConvertCommand(context, commandDeps);
-  registerQueryCommands(context, { ...commandDeps, queries });
+  registerQueryCommands(context, { ...commandDeps, queries, openQueryResults: webviews.openQueryResults });
   // Status types decide isDone/isCompleted, so a change means every file must be re-parsed.
   context.subscriptions.push(
     settings.onDidChange(() => {

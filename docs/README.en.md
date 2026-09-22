@@ -45,7 +45,7 @@ group by filename
 | Create or edit task | `Ctrl+Shift+C` |
 | Quick search tasks | `Cmd/Ctrl+Shift+;` |
 | Set status / priority / due / scheduled / start / recurrence / dependencies, Postpone | — |
-| Open kanban board / calendar / statistics / query builder | — |
+| Open kanban board / calendar / statistics / query builder / query results (beside the editor, follows the cursor) | — |
 | Archive completed tasks… | — |
 | Insert query block, Explain query under cursor | — |
 | Load status preset…, Convert task format in this file… | — |

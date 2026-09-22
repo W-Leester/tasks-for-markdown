@@ -64,7 +64,7 @@ export class TaskCodeLensProvider implements vscode.CodeLensProvider, vscode.Dis
     const registry = this.deps.getStatusRegistry();
     const globalFilter = this.deps.settings.get('globalFilter') || undefined;
     const today = (this.deps.clock ?? systemClock).now().startOf('day');
-    const out: vscode.CodeLens[] = [];
+    const out: vscode.CodeLens[] = this.queryBlockLenses(document);
     for (const line of lines) {
       if (line >= document.lineCount) continue;
       const text = document.lineAt(line).text;
@@ -73,6 +73,22 @@ export class TaskCodeLensProvider implements vscode.CodeLensProvider, vscode.Dis
       if (!task) continue;
       const range = new vscode.Range(line, 0, line, 0);
       out.push(...this.lensesFor(task, range, today));
+    }
+    return out;
+  }
+
+  /** "Show results · Explain" above every ```tasks fence — the way to see a query where the preview cannot render it. */
+  private queryBlockLenses(document: vscode.TextDocument): vscode.CodeLens[] {
+    const out: vscode.CodeLens[] = [];
+    const limit = Math.min(document.lineCount, 20000);
+    for (let line = 0; line < limit; line++) {
+      if (!/^\s*```tasks\b/.test(document.lineAt(line).text)) continue;
+      const range = new vscode.Range(line, 0, line, 0);
+      const ref = { uri: document.uri.toString(), line };
+      out.push(
+        new vscode.CodeLens(range, { title: `$(play) ${t('Show results')}`, command: 'tasksmd.runQueryAtCursor', arguments: [ref], tooltip: t('Open the results of this query in a panel beside the editor') }),
+        new vscode.CodeLens(range, { title: `$(question) ${t('Explain')}`, command: 'tasksmd.explainQuery', arguments: [ref] }),
+      );
     }
     return out;
   }

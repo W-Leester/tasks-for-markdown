@@ -284,5 +284,14 @@
   "Which task in {0} do you want to edit?": "{0}의 어떤 태스크를 편집할까요?",
   "Full screen": "전체 화면",
   "Exit full screen": "전체 화면 해제",
-  "Esc": "Esc"
+  "Esc": "Esc",
+  "Tasks: Query results": "Tasks: 쿼리 결과",
+  "Follow cursor": "커서 따라가기",
+  "Query": "쿼리",
+  "Refresh": "새로 고침",
+  "No tasks match.": "일치하는 태스크가 없습니다.",
+  "Click: edit · Double-click: open · Checkbox: toggle done": "클릭: 편집 · 더블클릭: 원본 열기 · 체크박스: 완료 전환",
+  "Show results": "결과 보기",
+  "Explain": "설명",
+  "Open the results of this query in a panel beside the editor": "이 쿼리의 결과를 에디터 옆 패널에 표시합니다"
 }

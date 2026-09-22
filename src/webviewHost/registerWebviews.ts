@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { WebviewHost, type WebviewHostDeps } from './WebviewHost';
 import { PanelFullscreen } from './PanelFullscreen';
+import { queryBlockAt, queryTargetFor, type QueryTarget } from '../commands/queryCommands';
 import { t } from '../l10n';
 
 export interface PanelHandle {
@@ -9,7 +10,7 @@ export interface PanelHandle {
 }
 
 /** Opens (or reveals) a singleton editor-area panel for the given app. Every panel can go full screen. */
-export function createPanelOpener(deps: WebviewHostDeps, app: string, title: string, icon: string, column: vscode.ViewColumn = vscode.ViewColumn.Active): () => PanelHandle {
+export function createPanelOpener(deps: WebviewHostDeps, app: string, title: string, icon: string, column: vscode.ViewColumn = vscode.ViewColumn.Active, onCreate?: (handle: PanelHandle, panel: vscode.WebviewPanel) => void): () => PanelHandle {
   let panel: vscode.WebviewPanel | null = null;
   let handle: PanelHandle | null = null;
   return () => {
@@ -30,6 +31,7 @@ export function createPanelOpener(deps: WebviewHostDeps, app: string, title: str
       host.send({ type: 'ui/fullscreen', on: fullscreen.active });
     };
     handle = { host, fullscreen };
+    onCreate?.(handle, panel);
     panel.onDidDispose(() => {
       fullscreen.dispose();
       host.dispose();
@@ -58,7 +60,7 @@ export function registerWebviewView(context: vscode.ExtensionContext, deps: Webv
   );
 }
 
-export function registerWebviews(context: vscode.ExtensionContext, deps: WebviewHostDeps): { openEdit: (target: EditTarget) => WebviewHost; openKanban: () => WebviewHost; openQueryBuilder: (id: string | null) => WebviewHost; openStats: () => WebviewHost; openCalendar: () => WebviewHost } {
+export function registerWebviews(context: vscode.ExtensionContext, deps: WebviewHostDeps): { openEdit: (target: EditTarget) => WebviewHost; openKanban: () => WebviewHost; openQueryBuilder: (id: string | null) => WebviewHost; openStats: () => WebviewHost; openCalendar: () => WebviewHost; openQueryResults: (target: QueryTarget | null) => WebviewHost } {
   // Beside, not on top of the editor: the user keeps seeing the note the task goes into.
   const openEditPanel = createPanelOpener(deps, 'edit', t('Tasks: Create or edit'), 'edit', vscode.ViewColumn.Beside);
   const openEdit = (target: EditTarget) => {
@@ -104,5 +106,44 @@ export function registerWebviews(context: vscode.ExtensionContext, deps: Webview
       return host;
     }),
   );
-  return { openEdit, openKanban, openQueryBuilder, openStats, openCalendar };
+
+  // Query results: beside the editor, following the cursor from one ```tasks block to the next.
+  let lastSent = '';
+  const sendTarget = (host: WebviewHost, target: QueryTarget) => {
+    const key = JSON.stringify(target);
+    if (key === lastSent) return;
+    lastSent = key;
+    host.extras = { ...host.extras, queryTarget: target };
+    host.send({ type: 'results/query', target });
+  };
+  const following = () => context.workspaceState.get<{ follow?: boolean }>('webview.query-results', {}).follow !== false;
+  const openResultsPanel = createPanelOpener(deps, 'query-results', t('Tasks: Query results'), 'list-tree', vscode.ViewColumn.Beside, (handle, panel) => {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const pushCursorBlock = (editor: vscode.TextEditor | undefined) => {
+      if (!editor || editor.document.languageId !== 'markdown' || !following()) return;
+      const block = queryBlockAt(editor.document, editor.selection.active.line);
+      if (block) sendTarget(handle.host, queryTargetFor(editor.document, block));
+    };
+    const subs = [
+      vscode.window.onDidChangeTextEditorSelection((e) => pushCursorBlock(e.textEditor)),
+      vscode.window.onDidChangeActiveTextEditor((e) => pushCursorBlock(e)),
+      vscode.workspace.onDidChangeTextDocument((e) => {
+        const editor = vscode.window.activeTextEditor;
+        if (editor?.document !== e.document) return;
+        clearTimeout(timer);
+        timer = setTimeout(() => pushCursorBlock(editor), 300);
+      }),
+    ];
+    panel.onDidDispose(() => {
+      clearTimeout(timer);
+      for (const s of subs) s.dispose();
+      lastSent = '';
+    });
+  });
+  const openQueryResults = (target: QueryTarget | null) => {
+    const { host } = openResultsPanel();
+    if (target) sendTarget(host, target);
+    return host;
+  };
+  return { openEdit, openKanban, openQueryBuilder, openStats, openCalendar, openQueryResults };
 }

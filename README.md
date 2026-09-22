@@ -79,7 +79,7 @@ group by filename
 ## 문서
 
 - [사용자 가이드](docs/user-guide.md)
-- [요구사항](docs/requirements.md) · [설계](docs/design.md) · [개발 체크리스트](docs/Tasks.md) · [성능](docs/perf.md) · [릴리스 절차](docs/release.md)
+- [요구사항](docs/requirements.md) · [설계](docs/design.md) · [개발 체크리스트](docs/Tasks.md) · [성능](docs/perf.md) · [릴리스 절차](docs/release.md) · [1.0 이후 변경 기록](docs/post-release-changes.md)
 
 ## 개발
 

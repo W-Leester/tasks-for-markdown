@@ -264,9 +264,9 @@
 - [x] 테스트: Obsidian Tasks `tests/Recurrence*.test.ts` 이식 + 표 기반 케이스
 
 ### M3.2 편집 서비스 확장
-- [ ] `toggle()`에서 DONE 진입 + 반복 → `insertLines(above|below)` (설정 `recurrence.insertPosition`)
-- [ ] 설정 `recurrence.insertPosition`, `recurrence.idHandling`, `recurrence.copyDependsOn`, `recurrence.removeScheduledOnRecur`
-- [ ] 하나의 `WorkspaceEdit`로 치환+삽입 원자 적용, Undo 한 번에 되돌아오는지 검증
+- [x] `toggle()`에서 DONE 진입 + 반복 → `insertLines(above|below)` (설정 `recurrence.insertPosition`) — `TaskEditService.toggle` → `replaceLine(…, insert)`
+- [x] 설정 `recurrence.insertPosition`, `recurrence.idHandling`, `recurrence.copyDependsOn`, `recurrence.removeScheduledDate`(이름 확정) — `schema.ts` + package.json
+- [x] 하나의 `WorkspaceEdit`로 치환+삽입 원자 적용 (`replaceLine`) — Undo 한 번 복구는 헤드리스에서 구동 불가, M8.7 수동 항목으로 이관
 
 ### M3.3 커스텀 상태
 - [x] 설정 `statuses[]` 스키마 — `{ symbol, name, nextSymbol, type }` (FR-1.16)
@@ -549,21 +549,21 @@
 
 ## 횡단 관심사 (모든 마일스톤에서 계속)
 
-- [ ] 커밋마다 `pnpm typecheck && pnpm lint && pnpm test` 통과 (CI 강제)
-- [ ] `core/`에 `vscode` import가 없는지 린트로 강제 (M0.1)
-- [ ] 새 설정 키는 `package.json` + `Settings.ts` + nls(en/ko) + requirements 표를 같이 갱신
-- [ ] 새 명령은 `package.json` + `registerCommands.ts` + nls + FR-8 표를 같이 갱신
-- [ ] Obsidian Tasks에서 이식한 파일에는 출처·라이선스 주석, `NOTICE.md` 유지 (NFR-8)
-- [ ] 마일스톤 종료 시 이 문서의 "진행 현황" 표와 `CHANGELOG.md` 갱신
-- [ ] 설계 변경이 생기면 design.md와 SVG(`docs/imgs/`) 재생성
+- [x] 커밋마다 `pnpm typecheck && pnpm lint && pnpm test` 통과 (CI 강제) — `.github/workflows/ci.yml` (+ xvfb 통합 테스트)
+- [x] `core/`에 `vscode` import가 없는지 린트로 강제 (M0.1) — `eslint.config.mjs` no-restricted-imports
+- [x] (상시 규칙) 새 설정 키는 `package.json` + `schema.ts` + nls(en/ko) + README 설정 표를 같이 갱신 — `tests/settings/schema.test.ts`가 package.json↔schema 불일치를 잡음
+- [x] (상시 규칙) 새 명령은 `package.json` + 등록 코드 + nls + README 명령 표를 같이 갱신
+- [x] (상시 규칙) Obsidian Tasks에서 이식한 파일에는 출처·라이선스 주석, `NOTICE.md` 유지 (NFR-8)
+- [x] (상시 규칙) 마일스톤 종료 시 이 문서의 "진행 현황" 표와 `CHANGELOG.md` 갱신 — 1.0 이후 변경은 `docs/post-release-changes.md`
+- [ ] (상시 규칙) 설계 변경이 생기면 design.md와 SVG(`docs/imgs/`) 재생성 — **미반영**: 1.0 이후 추가된 렌더 보기·쿼리 결과 패널·전체 화면이 design.md/SVG에 없음
 
 ## 열린 설계 이슈 추적
 
-- [ ] D-1 기본 미리보기 양방향 메시지 채널 — M5.0에서 스파이크 → 결론을 design.md에 기록
-- [ ] D-2 Cursor `markdown.previewScripts` 지원 — M5.0
-- [ ] D-3 칸반/캘린더 DnD 라이브러리 — M6.3
-- [ ] D-4 `rrule` 번들 크기 vs 반복 파서 이식 범위 — M3.1
-- [ ] D-5 OS 알림 Linux 지원 범위 — M7.1
+- [x] D-1 기본 미리보기 양방향 메시지 채널 — M5.0 스파이크: 채널 없음(`openLink`만) → 렌더 전용 + 1.0.4 렌더 보기(커스텀 에디터)로 상호작용 제공. design.md 변경 이력 0.4
+- [x] D-2 Cursor `markdown.previewScripts` 지원 — M5.0: 계약 동일, 단 Cursor Preview 토글은 자체 WYSIWYG(Tiptap)라 확장 불가 → 렌더 보기로 대체
+- [x] D-3 칸반/캘린더 DnD 라이브러리 — M6.3: 네이티브 HTML5 DnD, 라이브러리 없음
+- [x] D-4 `rrule` 번들 크기 vs 반복 파서 이식 범위 — M3.1: `rrule` 번들(≈60KB) + Obsidian의 반복 텍스트 파서 이식
+- [x] D-5 OS 알림 Linux 지원 범위 — M7.1: `notify-send` 있으면 사용, 없으면 토스트
 
 ## 변경 이력
 

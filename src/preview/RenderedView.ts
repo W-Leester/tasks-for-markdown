@@ -205,7 +205,7 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
   p { margin: 0 0 .75em; }
   h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.25; margin: 1.5em 0 .5em; }
   h1 { font-size: 1.75em; } h2 { font-size: 1.5em; } h3 { font-size: 1.25em; } h4 { font-size: 1.1em; } h5, h6 { font-size: 1em; }
-  ul, ol { margin: .75em 0; padding-left: 1.6em; } li { margin: 3px 0; } li > p { margin: 0; } li > ul, li > ol { margin: 2px 0; }
+  ul, ol { margin: .75em 0; padding-left: 1.6em; } li { margin: 2px 0; } li > p { margin: 0; } li > ul, li > ol { margin: 2px 0; }
   a { color: var(--vscode-textLink-foreground, var(--rv-accent)); text-decoration: none; } a:hover { text-decoration: underline; }
   code { font-family: var(--rv-mono); font-size: .9em; background: var(--rv-bg-2); border: 1px solid var(--rv-stroke); border-radius: 4px; padding: 0 .35em; }
   pre { font-family: var(--rv-mono); font-size: .9em; line-height: 1.5; background: var(--rv-bg-2); border-radius: 6px; padding: 12px 16px; margin: 0 0 .75em; overflow: auto; white-space: pre-wrap; }
@@ -217,12 +217,14 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
   strong { font-weight: 600; }
 
   /* Task lines: Cursor-style rounded checkbox, badges after the text. */
-  li.tfm-task { list-style: none; margin-left: -1.6em; padding: 2px 0; display: block; }
+  li.tfm-task { list-style: none; margin-left: -1.6em; padding: 0; display: block; }
+  /* Loose lists (blank lines between items) wrap the line in <p>: keep it inline so the checkbox, fields and hover buttons stay on one line. */
+  li.tfm-task > p { display: inline; margin: 0; }
   li.tfm-task > ul, li.tfm-task > ol { margin-left: 1.6em; } /* keep nesting after the negative margin above */
-  li.tfm-task > .tfm-check, .tfm-list li.tfm-task > .tfm-check { pointer-events: auto; appearance: none; -webkit-appearance: none; width: 17px; height: 17px; margin: 0 .6em 0 0; vertical-align: -3px; border: 1.5px solid color-mix(in srgb, var(--rv-fg) 32%, transparent); border-radius: 5px; background: transparent; cursor: pointer; position: relative; transition: background .12s, border-color .12s; box-sizing: border-box; }
-  li.tfm-task > .tfm-check:hover { border-color: var(--rv-accent); }
-  li.tfm-task > .tfm-check:checked { background: var(--rv-accent); border-color: var(--rv-accent); }
-  li.tfm-task > .tfm-check:checked::after { content: ''; position: absolute; left: 5px; top: 1.5px; width: 4px; height: 8px; border: solid var(--rv-bg); border-width: 0 2px 2px 0; transform: rotate(45deg); }
+  li.tfm-task > .tfm-check, li.tfm-task > p > .tfm-check, .tfm-list li.tfm-task > .tfm-check { pointer-events: auto; appearance: none; -webkit-appearance: none; width: 17px; height: 17px; margin: 0 .6em 0 0; vertical-align: -3px; border: 1.5px solid color-mix(in srgb, var(--rv-fg) 32%, transparent); border-radius: 5px; background: transparent; cursor: pointer; position: relative; transition: background .12s, border-color .12s; box-sizing: border-box; }
+  li.tfm-task > .tfm-check:hover, li.tfm-task > p > .tfm-check:hover { border-color: var(--rv-accent); }
+  li.tfm-task > .tfm-check:checked, li.tfm-task > p > .tfm-check:checked { background: var(--rv-accent); border-color: var(--rv-accent); }
+  li.tfm-task > .tfm-check:checked::after, li.tfm-task > p > .tfm-check:checked::after { content: ''; position: absolute; left: 5px; top: 1.5px; width: 4px; height: 8px; border: solid var(--rv-bg); border-width: 0 2px 2px 0; transform: rotate(45deg); }
   .rv-actions { display: none; margin-left: .5em; vertical-align: -1px; gap: 2px; }
   li.tfm-task:hover > .rv-actions, li.tfm-task:focus-within > .rv-actions { display: inline-flex; }
   .tfm-query .tfm-list > li { content-visibility: auto; contain-intrinsic-size: auto 28px; }
@@ -230,7 +232,7 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
   .rv-actions button:hover { background: var(--rv-bg-3); color: var(--rv-fg); }
   .tfm-fields { margin-left: .2em; } .tfm-field { white-space: nowrap; } .tfm-field.tfm-overdue { color: var(--vscode-errorForeground, #f14c4c); }
   .tfm-field.tfm-invalid { color: var(--vscode-editorWarning-foreground, #cca700); }
-  .rv-frontmatter { color: var(--rv-muted); font-size: .92em; margin: 0 0 1.5em; padding: 0 0 .75em; border-bottom: 1px solid var(--rv-stroke); }
+  .rv-frontmatter { color: var(--rv-muted); font-size: 1em; margin: 0 0 1.25em; padding: 0 0 .75em; border-bottom: 1px solid var(--rv-stroke); }
   .rv-frontmatter .k { color: var(--rv-fg); font-weight: 600; }
   li.tfm-task.tfm-status-done > .tfm-desc, li.tfm-task.tfm-status-done { color: var(--rv-muted); }
   .tfm-badges { margin-left: .4em; } .tfm-badge { font-size: .78em; line-height: 1.6; background: var(--rv-bg-3); color: var(--rv-fg); }

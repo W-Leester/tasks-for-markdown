@@ -23,7 +23,7 @@ window.addEventListener('message', (e: MessageEvent<ToWebview>) => {
 function addRowActions(): void {
   const labels = document.body.dataset;
   for (const li of Array.from(content.querySelectorAll<HTMLElement>('li.tfm-task'))) {
-    if (!li.querySelector(':scope > input.tfm-check') || li.dataset.tfmLine === undefined) continue;
+    if (!li.querySelector(':scope > input.tfm-check, :scope > p > input.tfm-check') || li.dataset.tfmLine === undefined) continue;
     const actions = document.createElement('span');
     actions.className = 'rv-actions';
     const button = (act: string, icon: string, title: string) => {
@@ -36,10 +36,12 @@ function addRowActions(): void {
       actions.appendChild(b);
     };
     button('edit', '✎', labels.lEdit ?? 'Edit');
-    if (li.querySelector(':scope > .tfm-fields .tfm-due, :scope > .tfm-fields .tfm-scheduled, :scope > .tfm-badges .tfm-due, :scope > .tfm-badges .tfm-scheduled')) button('postpone', '⏩', labels.lPostpone ?? 'Postpone');
+    if (li.querySelector(':scope > .tfm-fields .tfm-due, :scope > .tfm-fields .tfm-scheduled, :scope > .tfm-badges .tfm-due, :scope > .tfm-badges .tfm-scheduled, :scope > p > .tfm-fields .tfm-due, :scope > p > .tfm-fields .tfm-scheduled')) button('postpone', '⏩', labels.lPostpone ?? 'Postpone');
     // Before any nested list so the buttons stay on the task's own line.
     const nested = li.querySelector(':scope > ul, :scope > ol');
-    if (nested) li.insertBefore(actions, nested);
+    const para = li.querySelector(':scope > p');
+    if (para) para.appendChild(actions);
+    else if (nested) li.insertBefore(actions, nested);
     else li.appendChild(actions);
   }
 }

@@ -13,8 +13,9 @@
   "Open the results of this query in a panel beside the editor": "Open the results of this query in a panel beside the editor",
   "Tasks: Rendered view": "Tasks: Rendered view",
   "Open the Markdown source in the text editor": "Open the Markdown source in the text editor",
-  "Edit source": "Edit source",
-  "Checkbox: toggle · Double-click a task: edit · Links open their target": "Checkbox: toggle · Double-click a task: edit · Links open their target",
   "That task is no longer at line {0}; the view has been refreshed.": "That task is no longer at line {0}; the view has been refreshed.",
-  "Open a Markdown file first.": "Open a Markdown file first."
+  "Open a Markdown file first.": "Open a Markdown file first.",
+  "Editor mode": "Editor mode",
+  "Rendered": "Rendered",
+  "Source": "Source"
 }

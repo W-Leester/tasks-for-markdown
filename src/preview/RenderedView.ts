@@ -181,29 +181,52 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="${css}">
 <style>
-  body { font-family: var(--vscode-markdown-font-family, var(--vscode-font-family)); font-size: var(--vscode-markdown-font-size, 14px); line-height: var(--vscode-markdown-line-height, 22px); padding: 0 26px 40px; max-width: 980px; margin: 0 auto; }
-  .tfm-toolbar { position: sticky; top: 0; z-index: 1; display: flex; gap: 8px; align-items: center; padding: 6px 0; margin: 0 -26px 8px; padding-left: 26px; padding-right: 26px; background: var(--vscode-editor-background); border-bottom: 1px solid var(--vscode-widget-border, transparent); font-size: 0.85em; opacity: 0.85; }
-  .tfm-toolbar button { background: var(--vscode-button-secondaryBackground); color: var(--vscode-button-secondaryForeground); border: none; border-radius: 3px; padding: 2px 10px; cursor: pointer; }
-  .tfm-toolbar button:hover { background: var(--vscode-button-secondaryHoverBackground); }
-  .tfm-toolbar .hint { margin-left: auto; opacity: 0.8; }
-  li.tfm-task > .tfm-check, .tfm-list li.tfm-task > .tfm-check { pointer-events: auto; cursor: pointer; }
-  li.tfm-task > .tfm-desc { cursor: default; }
-  a { color: var(--vscode-textLink-foreground); }
-  code { font-family: var(--vscode-editor-font-family); font-size: 0.9em; background: color-mix(in srgb, var(--vscode-textCodeBlock-background, #8882) 100%, transparent); padding: 0 0.3em; border-radius: 3px; }
-  pre { background: var(--vscode-textCodeBlock-background, #8882); padding: 0.8em 1em; border-radius: 4px; overflow: auto; }
-  pre code { background: none; padding: 0; }
-  blockquote { border-left: 4px solid var(--vscode-textBlockQuote-border); background: var(--vscode-textBlockQuote-background); margin: 0; padding: 0.2em 1em; }
-  table { border-collapse: collapse; } th, td { border: 1px solid var(--vscode-widget-border, #8884); padding: 4px 10px; }
-  img { max-width: 100%; }
-  hr { border: none; border-top: 1px solid var(--vscode-widget-border, #8884); }
+  /* Typography and spacing follow Cursor's rich Markdown editor tokens (14px/1.42 base, 1.75/1.5/1.25em
+     headings, 0.9em code, 800px column) translated to VS Code theme variables. */
+  :root { color-scheme: light dark; --rv-fg: var(--vscode-editor-foreground, var(--vscode-foreground)); --rv-bg: var(--vscode-editor-background); --rv-bg-2: color-mix(in srgb, var(--rv-fg) 6%, transparent); --rv-bg-3: color-mix(in srgb, var(--rv-fg) 12%, transparent); --rv-stroke: color-mix(in srgb, var(--rv-fg) 12%, transparent); --rv-stroke-2: color-mix(in srgb, var(--rv-fg) 20%, transparent); --rv-muted: color-mix(in srgb, var(--rv-fg) 74%, transparent); --rv-accent: var(--vscode-terminal-ansiBlue, #7bafe9); --rv-mono: var(--vscode-editor-font-family, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace); }
+  html, body { margin: 0; padding: 0; background: var(--rv-bg); color: var(--rv-fg); }
+  body { font-family: var(--vscode-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif); font-size: 14px; line-height: 1.42; -webkit-font-smoothing: antialiased; }
+  #content { max-width: 800px; margin: 0 auto; padding: 32px 16px 64px; box-sizing: border-box; }
+  #content > :first-child { margin-top: 0; }
+  p { margin: 0 0 .75em; }
+  h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.25; margin: 1.5em 0 .5em; }
+  h1 { font-size: 1.75em; } h2 { font-size: 1.5em; } h3 { font-size: 1.25em; } h4 { font-size: 1.1em; } h5, h6 { font-size: 1em; }
+  ul, ol { margin: .75em 0; padding-left: 1.6em; } li { margin: 2px 0; } li > p { margin: 0; } li > ul, li > ol { margin: 2px 0; }
+  a { color: var(--vscode-textLink-foreground, var(--rv-accent)); text-decoration: none; } a:hover { text-decoration: underline; }
+  code { font-family: var(--rv-mono); font-size: .9em; background: var(--rv-bg-2); border: 1px solid var(--rv-stroke); border-radius: 4px; padding: 0 .35em; }
+  pre { font-family: var(--rv-mono); font-size: .9em; line-height: 1.5; background: var(--rv-bg-2); border-radius: 6px; padding: 12px 16px; margin: 0 0 .75em; overflow: auto; white-space: pre-wrap; }
+  pre code { background: none; border: none; padding: 0; font-size: 1em; }
+  blockquote { margin: 0 0 .75em; padding: 2px 0 2px 14px; border-left: 3px solid var(--rv-stroke-2); color: var(--rv-muted); } blockquote > :last-child { margin-bottom: 0; }
+  table { border-collapse: collapse; margin: 0 0 .75em; } th, td { border: 1px solid var(--rv-stroke); padding: 4px 10px; } th { background: var(--rv-bg-2); }
+  img { max-width: 100%; border-radius: 4px; }
+  hr { border: none; border-top: 1px solid var(--rv-stroke); margin: 1.5em 0; }
+  strong { font-weight: 600; }
+
+  /* Task lines: Cursor-style rounded checkbox, badges after the text. */
+  li.tfm-task { list-style: none; margin-left: -1.6em; padding-left: 0; display: block; }
+  li.tfm-task > .tfm-check, .tfm-list li.tfm-task > .tfm-check { pointer-events: auto; appearance: none; -webkit-appearance: none; width: 14px; height: 14px; margin: 0 .55em 0 0; vertical-align: -2px; border: 1px solid var(--rv-stroke-2); border-radius: 4px; background: transparent; cursor: pointer; position: relative; transition: background .12s, border-color .12s; }
+  li.tfm-task > .tfm-check:hover { border-color: var(--rv-accent); }
+  li.tfm-task > .tfm-check:checked { background: var(--rv-accent); border-color: var(--rv-accent); }
+  li.tfm-task > .tfm-check:checked::after { content: ''; position: absolute; left: 4px; top: 1px; width: 4px; height: 8px; border: solid var(--rv-bg); border-width: 0 2px 2px 0; transform: rotate(45deg); }
+  li.tfm-task.tfm-status-done > .tfm-desc, li.tfm-task.tfm-status-done { color: var(--rv-muted); }
+  .tfm-badges { margin-left: .4em; } .tfm-badge { font-size: .78em; line-height: 1.6; background: var(--rv-bg-3); color: var(--rv-fg); }
+  .tfm-query { background: var(--rv-bg-2); border: 1px solid var(--rv-stroke); border-radius: 6px; padding: 10px 14px; margin: 0 0 .75em; }
+  .tfm-query .tfm-list { margin: .2em 0 .3em; padding-left: 0; } .tfm-query .tfm-list li.tfm-task { margin-left: 0; }
+  .tfm-query h4.tfm-group, .tfm-query h5.tfm-group, .tfm-query h6.tfm-group { margin: .6em 0 .2em; font-size: 1em; font-weight: 600; }
+  .tfm-task-count { color: var(--rv-muted); }
+
+  /* Mode toggle in the top-right corner, like Cursor's "Preview | Markdown". */
+  .rv-toggle { position: fixed; top: 6px; right: 14px; z-index: 2; display: inline-flex; gap: 2px; padding: 2px; border-radius: 6px; background: var(--rv-bg); font-size: 12px; line-height: 1; }
+  .rv-toggle button { border: none; background: transparent; color: var(--rv-muted); padding: 4px 8px; border-radius: 4px; cursor: pointer; font: inherit; }
+  .rv-toggle button:hover { color: var(--rv-fg); }
+  .rv-toggle button[aria-pressed="true"] { background: var(--rv-bg-3); color: var(--rv-fg); cursor: default; }
 </style>
 <title>${t('Tasks: Rendered view')}</title>
 </head>
 <body>
-<div class="tfm-toolbar">
-  <button id="edit-source" title="${t('Open the Markdown source in the text editor')}">${t('Edit source')}</button>
-  <button id="refresh">${t('Refresh')}</button>
-  <span class="hint">${t('Checkbox: toggle · Double-click a task: edit · Links open their target')}</span>
+<div class="rv-toggle" role="group" aria-label="${t('Editor mode')}">
+  <button id="mode-rendered" aria-pressed="true">${t('Rendered')}</button>
+  <button id="mode-source" title="${t('Open the Markdown source in the text editor')} (Ctrl+Shift+R)">${t('Source')}</button>
 </div>
 <div id="content"></div>
 <script nonce="${nonce}" src="${script}"></script>
@@ -228,23 +251,41 @@ export function registerRenderedView(context: vscode.ExtensionContext, deps: Ren
     if (input?.uri && /\.(md|markdown)$/i.test(input.uri.path)) return input.uri;
     return provider.active ?? undefined;
   };
-  const open = async (arg: unknown, column: vscode.ViewColumn) => {
+  /** Close the other editor of the same note in the active group so switching feels like a mode toggle. */
+  const closeCounterpart = async (uri: vscode.Uri, keep: 'rendered' | 'source') => {
+    const key = uri.toString();
+    for (const tab of vscode.window.tabGroups.activeTabGroup.tabs) {
+      const input = tab.input;
+      const isSource = input instanceof vscode.TabInputText && input.uri.toString() === key;
+      const isRendered = input instanceof vscode.TabInputCustom && input.viewType === RENDERED_VIEW_TYPE && input.uri.toString() === key;
+      if ((keep === 'rendered' && isSource) || (keep === 'source' && isRendered)) {
+        if (tab.isDirty) continue; // never risk a save prompt; the document model is shared anyway
+        await vscode.window.tabGroups.close(tab, true);
+      }
+    }
+  };
+  const openRendered = async (arg: unknown, column: vscode.ViewColumn, toggle: boolean) => {
     const uri = activeMarkdownUri(arg);
     if (!uri) {
       void vscode.window.showInformationMessage(t('Open a Markdown file first.'));
       return;
     }
+    if (toggle && provider.active?.toString() === uri.toString() && !vscode.window.activeTextEditor) return openSource(uri);
     await vscode.commands.executeCommand('vscode.openWith', uri, RENDERED_VIEW_TYPE, column);
+    if (column === vscode.ViewColumn.Active) await closeCounterpart(uri, 'rendered');
+  };
+  const openSource = async (arg: unknown) => {
+    const uri = arg instanceof vscode.Uri ? arg : provider.active;
+    if (!uri) return;
+    await vscode.commands.executeCommand('vscode.openWith', uri, 'default');
+    await closeCounterpart(uri, 'source');
   };
   context.subscriptions.push(
     provider,
     vscode.window.registerCustomEditorProvider(RENDERED_VIEW_TYPE, provider, { webviewOptions: { retainContextWhenHidden: true }, supportsMultipleEditorsPerDocument: true }),
-    vscode.commands.registerCommand('tasksmd.openRendered', (arg?: unknown) => open(arg, vscode.ViewColumn.Active)),
-    vscode.commands.registerCommand('tasksmd.openRenderedToSide', (arg?: unknown) => open(arg, vscode.ViewColumn.Beside)),
-    vscode.commands.registerCommand('tasksmd.openSource', async (arg?: unknown) => {
-      const uri = arg instanceof vscode.Uri ? arg : provider.active;
-      if (uri) await vscode.commands.executeCommand('vscode.openWith', uri, 'default');
-    }),
+    vscode.commands.registerCommand('tasksmd.openRendered', (arg?: unknown) => openRendered(arg, vscode.ViewColumn.Active, true)),
+    vscode.commands.registerCommand('tasksmd.openRenderedToSide', (arg?: unknown) => openRendered(arg, vscode.ViewColumn.Beside, false)),
+    vscode.commands.registerCommand('tasksmd.openSource', (arg?: unknown) => openSource(arg)),
   );
   return provider;
 }

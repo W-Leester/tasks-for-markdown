@@ -208,6 +208,8 @@
 - `markdown-it`을 devDependencies에서 dependencies로 이동. `PreviewIntegration.pluginDeps()` 분리.
 - 테스트: `tests/preview-renderDocument.test.ts`(front matter 줄 번호 유지, 체크박스 활성, 쿼리 결과, 상대 이미지만 치환, 원문 HTML 이스케이프), 통합 테스트(커스텀 에디터 탭이 열리고 소스로 돌아옴).
 
+**후속(1.0.5).** "Preview 토글과 UI/UX가 너무 다르다"는 지적에 따라 Cursor 편집기의 디자인 토큰을 번들에서 추출했습니다(`--rte-font-size-*`, `--cursor-font-size-lg` 14px, `--rte-line-height-base` 1.42, 제목 1.75/1.5/1.25em, 코드 .9em, `.markdown-editor-react__richtext-content` max-width 800px / padding 32px 16px 64px, 배경 `color-mix(fg 6%)`, 테두리 12%/20%, radius 4/6px, 체크박스 accent `--cursor-blue`). 웹뷰에는 `--cursor-*` 변수가 없으므로 `--vscode-editor-foreground/background`, `--vscode-terminal-ansiBlue` 등으로 치환해 같은 비율로 재현했습니다. 상단 툴바를 제거하고 오른쪽 위 `렌더 | 소스` 토글로 바꾸었으며, `Ctrl+Shift+R`은 같은 탭 자리에서 전환하도록 반대편 편집기를 닫습니다(더티 문서는 닫지 않음). 검증은 헤드리스 Chrome으로 예시 노트를 렌더링해 스크린샷으로 확인.
+
 **남은 제한.** 본문 텍스트 편집은 소스 편집으로 전환해야 합니다. 렌더 보기는 실행 취소 스택을 갖지 않으며(편집은 모두 `TaskEditService`가 원본 파일에 적용) 미리보기 CSS(`media/preview.css`)를 공유하므로 스타일 변경은 두 곳에 함께 반영됩니다.
 
 ---

@@ -47,7 +47,6 @@ content.addEventListener('dblclick', (e) => {
   post({ type: 'doc/edit', ...ref });
 });
 
-document.getElementById('edit-source')?.addEventListener('click', () => post({ type: 'doc/openSource' }));
-document.getElementById('refresh')?.addEventListener('click', () => post({ type: 'ui/ready' }));
+document.getElementById('mode-source')?.addEventListener('click', () => post({ type: 'doc/openSource' }));
 
 post({ type: 'ui/ready' });

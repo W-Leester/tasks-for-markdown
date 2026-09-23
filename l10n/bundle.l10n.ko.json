@@ -296,7 +296,8 @@
   "Open the results of this query in a panel beside the editor": "이 쿼리의 결과를 에디터 옆 패널에 표시합니다",
   "Tasks: Rendered view": "Tasks: 렌더 보기",
   "Open the Markdown source in the text editor": "마크다운 소스를 텍스트 편집기로 엽니다",
-  "Edit source": "소스 편집",
-  "Checkbox: toggle · Double-click a task: edit · Links open their target": "체크박스: 완료 전환 · 태스크 더블클릭: 편집 · 링크: 대상 열기",
-  "That task is no longer at line {0}; the view has been refreshed.": "{0}번째 줄에 그 태스크가 더 이상 없습니다. 보기를 새로 고쳤습니다."
+  "That task is no longer at line {0}; the view has been refreshed.": "{0}번째 줄에 그 태스크가 더 이상 없습니다. 보기를 새로 고쳤습니다.",
+  "Editor mode": "편집기 모드",
+  "Rendered": "렌더",
+  "Source": "소스"
 }

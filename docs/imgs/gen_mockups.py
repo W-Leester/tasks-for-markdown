@@ -494,4 +494,95 @@ def stats():
     s.text(16, H - 10, 'ⓘ ✅/➕ 날짜가 없는 태스크 23개는 집계에서 제외됨 · 데이터는 인덱스에서 즉시 계산 (별도 저장 없음)', size=11, fill=C['muted'], italic=True)
     s.save('07-6-stats.svg')
 
-layers(); anatomy(); layout(); modal(); kanban(); calendar(); stats()
+# ---------------------------------------------------------------- 7.8 rendered view
+def rendered():
+    W, H = 1000, 560
+    s = SVG(W, H, '7.8 렌더 보기')
+    # tab strip + mode toggle
+    s.rect(0, 0, W, 36, fill=C['panel'], stroke='none', r=8)
+    s.rect(12, 8, 150, 22, fill='#fff', stroke=C['border'], r=4); s.text(22, 23, '샘플-태스크.md', size=12)
+    s.rect(W - 132, 8, 120, 22, fill=C['panel2'], stroke='none', r=6)
+    s.rect(W - 128, 11, 52, 16, fill='#fff', stroke=C['border'], r=4); s.text(W - 102, 23, '렌더', size=11, anchor='middle', weight='bold')
+    s.text(W - 40, 23, '소스', size=11, anchor='middle', fill=C['muted'])
+    x0 = 120
+    s.text(x0, 60, 'tags', size=11.5, weight='bold'); s.text(x0 + 34, 60, ': [샘플]', size=11.5, fill=C['muted'])
+    s.line(x0, 70, W - 120, 70, stroke=C['border'])
+    s.text(x0, 104, '샘플 태스크', size=24, weight='bold')
+    s.text(x0, 128, '오늘은 2026-09-21(월) 기준으로 작성했습니다.', size=13)
+    s.text(x0, 166, '업무', size=20, weight='bold')
+    rows = [(False, '주간 보고서 작성 #업무 ⏫ 🆔 report1 📅 2026-09-25', None, True),
+            (False, '계약서 검토 #업무 🔺 📅 2026-09-19', 'over', False),
+            (True, '회의록 정리 #업무 ✅ 2026-09-20', None, False),
+            (False, '여행 계획 세우기', None, False)]
+    y = 190
+    for checked, text, kind, hover in rows:
+        s.checkbox(x0, y - 11, checked=checked, size=15)
+        col = C['done'] if checked else C['text']
+        if kind == 'over':
+            head, tail = text.rsplit('📅', 1)
+            s.text(x0 + 24, y, head, size=13, fill=col); s.text(x0 + 24 + len(head) * 8.6, y, '📅' + tail, size=13, fill=C['err'])
+        else:
+            s.text(x0 + 24, y, text, size=13, fill=col)
+        if hover:
+            bx = x0 + 24 + len(text) * 8.6 + 12
+            s.rect(bx, y - 13, 22, 18, fill=C['panel2'], stroke='none', r=4); s.text(bx + 11, y, '✎', size=11, anchor='middle')
+            s.rect(bx + 26, y - 13, 22, 18, fill=C['panel2'], stroke='none', r=4); s.text(bx + 37, y, '⏩', size=11, anchor='middle')
+            s.text(bx + 56, y, '← hover / focus', size=10.5, fill=C['muted'], italic=True)
+        y += 27
+    s.checkbox(x0 + 26, y - 11, size=15); s.text(x0 + 50, y, '항공권 검색 📅 2026-10-05', size=13)
+    s.text(x0 + 300, y, '← 하위 태스크 들여쓰기 유지', size=10.5, fill=C['muted'], italic=True)
+    # query block
+    qy = y + 26
+    s.rect(x0, qy, W - 240, 128, fill=C['panel'], stroke=C['border'], r=6)
+    s.text(x0 + 12, qy + 20, 'tasks 쿼리 결과 — 행은 배지 유지', size=11, fill=C['muted'], italic=True)
+    for k, (t, chips) in enumerate([('계약서 검토 #업무', [('🔺 highest', C['errbg'], C['err']), ('📅 2026-09-19 · 4일 지남', C['errbg'], C['err']), ('샘플-태스크 › 업무', 'none', C['accent'])]),
+                                     ('예산안 제출 #업무', [('📅 2026-09-16 · 7일 지남', C['errbg'], C['err']), ('샘플-태스크 › 업무', 'none', C['accent'])])]):
+        ry = qy + 46 + k * 30
+        s.checkbox(x0 + 14, ry - 11, size=15); s.text(x0 + 38, ry, t, size=12.5)
+        cx = x0 + 38 + len(t) * 10 + 6
+        for ct, cf, cc in chips:
+            if cf == 'none': s.text(cx, ry, ct, size=10.5, fill=cc); cx += len(ct) * 7
+            else: cx += s.chip(cx, ry - 13, ct, fill=cf, color=cc, size=10, h=17) + 5
+    s.text(x0 + W - 260, qy + 118, '18 of 18 tasks', size=10.5, fill=C['muted'], anchor='end')
+    s.text(16, H - 10, '체크박스 → 완료 전환 · 더블클릭/✎ → 편집 모달 · ⏩ → 연기 · 링크/백링크 → 대상 줄 · Ctrl+Shift+R 또는 [렌더|소스]로 같은 탭에서 전환 · 파일·인덱스 변경 시 자동 재렌더', size=11, fill=C['muted'], italic=True)
+    s.save('07-8-rendered.svg')
+
+# ---------------------------------------------------------------- 7.9 query results panel
+def results():
+    W, H = 1000, 400
+    s = SVG(W, H, '7.9 쿼리 결과 패널')
+    # left: editor
+    s.rect(0, 0, 560, H, fill='#fff', stroke=C['border'], r=8)
+    s.rect(0, 0, 560, 32, fill=C['panel'], stroke='none', r=8); s.text(14, 21, '쿼리-예시.md', size=12, weight='bold')
+    lines = [('## 2. 날짜', C['accent'], False), ('기한 초과:', C['text'], False), ('▷ 결과 보기 | ⓘ 설명', C['muted'], True), ('```tasks', C['muted'], True), ('not done', C['text'], True), ('due before today', C['text'], True), ('sort by due', C['text'], True), ('```', C['muted'], True)]
+    for i, (t, col, mono) in enumerate(lines):
+        y = 60 + i * 26
+        if i == 2: s.text(24, y, t, size=10.5, fill=col)
+        else: s.text(24, y, t, size=13, fill=col, mono=mono)
+    s.rect(18, 60 + 4 * 26 - 14, 520, 20, fill=C['accentbg'], stroke='none', r=3, opacity=0.6)
+    s.text(300, 60 + 4 * 26, '◄ 커서', size=11, fill=C['accent'], italic=True)
+    s.text(24, 60 + 8 * 26 + 10, 'CodeLens ▷ 결과 보기 클릭 → 패널이 옆에 열림', size=11, fill=C['muted'], italic=True)
+    s.text(24, 60 + 9 * 26 + 6, '커서를 다른 블록으로 옮기면 패널 대상이 바뀜 (300ms)', size=11, fill=C['muted'], italic=True)
+    # right: panel
+    px = 580
+    s.rect(px, 0, W - px, H, fill=C['panel'], stroke=C['border'], r=8)
+    s.rect(px, 0, W - px, 32, fill=C['panel2'], stroke='none', r=8); s.text(px + 14, 21, 'Tasks: 쿼리 결과', size=12, weight='bold')
+    s.text(px + 14, 56, '쿼리-예시.md:25', size=12.5, weight='bold'); s.text(px + 140, 56, '5개 일치', size=11.5, fill=C['muted'])
+    s.rect(px + 14, 68, 12, 12, fill=C['accent'], stroke=C['accent'], r=2); s.path(f'M{px+16.5} {74} l3 3 l5 -6', stroke='#fff', sw=1.6, marker=False)
+    s.text(px + 32, 79, '커서 따라가기', size=11.5)
+    s.rect(px + 140, 66, 44, 18, fill='#fff', stroke=C['border'], r=4); s.text(px + 162, 79, '쿼리', size=11, anchor='middle')
+    s.rect(px + 190, 66, 28, 18, fill='#fff', stroke=C['border'], r=4); s.text(px + 204, 79, '↻', size=11, anchor='middle')
+    cards = [('계약서 검토 #업무', [('🔺 highest', C['errbg'], C['err']), ('📅 09-19 · 4일 지남', C['errbg'], C['err'])]),
+             ('예산안 제출 #업무', [('📅 09-16 · 7일 지남', C['errbg'], C['err'])]),
+             ('운동 #건강', [('🔁', '#ede7f6', C['purple']), ('📅 09-21 · 2일 지남', C['errbg'], C['err'])]),
+             ('우유 사기 #집안일', [('🔁', '#ede7f6', C['purple']), ('📅 09-22 · 1일 지남', C['errbg'], C['err'])])]
+    for k, (t, chips) in enumerate(cards):
+        cy = 100 + k * 64
+        s.rect(px + 14, cy, W - px - 28, 54, fill='#fff', stroke=C['border'], r=5)
+        s.checkbox(px + 24, cy + 10, size=13); s.text(px + 44, cy + 21, t, size=12.5)
+        cx = px + 24
+        for ct, cf, cc in chips: cx += s.chip(cx, cy + 30, ct, fill=cf, color=cc, size=10, h=17) + 5
+    s.text(px + 14, H - 12, '카드: 클릭 편집 · 더블클릭 원본 · 체크박스 토글', size=10.5, fill=C['muted'], italic=True)
+    s.save('07-9-query-results.svg')
+
+layers(); anatomy(); layout(); modal(); kanban(); calendar(); stats(); rendered(); results()

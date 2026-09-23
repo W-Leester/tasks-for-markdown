@@ -17,5 +17,9 @@
   "Open a Markdown file first.": "Open a Markdown file first.",
   "Editor mode": "Editor mode",
   "Rendered": "Rendered",
-  "Source": "Source"
+  "Source": "Source",
+  "Moved to {0}": "Moved to {0}",
+  "Click: edit · Double-click: open · Space: toggle done · Alt+←/→: move to the next column": "Click: edit · Double-click: open · Space: toggle done · Alt+←/→: move to the next column",
+  "Arrow keys: move between days · Enter: new task in the focused day": "Arrow keys: move between days · Enter: new task in the focused day",
+  "tasks": "tasks"
 }

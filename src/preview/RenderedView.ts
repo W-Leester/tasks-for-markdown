@@ -224,7 +224,8 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
   li.tfm-task > .tfm-check:checked { background: var(--rv-accent); border-color: var(--rv-accent); }
   li.tfm-task > .tfm-check:checked::after { content: ''; position: absolute; left: 5px; top: 1.5px; width: 4px; height: 8px; border: solid var(--rv-bg); border-width: 0 2px 2px 0; transform: rotate(45deg); }
   .rv-actions { display: none; margin-left: .5em; vertical-align: -1px; gap: 2px; }
-  li.tfm-task:hover > .rv-actions { display: inline-flex; }
+  li.tfm-task:hover > .rv-actions, li.tfm-task:focus-within > .rv-actions { display: inline-flex; }
+  .tfm-query .tfm-list > li { content-visibility: auto; contain-intrinsic-size: auto 28px; }
   .rv-actions button { border: none; background: var(--rv-bg-2); color: var(--rv-muted); border-radius: 4px; padding: 0 5px; line-height: 18px; font-size: 12px; cursor: pointer; font-family: inherit; }
   .rv-actions button:hover { background: var(--rv-bg-3); color: var(--rv-fg); }
   .tfm-fields { margin-left: .2em; } .tfm-field { white-space: nowrap; } .tfm-field.tfm-overdue { color: var(--vscode-errorForeground, #f14c4c); }

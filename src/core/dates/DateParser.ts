@@ -27,9 +27,9 @@ export function parseNaturalDate(input: string, today: Dayjs): Dayjs | null {
   }
 
   // in N units / N units / N units ago / N일 후 / N일 뒤 / N일 전
-  m = /^(?:in )?(\d+) (day|days|week|weeks|month|months|year|years)( ago)?$/.exec(text) ?? koRelative(text);
+  m = /^(?:in )?(\d+|an?|one|two|three|four|five|six|seven|eight|nine|ten) (day|days|week|weeks|month|months|year|years)( ago)?$/.exec(text) ?? koRelative(text);
   if (m) {
-    const n = +m[1]! * (m[3] ? -1 : 1);
+    const n = numberWord(m[1]!) * (m[3] ? -1 : 1);
     return base.add(n, unit(m[2]!));
   }
 
@@ -116,4 +116,10 @@ function koWeekday(text: string): RegExpExecArray | null {
   if (!m) return null;
   const dir = m[1] === '다음' ? 'next' : m[1] === '지난' ? 'last' : 'this';
   return ['', dir, m[2]!] as unknown as RegExpExecArray;
+}
+
+/** "two" → 2 (Obsidian accepts number words in relative dates: "in two weeks"). */
+function numberWord(w: string): number {
+  const words: Record<string, number> = { a: 1, an: 1, one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10 };
+  return words[w] ?? +w;
 }

@@ -63,7 +63,7 @@
     <div class="title">
       {#if query}
         <strong title={query.label}>{query.label}</strong>
-        <span class="tfm-muted">{t('{0} tasks match', matched)}</span>
+        <span class="tfm-muted" aria-live="polite">{t('{0} tasks match', matched)}</span>
       {:else}
         <span class="tfm-muted">{t('Place the cursor inside a ```tasks block.')}</span>
       {/if}
@@ -73,7 +73,7 @@
     <button class="tfm-btn secondary" onclick={run} title={t('Refresh')}>↻</button>
   </header>
   {#if showQuery && query}<pre class="query">{query.text.trimEnd()}</pre>{/if}
-  {#if errors.length}<div class="error">{errors.join(' · ')}</div>{/if}
+  {#if errors.length}<div class="error" role="alert">{errors.join(' · ')}</div>{/if}
 
   {#if init && query}
     <div class="results">
@@ -104,5 +104,6 @@
   h3 { margin: 10px 0 4px; font-size: 0.95em; border-bottom: 1px solid var(--tfm-border); padding-bottom: 2px; }
   .n { font-weight: normal; opacity: 0.65; margin-left: 4px; font-size: 0.85em; }
   .cards { display: flex; flex-direction: column; gap: 4px; }
+  .cards :global(.card) { content-visibility: auto; contain-intrinsic-size: auto 56px; }
   .small { font-size: 0.85em; margin: 0; }
 </style>

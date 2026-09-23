@@ -20,6 +20,9 @@
   class:overdue
   role="button"
   tabindex="0"
+  data-key={task.key}
+  data-line={task.line}
+  aria-label={`${task.description}${task.due ? `, ${shortDate(task.due)}` : ''}`}
   {draggable}
   ondragstart={onDragStart}
   onclick={() => post({ type: 'task/edit', key: task.key, line: task.line })}

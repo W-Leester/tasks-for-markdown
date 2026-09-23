@@ -151,25 +151,31 @@ src/
 │   ├── TaskDiagnostics.ts
 │   └── quickpicks/             # StatusPick, PriorityPick, DatePick, RecurrencePick, DependencyPick
 ├── preview/
-│   ├── markdownItPlugin.ts     # 태스크 줄 뱃지 렌더 + ```tasks 블록 → placeholder
-│   ├── previewScript.ts        # 웹뷰 측: 체크박스 클릭, 쿼리 결과 요청
-│   └── PreviewBridge.ts        # 확장 측: 메시지 처리
+│   ├── markdownItPlugin.ts     # 태스크 줄 뱃지 렌더 + ```tasks 블록 → 결과 HTML (렌더 시점 통합, D-1)
+│   ├── PreviewIntegration.ts   # extendMarkdownIt 진입점, 인덱스 변경 시 preview.refresh, pluginDeps()
+│   ├── renderDocument.ts       # 노트 전체 → HTML (렌더 보기용, vscode 의존 없음)
+│   └── RenderedView.ts         # 렌더 보기: CustomTextEditorProvider + 명령 (1.0.4)
+├── webviewHost/
+│   ├── WebviewHost.ts          # HTML 생성(CSP nonce), 메시지 라우팅, state/init·patch
+│   ├── registerWebviews.ts     # 패널 오프너(edit·kanban·query-builder·stats·calendar·query-results)
+│   └── PanelFullscreen.ts      # 패널 전체 화면(사이드바·패널 숨김 + 그룹 최대화) (1.0.2)
 ├── views/
 │   ├── TaskTreeProvider.ts     # 스마트 뷰 + 그룹 전환 + 체크박스
 │   ├── SavedQueryTreeProvider.ts
 │   └── StatusBar.ts
-├── webviews/                   # Svelte 앱들 (별도 esbuild 엔트리)
-│   ├── shared/                 # 메시지 타입, 디자인 토큰, 컴포넌트
-│   ├── edit-modal/
-│   ├── kanban/
+├── webviews/                   # Svelte 5 앱들 (src/webviews/<app>/main.ts 마다 esbuild 엔트리)
+│   ├── shared/                 # protocol.ts(메시지 타입), tokens.css, l10n, TaskCard
+│   ├── edit/                   # 만들기/편집 대화상자
+│   ├── kanban/                 # 칸반 (패널 + 사이드바 뷰) — 윈도잉, 키보드 이동
 │   ├── query-builder/
-│   ├── calendar/
+│   ├── query-results/          # 커서 위치 ```tasks 블록의 실시간 결과 (1.0.3)
+│   ├── rendered/               # 렌더 보기 페이지 스크립트 (프레임워크 없음, 1.5KB)
+│   ├── calendar/               # 월간/주간, 전체 화면, 화살표 탐색
 │   └── stats/
-├── commands/
-│   └── registerCommands.ts
-├── settings/
-│   └── Settings.ts             # 타입 안전 설정 접근 + onDidChange
-└── l10n/                       # bundle.l10n.json, bundle.l10n.ko.json
+├── commands/                   # registerCommands · editCommands · queryCommands · statusCommands · convertCommand
+├── settings/                   # Settings.ts(타입 안전 접근) · schema.ts(키·기본값) · statusRegistryFromSettings.ts
+├── l10n.ts                     # t(): tasksmd.language로 번들 강제 (auto | en | ko)
+└── (repo) l10n/                # bundle.l10n.json, bundle.l10n.ko.json
 ```
 
 ---
@@ -444,6 +450,8 @@ sequenceDiagram
 
 **M5.0 스파이크 결과(D-1)**: 위 시퀀스의 `postMessage`/`query/run` 경로는 클래식 미리보기에서 **불가능**하다(기여 스크립트는 `acquireVsCodeApi` 획득 불가, `command:` 링크 비활성). 실제 구현은 렌더 시점 통합이다 — markdown-it 플러그인이 확장 프로세스에서 `QueryService`를 직접 호출해 결과 HTML을 만들고, 인덱스 변경 시 `markdown.preview.refresh`를 호출한다. 체크박스는 표시 전용이며 토글은 사이드바/칸반/에디터에서 한다. 상호작용형 미리보기는 VS Code의 새 Markdown Editor + `codeBlockEditors`(v1.x 후보)로 가능하다.
 
+**1.0.4 렌더 보기(5.7)**: Cursor의 "Preview" 토글은 Cursor 자체 Tiptap/ProseMirror 편집기라 위 플러그인이 전혀 개입할 수 없다(확장 호스트 API 없음). 그래서 같은 markdown-it 파이프라인으로 노트 전체를 그리는 **확장 자체의 커스텀 에디터**를 두었다. 이것은 클래식 미리보기와 달리 웹뷰이므로 양방향 메시지가 가능해 체크박스·편집·연기·링크가 동작한다.
+
 ### 5.6 웹뷰 메시지 프로토콜 (모든 Svelte 앱 공통)
 
 ```mermaid
@@ -474,6 +482,52 @@ flowchart LR
 | wv → ext | `query/run { requestId, query }` | 쿼리 실행 |
 
 메시지 타입은 `webviews/shared/protocol.ts`에 discriminated union으로 정의해 양쪽에서 같은 타입을 import한다.
+
+1.0.x에서 추가된 메시지:
+
+| 방향 | 메시지 | 용도 |
+|---|---|---|
+| wv → ext | `query/run { …, source }` | 문서 상대 경로를 함께 보내 `{{query.file.folder}}` 자리표시자가 패널에서도 동작 |
+| ext → wv | `results/query { target: { text, source, label } }` | 쿼리 결과 패널: 커서가 다른 ```tasks 블록으로 가면 대상 교체 |
+| 양방향 | `ui/fullscreen { on }` | 패널 전체 화면 요청 / 확정 상태 |
+| ext → wv | `doc/html { html }` | 렌더 보기: 노트 전체 HTML |
+| wv → ext | `doc/toggle · doc/edit · doc/postpone { path, line }` | 렌더 보기의 태스크 조작 (`path`는 쿼리 결과 행일 때 워크스페이스 경로, 본문 줄이면 null) |
+| wv → ext | `doc/link { href }` · `doc/openSource` | 링크 열기(외부 URL / 상대 경로 `#L<n>`) · 소스 편집기로 전환 |
+
+### 5.7 렌더 보기 (상호작용 커스텀 에디터, 1.0.4)
+
+```mermaid
+sequenceDiagram
+    participant U as 사용자
+    participant VS as VS Code / Cursor
+    participant RV as RenderedViewProvider (확장)
+    participant RD as renderDocumentHtml + markdownItPlugin
+    participant WV as rendered.js (webview)
+    participant ES as TaskEditService
+
+    U->>VS: Ctrl+Shift+R / 제목 표시줄 아이콘 / Open With…
+    VS->>RV: vscode.openWith(uri, 'tasksmd.rendered')
+    RV->>RV: resolveCustomTextEditor(document, panel)
+    RV-->>WV: HTML 셸 (CSP nonce, media/preview.css, Cursor 편집기 토큰)
+    WV->>RV: ui/ready
+    RV->>RD: render(document.getText(), env.currentDocument)
+    RD-->>RV: HTML (li.tfm-task[data-tfm-line], tfm-query-block, front matter 블록)
+    RV-->>WV: doc/html
+    Note over WV: 체크박스 클릭 / ✎ ⏩ / 더블클릭 / 링크
+    WV->>RV: doc/toggle { path: null, line }
+    RV->>ES: toggle(taskAt(uri, line) ?? parse(document.lineAt(line)))
+    ES-->>VS: WorkspaceEdit (파일 수정)
+    VS-->>RV: onDidChangeTextDocument (250ms 디바운스) / index.onDidChange (400ms)
+    RV-->>WV: doc/html (스크롤 위치 유지)
+    WV->>RV: doc/openSource
+    RV->>VS: vscode.openWith(uri, 'default') + 반대편 탭 닫기 (더티 문서 제외)
+```
+
+![렌더 보기 시퀀스](imgs/05-7-rendered-view.svg)
+
+- 문서 줄 번호는 `data-tfm-line`으로 유지된다. front matter는 줄 수를 보존한 채 비우고 위쪽에 키/값 블록으로 표시한다.
+- 태스크 줄 필드는 `RenderOptions.fieldStyle`(`plain` = 원문처럼 이모지+값, `badges` = 알약)로 그리고, 쿼리 결과 행은 항상 배지다. 플러그인의 `renderOptions(source, 'line' | 'query')` 컨텍스트로 구분한다.
+- 원문 HTML은 이스케이프(`html: false`), 상대 경로 이미지는 `asWebviewUri`로 치환, `localResourceRoots`는 확장·문서 폴더·워크스페이스 루트.
 
 ---
 
@@ -553,7 +607,9 @@ stateDiagram-v2
 
 - **A**: 액티비티 바의 Tasks 아이콘. 클릭하면 세 개의 뷰(스마트 뷰 / 저장된 쿼리 / 칸반)가 한 컨테이너에 표시된다.
 - **에디터**: CodeLens(커서 줄에만, 설정), 줄 끝 상대 날짜 장식, 기한 초과 줄 배경색, 필드 부분 옅은 색.
-- **미리보기**: 체크박스 클릭 가능, 필드는 뱃지, ` ```tasks ` 블록은 결과 카드.
+- **미리보기**: 표시 전용(D-1). 필드는 뱃지, ` ```tasks ` 블록은 결과 카드. 인덱스 변경 시 자동 갱신.
+- **렌더 보기(7.8)**: 미리보기와 같은 모습에 상호작용을 더한 커스텀 에디터. `Ctrl+Shift+R`로 같은 탭 자리에서 소스와 오간다. Cursor Preview 토글의 대안.
+- **쿼리 결과 패널(7.9)**: 에디터 옆에서 커서 위치 블록의 결과를 실시간 표시.
 - **상태바**: 요약 + 클릭 시 사이드바 열기. Problems 패널에 진단.
 
 ### 7.2 에디터 안 상호작용 흐름
@@ -616,6 +672,8 @@ flowchart LR
 
 드래그 결과는 컬럼 기준에 따라 `task/setField`로 변환된다: 상태 → `status`, 마감일 버킷 → `due`, 우선순위 → `priority`. 사이드바 버전은 폭이 좁으므로 컬럼을 탭으로 전환한다.
 
+**1.0.x 보강**: 컬럼 카드가 150개 이상이면 **윈도잉**(보이는 범위 ± 6장만 렌더, 카드 추정 64px 스페이서)으로 그린다. 키보드: 카드에 포커스 후 `Space` 완료 전환, `Enter` 편집, **`Alt+←/→`로 옆 컬럼 이동**(드래그앤드롭의 키보드 대체, `aria-live`로 결과 안내). 컬럼은 `role="group"`, 카드 목록은 `role="list"`.
+
 ### 7.5 캘린더 (월간 / 주간)
 
 ```
@@ -632,6 +690,9 @@ flowchart LR
 
 - 칸 안 항목 클릭 → 편집 모달, 드래그 → 해당 날짜 필드 변경, 빈 칸 더블클릭 → 새 태스크(마감일 채움).
 - 주간 뷰는 하루를 세로로 넓게 펼쳐 항목을 모두 표시한다.
+
+- **1.0.2**: 툴바 `⤢ 전체 화면`(사이드바·패널 숨김 + 에디터 그룹 최대화, `PanelFullscreen`; `tasksmd.calendar.fullScreen: window`면 창도 전체 화면), `Esc`로 해제. 월간 칸은 높이에 맞춰 보이는 개수를 계산(`maxItems`), 글자 크기 `tasksmd.calendar.fontSize`.
+- **접근성**: `role="grid"`/`gridcell`, 오늘 칸부터 roving tabindex, 화살표로 날짜 이동(가장자리를 넘으면 월/주 전환), `Enter`로 그 날짜에 새 태스크.
 
 ### 7.6 통계 (주 단위)
 
@@ -662,6 +723,57 @@ flowchart LR
 | 중간/낮음/최저 | `--vscode-charts-yellow` / `--vscode-charts-blue` / `--vscode-descriptionForeground` |
 | 필드(메타데이터) 텍스트 | `--vscode-descriptionForeground` |
 | 완료 | `--vscode-disabledForeground` + 취소선 |
+
+### 7.8 렌더 보기 (1.0.4)
+
+```
+┌─ 샘플-태스크.md ───────────────────────────────────────────── [렌더][소스] ─┐
+│ tags: [샘플]                                     ← front matter (흐린 키/값)   │
+│ ──────────────────────────────────────────────────────────────────────── │
+│ 샘플 태스크                                                   (h1 1.75em)  │
+│ 오늘은 2026-09-21(월) 기준으로 작성했습니다.                                │
+│                                                                          │
+│ 업무                                                          (h2 1.5em)  │
+│ ☐ 주간 보고서 작성 #업무 ⏫ 🆔 report1 📅 2026-09-25        ✎ ⏩ (hover)     │
+│ ☐ 계약서 검토 #업무 🔺 📅 2026-09-19  ← 지난 마감은 붉게                     │
+│ ☑ 회의록 정리 #업무 ✅ 2026-09-20      ← 완료는 흐리게                        │
+│ ☐ 여행 계획 세우기                                                        │
+│    ☐ 항공권 검색 📅 2026-10-05          ← 하위 태스크 들여쓰기 유지            │
+│                                                                          │
+│ ┌─ tasks 쿼리 결과 (배지 유지) ─────────────────────────────────────────┐ │
+│ │ ☐ 계약서 검토 #업무 [🔺 highest] [📅 2026-09-19 · 4일 지남] 샘플-태스크 › 업무│ │
+│ │ ☐ 예산안 제출 #업무 [📅 2026-09-16 · 7일 지남]                          │ │
+│ │                                                       18 of 18 tasks │ │
+│ └──────────────────────────────────────────────────────────────────────┘ │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+![7.8 렌더 보기](imgs/07-8-rendered.svg)
+
+- 본문 800px 중앙 열, 14px/1.42, 제목 1.75·1.5·1.25em, 코드 0.9em, 배경·테두리는 글자색을 6%·12%·20% 섞은 값 — Cursor 편집기의 디자인 토큰을 VS Code 테마 변수로 옮긴 것(7.7).
+- 체크박스 = 완료 전환, 더블클릭 또는 `✎` = 편집 대화상자, `⏩` = 연기(마감·예정일 있는 태스크만), 링크·백링크 = 대상 줄로 이동. 줄에 포커스가 있어도(`focus-within`) 버튼이 보인다.
+- 오른쪽 위 `렌더 | 소스` 토글과 `Ctrl+Shift+R`은 같은 탭 자리에서 전환한다(반대편 편집기를 닫음, 더티 문서 제외). `workbench.editorAssociations`로 기본 에디터 지정 가능.
+
+### 7.9 쿼리 결과 패널 (1.0.3)
+
+```
+┌─ 에디터: 쿼리-예시.md ───────────────┬─ Tasks: 쿼리 결과 ──────────────────────┐
+│ ## 2. 날짜                            │ 쿼리-예시.md:25   5개 일치               │
+│ 기한 초과:                            │ ☑ 커서 따라가기   [쿼리] [↻]             │
+│  ▷ 결과 보기 | ⓘ 설명   ← CodeLens    │ ┌────────────────────────────────────┐ │
+│ ```tasks                              │ │ ☐ 계약서 검토 #업무                  │ │
+│ not done        ◄ 커서                │ │   [🔺 highest] [📅 09-19 · 4일 지남]  │ │
+│ due before today                      │ │ ☐ 예산안 제출 #업무                  │ │
+│ sort by due                           │ │   [📅 09-16 · 7일 지남]              │ │
+│ ```                                   │ └────────────────────────────────────┘ │
+└──────────────────────────────────────┴─────────────────────────────────────────┘
+```
+
+![7.9 쿼리 결과 패널](imgs/07-9-query-results.svg)
+
+- 모든 ` ```tasks ` 펜스 위에 CodeLens `▷ 결과 보기 · ⓘ 설명`. 결과 보기는 패널을 `Beside`로 열고 그 블록을 대상으로 한다.
+- 패널이 열려 있는 동안 `onDidChangeTextEditorSelection` / `onDidChangeActiveTextEditor` / `onDidChangeTextDocument`(300ms)를 구독해 커서가 있는 블록으로 대상을 갱신한다(동일 대상은 재전송하지 않음). "커서 따라가기"를 끄면 고정.
+- 카드는 칸반과 같은 `TaskCard`: 클릭 편집, 더블클릭 원본, 체크박스 토글. 일치 수는 `aria-live`.
 
 ---
 
@@ -706,7 +818,7 @@ flowchart TB
 | CodeLens | 기본 "커서 줄에만" → 렌즈 1개 |
 | 쿼리 | `(queryText, indexVersion)` 캐시. 50,000 태스크 필터 < 100ms 목표. `regex` 필터는 컴파일 1회 |
 | 트리 뷰 | 그룹 노드는 lazy `getChildren`, 태스크 노드 5,000개 이상이면 "더 보기" |
-| 웹뷰 | `state/patch`로 변경된 파일의 태스크만 전송. 칸반·캘린더는 가상 스크롤 |
+| 웹뷰 | 칸반 컬럼 150장 이상은 윈도잉(보이는 범위 ± 6장, 스페이서로 스크롤 높이 유지). 캘린더 월간 칸은 높이에 맞는 개수만 표시(`+N`), 주간 칸은 스크롤. 쿼리 결과 패널·렌더 보기의 긴 목록은 `content-visibility: auto`로 화면 밖 렌더를 미룸 |
 | 메모리 | Task는 원문 문자열 + 파싱 필드만 보유(≈ 1KB). 50,000개 ≈ 50MB 상한 |
 
 ---
@@ -793,6 +905,7 @@ GitHub Actions: PR마다 `typecheck + lint + test`, 태그 `v*` 푸시 시 패�
 | M6 | `webviews/edit-modal`, `kanban` | 5.6, 7.3, 7.4 |
 | M7 | `NotificationService`, `ArchiveService`, `stats`, `calendar` | 7.5, 7.6 |
 | M8 | i18n, 성능, 패키징, 게시 | 11, 13 |
+| 1.0.1–1.0.7 | `l10n.ts`(언어 강제), `PanelFullscreen`, `webviews/query-results`, `preview/RenderedView`·`renderDocument`, `webviews/rendered`, 칸반 윈도잉·키보드, 캘린더 키보드 | 5.6, 5.7, 7.4, 7.5, 7.8, 7.9, 9 |
 
 ---
 
@@ -812,6 +925,7 @@ GitHub Actions: PR마다 `typecheck + lint + test`, 태그 `v*` 푸시 시 패�
 
 | 날짜 | 버전 | 내용 |
 |---|---|---|
+| 2026-09-23 | 0.5 | 1.0 이후 구현 반영: 3.2 모듈 트리 현행화, 5.5 렌더 보기 배경, 5.6 추가 메시지, **5.7 렌더 보기 시퀀스**, 7.1/7.4/7.5 보강, **7.8 렌더 보기·7.9 쿼리 결과 패널 목업**, 9 성능(윈도잉), 14 매핑. 상세 배경은 `docs/post-release-changes.md` |
 | 2026-09-21 | 0.4 | D-1 재검증: 미리보기 스크립트는 로드되나 `openLink`(파일 열기)만 통함 — 결론 유지. 기여 키는 평면 `markdown.*` 형태여야 함(중첩 시 무시) |
 | 2026-09-21 | 0.3 | 4.1 직렬화 순서를 Obsidian 실제 구현에 맞춤 (id/dependsOn이 앞, cancelled가 done 앞) |
 | 2026-09-21 | 0.2 | 모든 Mermaid 다이어그램과 ASCII 목업에 SVG 버전 추가 (`imgs/`) · 5.4/5.5 Mermaid 소스의 백틱 파싱 오류 수정 |

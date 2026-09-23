@@ -299,5 +299,9 @@
   "That task is no longer at line {0}; the view has been refreshed.": "{0}번째 줄에 그 태스크가 더 이상 없습니다. 보기를 새로 고쳤습니다.",
   "Editor mode": "편집기 모드",
   "Rendered": "렌더",
-  "Source": "소스"
+  "Source": "소스",
+  "Moved to {0}": "{0}(으)로 이동함",
+  "Click: edit · Double-click: open · Space: toggle done · Alt+←/→: move to the next column": "클릭: 편집 · 더블클릭: 원본 열기 · Space: 완료 전환 · Alt+←/→: 옆 컬럼으로 이동",
+  "Arrow keys: move between days · Enter: new task in the focused day": "화살표: 날짜 이동 · Enter: 선택한 날에 새 태스크",
+  "tasks": "태스크"
 }

@@ -169,7 +169,7 @@ const miscParser: InstructionParser = (line, q) => {
   if (l === 'no depends on') { q.filters.push(f(line, 'no depends on', (t) => t.dependsOn.length === 0)); return 'handled'; }
   m = /^id (.+)$/i.exec(line);
   if (m) {
-    const tm = parseTextOperator(m[1]!, 'id', { caseInsensitive: false });
+    const tm = parseTextOperator(m[1]!, 'id', { caseInsensitive: true });
     if (!tm) throw new Error(`Unknown id operator in "${line}"`);
     q.filters.push(f(line, tm.explain, (t) => tm.test(t.id)));
     return 'handled';
@@ -233,9 +233,15 @@ const textParser: InstructionParser = (line, q) => {
  * `(a) AND (b)`, `(a) OR NOT (b)`, `NOT (a)`, `(a) XOR (b)`, with nesting. Each operand is a
  * complete single-line filter inside parentheses. Precedence: NOT > AND > XOR > OR.
  */
+/** Obsidian allows one delimiter pair per line: ( ), [ ], { } or " " (no mixing since Tasks 7.0). */
+const BOOLEAN_DELIMITERS: Record<string, string> = { '(': ')', '[': ']', '{': '}', '"': '"' };
+
 export function parseBoolean(line: string): Filter | null {
-  if (!/^\s*(NOT\s*)?\(/.test(line) || !/\)\s*$/.test(line)) return null;
-  const tokens = tokenizeBoolean(line);
+  const open = /^\s*(?:NOT\s*)?([([{"])/.exec(line)?.[1];
+  if (!open) return null;
+  const close = BOOLEAN_DELIMITERS[open]!;
+  if (!line.trimEnd().endsWith(close)) return null;
+  const tokens = tokenizeBoolean(line, open, close);
   if (!tokens) return null;
   let pos = 0;
   const peek = () => tokens[pos];
@@ -285,19 +291,24 @@ export function parseBoolean(line: string): Filter | null {
 
 type BoolToken = { type: 'op'; value: string } | { type: 'group'; value: string };
 
-function tokenizeBoolean(line: string): BoolToken[] | null {
+function tokenizeBoolean(line: string, open = '(', close = ')'): BoolToken[] | null {
   const out: BoolToken[] = [];
   let i = 0;
   while (i < line.length) {
     const ch = line[i]!;
     if (/\s/.test(ch)) { i++; continue; }
-    if (ch === '(') {
+    if (ch === open) {
       let depth = 0, j = i;
-      for (; j < line.length; j++) {
-        if (line[j] === '(') depth++;
-        else if (line[j] === ')') { depth--; if (depth === 0) break; }
+      if (open === close) {
+        j = line.indexOf(close, i + 1); // quotes cannot nest
+        if (j < 0) throw new Error('Unbalanced quotes in boolean expression');
+      } else {
+        for (; j < line.length; j++) {
+          if (line[j] === open) depth++;
+          else if (line[j] === close) { depth--; if (depth === 0) break; }
+        }
+        if (depth !== 0) throw new Error('Unbalanced parentheses in boolean expression');
       }
-      if (depth !== 0) throw new Error('Unbalanced parentheses in boolean expression');
       const inner = line.slice(i + 1, j).trim();
       // Nested boolean inside parentheses: recurse by treating it as a group whose text is boolean.
       out.push({ type: 'group', value: inner });

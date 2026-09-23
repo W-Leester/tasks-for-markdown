@@ -37,6 +37,20 @@ describe('CalendarApp full screen', () => {
     expect(posted.at(-1)).toEqual({ type: 'ui/fullscreen', on: false });
   });
 
+  it('arrow keys move the roving focus between day cells', async () => {
+    await boot();
+    const todayCell = document.getElementById('cell-2026-09-22')!;
+    expect(todayCell.getAttribute('tabindex')).toBe('0');
+    todayCell.focus();
+    await fireEvent.keyDown(todayCell, { key: 'ArrowRight' });
+    await Promise.resolve();
+    expect(document.getElementById('cell-2026-09-23')!.getAttribute('tabindex')).toBe('0');
+    expect(todayCell.getAttribute('tabindex')).toBe('-1');
+    await fireEvent.keyDown(document.getElementById('cell-2026-09-23')!, { key: 'ArrowDown' });
+    await Promise.resolve();
+    expect(document.getElementById('cell-2026-09-30')!.getAttribute('tabindex')).toBe('0');
+  });
+
   it('restores the full-screen label from uiState after a webview reload', async () => {
     await boot({ fullscreen: true });
     expect(screen.getByRole('button', { name: /Exit full screen/ })).toBeTruthy();

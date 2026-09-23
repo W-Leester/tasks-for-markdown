@@ -32,6 +32,7 @@ function addRowActions(): void {
       b.dataset.act = act;
       b.textContent = icon;
       b.title = title;
+      b.setAttribute('aria-label', title);
       actions.appendChild(b);
     };
     button('edit', '✎', labels.lEdit ?? 'Edit');

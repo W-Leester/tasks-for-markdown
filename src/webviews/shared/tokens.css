@@ -41,3 +41,4 @@ input.tfm-input, select.tfm-input, textarea.tfm-input { background: var(--tfm-in
 .tfm-chip.today { background: var(--tfm-today-bg); color: var(--tfm-warn); }
 .tfm-chip.pri-0 { color: var(--tfm-pri-highest); } .tfm-chip.pri-1 { color: var(--tfm-pri-high); } .tfm-chip.pri-2 { color: var(--tfm-pri-medium); } .tfm-chip.pri-4 { color: var(--tfm-pri-low); } .tfm-chip.pri-5 { color: var(--tfm-pri-lowest); }
 .tfm-muted { color: var(--tfm-muted); }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }

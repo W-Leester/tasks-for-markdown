@@ -17,6 +17,7 @@
   let creating: string | null = $state(null); // ISO date of the cell with the inline input
   let newText = $state('');
   let fullscreen = $state(false);
+  let focusDay = $state(''); // roving tabindex target in the grid
   let gridHeight = $state(0);
   let request = 0;
 
@@ -65,6 +66,17 @@
   /** How many items fit in a month cell: grows with the panel height (full screen shows more). */
   const maxItems = $derived(view === 'week' ? Infinity : Math.max(2, Math.floor(((gridHeight - 26) / 6 - 28) / itemHeight)));
 
+  /** Arrow keys walk the grid (←→ a day, ↑↓ a week); moving past the edge turns the page. */
+  function onCellKey(e: KeyboardEvent, day: string) {
+    const delta: Record<string, number> = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7 };
+    if (e.key === 'Enter') { e.preventDefault(); startCreate(day); return; }
+    if (!(e.key in delta) || e.altKey || e.metaKey || e.ctrlKey) return;
+    e.preventDefault();
+    const next = addDays(day, delta[e.key]!);
+    if (!days.includes(next)) move(delta[e.key]! > 0 ? 1 : -1);
+    focusDay = next;
+    queueMicrotask(() => document.getElementById('cell-' + next)?.focus());
+  }
   function move(n: number) {
     if (view === 'week') cursor = addDays(cursor, 7 * n);
     else { const d = parse(cursor.slice(0, 8) + '01'); d.setUTCMonth(d.getUTCMonth() + n); cursor = iso(d); }
@@ -89,7 +101,7 @@
   onMount(() => {
     const off = onMessage((m) => {
       if (m.type === 'state/init') {
-        init = m.state; setBundle(m.state.l10n); cursor = m.state.today;
+        init = m.state; setBundle(m.state.l10n); cursor = m.state.today; focusDay = m.state.today;
         const ui = m.state.uiState as { view?: 'month' | 'week'; show?: Record<Field, boolean>; source?: string; fullscreen?: boolean };
         if (ui.view) view = ui.view; if (ui.show) show = ui.show; if (ui.source) source = ui.source;
         fullscreen = ui.fullscreen === true;
@@ -135,12 +147,15 @@
   </header>
 
   {#if init}
-    <div class="grid" class:week={view === 'week'} bind:clientHeight={gridHeight} style:--tfm-cal-font={fontSize + 'px'}>
-      {#each DOW as d, i (d)}<div class="dow" class:weekend={i >= 5}>{t(d)}</div>{/each}
+    <div class="grid" class:week={view === 'week'} bind:clientHeight={gridHeight} style:--tfm-cal-font={fontSize + 'px'} role="grid" aria-label={title}>
+      {#each DOW as d, i (d)}<div class="dow" role="columnheader" class:weekend={i >= 5}>{t(d)}</div>{/each}
       {#each days as day (day)}
         {@const inMonth = view === 'week' || day.slice(0, 7) === cursor.slice(0, 7)}
         {@const items = itemsByDay.get(day) ?? []}
-        <div class="cell" class:today={day === init.today} class:muted={!inMonth} class:weekend={isoWeekday(day) >= 5} role="gridcell" tabindex="-1"
+        <div class="cell" id={'cell-' + day} class:today={day === init.today} class:muted={!inMonth} class:weekend={isoWeekday(day) >= 5} role="gridcell"
+          tabindex={day === focusDay || (!days.includes(focusDay) && day === days[0]) ? 0 : -1} aria-label={`${day}, ${items.length} ${t('tasks')}`} aria-selected={day === focusDay}
+          onkeydown={(e) => { if (e.target === e.currentTarget) onCellKey(e, day); }}
+          onfocus={() => (focusDay = day)}
           ondragover={(e) => { e.preventDefault(); e.dataTransfer!.dropEffect = 'move'; }} ondrop={(e) => onDrop(e, day)}
           ondblclick={(e) => { if (e.target === e.currentTarget) startCreate(day); }}>
           <div class="day"><span class="num">{Number(day.slice(8))}</span>{#if items.length > maxItems}<span class="tfm-muted more">+{items.length - maxItems}</span>{/if}</div>
@@ -161,7 +176,7 @@
         </div>
       {/each}
     </div>
-    <p class="tfm-muted small">{t('Click: edit · Double-click: open · Drag to another day: move the date · Double-click an empty cell: new task')}</p>
+    <p class="tfm-muted small">{t('Click: edit · Double-click: open · Drag to another day: move the date · Double-click an empty cell: new task')} · {t('Arrow keys: move between days · Enter: new task in the focused day')}</p>
   {/if}
 </main>
 

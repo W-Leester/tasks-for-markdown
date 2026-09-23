@@ -242,7 +242,7 @@
 
     <footer>
       <div class="preview"><span class="tfm-muted">{t('Preview')}</span><code>{previewLine}</code></div>
-      {#if error}<div class="error">{error}</div>{/if}
+      {#if error}<div class="error" role="alert">{error}</div>{/if}
       <div class="actions">
         <button type="button" class="tfm-btn secondary" onclick={cancel}>{t('Cancel')} <kbd>Esc</kbd></button>
         <button type="button" class="tfm-btn" onclick={apply}>{t('Apply')} <kbd>⏎</kbd></button>

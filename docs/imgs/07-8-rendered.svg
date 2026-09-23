@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="560" viewBox="0 0 1000 560" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif"><title>7.8 렌더 보기</title><defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#666"/></marker></defs><rect width="1000" height="560" fill="#ffffff" rx="8"/>
+<rect x="0" y="0" width="1000" height="36" rx="8" fill="#f3f3f3" stroke="none" stroke-width="1"/>
+<rect x="12" y="8" width="150" height="22" rx="4" fill="#fff" stroke="#c8c8c8" stroke-width="1"/>
+<text x="22" y="23" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="12" fill="#1f1f1f" text-anchor="start" font-weight="normal">샘플-태스크.md</text>
+<rect x="868" y="8" width="120" height="22" rx="6" fill="#e8e8e8" stroke="none" stroke-width="1"/>
+<rect x="872" y="11" width="52" height="16" rx="4" fill="#fff" stroke="#c8c8c8" stroke-width="1"/>
+<text x="898" y="23" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11" fill="#1f1f1f" text-anchor="middle" font-weight="bold">렌더</text>
+<text x="960" y="23" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11" fill="#6b6b6b" text-anchor="middle" font-weight="normal">소스</text>
+<text x="120" y="60" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#1f1f1f" text-anchor="start" font-weight="bold">tags</text>
+<text x="154" y="60" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11.5" fill="#6b6b6b" text-anchor="start" font-weight="normal">: [샘플]</text>
+<line x1="120" y1="70" x2="880" y2="70" stroke="#c8c8c8" stroke-width="1"/>
+<text x="120" y="104" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="24" fill="#1f1f1f" text-anchor="start" font-weight="bold">샘플 태스크</text>
+<text x="120" y="128" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="13" fill="#1f1f1f" text-anchor="start" font-weight="normal">오늘은 2026-09-21(월) 기준으로 작성했습니다.</text>
+<text x="120" y="166" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="20" fill="#1f1f1f" text-anchor="start" font-weight="bold">업무</text>
+<rect x="120" y="179" width="15" height="15" rx="2" fill="#fff" stroke="#0066b8" stroke-width="1.2"/>
+<text x="144" y="190" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="13" fill="#1f1f1f" text-anchor="start" font-weight="normal">주간 보고서 작성 #업무 ⏫ 🆔 report1 📅 2026-09-25</text>
+<rect x="482.8" y="177" width="22" height="18" rx="4" fill="#e8e8e8" stroke="none" stroke-width="1"/>
+<text x="493.8" y="190" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11" fill="#1f1f1f" text-anchor="middle" font-weight="normal">✎</text>
+<rect x="508.8" y="177" width="22" height="18" rx="4" fill="#e8e8e8" stroke="none" stroke-width="1"/>
+<text x="519.8" y="190" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11" fill="#1f1f1f" text-anchor="middle" font-weight="normal">⏩</text>
+<text x="538.8" y="190" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10.5" fill="#6b6b6b" text-anchor="start" font-weight="normal" font-style="italic">← hover / focus</text>
+<rect x="120" y="206" width="15" height="15" rx="2" fill="#fff" stroke="#0066b8" stroke-width="1.2"/>
+<text x="144" y="217" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="13" fill="#1f1f1f" text-anchor="start" font-weight="normal">계약서 검토 #업무 🔺 </text>
+<text x="255.8" y="217" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="13" fill="#c72e2e" text-anchor="start" font-weight="normal">📅 2026-09-19</text>
+<rect x="120" y="233" width="15" height="15" rx="2" fill="#0066b8" stroke="#0066b8" stroke-width="1.2"/>
+<path d="M122.5 240.5 l3.3 3.75 l6.3 -7.5" fill="none" stroke="#fff" stroke-width="1.8"/>
+<text x="144" y="244" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="13" fill="#9a9a9a" text-anchor="start" font-weight="normal">회의록 정리 #업무 ✅ 2026-09-20</text>
+<rect x="120" y="260" width="15" height="15" rx="2" fill="#fff" stroke="#0066b8" stroke-width="1.2"/>
+<text x="144" y="271" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="13" fill="#1f1f1f" text-anchor="start" font-weight="normal">여행 계획 세우기</text>
+<rect x="146" y="287" width="15" height="15" rx="2" fill="#fff" stroke="#0066b8" stroke-width="1.2"/>
+<text x="170" y="298" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="13" fill="#1f1f1f" text-anchor="start" font-weight="normal">항공권 검색 📅 2026-10-05</text>
+<text x="420" y="298" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10.5" fill="#6b6b6b" text-anchor="start" font-weight="normal" font-style="italic">← 하위 태스크 들여쓰기 유지</text>
+<rect x="120" y="324" width="760" height="128" rx="6" fill="#f3f3f3" stroke="#c8c8c8" stroke-width="1"/>
+<text x="132" y="344" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11" fill="#6b6b6b" text-anchor="start" font-weight="normal" font-style="italic">tasks 쿼리 결과 — 행은 배지 유지</text>
+<rect x="134" y="359" width="15" height="15" rx="2" fill="#fff" stroke="#0066b8" stroke-width="1.2"/>
+<text x="158" y="370" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="12.5" fill="#1f1f1f" text-anchor="start" font-weight="normal">계약서 검토 #업무</text>
+<rect x="264" y="357" width="70" height="17" rx="9" fill="#fde7e9" stroke="none" stroke-width="1"/>
+<text x="299.0" y="368.9" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10" fill="#c72e2e" text-anchor="middle" font-weight="normal">🔺 highest</text>
+<rect x="339" y="357" width="148" height="17" rx="9" fill="#fde7e9" stroke="none" stroke-width="1"/>
+<text x="413.0" y="368.9" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10" fill="#c72e2e" text-anchor="middle" font-weight="normal">📅 2026-09-19 · 4일 지남</text>
+<text x="492" y="370" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10.5" fill="#0066b8" text-anchor="start" font-weight="normal">샘플-태스크 › 업무</text>
+<rect x="134" y="389" width="15" height="15" rx="2" fill="#fff" stroke="#0066b8" stroke-width="1.2"/>
+<text x="158" y="400" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="12.5" fill="#1f1f1f" text-anchor="start" font-weight="normal">예산안 제출 #업무</text>
+<rect x="264" y="387" width="148" height="17" rx="9" fill="#fde7e9" stroke="none" stroke-width="1"/>
+<text x="338.0" y="398.9" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10" fill="#c72e2e" text-anchor="middle" font-weight="normal">📅 2026-09-16 · 7일 지남</text>
+<text x="417" y="400" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10.5" fill="#0066b8" text-anchor="start" font-weight="normal">샘플-태스크 › 업무</text>
+<text x="860" y="442" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="10.5" fill="#6b6b6b" text-anchor="end" font-weight="normal">18 of 18 tasks</text>
+<text x="16" y="550" font-family="'Apple SD Gothic Neo','Noto Sans KR','Helvetica Neue',Arial,sans-serif" font-size="11" fill="#6b6b6b" text-anchor="start" font-weight="normal" font-style="italic">체크박스 → 완료 전환 · 더블클릭/✎ → 편집 모달 · ⏩ → 연기 · 링크/백링크 → 대상 줄 · Ctrl+Shift+R 또는 [렌더|소스]로 같은 탭에서 전환 · 파일·인덱스 변경 시 자동 재렌더</text>
+</svg>

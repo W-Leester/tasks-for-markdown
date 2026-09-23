@@ -13,7 +13,7 @@ import re, subprocess, sys, tempfile, os
 HERE = os.path.dirname(os.path.abspath(__file__))
 DOC = os.path.join(HERE, '..', 'design.md')
 NAMES = ['02-system-context', '03-1-layers', '04-domain-model', '05-1-index-pipeline', '05-2-toggle-sequence',
-         '05-3-recurrence-flow', '05-4-query-pipeline', '05-5-preview-bridge', '05-6-webview-protocol',
+         '05-3-recurrence-flow', '05-4-query-pipeline', '05-5-preview-bridge', '05-6-webview-protocol', '05-7-rendered-view',
          '06-1-status-machine', '06-2-index-lifecycle', '07-2-editor-interaction', '08-storage',
          '12-test-strategy', '13-build-pipeline']
 HAND_DRAWN = {'03-1-layers'}

@@ -18,7 +18,42 @@
   let activeTab = $state(0);
   let narrow = $state(false);
   let dragOver: string | null = $state(null);
+  let live = $state(''); // screen-reader announcements (keyboard moves)
+  let boardHeight = $state(0);
+  let scrollTops: Record<string, number> = $state({});
   let request = 0;
+
+  // Windowing (D§9): columns with many cards render only the visible slice plus an overscan.
+  const CARD_ESTIMATE = 64; // px per card incl. gap — cards vary, the overscan hides the drift
+  const OVERSCAN = 6;
+  const VIRTUAL_FROM = 150;
+  function windowFor(col: Column): { start: number; end: number; top: number; bottom: number } {
+    const n = col.tasks.length;
+    if (n < VIRTUAL_FROM) return { start: 0, end: n, top: 0, bottom: 0 };
+    const viewport = Math.max(boardHeight - 40, 200);
+    const top = scrollTops[col.id] ?? 0;
+    const start = Math.max(0, Math.floor(top / CARD_ESTIMATE) - OVERSCAN);
+    const end = Math.min(n, Math.ceil((top + viewport) / CARD_ESTIMATE) + OVERSCAN);
+    return { start, end, top: start * CARD_ESTIMATE, bottom: (n - end) * CARD_ESTIMATE };
+  }
+
+  /** Alt+←/→ on a focused card moves it to the neighbouring column (keyboard alternative to drag and drop). */
+  function onCardKey(e: KeyboardEvent, from: number) {
+    if (!e.altKey || (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight')) return;
+    const card = (e.target as HTMLElement).closest<HTMLElement>('.card');
+    if (!card) return;
+    const task = tasks.find((x) => x.key === card.dataset.key && x.line === Number(card.dataset.line));
+    if (!task) return;
+    const step = e.key === 'ArrowLeft' ? -1 : 1;
+    for (let i = from + step; i >= 0 && i < columns.length; i += step) {
+      const col = columns[i]!;
+      if (!col.drop) continue;
+      const change = col.drop(task);
+      e.preventDefault();
+      if (change) { post({ type: 'task/setField', key: task.key, line: task.line, field: change.field, value: change.value }); live = t('Moved to {0}', col.label); }
+      return;
+    }
+  }
 
   const STATUS_ORDER = ['IN_PROGRESS', 'TODO', 'ON_HOLD', 'DONE', 'CANCELLED'];
   const DUE_ORDER = ['overdue', 'today', 'tomorrow', 'week', 'next', 'later', 'none'];
@@ -137,7 +172,8 @@
     <input class="tfm-input search" type="search" placeholder={t('Filter…')} bind:value={search} />
     <span class="tfm-muted count">{filtered.length}</span>
   </div>
-  {#if errors.length}<div class="error">{errors.join(' · ')}</div>{/if}
+  {#if errors.length}<div class="error" role="alert">{errors.join(' · ')}</div>{/if}
+  <div class="sr-only" aria-live="polite">{live}</div>
 
   {#if narrow}
     <div class="tabs" role="tablist">
@@ -148,24 +184,28 @@
     </div>
   {/if}
 
-  <div class="board" class:tabs-mode={narrow}>
+  <div class="board" class:tabs-mode={narrow} bind:clientHeight={boardHeight}>
     {#each columns as col, i (col.id)}
       {#if !narrow || i === activeTab}
-        <section class="column" role="list" aria-label={col.label} class:over={dragOver === col.id} class:readonly={!col.drop}
+        {@const w = windowFor(col)}
+        <section class="column" role="group" aria-label={col.label} class:over={dragOver === col.id} class:readonly={!col.drop}
           ondragover={(e) => { if (col.drop) { e.preventDefault(); e.dataTransfer!.dropEffect = 'move'; dragOver = col.id; } }}
           ondragleave={() => (dragOver === col.id ? (dragOver = null) : null)}
           ondrop={(e) => onDrop(e, col)}>
           {#if !narrow}<h3>{col.label} <span class="n">{col.tasks.length}</span></h3>{/if}
-          <div class="cards">
-            {#each col.tasks as task (task.key + '#' + task.line)}
+          <div class="cards" role="list" onscroll={(e) => (scrollTops[col.id] = (e.currentTarget as HTMLElement).scrollTop)} onkeydown={(e) => onCardKey(e, i)}>
+            {#if w.top}<div class="spacer" style:height={`${w.top}px`}></div>{/if}
+            {#each col.tasks.slice(w.start, w.end) as task (task.key + '#' + task.line)}
               <TaskCard {task} today={init?.today ?? ''} showFile={mode !== 'file'} />
             {/each}
+            {#if w.bottom}<div class="spacer" style:height={`${w.bottom}px`}></div>{/if}
             {#if !col.tasks.length}<div class="empty tfm-muted">{col.drop ? t('Drop tasks here') : '—'}</div>{/if}
           </div>
         </section>
       {/if}
     {/each}
   </div>
+  <p class="tfm-muted hint">{t('Click: edit · Double-click: open · Space: toggle done · Alt+←/→: move to the next column')}</p>
 </main>
 
 <style>
@@ -185,6 +225,8 @@
   .n { font-weight: normal; opacity: 0.65; margin-left: 4px; font-size: 0.85em; }
   .cards { display: flex; flex-direction: column; gap: 6px; padding: 8px; overflow-y: auto; flex: 1; }
   .empty { text-align: center; padding: 16px 0; font-style: italic; }
+  .spacer { flex: none; }
+  .hint { font-size: 0.85em; margin: 0; }
   .tabs { display: flex; flex-wrap: wrap; gap: 4px; }
   .tabs button { background: var(--tfm-panel); color: inherit; border: 1px solid var(--tfm-border); border-radius: 12px; padding: 2px 10px; cursor: pointer; }
   .tabs button.active { border-color: var(--tfm-accent); background: var(--vscode-list-activeSelectionBackground); color: var(--vscode-list-activeSelectionForeground); }

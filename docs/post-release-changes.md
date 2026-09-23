@@ -42,6 +42,10 @@
 | 27 | `7fb8cc7` | 09-22 15:43 | 기능 | 쿼리 결과 패널 + 블록 위 CodeLens, **1.0.3** |
 | 28 | `6d4db7b`, `b32239a` | 09-22 | 문서 | 이 문서 작성, Cursor `Cmd+Shift+V` 바인딩 정정 |
 | 29 | `ee1ec93` | 09-22 23:20 | 기능 | **렌더 보기**(상호작용 커스텀 에디터), **1.0.4** |
+| 30 | `b98ecf4`, `089cb72` | 09-23 | 기능 | 렌더 보기를 Cursor Preview 모양에 맞춤(토큰 이식, 토글, 원문식 필드, 들여쓰기), **1.0.5–1.0.6** |
+| 31 | `299e02c`, `eaa49e7` | 09-23 | 기능 | 렌더 보기 줄의 `✎ ⏩` 버튼, **1.0.7** |
+| 32 | `4070009` | 09-23 | 문서 | 체크리스트 정리(코드로 끝난 항목 체크, D-1~D-5) |
+| 33 | (다음) | 09-23 | 기능·문서 | 설계 문서 0.5, Obsidian 호환 테스트 이식 + 차이 3건 수정, 접근성, 칸반 윈도잉, **1.0.8** |
 
 ---
 
@@ -213,6 +217,22 @@
 **후속(1.0.6).** 스크린샷 비교에서 남은 차이 네 가지를 맞췄습니다. (1) 필드: 배지+상대 날짜 대신 원문과 같은 이모지+값(`RenderOptions.fieldStyle: 'plain'`, `.tfm-field`; 상대 날짜는 `title`로, 지난 마감·잘못된 날짜는 색). 플러그인의 `renderOptions(source, context)`에 `'line' | 'query'` 컨텍스트를 추가해 문서 줄에만 적용하고 쿼리 결과는 배지를 유지. 설정 `tasksmd.rendered.fieldStyle`(기본 `plain`). (2) 하위 태스크 들여쓰기: `li.tfm-task`의 음수 margin이 중첩 `ul`의 padding과 상쇄되어 평평해지던 것을 `li.tfm-task > ul { margin-left: 1.6em }`으로 복원. (3) 체크박스 17px/radius 5px, 줄 간격 확대. (4) front matter를 상단 키/값 블록으로 표시(`renderDocumentHtml`의 `frontMatter` 옵션, 줄 번호는 그대로 유지). 헤드리스 Chrome 스크린샷으로 재확인.
 
 **남은 제한.** 본문 텍스트 편집은 소스 편집으로 전환해야 합니다. 렌더 보기는 실행 취소 스택을 갖지 않으며(편집은 모두 `TaskEditService`가 원본 파일에 적용) 미리보기 CSS(`media/preview.css`)를 공유하므로 스타일 변경은 두 곳에 함께 반영됩니다.
+
+### 2.13 체크리스트 잔여 4건 처리 (#33, 1.0.8)
+
+**배경.** docs/Tasks.md에서 제가 처리할 수 있는 미체크 항목 4개를 한 번에 진행했습니다.
+
+**(1) 설계 문서 반영.** design.md 0.5 — 3.2 모듈 트리를 실제 구조로(`preview/RenderedView`, `webviewHost/`, `webviews/query-results`·`rendered`, `l10n.ts`), 5.5에 렌더 보기 배경, 5.6에 1.0.x 메시지 표, **5.7 렌더 보기 시퀀스**(Mermaid → `05-7-rendered-view.svg`, `render-mermaid.py`의 `NAMES`에 추가), 7.1/7.4/7.5 보강, **7.8 렌더 보기·7.9 쿼리 결과 패널** ASCII 목업 + SVG(`gen_mockups.py`에 `rendered()`·`results()` 추가), 9 성능(윈도잉), 14 매핑, 16 이력. SVG는 헤드리스 Chrome으로 렌더링해 확인.
+
+**(2) Obsidian Tasks 테스트 이식.** 원본 저장소를 임시 폴더에 받아 `tests/Query/Filter/*.test.ts`에서 "필터 + 태스크 줄 + 기대값" 형태로 옮길 수 있는 케이스를 골라 `tests/core/query/obsidian-compat.test.ts`(224 케이스, 표 기반)로 이식했습니다. 우리 엔진으로 돌리자 **3건이 실패**했고 모두 우리 쪽 차이여서 고쳤습니다.
+- `due in two weeks`: 상대 날짜의 숫자 단어(one…ten, a/an) 미지원 → `DateParser`에 `numberWord()`.
+- `id includes DEF`가 `abcdef`에 불일치: id 필터만 대소문자 구분이었음 → Obsidian처럼 무시.
+- 불리언 구분자: `( )`만 받았음 → `[ ]`, `{ }`, `" "` 허용(한 줄에 한 종류, 따옴표는 중첩 불가). `parseBoolean`/`tokenizeBoolean`에 open/close 매개변수.
+이식하지 않은 것: 정렬·그룹·explain·approval 테스트(우리 출력 형식과 다름), `FunctionField`(JS 함수, 별도 테스트 있음), 전역 필터 조합(설정 의존).
+
+**(3) 접근성.** 칸반: 카드에 `data-key/line`·`aria-label`, 컬럼 `role=group`/목록 `role=list`, **`Alt+←/→`로 옆 컬럼 이동**(`onCardKey`: drop 가능한 다음 컬럼을 찾아 `task/setField`), `aria-live` 안내, 오류 `role=alert`, 힌트 줄. 캘린더: `role=grid`/`gridcell`/`columnheader`, 오늘 칸부터 roving tabindex(`focusDay`), 화살표 이동(가장자리를 넘으면 `move()`로 페이지 전환), `Enter`로 새 태스크, `aria-label`에 날짜와 개수. 결과 패널 일치 수 `aria-live`, 오류 `role=alert`; 편집 대화상자 오류 `role=alert`; 렌더 보기 `focus-within`에 버튼 표시 + `aria-label`. `tokens.css`에 `.sr-only`. 포커스 트랩은 각 웹뷰가 독립 문서라 불필요(편집 대화상자는 `Esc`로 닫힘). 테스트: `KanbanApp.test.ts`(키보드 이동), `CalendarApp.test.ts`(화살표 roving).
+
+**(4) 가상 스크롤.** 칸반 컬럼 150장 이상은 `windowFor()`로 보이는 범위 ± 6장만 렌더(카드 64px 추정, 위·아래 스페이서로 스크롤 높이 유지, `onscroll`로 시작 인덱스 갱신, `bind:clientHeight`로 뷰포트). 카드 높이가 제각각이라 추정치와 어긋나는 부분은 오버스캔이 흡수합니다. 결과 패널 카드와 렌더 보기 쿼리 목록에는 `content-visibility: auto`. 테스트: jsdom에서 `clientHeight`를 600으로 가장해 1,000장 → 60장 미만 렌더, 3장이면 전부 렌더.
 
 ---
 

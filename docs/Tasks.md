@@ -356,7 +356,7 @@
 
 ### M4.7 테스트
 - [x] 명령어별 단위 테스트 + `explain` 검증 (tokenizer 4 · skeleton 4 · filters 23 · sort/group 18 · functions 10)
-- [ ] Obsidian Tasks `tests/Query/**` 케이스 이식 (호환성 회귀 방지) — M8에서 선별 이식
+- [x] Obsidian Tasks `tests/Query/**` 케이스 이식 (호환성 회귀 방지) — `tests/core/query/obsidian-compat.test.ts` 224 케이스(due/created/done/cancelled/happens 날짜, 우선순위, 상태, 반복, 설명·태그 정규식, path/folder/filename/heading, id/dependsOn, 불리언 구분자). 이식 중 발견해 고친 차이 3건: `in two weeks` 숫자 단어, `id includes` 대소문자 무시, 불리언 구분자 `[ ]`·`{ }`·`" "`
 - [x] 벤치마크 스크립트 — `BENCH=1 pnpm vitest run tests/perf`: 50,000 태스크에서 not done 55ms · group by folder/due 61ms · function filter 98ms (정렬 키 사전 계산으로 780ms→55ms); CI는 완화된 상한만 검사
 
 ---
@@ -424,7 +424,7 @@
 - [x] 액세스 키(Alt+글자), 설정 `editModal.accessKeys`, `editModal.hiddenFields` (FR-6.4)
 - [x] 하단 실시간 마크다운 미리보기 줄 (FR-6.5)
 - [x] 기존 `createOrEdit` QuickPick 임시 구현 교체, CodeLens ✎·Hover·트리·미리보기 연결
-- [ ] 키보드 탐색·ARIA·포커스 트랩 점검 (NFR-5) — M8.3
+- [x] 키보드 탐색·ARIA·포커스 트랩 점검 (NFR-5) — 칸반 `Alt+←/→` 컬럼 이동 + `aria-live` 안내, `role=group/list`; 캘린더 `role=grid`, roving tabindex, 화살표/Enter; 결과 패널·편집 대화상자 오류 `role=alert`; 렌더 보기 `focus-within` 버튼·aria-label; `.sr-only` 유틸. 포커스 트랩은 패널이 독립 문서라 불필요(Escape로 닫힘)
 
 ### M6.3 칸반 / 컬럼 뷰 (`webviews/kanban/`)
 - [x] D-3: **네이티브 HTML5 드래그앤드롭** 채택(의존성 없음, 웹뷰에서 안정적) — design.md D-3
@@ -433,7 +433,7 @@
 - [x] 카드 클릭 → 편집 모달, 더블클릭 → 원본 이동 (FR-5.10)
 - [x] 데이터 소스: 저장된 쿼리 선택 (FR-5.11)
 - [x] 두 호스트: 사이드바 `WebviewView`(컬럼을 탭으로) + 에디터 패널 `WebviewPanel`(전체 컬럼) — 같은 Svelte 컴포넌트 (Q-12)
-- [ ] 가상 스크롤(컬럼당 카드 500개 이상) (D§9) — M8 성능 단계에서 필요 시
+- [x] 가상 스크롤(컬럼당 카드 500개 이상) (D§9) — 칸반 컬럼 150장 이상 윈도잉(`windowFor`, 64px 추정 + 6장 오버스캔, 스페이서), 결과 패널·렌더 보기 목록 `content-visibility: auto`. jsdom 테스트: 1,000장 → 60장 미만 렌더
 - [x] 명령 `tasksmd.openKanban`, 마지막 컬럼 기준·쿼리를 `workspaceState`에 저장
 
 ### M6.4 쿼리 빌더 (`webviews/query-builder/`) — M4.5에서 미뤄둔 항목
@@ -555,7 +555,7 @@
 - [x] (상시 규칙) 새 명령은 `package.json` + 등록 코드 + nls + README 명령 표를 같이 갱신
 - [x] (상시 규칙) Obsidian Tasks에서 이식한 파일에는 출처·라이선스 주석, `NOTICE.md` 유지 (NFR-8)
 - [x] (상시 규칙) 마일스톤 종료 시 이 문서의 "진행 현황" 표와 `CHANGELOG.md` 갱신 — 1.0 이후 변경은 `docs/post-release-changes.md`
-- [ ] (상시 규칙) 설계 변경이 생기면 design.md와 SVG(`docs/imgs/`) 재생성 — **미반영**: 1.0 이후 추가된 렌더 보기·쿼리 결과 패널·전체 화면이 design.md/SVG에 없음
+- [x] (상시 규칙) 설계 변경이 생기면 design.md와 SVG(`docs/imgs/`) 재생성 — design.md 0.5: 3.2 트리 현행화, 5.6 추가 메시지, 5.7 렌더 보기 시퀀스(`05-7-rendered-view.svg`), 7.8/7.9 목업(`07-8-rendered.svg`, `07-9-query-results.svg`), 7.4/7.5/9/14 보강
 
 ## 열린 설계 이슈 추적
 

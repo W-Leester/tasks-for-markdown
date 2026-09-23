@@ -25,6 +25,7 @@ type Incoming =
   | { type: 'ui/ready' }
   | { type: 'doc/toggle'; path: string | null; line: number }
   | { type: 'doc/edit'; path: string | null; line: number }
+  | { type: 'doc/postpone'; path: string | null; line: number }
   | { type: 'doc/link'; href: string }
   | { type: 'doc/openSource' };
 
@@ -107,6 +108,11 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
         case 'doc/edit': {
           const task = this.taskFor(msg.path, msg.line, document);
           if (task) await vscode.commands.executeCommand('tasksmd.createOrEdit', task);
+          break;
+        }
+        case 'doc/postpone': {
+          const task = this.taskFor(msg.path, msg.line, document);
+          if (task) await vscode.commands.executeCommand('tasksmd.postpone', task);
           break;
         }
         case 'doc/link':
@@ -217,6 +223,10 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
   li.tfm-task > .tfm-check:hover { border-color: var(--rv-accent); }
   li.tfm-task > .tfm-check:checked { background: var(--rv-accent); border-color: var(--rv-accent); }
   li.tfm-task > .tfm-check:checked::after { content: ''; position: absolute; left: 5px; top: 1.5px; width: 4px; height: 8px; border: solid var(--rv-bg); border-width: 0 2px 2px 0; transform: rotate(45deg); }
+  .rv-actions { display: none; margin-left: .5em; vertical-align: -1px; gap: 2px; }
+  li.tfm-task:hover > .rv-actions { display: inline-flex; }
+  .rv-actions button { border: none; background: var(--rv-bg-2); color: var(--rv-muted); border-radius: 4px; padding: 0 5px; line-height: 18px; font-size: 12px; cursor: pointer; font-family: inherit; }
+  .rv-actions button:hover { background: var(--rv-bg-3); color: var(--rv-fg); }
   .tfm-fields { margin-left: .2em; } .tfm-field { white-space: nowrap; } .tfm-field.tfm-overdue { color: var(--vscode-errorForeground, #f14c4c); }
   .tfm-field.tfm-invalid { color: var(--vscode-editorWarning-foreground, #cca700); }
   .rv-frontmatter { color: var(--rv-muted); font-size: .92em; margin: 0 0 1.5em; padding: 0 0 .75em; border-bottom: 1px solid var(--rv-stroke); }
@@ -236,7 +246,7 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
 </style>
 <title>${t('Tasks: Rendered view')}</title>
 </head>
-<body>
+<body data-l-edit="${t('Edit')}" data-l-postpone="${t('Postpone')}">
 <div class="rv-toggle" role="group" aria-label="${t('Editor mode')}">
   <button id="mode-rendered" aria-pressed="true">${t('Rendered')}</button>
   <button id="mode-source" title="${t('Open the Markdown source in the text editor')} (Ctrl+Shift+R)">${t('Source')}</button>

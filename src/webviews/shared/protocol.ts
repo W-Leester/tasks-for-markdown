@@ -121,6 +121,7 @@ export type FromWebview =
   // Rendered view. `path` is the task's workspace path for query-result rows, null for the note itself.
   | { type: 'doc/toggle'; path: string | null; line: number }
   | { type: 'doc/edit'; path: string | null; line: number }
+  | { type: 'doc/postpone'; path: string | null; line: number }
   | { type: 'doc/link'; href: string }
   | { type: 'doc/openSource' }
   | { type: 'ui/notify'; level: 'info' | 'warn' | 'error'; message: string };

@@ -15,8 +15,33 @@ window.addEventListener('message', (e: MessageEvent<ToWebview>) => {
   if (m.type !== 'doc/html') return;
   const y = window.scrollY;
   content.innerHTML = m.html;
+  addRowActions();
   window.scrollTo(0, y);
 });
+
+/** Obsidian-style per-row buttons (✎ edit, ⏩ postpone) that appear on hover. */
+function addRowActions(): void {
+  const labels = document.body.dataset;
+  for (const li of content.querySelectorAll<HTMLElement>('li.tfm-task')) {
+    if (!li.querySelector(':scope > input.tfm-check') || li.dataset.tfmLine === undefined) continue;
+    const actions = document.createElement('span');
+    actions.className = 'rv-actions';
+    const button = (act: string, icon: string, title: string) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.dataset.act = act;
+      b.textContent = icon;
+      b.title = title;
+      actions.appendChild(b);
+    };
+    button('edit', '✎', labels.lEdit ?? 'Edit');
+    if (li.querySelector(':scope > .tfm-fields .tfm-due, :scope > .tfm-fields .tfm-scheduled, :scope > .tfm-badges .tfm-due, :scope > .tfm-badges .tfm-scheduled')) button('postpone', '⏩', labels.lPostpone ?? 'Postpone');
+    // Before any nested list so the buttons stay on the task's own line.
+    const nested = li.querySelector(':scope > ul, :scope > ol');
+    if (nested) li.insertBefore(actions, nested);
+    else li.appendChild(actions);
+  }
+}
 
 function taskRef(el: Element | null): { path: string | null; line: number } | null {
   const li = el?.closest<HTMLElement>('li.tfm-task');
@@ -26,6 +51,13 @@ function taskRef(el: Element | null): { path: string | null; line: number } | nu
 
 content.addEventListener('click', (e) => {
   const target = e.target as Element;
+  const action = target.closest<HTMLButtonElement>('.rv-actions button');
+  if (action) {
+    e.preventDefault();
+    const ref = taskRef(action);
+    if (ref) post({ type: action.dataset.act === 'postpone' ? 'doc/postpone' : 'doc/edit', ...ref });
+    return;
+  }
   if (target.closest('input.tfm-check')) {
     e.preventDefault();
     const ref = taskRef(target);

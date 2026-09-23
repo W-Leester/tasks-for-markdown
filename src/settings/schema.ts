@@ -66,7 +66,7 @@ export const SETTINGS_DEFAULTS: Readonly<SettingsSchema> = {
   setCancelledDate: true,
   'decorations.relativeDates': true,
   'decorations.overdueHighlight': true,
-  'decorations.strikeDone': true,
+  'decorations.strikeDone': false,
   'decorations.dimFields': true,
   'decorations.gutterIcons': true,
   'codeLens.mode': 'cursorLine',

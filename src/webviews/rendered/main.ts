@@ -22,7 +22,7 @@ window.addEventListener('message', (e: MessageEvent<ToWebview>) => {
 /** Obsidian-style per-row buttons (✎ edit, ⏩ postpone) that appear on hover. */
 function addRowActions(): void {
   const labels = document.body.dataset;
-  for (const li of content.querySelectorAll<HTMLElement>('li.tfm-task')) {
+  for (const li of Array.from(content.querySelectorAll<HTMLElement>('li.tfm-task'))) {
     if (!li.querySelector(':scope > input.tfm-check') || li.dataset.tfmLine === undefined) continue;
     const actions = document.createElement('span');
     actions.className = 'rv-actions';

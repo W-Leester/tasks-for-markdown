@@ -8,7 +8,8 @@ export interface PluginDeps {
   /** Run a query for a ```tasks block; `source` identifies the rendering document. */
   runQuery(text: string, source?: QuerySource): QueryResult;
   parseQuery(text: string, source?: QuerySource): Query;
-  renderOptions(source?: QuerySource): RenderOptions;
+  /** `context` lets hosts style task lines and query-result rows differently. */
+  renderOptions(source?: QuerySource, context?: 'line' | 'query'): RenderOptions;
   /** Map markdown-it's env to a query source (VS Code passes env.currentDocument). */
   sourceFromEnv(env: unknown): QuerySource | undefined;
   globalFilter(): string | undefined;
@@ -44,7 +45,7 @@ export function tasksMarkdownItPlugin(md: MarkdownIt, deps: PluginDeps): void {
       const query = deps.parseQuery(text, source);
       const result = deps.runQuery(text, source);
       const line = token.map ? ` data-line="${token.map[0]}"` : '';
-      return `<div class="tfm-query-block"${line}>${renderQueryResult(result, query.layout, text, deps.renderOptions(source))}</div>\n`;
+      return `<div class="tfm-query-block"${line}>${renderQueryResult(result, query.layout, text, deps.renderOptions(source, 'query'))}</div>\n`;
     } catch (err) {
       deps.log?.(`preview: tasks block failed: ${err instanceof Error ? err.stack ?? err.message : String(err)}`);
       return defaultFence(tokens, idx, options, env, self);
@@ -60,7 +61,7 @@ function decorateTaskLines(state: StateCore, deps: PluginDeps): void {
   {
     const tokens = state.tokens;
     const registry = deps.getStatusRegistry();
-    const o = deps.renderOptions(deps.sourceFromEnv(state.env));
+    const o = deps.renderOptions(deps.sourceFromEnv(state.env), 'line');
     for (let i = 0; i + 2 < tokens.length; i++) {
       const open = tokens[i]!;
       if (open.type !== 'list_item_open' || tokens[i + 1]!.type !== 'paragraph_open' || tokens[i + 2]!.type !== 'inline') continue;

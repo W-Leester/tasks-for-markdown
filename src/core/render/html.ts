@@ -14,6 +14,12 @@ export interface RenderOptions {
   t?: (s: string, ...args: (string | number)[]) => string;
   /** Show raw fields instead of badges (setting preview.renderBadges = false). */
   hideBadges?: boolean;
+  /**
+   * 'badges' (default): pill chips with relative dates. 'plain': the fields as they appear in the
+   * source line (emoji + value, no chips) — what Cursor's rich editor shows — with the relative
+   * date in a tooltip and overdue dates still highlighted.
+   */
+  fieldStyle?: 'badges' | 'plain';
 }
 
 const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -51,11 +57,14 @@ export function renderBadges(task: Task, layout: Layout | null, o: RenderOptions
   }
   const hidden = layout?.hidden ?? new Set();
   const short = layout?.shortMode ?? false;
+  const plain = o.fieldStyle === 'plain';
   const badges: string[] = [];
   const badge = (cls: string, icon: string, text: string, title = '') =>
-    badges.push(`<span class="tfm-badge tfm-${cls}"${title ? ` title="${esc(title)}"` : ''}>${icon}${short ? '' : ` ${esc(text)}`}</span>`);
+    badges.push(plain
+      ? `<span class="tfm-field tfm-${cls}"${title ? ` title="${esc(title)}"` : ''}>${icon}${text ? ` ${esc(text)}` : ''}</span>`
+      : `<span class="tfm-badge tfm-${cls}"${title ? ` title="${esc(title)}"` : ''}>${icon}${short ? '' : ` ${esc(text)}`}</span>`);
 
-  if (!hidden.has('priority') && task.priority !== Priority.None) badge(`pri-${PRIORITY_CLASS[task.priority]}`, PRIORITY_EMOJI[task.priority], PRIORITY_NAME[task.priority]);
+  if (!hidden.has('priority') && task.priority !== Priority.None) badge(`pri-${PRIORITY_CLASS[task.priority]}`, PRIORITY_EMOJI[task.priority], plain ? '' : PRIORITY_NAME[task.priority], plain ? PRIORITY_NAME[task.priority] : '');
   if (!hidden.has('recurrence rule') && task.recurrenceText) badge('recur', '🔁', task.recurrenceText);
   if (!hidden.has('on completion') && task.onCompletion) badge('oncompletion', '🏁', task.onCompletion);
   if (!hidden.has('id') && task.id) badge('id', '🆔', task.id);
@@ -66,7 +75,7 @@ export function renderBadges(task: Task, layout: Layout | null, o: RenderOptions
     if (!f.valid) return badge(`${name} tfm-invalid`, icon, `${f.raw} (${t('invalid date')})`);
     const overdue = name === 'due' && !task.isCompleted && f.date!.isBefore(today, 'day');
     const rel = relative(describeRelative(f.date!, today), overdue);
-    badge(`${name}${overdue ? ' tfm-overdue' : ''}`, icon, short ? '' : `${f.format()} · ${rel}`, `${name}: ${f.format()} (${rel})`);
+    badge(`${name}${overdue ? ' tfm-overdue' : ''}`, icon, short ? '' : plain ? f.format() : `${f.format()} · ${rel}`, `${name}: ${f.format()} (${rel})`);
   };
   date('created', '➕', 'created date');
   date('start', '🛫', 'start date');
@@ -74,7 +83,8 @@ export function renderBadges(task: Task, layout: Layout | null, o: RenderOptions
   date('due', '📅', 'due date');
   date('done', '✅', 'done date');
   date('cancelled', '❌', 'cancelled date');
-  return badges.length ? `<span class="tfm-badges">${badges.join('')}</span>` : '';
+  if (!badges.length) return '';
+  return plain ? `<span class="tfm-fields">${badges.join(' ')}</span>` : `<span class="tfm-badges">${badges.join('')}</span>`;
 }
 
 /** Description with tags wrapped, global filter removed; plain text (no inline markdown) — used for query results. */

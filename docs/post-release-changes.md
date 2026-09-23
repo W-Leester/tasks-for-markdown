@@ -210,6 +210,8 @@
 
 **후속(1.0.5).** "Preview 토글과 UI/UX가 너무 다르다"는 지적에 따라 Cursor 편집기의 디자인 토큰을 번들에서 추출했습니다(`--rte-font-size-*`, `--cursor-font-size-lg` 14px, `--rte-line-height-base` 1.42, 제목 1.75/1.5/1.25em, 코드 .9em, `.markdown-editor-react__richtext-content` max-width 800px / padding 32px 16px 64px, 배경 `color-mix(fg 6%)`, 테두리 12%/20%, radius 4/6px, 체크박스 accent `--cursor-blue`). 웹뷰에는 `--cursor-*` 변수가 없으므로 `--vscode-editor-foreground/background`, `--vscode-terminal-ansiBlue` 등으로 치환해 같은 비율로 재현했습니다. 상단 툴바를 제거하고 오른쪽 위 `렌더 | 소스` 토글로 바꾸었으며, `Ctrl+Shift+R`은 같은 탭 자리에서 전환하도록 반대편 편집기를 닫습니다(더티 문서는 닫지 않음). 검증은 헤드리스 Chrome으로 예시 노트를 렌더링해 스크린샷으로 확인.
 
+**후속(1.0.6).** 스크린샷 비교에서 남은 차이 네 가지를 맞췄습니다. (1) 필드: 배지+상대 날짜 대신 원문과 같은 이모지+값(`RenderOptions.fieldStyle: 'plain'`, `.tfm-field`; 상대 날짜는 `title`로, 지난 마감·잘못된 날짜는 색). 플러그인의 `renderOptions(source, context)`에 `'line' | 'query'` 컨텍스트를 추가해 문서 줄에만 적용하고 쿼리 결과는 배지를 유지. 설정 `tasksmd.rendered.fieldStyle`(기본 `plain`). (2) 하위 태스크 들여쓰기: `li.tfm-task`의 음수 margin이 중첩 `ul`의 padding과 상쇄되어 평평해지던 것을 `li.tfm-task > ul { margin-left: 1.6em }`으로 복원. (3) 체크박스 17px/radius 5px, 줄 간격 확대. (4) front matter를 상단 키/값 블록으로 표시(`renderDocumentHtml`의 `frontMatter` 옵션, 줄 번호는 그대로 유지). 헤드리스 Chrome 스크린샷으로 재확인.
+
 **남은 제한.** 본문 텍스트 편집은 소스 편집으로 전환해야 합니다. 렌더 보기는 실행 취소 스택을 갖지 않으며(편집은 모두 `TaskEditService`가 원본 파일에 적용) 미리보기 CSS(`media/preview.css`)를 공유하므로 스타일 변경은 두 곳에 함께 반영됩니다.
 
 ---

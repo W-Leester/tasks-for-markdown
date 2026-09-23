@@ -1,11 +1,15 @@
 import MarkdownIt from 'markdown-it';
 import { type PluginDeps, tasksMarkdownItPlugin } from './markdownItPlugin';
 
+const escape = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
 export interface RenderDocumentOptions {
   /** Absolute URL for a relative image path, or null to leave it alone. */
   resolveImage?(src: string): string | null;
   /** Value of markdown-it's env (the plugin reads the query source from it). */
   env?: Record<string, unknown>;
+  /** Show YAML front matter as a muted key/value block at the top (like Cursor's editor). */
+  frontMatter?: boolean;
 }
 
 /**
@@ -18,8 +22,19 @@ export function renderDocumentHtml(text: string, deps: PluginDeps, options: Rend
   const md = new MarkdownIt({ html: false, linkify: true });
   tasksMarkdownItPlugin(md, deps);
   // Keep the line count: replace every non-newline character of the front matter with nothing.
-  const source = text.replace(/^---\r?\n[\s\S]*?\r?\n---[ \t]*(?:\r?\n|$)/, (m) => m.replace(/[^\n]/g, ''));
+  let frontMatter = '';
+  const source = text.replace(/^---\r?\n([\s\S]*?)\r?\n---[ \t]*(?:\r?\n|$)/, (m, body: string) => {
+    frontMatter = body;
+    return m.replace(/[^\n]/g, '');
+  });
   let html = md.render(source, options.env);
+  if (options.frontMatter && frontMatter.trim()) {
+    const rows = frontMatter.split(/\r?\n/).filter((l) => l.trim()).map((l) => {
+      const m = /^([^:]+):\s*(.*)$/.exec(l);
+      return m ? `<div><span class="k">${escape(m[1]!.trim())}</span>: ${escape(m[2]!)}</div>` : `<div>${escape(l)}</div>`;
+    });
+    html = `<div class="rv-frontmatter">${rows.join('')}</div>` + html;
+  }
   html = html.replace(/(<input type="checkbox" class="tfm-check") disabled/g, '$1');
   if (options.resolveImage) {
     const resolve = options.resolveImage;

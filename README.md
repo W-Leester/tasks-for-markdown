@@ -70,6 +70,7 @@ group by filename
 | `notifications.*` | 켜짐, `09:00`, 1일 | 일일 요약·마감 임박 알림, OS 알림 |
 | `archive.file` / `afterDays` / `linkStyle` | `Archive.md` / 30 / `wiki` | 아카이브 명령 |
 | `calendar.newTaskFile` | `""` | 캘린더에서 만든 태스크를 넣을 파일 |
+| `rendered.fieldStyle` | `plain` | 렌더 보기 태스크 줄의 필드 표시: 원문처럼(`plain`) / 배지(`badges`) |
 | `calendar.fontSize` | `13` | 캘린더 칸의 태스크 글자 크기(px) |
 | `calendar.fullScreen` | `maximize` | 전체 화면 버튼: 에디터 그룹 최대화만(`maximize`) / 창도 전체 화면(`window`) |
 | `updateCheckUrl` | `""` | `.vsix` 설치본용 `latest.json` 위치 |

@@ -46,6 +46,7 @@ export interface SettingsSchema {
   'calendar.newTaskFile': string;
   'calendar.fullScreen': 'maximize' | 'window';
   'calendar.fontSize': number;
+  'rendered.fieldStyle': 'plain' | 'badges';
   updateCheckUrl: string;
   language: 'auto' | 'en' | 'ko';
 }
@@ -93,6 +94,7 @@ export const SETTINGS_DEFAULTS: Readonly<SettingsSchema> = {
   'calendar.newTaskFile': '',
   'calendar.fullScreen': 'maximize',
   'calendar.fontSize': 13,
+  'rendered.fieldStyle': 'plain',
   updateCheckUrl: '',
   language: 'auto',
 };

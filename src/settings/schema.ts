@@ -97,7 +97,7 @@ export const SETTINGS_DEFAULTS: Readonly<SettingsSchema> = {
   'calendar.fullScreen': 'maximize',
   'calendar.fontSize': 13,
   'rendered.fieldStyle': 'plain',
-  'rendered.fontSize': 15,
+  'rendered.fontSize': 14.5,
   'rendered.lineHeight': 1.6,
   updateCheckUrl: '',
   language: 'auto',

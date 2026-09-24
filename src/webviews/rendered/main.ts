@@ -13,6 +13,8 @@ const content = document.getElementById('content')!;
 window.addEventListener('message', (e: MessageEvent<ToWebview>) => {
   const m = e.data;
   if (m.type !== 'doc/html') return;
+  document.documentElement.style.setProperty('--rv-font-size', `${m.fontSize}px`);
+  document.documentElement.style.setProperty('--rv-line-height', String(m.lineHeight));
   const y = window.scrollY;
   content.innerHTML = m.html;
   addRowActions();

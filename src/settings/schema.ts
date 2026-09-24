@@ -47,6 +47,8 @@ export interface SettingsSchema {
   'calendar.fullScreen': 'maximize' | 'window';
   'calendar.fontSize': number;
   'rendered.fieldStyle': 'plain' | 'badges';
+  'rendered.fontSize': number;
+  'rendered.lineHeight': number;
   updateCheckUrl: string;
   language: 'auto' | 'en' | 'ko';
 }
@@ -95,6 +97,8 @@ export const SETTINGS_DEFAULTS: Readonly<SettingsSchema> = {
   'calendar.fullScreen': 'maximize',
   'calendar.fontSize': 13,
   'rendered.fieldStyle': 'plain',
+  'rendered.fontSize': 15,
+  'rendered.lineHeight': 1.6,
   updateCheckUrl: '',
   language: 'auto',
 };

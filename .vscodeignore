@@ -21,3 +21,5 @@ History.md
 dist/latest.json
 vitest.webviews.config.mts
 packages/**
+.tasks/**
+examples/Query_Test.md

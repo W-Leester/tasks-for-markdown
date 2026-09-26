@@ -34,6 +34,7 @@
 | M6 | 웹뷰: 편집 모달 + 칸반 + 쿼리 빌더 | ✅ 완료 | 2026-09-21 · unit 447 / integration 31 |
 | M7 | 추가 기능: 알림·아카이브·통계·캘린더·업데이트 확인 | ✅ 완료 | 2026-09-21 · unit 462 / integration 34 |
 | M8 | 마감: i18n·성능·접근성·문서·패키징·게시 | 🟡 코드 완료 · 사용자 작업 대기 | 1.0.0 `.vsix` 생성됨 · 남은 것: 퍼블리셔/토큰 생성, 저장소 공개 여부, M8.7 수동 테스트 |
+| M9 | 공개 API: 확장 API·명령·npm/CLI·MCP·URI | ⬜ 계획 확정(2026-09-26) | docs/api-plan.md v0.2 |
 
 ---
 
@@ -556,6 +557,46 @@
 - [x] (상시 규칙) Obsidian Tasks에서 이식한 파일에는 출처·라이선스 주석, `NOTICE.md` 유지 (NFR-8)
 - [x] (상시 규칙) 마일스톤 종료 시 이 문서의 "진행 현황" 표와 `CHANGELOG.md` 갱신 — 1.0 이후 변경은 `docs/post-release-changes.md`
 - [x] (상시 규칙) 설계 변경이 생기면 design.md와 SVG(`docs/imgs/`) 재생성 — design.md 0.5: 3.2 트리 현행화, 5.6 추가 메시지, 5.7 렌더 보기 시퀀스(`05-7-rendered-view.svg`), 7.8/7.9 목업(`07-8-rendered.svg`, `07-9-query-results.svg`), 7.4/7.5/9/14 보강
+
+## M9. 공개 API (docs/api-plan.md v0.2)
+
+### M9.1 (A1) API 코어 `src/api/`
+- [ ] `types.ts`: `TasksApi` v1 인터페이스, `TaskRef {path,line,expectedText?}`, `TaskDto` 재사용, `ApiError {code,message,details?}` (코드 7종)
+- [ ] `TasksApiImpl`: `query.run/explain/get/list/saved`, `edit.create/update/setStatus/toggle/postpone/remove/batch`, `events.onDidChangeTasks/onDidCompleteTask`, `ui.openEdit/openKanban/openCalendar/openQueryResults/reveal`
+- [ ] 쓰기 정책: 설정 `tasksmd.api.writePolicy` (`confirm` 기본 | `allow` | `deny`), `tasksmd.api.allowedWriters`(기억된 허용 목록), 첫 쓰기 시 확인 대화상자, 신뢰되지 않은 워크스페이스는 `UNTRUSTED`
+- [ ] `batch`: 단일 `WorkspaceEdit`, 상한 `tasksmd.api.batchLimit`(200), 하나라도 실패하면 전체 취소
+- [ ] 호출 로그 `api <caller> <method> <path>:<line>` 출력 채널
+- [ ] 단위 테스트(DTO 변환·오류 매핑·정책) + 통합 테스트(`getExtension().exports.getAPI(1)`로 조회·생성·완료·삭제·batch·STALE_LINE)
+
+### M9.2 (A2) 노출과 타입
+- [ ] `activate()` 반환을 `{ getAPI(version), __internal }`로 교체(통합 테스트는 `__internal`)
+- [ ] `dist/api.d.ts` 생성(`tsc -d`로 `src/api/types.ts`만), `.vsix`에 포함, `package.json` `exports`/`types` 안내
+- [ ] `docs/api.md`(한국어) + `docs/api.en.md`: 시작 코드, 메서드 표, 오류 코드, 예제 3개
+- [ ] CHANGELOG "API" 절, `docs/requirements.md`에 FR-API 항목 추가
+
+### M9.3 (B1) 명령 표면
+- [ ] `tasksmd.api.<ns>.<method>` 명령을 메서드 목록에서 자동 등록, 인자 1개(JSON), 반환 Promise<JSON>, 오류는 `{error:{code,message}}`
+- [ ] `commandPalette` 숨김, `package.json` 명령 선언 자동 생성 스크립트(`scripts/gen-api-commands.mjs`) + 일치 테스트
+- [ ] 통합 테스트: `executeCommand('tasksmd.api.query.run', {query})`
+
+### M9.4 (D1) npm 라이브러리 + CLI
+- [ ] pnpm workspace: `packages/core`(현재 `src/core` 이동 또는 재수출), `packages/cli`
+- [ ] 폴더 스캐너(gitignore·`tasksmd.exclude` 존중), 파일 쓰기 구현(7-a: `expectedText` 검사)
+- [ ] CLI: `query`, `explain`, `add`, `done`, `set`, `mcp` 서브커맨드, `--json|--md`, `--root`
+- [ ] 발행: 마켓플레이스 게시와 함께 공개 npm `@hmcvecdt/tasks-core`, `@hmcvecdt/tasks-cli`; 불가 시 `.tgz` 릴리스 첨부
+- [ ] 테스트: 임시 폴더 픽스처로 CLI E2E
+
+### M9.5 (C1) MCP 서버 (주 대상 Claude Code)
+- [ ] `tasksmd mcp --root <dir>` stdio 서버, 도구: `tasks_query`, `tasks_list_saved_queries`, `tasks_create`, `tasks_update`, `tasks_set_status`, `tasks_postpone`, `tasks_remove`, `tasks_explain_query`; 리소스 `tasks_syntax_reference`
+- [ ] 도구 설명에 "편집기에서 저장 후 사용" 안내, 쓰기는 `expectedText` 필수
+- [ ] 등록 문서: Claude Code(`claude mcp add`), Cursor(`.cursor/mcp.json`), VS Code(`mcp.json`)
+- [ ] 테스트: MCP 클라이언트 SDK로 도구 호출 E2E; Claude Code에서 시나리오 3개 수동 확인
+
+### M9.6 (C2, 선택) 편집기 위임 (7-b)
+- [ ] 확장이 로컬 소켓을 열고 토큰 파일로 인증, CLI/MCP는 편집기가 떠 있으면 위임
+
+### M9.7 (F1) URI 핸들러
+- [ ] `vscode://HMCVECDT.tasks-for-markdown/open?path=…&line=…`, `/query?text=…`
 
 ## 열린 설계 이슈 추적
 

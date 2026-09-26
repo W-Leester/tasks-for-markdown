@@ -571,7 +571,7 @@
 ### M9.2 (A2) 노출과 타입
 - [x] `activate()` 반환을 `{ getAPI(version), extendMarkdownIt, __internal }`로 교체(통합 테스트는 `__internal`)
 - [x] `dist/api-types/api/types.d.ts` 생성(`tsconfig.api.json`, `pnpm build:api-types`, `package` 스크립트에 포함), `.vsix`에 포함
-- [x] `docs/api.md`(한국어): 시작 코드, 메서드 표, 명령 표, 쓰기 정책, 오류 코드, 호환 정책 — 영문판은 D1 이후
+- [x] `docs/api.md`(한국어) + `docs/api.en.md`(영문): 시작 코드, 메서드 표, 명령 표, 쓰기 정책, 오류 코드, 라이브러리·CLI·MCP, 호환 정책. README 양쪽에 "API와 자동화" 절
 - [x] CHANGELOG "API" 절 (1.1.0) — requirements FR-API 표는 D1 때 함께
 
 ### M9.3 (B1) 명령 표면

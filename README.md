@@ -77,6 +77,26 @@ group by filename
 | `calendar.fullScreen` | `maximize` | 전체 화면 버튼: 에디터 그룹 최대화만(`maximize`) / 창도 전체 화면(`window`) |
 | `updateCheckUrl` | `""` | `.vsix` 설치본용 `latest.json` 위치 |
 
+## API와 자동화
+
+다른 프로그램에서 태스크를 읽고 쓰는 통로가 네 가지 있습니다. 상세는 [docs/api.md](docs/api.md).
+
+| 어디서 | 방법 |
+|---|---|
+| 다른 VS Code/Cursor 확장 | `getExtension('hastycapybara.tasks-for-markdown').exports.getAPI(1, { extensionId })` → `query.run(...)`, `edit.setStatus(...)` 등. 타입은 확장에 동봉된 `dist/api-types/api/types.d.ts` |
+| 키바인딩·매크로 | 명령 `tasksmd.api.<ns>.<method>` (예: `tasksmd.api.query.run` + `{ "query": "due today" }`) |
+| 터미널·스크립트·CI | `npx @hastycapybara/tasks-cli query "not done\ndue before today" --root ~/notes` — 편집기 없이 동작 |
+| AI 에이전트 (Claude Code 등) | `claude mcp add tasks -- npx -y @hastycapybara/tasks-cli mcp --root "$PWD"` 후 말로 지시 |
+
+```ts
+// 다른 확장에서
+const tasks = (await ext.activate()).getAPI(1, { extensionId: 'my.extension' });
+const r = await tasks.query.run('not done\nhappens on or before today');   // 사이드바 "오늘"과 같은 결과
+await tasks.edit.setStatus({ path: r.tasks[0].path, line: r.tasks[0].line, expectedText: r.tasks[0].originalMarkdown }, 'x');
+```
+
+쓰기는 기본 설정에서 호출자마다 한 번 확인창이 뜹니다(`tasksmd.api.writePolicy`). 값은 전부 JSON이고 오류는 `{ code, message }`입니다. Node 라이브러리만 필요하면 `@hastycapybara/tasks-core`.
+
 ## 마크다운 미리보기에 관해
 
 내장 미리보기는 태스크 줄을 체크박스와 뱃지로, ` ```tasks ` 블록을 실시간 결과로 렌더링하고 태스크가 바뀌면 자동 갱신됩니다. 다만 클래식 미리보기는 클릭을 확장으로 전달할 수 없어서 체크박스는 표시 전용입니다 — 토글은 에디터, 사이드바, 칸반에서 하세요.

@@ -76,11 +76,33 @@ group by filename
 | `calendar.fullScreen` | `maximize` | Full screen button: maximize the editor group only, or `window` for the whole window |
 | `updateCheckUrl` | `""` | `latest.json` location for `.vsix` installs |
 
+## API and automation
+
+Four ways for other programs to read and write tasks. Details in [docs/api.en.md](api.en.md).
+
+| From | How |
+|---|---|
+| Another VS Code/Cursor extension | `getExtension('hastycapybara.tasks-for-markdown').exports.getAPI(1, { extensionId })` → `query.run(...)`, `edit.setStatus(...)`. Types ship with the extension in `dist/api-types/api/types.d.ts` |
+| Keybindings, macros | Commands `tasksmd.api.<ns>.<method>` (e.g. `tasksmd.api.query.run` with `{ "query": "due today" }`) |
+| Terminal, scripts, CI | `npx @hastycapybara/tasks-cli query "not done\ndue before today" --root ~/notes` — no editor needed |
+| AI agents (Claude Code, Cursor, …) | `claude mcp add tasks -- npx -y @hastycapybara/tasks-cli mcp --root "$PWD"`, then ask in plain language |
+
+```ts
+// from another extension
+const tasks = (await ext.activate()).getAPI(1, { extensionId: 'my.extension' });
+const r = await tasks.query.run('not done\nhappens on or before today');   // same as the sidebar's "Today"
+await tasks.edit.setStatus({ path: r.tasks[0].path, line: r.tasks[0].line, expectedText: r.tasks[0].originalMarkdown }, 'x');
+```
+
+Writes ask the user once per caller by default (`tasksmd.api.writePolicy`). Everything is plain JSON; errors are `{ code, message }`. Need only the Node library? `@hastycapybara/tasks-core`.
+
 ## Notes on the Markdown preview
 
 The built-in preview renders task lines with checkboxes and badges and ` ```tasks ` blocks as live results, refreshed whenever tasks change. The classic preview cannot send clicks back to extensions, so checkboxes there are display-only — toggle tasks from the editor, the sidebar or the kanban board instead.
 
 ## Documentation
+
+- [Public API (extension API, commands, library, CLI, MCP server)](api.en.md)
 
 - [User guide (Korean)](user-guide.md)
 - [Requirements](requirements.md) · [Design](design.md) · [Development checklist](Tasks.md) · [Performance](perf.md)

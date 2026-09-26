@@ -64,6 +64,17 @@ VS Code와 다른 부분만 봅니다.
 3. 대조할 것: 블록의 **일치 개수**("N of M tasks")와 **순서**가 Obsidian과 같은지, 각 태스크의 날짜·우선순위·반복 배지가 같은지, 여기서 완료 토글한 줄을 Obsidian에서 열었을 때 필드 순서(`🆔 ⛔ 우선순위 🔁 🏁 ➕ 🛫 ⏳ 📅 ❌ ✅`)가 Obsidian이 쓴 것과 같은지.
 4. 다르면 그 태스크 줄 원문과 쿼리 텍스트를 그대로 붙여 주세요. `tests/core/query/obsidian-compat.test.ts`에 케이스로 추가해 고칩니다.
 
+### 2-8. Claude Code에서 MCP 서버 시나리오
+
+1. 저장소에서 `pnpm build:packages` 후 프로젝트 폴더(예: 이 저장소의 `examples`)에서
+   ```bash
+   claude mcp add tasks -- node /Users/leester/Desktop/Dev/Tasks-like-plugin/packages/cli/dist/tasksmd.cjs mcp --root "$PWD"
+   ```
+   npm 발행 후에는 `npx -y @hastycapybara/tasks-cli mcp --root "$PWD"`로 바꿉니다.
+2. Claude Code를 열고 `/mcp`로 `tasks` 서버가 연결됐는지 확인합니다.
+3. 시나리오 세 개를 말로 시킵니다. (a) "지난 마감 태스크를 마감일 순으로 보여줘" → `tasks_query` 호출, 결과가 `tasksmd query "not done\ndue before today\nsort by due"`와 같은지. (b) "계약서 검토를 완료 처리해" → `tasks_set_status`(승인 창 확인) 후 파일에 `✅ 오늘 날짜`가 붙는지. (c) "inbox.md에 '월간 결산' 태스크를 10월 5일 마감, 높은 우선순위로 추가해" → `tasks_create` 후 줄이 `- [ ] 월간 결산 ⏫ 📅 2026-10-05` 형식인지.
+4. 편집기에서 같은 파일을 저장 안 한 채로 (b)를 시켜 보고 "덮어쓸까요?" 대화상자가 뜨는지도 봐 두면 좋습니다(알려진 제한).
+
 ---
 
 ## 3. 사용자 작업·결정 (3개)

@@ -34,7 +34,7 @@
 | M6 | 웹뷰: 편집 모달 + 칸반 + 쿼리 빌더 | ✅ 완료 | 2026-09-21 · unit 447 / integration 31 |
 | M7 | 추가 기능: 알림·아카이브·통계·캘린더·업데이트 확인 | ✅ 완료 | 2026-09-21 · unit 462 / integration 34 |
 | M8 | 마감: i18n·성능·접근성·문서·패키징·게시 | 🟡 코드 완료 · 사용자 작업 대기 | 1.0.0 `.vsix` 생성됨 · 남은 것: 퍼블리셔/토큰 생성, 저장소 공개 여부, M8.7 수동 테스트 |
-| M9 | 공개 API: 확장 API·명령·npm/CLI·MCP·URI | 🟡 M9.1–9.4 완료(1.2.0, npm 발행은 사용자 작업) · M9.5–9.7 남음 | docs/api-plan.md v0.2, docs/api.md |
+| M9 | 공개 API: 확장 API·명령·npm/CLI·MCP·URI | 🟡 M9.1–9.5 완료(1.3.0, npm 발행은 사용자 작업) · M9.6(선택)·9.7 남음 | docs/api-plan.md v0.2, docs/api.md |
 
 ---
 
@@ -587,10 +587,10 @@
 - [x] 테스트: `tests/cli.test.ts` 임시 폴더 픽스처 5건(스캔·출력 형식, 쿼리 오류, add/done(반복)/set/postpone/remove/STALE_LINE/NOT_FOUND, settings.json JSONC, help) + 빌드 산출물 스모크(examples/)
 
 ### M9.5 (C1) MCP 서버 (주 대상 Claude Code)
-- [ ] `tasksmd mcp --root <dir>` stdio 서버, 도구: `tasks_query`, `tasks_list_saved_queries`, `tasks_create`, `tasks_update`, `tasks_set_status`, `tasks_postpone`, `tasks_remove`, `tasks_explain_query`; 리소스 `tasks_syntax_reference`
-- [ ] 도구 설명에 "편집기에서 저장 후 사용" 안내, 쓰기는 `expectedText` 필수
-- [ ] 등록 문서: Claude Code(`claude mcp add`), Cursor(`.cursor/mcp.json`), VS Code(`mcp.json`)
-- [ ] 테스트: MCP 클라이언트 SDK로 도구 호출 E2E; Claude Code에서 시나리오 3개 수동 확인
+- [x] `tasksmd mcp --root <dir>` stdio 서버(`@modelcontextprotocol/sdk` 1.30, zod), 도구 10개(`tasks_query`, `tasks_explain_query`, `tasks_get`, `tasks_list_saved_queries`, `tasks_create`, `tasks_update`, `tasks_set_status`, `tasks_postpone`, `tasks_remove`, `tasks_syntax_reference`) + 리소스 `tasks://syntax`
+- [x] 서버 안내문·도구 설명에 "저장 후 사용"과 `expectedText` 권고(필수는 아님: 에이전트가 방금 조회한 값을 넣도록 유도)
+- [x] 등록 문서: docs/api.md 8절(Claude Code `claude mcp add`, Cursor `.cursor/mcp.json`, VS Code `.vscode/mcp.json`), packages/cli/README.md
+- [x] 테스트: `tests/mcp.test.ts` 인메모리 전송으로 도구 목록·리소스·조회·저장 쿼리·생성→수정→상태(반복)→연기→삭제·STALE_LINE·NOT_FOUND; 빌드 산출물로 stdio 왕복 스모크(examples/) — Claude Code 실제 시나리오는 사용자 수동 확인(docs/manual-checklist.md 2-8)
 
 ### M9.6 (C2, 선택) 편집기 위임 (7-b)
 - [ ] 확장이 로컬 소켓을 열고 토큰 파일로 인증, CLI/MCP는 편집기가 떠 있으면 위임

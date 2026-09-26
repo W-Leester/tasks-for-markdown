@@ -1,16 +1,31 @@
 {
   "name": "@hastycapybara/tasks-core",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Obsidian Tasks-compatible task lines, dates, recurrence and query engine for Markdown — the core of Tasks for Markdown, usable from any Node program.",
   "license": "MIT",
   "author": "hastyCapybara (W.Leester)",
   "homepage": "https://github.com/W-Leester/tasks-for-markdown",
-  "repository": { "type": "git", "url": "https://github.com/W-Leester/tasks-for-markdown.git", "directory": "packages/core" },
-  "keywords": ["markdown", "tasks", "obsidian", "todo", "query"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/W-Leester/tasks-for-markdown.git",
+    "directory": "packages/core"
+  },
+  "keywords": [
+    "markdown",
+    "tasks",
+    "obsidian",
+    "todo",
+    "query"
+  ],
   "main": "./dist/main.js",
   "types": "./dist/main.d.ts",
-  "files": ["dist", "README.md"],
-  "publishConfig": { "access": "public" },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\" && tsc -p tsconfig.json"
   },

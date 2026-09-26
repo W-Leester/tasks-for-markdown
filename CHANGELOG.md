@@ -1,5 +1,11 @@
 # 변경 이력
 
+## 1.3.0 — 2026-09-26
+
+### API
+- **MCP 서버 `tasksmd mcp`** (`@hastycapybara/tasks-cli`): Claude Code·Cursor·Claude Desktop 같은 AI 에이전트가 쓰는 도구 10개(`tasks_query`, `tasks_explain_query`, `tasks_get`, `tasks_list_saved_queries`, `tasks_create`, `tasks_update`, `tasks_set_status`, `tasks_postpone`, `tasks_remove`, `tasks_syntax_reference`)와 문법 리소스 `tasks://syntax`. 등록: `claude mcp add tasks -- npx -y @hastycapybara/tasks-cli mcp --root "$PWD"`.
+- CLI에 `saved`(저장된 쿼리 목록) 추가, `tasksmd.savedQueries` 설정 읽기.
+
 ## 1.2.0 — 2026-09-26
 
 ### API

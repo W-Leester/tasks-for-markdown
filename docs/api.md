@@ -167,7 +167,44 @@ tasksmd explain "priority is above none"
 - 출력: 터미널이면 마크다운(`원문 줄  (경로:줄)`), 파이프면 JSON. `--json`/`--md`로 고정. 오류는 JSON 모드에서 `{ "error": { code, message } }`, 종료 코드 1(실행 오류)·2(인자 오류).
 - 파일을 직접 고칩니다. 편집기에 저장 안 된 변경이 있는 파일은 저장 후 쓰세요. `--expect`에 줄 원문을 주면 그사이 바뀐 줄은 `STALE_LINE`으로 거부합니다. 완료 처리는 확장과 같은 코드라 완료일·반복 다음 회차·필드 순서가 동일합니다.
 
-## 8. 호환 정책
+## 8. AI 에이전트용 MCP 서버 (`tasksmd mcp`)
+
+CLI에 들어 있는 MCP(Model Context Protocol) 서버입니다. Claude Code, Cursor Agent, Claude Desktop 같은 에이전트가 태스크를 도구로 다룹니다. 표준 입출력으로 통신하며 별도 설정 파일이 없습니다.
+
+**등록**
+
+```bash
+# Claude Code (프로젝트 폴더에서)
+claude mcp add tasks -- npx -y @hastycapybara/tasks-cli mcp --root "$PWD"
+# npm에 없을 때(저장소에서 빌드한 경우)
+claude mcp add tasks -- node /경로/packages/cli/dist/tasksmd.cjs mcp --root "$PWD"
+```
+Cursor는 `.cursor/mcp.json`, VS Code는 `.vscode/mcp.json`에 같은 명령을 적습니다.
+```json
+{ "mcpServers": { "tasks": { "command": "npx", "args": ["-y", "@hastycapybara/tasks-cli", "mcp", "--root", "${workspaceFolder}"] } } }
+```
+
+**도구**
+
+| 도구 | 하는 일 |
+|---|---|
+| `tasks_query { query, source?, limit? }` | 쿼리 실행. `matched`, `shown`, `tasks[]`(path, 0-based line, description, 날짜, priority, tags, originalMarkdown) |
+| `tasks_explain_query { query }` | 쿼리 해석과 문법 오류(실행 안 함) |
+| `tasks_get { path, line }` | 태스크 하나 |
+| `tasks_list_saved_queries` | 저장된 쿼리 목록 |
+| `tasks_create { file, description, afterLine?, due?, priority?, … }` | 생성(파일 끝 또는 지정 줄 뒤) |
+| `tasks_update { path, line, expectedText?, …fields }` | 필드 변경(`null`은 제거), `status`는 마지막에 |
+| `tasks_set_status { path, line, expectedText?, symbol }` | 상태 변경. `x`면 완료일과 반복 다음 회차 |
+| `tasks_postpone { path, line, expectedText?, to }` | 마감(없으면 예정) 연기, 자연어 가능 |
+| `tasks_remove { path, line, expectedText? }` | 줄 삭제 |
+| `tasks_syntax_reference` / 리소스 `tasks://syntax` | 태스크 줄 형식과 쿼리 문법 요약. 에이전트가 먼저 읽도록 서버 안내문에 적혀 있음 |
+
+- 쓰기 도구는 `expectedText`(그 줄의 `originalMarkdown`)를 받으면 그사이 바뀐 줄을 `STALE_LINE`으로 거부합니다. 서버 안내문이 에이전트에게 항상 넣으라고 권합니다.
+- 호출마다 폴더를 다시 훑어 파일이 그사이 바뀌어도 최신 상태를 봅니다. 설정은 CLI와 같이 `.vscode/settings.json`을 읽습니다.
+- 편집기에 저장 안 된 변경이 있는 파일과는 충돌할 수 있습니다. 안내문에 "먼저 저장하라고 하라"가 들어 있습니다.
+- 오류는 `isError`와 `{ error: { code, message } }` 본문으로 돌아옵니다.
+
+## 9. 호환 정책
 
 - `version: 1`. 필드·메서드 **추가**는 1을 유지합니다. 제거·의미 변경은 `getAPI(2)`를 추가하고 1을 최소 한 릴리스 동안 병행합니다.
 - 변경은 CHANGELOG의 "API" 절에 적습니다.

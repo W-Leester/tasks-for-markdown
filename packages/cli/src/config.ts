@@ -15,6 +15,7 @@ export interface CliConfig {
   allowFunctions: boolean;
   recurrence: { insertPosition: 'above' | 'below'; idHandling: 'keep' | 'new' | 'remove'; copyDependsOn: boolean; removeScheduledDate: boolean };
   statuses: StatusConfig[];
+  savedQueries: { name: string; query: string }[];
 }
 
 const DEFAULTS: Omit<CliConfig, 'root'> = {
@@ -28,6 +29,7 @@ const DEFAULTS: Omit<CliConfig, 'root'> = {
   allowFunctions: false,
   recurrence: { insertPosition: 'above', idHandling: 'keep', copyDependsOn: true, removeScheduledDate: false },
   statuses: [...DEFAULT_STATUSES],
+  savedQueries: [],
 };
 
 /** Tolerant JSONC: strips line and block comments outside strings, and trailing commas. */
@@ -54,7 +56,7 @@ export function parseJsonc(text: string): unknown {
 }
 
 export function loadConfig(root: string): CliConfig {
-  const cfg: CliConfig = { root, ...DEFAULTS, recurrence: { ...DEFAULTS.recurrence }, statuses: [...DEFAULTS.statuses] };
+  const cfg: CliConfig = { root, ...DEFAULTS, recurrence: { ...DEFAULTS.recurrence }, statuses: [...DEFAULTS.statuses], savedQueries: [] };
   const file = path.join(root, '.vscode', 'settings.json');
   if (!fs.existsSync(file)) return cfg;
   let raw: Record<string, unknown>;
@@ -85,6 +87,8 @@ export function loadConfig(root: string): CliConfig {
   if (idh === 'keep' || idh === 'new' || idh === 'remove') cfg.recurrence.idHandling = idh;
   cfg.recurrence.copyDependsOn = get('recurrence.copyDependsOn', isBool) ?? cfg.recurrence.copyDependsOn;
   cfg.recurrence.removeScheduledDate = get('recurrence.removeScheduledDate', isBool) ?? cfg.recurrence.removeScheduledDate;
+  const saved = raw['tasksmd.savedQueries'];
+  if (Array.isArray(saved)) cfg.savedQueries = saved.filter((q): q is { name: string; query: string } => !!q && typeof q === 'object' && typeof (q as { name?: unknown }).name === 'string' && typeof (q as { query?: unknown }).query === 'string');
   const statuses = raw['tasksmd.statuses'];
   if (Array.isArray(statuses)) {
     const valid = statuses.filter((e): e is StatusConfig => !!e && typeof e === 'object' && typeof (e as StatusConfig).symbol === 'string' && (e as StatusConfig).symbol.length === 1 && typeof (e as StatusConfig).name === 'string' && typeof (e as StatusConfig).nextSymbol === 'string' && isStatusType((e as StatusConfig).type));

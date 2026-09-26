@@ -1,0 +1,29 @@
+/** Compact reference an AI agent can read before writing task lines or queries (MCP resource + tool). */
+export const SYNTAX_REFERENCE = `# Tasks for Markdown — syntax reference
+
+## Task line
+A task is a Markdown list item with a checkbox: \`- [ ] description ...fields\`.
+Status symbols: \`[ ]\` todo, \`[x]\` done, \`[/]\` in progress, \`[-]\` cancelled (custom statuses may exist).
+Fields go after the description, in this order (emoji format):
+  🆔 id · ⛔ dependsOn(ids, comma separated) · priority (🔺 highest ⏫ high 🔼 medium 🔽 low ⏬ lowest) · 🔁 recurrence · 🏁 keep|delete
+  ➕ created · 🛫 start · ⏳ scheduled · 📅 due · ❌ cancelled · ✅ done   (all dates YYYY-MM-DD)
+Tags are #words inside the description. Example:
+  - [ ] Write report #work ⏫ 🔁 every week 📅 2026-10-01
+Recurrence text examples: every day · every week · every 2 weeks on friday · every month on the 1st · every year · every week when done.
+
+## Query language (one instruction per line, all lines ANDed)
+Status: done · not done · status.type is TODO|IN_PROGRESS|DONE|CANCELLED|NON_TASK · status.name includes X · status.symbol includes X
+Dates (due|scheduled|start|created|done|cancelled|happens): \`due today\`, \`due before tomorrow\`, \`due after 2026-10-01\`, \`due on or before next friday\`, \`due this week\`, \`due 2026-10\`, \`due 2026-Q4\`, \`due 2026-W40\`, \`has due date\`, \`no due date\`, \`due date is invalid\`. Natural dates: today, tomorrow, yesterday, next monday, last week, in 3 days, 2 weeks ago.
+Priority: priority is high · priority is above none · priority is below medium · priority is not lowest
+Text: description includes X · description does not include X · description regex matches /x/i
+Tags: has tags · no tags · tags include #home · tag does not include work · tags regex matches /#t$/
+Location: path includes notes/ · folder includes projects · filename includes todo · heading includes Ideas · root includes work
+Other: is recurring · is not recurring · is blocked · is not blocked · is blocking · has id · no id · has depends on · exclude sub-items
+Boolean: (not done) AND (due before today) · (priority is high) OR (tags include #urgent) · NOT (is recurring) · XOR
+Sort: sort by due|scheduled|start|created|done|priority|urgency|description|path|status|tag [reverse]
+Group: group by due|folder|filename|heading|priority|status|tag|path|happens|urgency
+Limit/layout: limit 20 · limit groups 5 · short mode · hide backlink · hide priority · show tree · explain
+Placeholders inside a note: {{query.file.folder}} {{query.file.path}} {{query.file.filename}}
+
+Lines in tool arguments are 0-based (line 0 = first line of the file); the CLI shows 1-based numbers.
+`;

@@ -2,6 +2,8 @@ import * as path from 'node:path';
 import { CliError, addTask, explainQuery, openWorkspace, parseRef, postpone, removeTask, runQuery, setFields, setStatus, type QueryOutput, type Workspace } from './commands';
 import { loadConfig } from './config';
 import { StaleLineError } from './store';
+import { startMcpServer } from './mcp';
+import { listSavedQueries } from './savedQueries';
 import type { GroupDto, TaskDto } from '../../../src/core/dto';
 
 export interface Io {
@@ -23,6 +25,8 @@ Usage:
   tasksmd postpone <path:line> <date|tomorrow|next monday|in 2 weeks> [--expect]
   tasksmd remove <path:line> [--expect <text>]
   tasksmd list [--file <path>]                        every task (optionally one file)
+  tasksmd saved                                       saved queries (settings + .tasks/queries)
+  tasksmd mcp                                         start the MCP server (stdio) for AI agents
 
 Options:
   --root <dir>      workspace folder (default: current directory)
@@ -33,6 +37,9 @@ Options:
   -h, --help        this help
 
 Lines are 1-based in <path:line>. Settings are read from <root>/.vscode/settings.json (tasksmd.*).`;
+
+declare const __TASKSMD_VERSION__: string | undefined;
+const CLI_VERSION = typeof __TASKSMD_VERSION__ === 'string' ? __TASKSMD_VERSION__ : 'dev';
 
 interface Parsed { positional: string[]; flags: Record<string, string | true> }
 
@@ -87,6 +94,11 @@ export async function run(argv: string[], io: Io, isTTY = false): Promise<number
   if (!command || flags.help) { io.out(HELP); return command ? 0 : 2; }
   const json = flags.json === true ? true : flags.md === true ? false : !isTTY;
   const root = path.resolve(io.cwd, str(flags, 'root') ?? '.');
+  if (command === 'mcp') {
+    // stdout is the protocol channel: never print anything else here.
+    await startMcpServer({ root, today: str(flags, 'today'), version: CLI_VERSION });
+    return 0;
+  }
   const emit = (value: unknown, text: () => string[]) => { if (json) io.out(JSON.stringify(value, null, 2)); else for (const l of text()) io.out(l); };
   try {
     const ws: Workspace = openWorkspace(loadConfig(root), str(flags, 'today'));
@@ -110,6 +122,11 @@ export async function run(argv: string[], io: Io, isTTY = false): Promise<number
         const r = runQuery(ws, file ? `path includes ${file}` : '');
         void tasks;
         emit(r.tasks, () => r.tasks.map(fmtTask));
+        return 0;
+      }
+      case 'saved': {
+        const list = listSavedQueries(ws.cfg);
+        emit(list, () => list.map((q) => `${q.name} [${q.source}]\n${q.query.split('\n').map((l) => '  ' + l).join('\n')}`));
         return 0;
       }
       case 'add': {

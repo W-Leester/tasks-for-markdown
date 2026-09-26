@@ -1,4 +1,5 @@
 import * as esbuild from 'esbuild';
+import { readFileSync } from 'node:fs';
 
 await esbuild.build({
   entryPoints: ['src/main.ts'],
@@ -9,5 +10,6 @@ await esbuild.build({
   format: 'cjs',
   minify: true,
   banner: { js: '#!/usr/bin/env node' },
+  define: { __TASKSMD_VERSION__: JSON.stringify(JSON.parse(readFileSync('package.json', 'utf8')).version) },
   logLevel: 'info',
 });

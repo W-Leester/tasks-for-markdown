@@ -1,5 +1,17 @@
 # 변경 이력
 
+## 1.1.0 — 2026-09-26
+
+### API
+- **공개 API v1** (docs/api.md). 다른 확장은 `getExtension('HMCVECDT.tasks-for-markdown').exports.getAPI(1, { extensionId })`로 받습니다. `query.run/explain/get/list/saved`, `edit.create/update/setStatus/toggle/postpone/remove/batch`, `events.onDidChangeTasks/onDidCompleteTask`, `ui.openEdit/openKanban/openCalendar/openQueryResults/reveal`. 값은 모두 JSON, 오류는 `{ code, message, details? }`.
+- 명령 표면 `tasksmd.api.<ns>.<method>` 17개(팔레트 숨김). 키바인딩·매크로에서 인자 객체 하나로 호출.
+- 쓰기 정책 `tasksmd.api.writePolicy`(기본 `confirm`: 호출자마다 한 번 확인 후 `tasksmd.api.allowedWriters`에 기억), `tasksmd.api.batchLimit`(200). 신뢰되지 않은 워크스페이스에서는 쓰기 거부. 모든 쓰기 로그.
+- 타입 선언 `dist/api-types/api/types.d.ts`를 확장에 동봉.
+
+### 내부
+- `activate()`의 반환이 `{ getAPI, extendMarkdownIt, __internal }`로 바뀌었습니다(내부 객체는 `__internal`).
+- `TaskEditService.onDidSetStatus`, `deleteTaskLine`; 웹뷰와 API가 같은 `applyFieldValues` 사용.
+
 ## 1.0.13 — 2026-09-24
 
 ### 변경

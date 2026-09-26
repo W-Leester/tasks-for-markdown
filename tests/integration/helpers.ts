@@ -1,14 +1,18 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as vscode from 'vscode';
-import type { ExtensionApi } from '../../src/extension';
+import type { ExtensionApi, ExtensionExports } from '../../src/extension';
 
 export const EXTENSION_ID = 'HMCVECDT.tasks-for-markdown';
 
-export async function getApi(): Promise<ExtensionApi> {
-  const ext = vscode.extensions.getExtension<ExtensionApi>(EXTENSION_ID);
+export async function getExports(): Promise<ExtensionExports> {
+  const ext = vscode.extensions.getExtension<ExtensionExports>(EXTENSION_ID);
   if (!ext) throw new Error(`extension ${EXTENSION_ID} not found`);
-  const api = await ext.activate();
+  return ext.activate();
+}
+
+export async function getApi(): Promise<ExtensionApi> {
+  const api = (await getExports()).__internal;
   await waitFor(() => api.index.state === 'ready', 15000, 'index ready');
   return api;
 }

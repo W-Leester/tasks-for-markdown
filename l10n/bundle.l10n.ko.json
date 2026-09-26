@@ -303,5 +303,11 @@
   "Moved to {0}": "{0}(으)로 이동함",
   "Click: edit · Double-click: open · Space: toggle done · Alt+←/→: move to the next column": "클릭: 편집 · 더블클릭: 원본 열기 · Space: 완료 전환 · Alt+←/→: 옆 컬럼으로 이동",
   "Arrow keys: move between days · Enter: new task in the focused day": "화살표: 날짜 이동 · Enter: 선택한 날에 새 태스크",
-  "tasks": "태스크"
+  "tasks": "태스크",
+  "Allow": "허용",
+  "This time": "이번만",
+  "Deny": "거부",
+  "an unknown caller": "알 수 없는 호출자",
+  "\"{0}\" wants to modify tasks in this workspace through the Tasks API ({1}).": "\"{0}\"이(가) Tasks API로 이 워크스페이스의 태스크를 수정하려고 합니다({1}).",
+  "API query": "API 쿼리"
 }

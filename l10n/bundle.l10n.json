@@ -21,5 +21,11 @@
   "Moved to {0}": "Moved to {0}",
   "Click: edit · Double-click: open · Space: toggle done · Alt+←/→: move to the next column": "Click: edit · Double-click: open · Space: toggle done · Alt+←/→: move to the next column",
   "Arrow keys: move between days · Enter: new task in the focused day": "Arrow keys: move between days · Enter: new task in the focused day",
-  "tasks": "tasks"
+  "tasks": "tasks",
+  "Allow": "Allow",
+  "This time": "This time",
+  "Deny": "Deny",
+  "an unknown caller": "an unknown caller",
+  "\"{0}\" wants to modify tasks in this workspace through the Tasks API ({1}).": "\"{0}\" wants to modify tasks in this workspace through the Tasks API ({1}).",
+  "API query": "API query"
 }

@@ -69,6 +69,7 @@ group by filename
 | `notifications.*` | on, `09:00`, 1 day | Daily summary and due-soon digest, OS notifications |
 | `archive.file` / `afterDays` / `linkStyle` | `Archive.md` / 30 / `wiki` | Archive command |
 | `calendar.newTaskFile` | `""` | File that receives tasks created from the calendar |
+| `api.writePolicy` | `confirm` | Writes through the public API: confirm once per caller / allow / deny |
 | `rendered.fontSize` / `rendered.lineHeight` | `14.5` / `1.6` | Rendered view body font size (px) and line height |
 | `rendered.fieldStyle` | `plain` | Task-line fields in the rendered view: as in the source (`plain`) or pill badges (`badges`) |
 | `calendar.fontSize` | `13` | Font size (px) of tasks in calendar cells |

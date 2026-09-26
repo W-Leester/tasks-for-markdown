@@ -25,6 +25,14 @@ export interface TaskEditDeps {
   today?: () => Dayjs;
 }
 
+export interface StatusChangeEvent {
+  before: Task;
+  after: Task;
+  /** New occurrences written next to the task (recurrence). */
+  created: Task[];
+  deleted: boolean;
+}
+
 export interface LineInsert {
   position: 'above' | 'below';
   lines: string[];
@@ -36,7 +44,15 @@ export interface LineInsert {
  * in open editors. Files that were not open are saved after the edit so they don't linger dirty.
  */
 export class TaskEditService {
+  private readonly statusListeners = new Set<(e: StatusChangeEvent) => void>();
+
   constructor(private readonly deps: TaskEditDeps) {}
+
+  /** Fires after every status change written by this service (UI, commands and the public API alike). */
+  onDidSetStatus(listener: (e: StatusChangeEvent) => void): { dispose(): void } {
+    this.statusListeners.add(listener);
+    return { dispose: () => this.statusListeners.delete(listener) };
+  }
 
   private today(): Dayjs {
     return (this.deps.today ?? (() => dayjs()))();
@@ -69,7 +85,34 @@ export class TaskEditService {
       ? { position: settings.get('recurrence.insertPosition'), lines: result.newTasks.map((t) => serializeTask(t, format)) }
       : undefined;
     await this.replaceTask(task, result.task, insert, result.deleteOriginal);
+    for (const l of this.statusListeners) {
+      try { l({ before: task, after: result.task, created: result.newTasks, deleted: result.deleteOriginal }); } catch { /* listeners must not break edits */ }
+    }
     return result.task;
+  }
+
+  /** Remove the task's line entirely (public API `edit.remove`). */
+  async deleteTaskLine(task: Task): Promise<void> {
+    const uri = vscode.Uri.parse(task.location.key);
+    const line = task.location.line;
+    const doc = await vscode.workspace.openTextDocument(uri);
+    const visible = vscode.window.visibleTextEditors.some((e) => e.document.uri.toString() === uri.toString());
+    const shouldSave = !visible && !doc.isDirty;
+    const strip = (s: string) => (s.endsWith('\r') ? s.slice(0, -1) : s);
+    const actual = line < doc.lineCount ? doc.lineAt(line).text : '';
+    if (strip(actual) !== strip(task.originalMarkdown)) {
+      void this.deps.indexService.indexText(uri, doc.getText());
+      throw new StaleLineError(uri, line, task.originalMarkdown, actual);
+    }
+    const edit = new vscode.WorkspaceEdit();
+    const range = doc.lineAt(line).rangeIncludingLineBreak;
+    // Deleting the last line: take the preceding line break instead so no trailing blank line remains.
+    if (line === doc.lineCount - 1 && line > 0) edit.delete(uri, new vscode.Range(doc.lineAt(line - 1).range.end, range.end));
+    else edit.delete(uri, range);
+    const ok = await vscode.workspace.applyEdit(edit);
+    if (!ok) throw new Error(`Could not edit ${uri.fsPath}`);
+    this.deps.indexService.indexText(uri, doc.getText());
+    if (shouldSave) await doc.save();
   }
 
   /** Change any fields (dates, priority, description…) and write the line back. */

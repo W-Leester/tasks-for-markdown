@@ -70,6 +70,7 @@ group by filename
 | `notifications.*` | 켜짐, `09:00`, 1일 | 일일 요약·마감 임박 알림, OS 알림 |
 | `archive.file` / `afterDays` / `linkStyle` | `Archive.md` / 30 / `wiki` | 아카이브 명령 |
 | `calendar.newTaskFile` | `""` | 캘린더에서 만든 태스크를 넣을 파일 |
+| `api.writePolicy` | `confirm` | 다른 확장이 API로 쓸 때: 확인(`confirm`) / 허용 / 거부 |
 | `rendered.fontSize` / `rendered.lineHeight` | `14.5` / `1.6` | 렌더 보기 본문 글자 크기(px)와 줄 간격 |
 | `rendered.fieldStyle` | `plain` | 렌더 보기 태스크 줄의 필드 표시: 원문처럼(`plain`) / 배지(`badges`) |
 | `calendar.fontSize` | `13` | 캘린더 칸의 태스크 글자 크기(px) |
@@ -83,7 +84,7 @@ group by filename
 ## 문서
 
 - [사용자 가이드](docs/user-guide.md)
-- [요구사항](docs/requirements.md) · [설계](docs/design.md) · [개발 체크리스트](docs/Tasks.md) · [성능](docs/perf.md) · [릴리스 절차](docs/release.md) · [1.0 이후 변경 기록](docs/post-release-changes.md) · [수동 점검·사용자 작업 안내](docs/manual-checklist.md) · [공개 API 계획](docs/api-plan.md)
+- [요구사항](docs/requirements.md) · [설계](docs/design.md) · [개발 체크리스트](docs/Tasks.md) · [성능](docs/perf.md) · [릴리스 절차](docs/release.md) · [1.0 이후 변경 기록](docs/post-release-changes.md) · [수동 점검·사용자 작업 안내](docs/manual-checklist.md) · [공개 API](docs/api.md) · [API 계획](docs/api-plan.md)
 
 ## 개발
 

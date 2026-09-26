@@ -34,7 +34,7 @@
 | M6 | 웹뷰: 편집 모달 + 칸반 + 쿼리 빌더 | ✅ 완료 | 2026-09-21 · unit 447 / integration 31 |
 | M7 | 추가 기능: 알림·아카이브·통계·캘린더·업데이트 확인 | ✅ 완료 | 2026-09-21 · unit 462 / integration 34 |
 | M8 | 마감: i18n·성능·접근성·문서·패키징·게시 | 🟡 코드 완료 · 사용자 작업 대기 | 1.0.0 `.vsix` 생성됨 · 남은 것: 퍼블리셔/토큰 생성, 저장소 공개 여부, M8.7 수동 테스트 |
-| M9 | 공개 API: 확장 API·명령·npm/CLI·MCP·URI | ⬜ 계획 확정(2026-09-26) | docs/api-plan.md v0.2 |
+| M9 | 공개 API: 확장 API·명령·npm/CLI·MCP·URI | 🟡 M9.1–9.3 완료(1.1.0) · M9.4–9.7 남음 | docs/api-plan.md v0.2, docs/api.md |
 
 ---
 
@@ -561,23 +561,23 @@
 ## M9. 공개 API (docs/api-plan.md v0.2)
 
 ### M9.1 (A1) API 코어 `src/api/`
-- [ ] `types.ts`: `TasksApi` v1 인터페이스, `TaskRef {path,line,expectedText?}`, `TaskDto` 재사용, `ApiError {code,message,details?}` (코드 7종)
-- [ ] `TasksApiImpl`: `query.run/explain/get/list/saved`, `edit.create/update/setStatus/toggle/postpone/remove/batch`, `events.onDidChangeTasks/onDidCompleteTask`, `ui.openEdit/openKanban/openCalendar/openQueryResults/reveal`
-- [ ] 쓰기 정책: 설정 `tasksmd.api.writePolicy` (`confirm` 기본 | `allow` | `deny`), `tasksmd.api.allowedWriters`(기억된 허용 목록), 첫 쓰기 시 확인 대화상자, 신뢰되지 않은 워크스페이스는 `UNTRUSTED`
-- [ ] `batch`: 단일 `WorkspaceEdit`, 상한 `tasksmd.api.batchLimit`(200), 하나라도 실패하면 전체 취소
-- [ ] 호출 로그 `api <caller> <method> <path>:<line>` 출력 채널
-- [ ] 단위 테스트(DTO 변환·오류 매핑·정책) + 통합 테스트(`getExtension().exports.getAPI(1)`로 조회·생성·완료·삭제·batch·STALE_LINE)
+- [x] `types.ts`: `TasksApi` v1 인터페이스, `TaskRef {path,line,expectedText?}`, `TaskDto` 재사용, `ApiError {code,message,details?}` (코드 7종)
+- [x] `TasksApiImpl`: `query.run/explain/get/list/saved`, `edit.create/update/setStatus/toggle/postpone/remove/batch`, `events.onDidChangeTasks/onDidCompleteTask`, `ui.openEdit/openKanban/openCalendar/openQueryResults/reveal` — `createTasksApi(deps, caller)`
+- [x] 쓰기 정책: 설정 `tasksmd.api.writePolicy` (`confirm` 기본 | `allow` | `deny`), `tasksmd.api.allowedWriters`(기억된 허용 목록), 첫 쓰기 시 확인 대화상자, 신뢰되지 않은 워크스페이스는 `UNTRUSTED`
+- [x] `batch`: 순차 실행, 상한 `tasksmd.api.batchLimit`(200), 첫 실패에서 중단하고 `details.completed/results` 반환 — 단일 WorkspaceEdit 원자성은 줄 번호가 앞선 작업에 따라 바뀌어 v1에서 보류(문서에 명시)
+- [x] 호출 로그 `api <caller> <method> <path>:<line>` 출력 채널
+- [x] 통합 테스트 `tests/integration/api.test.ts`(getAPI(1)·버전 거부·읽기·생성·수정·상태(반복 다음 회차)·연기·batch·삭제·STALE_LINE·NOT_FOUND·이벤트·deny·명령 표면), 단위 `tests/api-commands.test.ts`(명령 선언 일치)
 
 ### M9.2 (A2) 노출과 타입
-- [ ] `activate()` 반환을 `{ getAPI(version), __internal }`로 교체(통합 테스트는 `__internal`)
-- [ ] `dist/api.d.ts` 생성(`tsc -d`로 `src/api/types.ts`만), `.vsix`에 포함, `package.json` `exports`/`types` 안내
-- [ ] `docs/api.md`(한국어) + `docs/api.en.md`: 시작 코드, 메서드 표, 오류 코드, 예제 3개
-- [ ] CHANGELOG "API" 절, `docs/requirements.md`에 FR-API 항목 추가
+- [x] `activate()` 반환을 `{ getAPI(version), extendMarkdownIt, __internal }`로 교체(통합 테스트는 `__internal`)
+- [x] `dist/api-types/api/types.d.ts` 생성(`tsconfig.api.json`, `pnpm build:api-types`, `package` 스크립트에 포함), `.vsix`에 포함
+- [x] `docs/api.md`(한국어): 시작 코드, 메서드 표, 명령 표, 쓰기 정책, 오류 코드, 호환 정책 — 영문판은 D1 이후
+- [x] CHANGELOG "API" 절 (1.1.0) — requirements FR-API 표는 D1 때 함께
 
 ### M9.3 (B1) 명령 표면
-- [ ] `tasksmd.api.<ns>.<method>` 명령을 메서드 목록에서 자동 등록, 인자 1개(JSON), 반환 Promise<JSON>, 오류는 `{error:{code,message}}`
-- [ ] `commandPalette` 숨김, `package.json` 명령 선언 자동 생성 스크립트(`scripts/gen-api-commands.mjs`) + 일치 테스트
-- [ ] 통합 테스트: `executeCommand('tasksmd.api.query.run', {query})`
+- [x] `tasksmd.api.<ns>.<method>` 명령 17개(`API_COMMANDS`), 인자 1개(JSON), 반환 JSON, 오류는 `{error:{code,message}}`
+- [x] `commandPalette` 숨김(`when: false`, `enablement: false`), 선언 일치 단위 테스트(`tests/api-commands.test.ts`) — 생성 스크립트 대신 테스트로 강제
+- [x] 통합 테스트: `executeCommand('tasksmd.api.query.run', {query, limit})`, `edit.create` 거부 시 `{error}`
 
 ### M9.4 (D1) npm 라이브러리 + CLI
 - [ ] pnpm workspace: `packages/core`(현재 `src/core` 이동 또는 재수출), `packages/cli`

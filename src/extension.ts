@@ -14,6 +14,7 @@ import { TaskLineContext } from './editor/TaskLineContext';
 import { IndexService } from './index/IndexService';
 import { PreviewIntegration } from './preview/PreviewIntegration';
 import { registerRenderedView } from './preview/RenderedView';
+import { TasksApiError, createTasksApi, registerApiCommands, type ApiCaller, type TasksApi } from './api';
 import { ArchiveService } from './services/ArchiveService';
 import { NotificationService } from './services/NotificationService';
 import { QueryService } from './services/QueryService';
@@ -46,7 +47,16 @@ export interface ExtensionApi {
   webviews: { openEdit: (target: { key: string | null; line: number | null }) => WebviewHost; openKanban: () => WebviewHost; openQueryBuilder: (id: string | null) => WebviewHost; openStats: () => WebviewHost; openCalendar: () => WebviewHost; openQueryResults: (target: { text: string; source: string; label: string } | null) => WebviewHost };
 }
 
-export async function activate(context: vscode.ExtensionContext): Promise<ExtensionApi> {
+/** What `getExtension(...).exports` resolves to: the public API (docs/api.md) plus internals for tests. */
+export interface ExtensionExports {
+  getAPI(version: 1, caller?: ApiCaller): TasksApi;
+  /** Consumed by VS Code's built-in Markdown extension. */
+  extendMarkdownIt(md: import('markdown-it').MarkdownIt): import('markdown-it').MarkdownIt;
+  /** Internal services — for this extension's own integration tests only; no compatibility promise. */
+  __internal: ExtensionApi;
+}
+
+export async function activate(context: vscode.ExtensionContext): Promise<ExtensionExports> {
   log(`activate ${context.extension.packageJSON.version} (${vscode.env.appName} ${vscode.version}, ${vscode.env.language}, trusted=${vscode.workspace.isTrusted})`);
 
   const settings = new Settings();
@@ -115,7 +125,17 @@ export async function activate(context: vscode.ExtensionContext): Promise<Extens
   if (context.extensionMode !== vscode.ExtensionMode.Test) void updates.checkOnStartup();
 
   void indexService.start();
-  return { index, indexService, editService, queries, savedQueries, settings, archive, preview, extendMarkdownIt: (md) => preview.extendMarkdownIt(md), webviews };
+  const internal: ExtensionApi = { index, indexService, editService, queries, savedQueries, settings, archive, preview, extendMarkdownIt: (md) => preview.extendMarkdownIt(md), webviews };
+  const apiDeps = { index, indexService, editService, queries, savedQueries, settings, getStatusRegistry, log, ui: { openEdit: webviews.openEdit, openKanban: webviews.openKanban, openCalendar: webviews.openCalendar, openQueryResults: webviews.openQueryResults } };
+  registerApiCommands(context, createTasksApi(apiDeps, { extensionId: 'command' }));
+  return {
+    getAPI: (version, caller) => {
+      if (version !== 1) throw new TasksApiError('INVALID_ARGUMENT', `Unsupported Tasks API version ${String(version)}; this build provides 1`);
+      return createTasksApi(apiDeps, caller);
+    },
+    extendMarkdownIt: (md) => preview.extendMarkdownIt(md),
+    __internal: internal,
+  };
 }
 
 export function deactivate(): void {

@@ -48,6 +48,9 @@ export interface SettingsSchema {
   'calendar.fontSize': number;
   'rendered.fieldStyle': 'plain' | 'badges';
   'rendered.fontSize': number;
+  'api.writePolicy': 'confirm' | 'allow' | 'deny';
+  'api.allowedWriters': string[];
+  'api.batchLimit': number;
   'rendered.lineHeight': number;
   updateCheckUrl: string;
   language: 'auto' | 'en' | 'ko';
@@ -98,6 +101,9 @@ export const SETTINGS_DEFAULTS: Readonly<SettingsSchema> = {
   'calendar.fontSize': 13,
   'rendered.fieldStyle': 'plain',
   'rendered.fontSize': 14.5,
+  'api.writePolicy': 'confirm',
+  'api.allowedWriters': [],
+  'api.batchLimit': 200,
   'rendered.lineHeight': 1.6,
   updateCheckUrl: '',
   language: 'auto',

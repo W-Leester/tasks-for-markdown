@@ -10,6 +10,7 @@ import type { QueryService } from '../services/QueryService';
 import type { SavedQueryStore } from '../services/SavedQueryStore';
 import { StaleLineError, type TaskEditService } from '../services/TaskEditService';
 import { toGroupDto, toTaskDto } from '../services/dto';
+import { applyFieldValues } from '../services/taskFields';
 import type { Settings } from '../settings/Settings';
 import type { FromWebview, InitState, TaskFieldName, ToWebview } from '../webviews/shared/protocol';
 import { currentBundle, currentLanguage, t } from '../l10n';
@@ -135,7 +136,7 @@ export class WebviewHost implements vscode.Disposable {
           const registry = this.deps.getStatusRegistry();
           let task = Task.blank('', registry.firstOfType(StatusType.TODO) ?? registry.bySymbol(' '));
           if (Array.isArray(msg.fields.dependsOn)) msg.fields.dependsOn = await this.resolveDependencyRefs(msg.fields.dependsOn);
-          task = this.withFields(task, msg.fields);
+          task = applyFieldValues(task, msg.fields);
           if (typeof msg.fields.status === 'string') task = task.with({ status: registry.bySymbol(msg.fields.status) });
           if (this.deps.settings.get('setCreatedDate')) task = task.with({ created: DateField.fromDate(this.today()) });
           let target = msg.key ? vscode.Uri.parse(msg.key) : undefined;
@@ -270,27 +271,6 @@ export class WebviewHost implements vscode.Disposable {
   /** Set by panel openers: maximize/restore the panel's layout (see PanelFullscreen). */
   onFullscreen?: (on: boolean) => Promise<void>;
 
-  private withFields(task: Task, fields: Partial<Record<TaskFieldName, string | string[] | null>>): Task {
-    const registry = this.deps.getStatusRegistry();
-    const date = (v: string | string[] | null | undefined) => (typeof v === 'string' && v ? DateField.parse(v) : null);
-    let t = task;
-    for (const [field, value] of Object.entries(fields) as [TaskFieldName, string | string[] | null][]) {
-      switch (field) {
-        case 'description': t = t.with({ description: typeof value === 'string' ? value : '' }); break;
-        case 'priority': t = t.with({ priority: (typeof value === 'string' && /^[0-5]$/.test(value) ? value : '3') as Task['priority'] }); break;
-        case 'due': case 'scheduled': case 'start': case 'created': case 'done': case 'cancelled': t = t.with({ [field]: date(value) }); break;
-        case 'recurrence': t = t.with({ recurrenceText: typeof value === 'string' && value ? value : null }); break;
-        case 'onCompletion': t = t.with({ onCompletion: typeof value === 'string' && value ? value : null }); break;
-        case 'id': t = t.with({ id: typeof value === 'string' && value ? value : null }); break;
-        case 'dependsOn': t = t.with({ dependsOn: Array.isArray(value) ? value : typeof value === 'string' && value ? value.split(',').map((s) => s.trim()).filter(Boolean) : [] }); break;
-        case 'status': break; // handled separately (needs date side effects)
-      }
-    }
-    void registry;
-    return t;
-  }
-
-  /** `@<key>#<line>` entries in dependsOn refer to tasks without an id: mint one and rewrite. */
   private async resolveDependencyRefs(list: string[]): Promise<string[]> {
     const out: string[] = [];
     for (const entry of list) {
@@ -306,12 +286,11 @@ export class WebviewHost implements vscode.Disposable {
     }
     return out;
   }
-
   private async applyFields(task: Task, fields: Partial<Record<TaskFieldName, string | string[] | null>>): Promise<void> {
     const { status, ...rest } = fields;
     if (Array.isArray(rest.dependsOn)) rest.dependsOn = await this.resolveDependencyRefs(rest.dependsOn);
     let current = this.deps.index.taskAt(task.location.key, task.location.line) ?? task;
-    if (Object.keys(rest).length) current = await this.deps.editService.update(current, this.withFields(current, rest).toFields());
+    if (Object.keys(rest).length) current = await this.deps.editService.update(current, applyFieldValues(current, rest).toFields());
     if (typeof status === 'string') {
       const target = this.deps.getStatusRegistry().bySymbol(status);
       const fresh = this.deps.index.taskAt(current.location.key, current.location.line) ?? current;

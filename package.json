@@ -2,7 +2,7 @@
   "name": "tasks-for-markdown",
   "displayName": "Tasks for Markdown",
   "description": "VS Code와 Cursor에서 쓰는 Obsidian Tasks 호환 마크다운 할 일 관리. Obsidian Tasks-compatible task management for Markdown files.",
-  "version": "1.0.13",
+  "version": "1.1.0",
   "publisher": "HMCVECDT",
   "license": "MIT",
   "repository": {
@@ -290,6 +290,108 @@
         "command": "tasksmd.convertFormat",
         "title": "%tasksmd.convertFormat.title%",
         "category": "Tasks"
+      },
+      {
+        "command": "tasksmd.api.query.run",
+        "title": "Tasks API: query.run",
+        "category": "Tasks",
+        "enablement": "false"
+      },
+      {
+        "command": "tasksmd.api.query.explain",
+        "title": "Tasks API: query.explain",
+        "category": "Tasks",
+        "enablement": "false"
+      },
+      {
+        "command": "tasksmd.api.query.get",
+        "title": "Tasks API: query.get",
+        "category": "Tasks",
+        "enablement": "false"
+      },
+      {
+        "command": "tasksmd.api.query.list",
+        "title": "Tasks API: query.list",
+        "category": "Tasks",
+        "enablement": "false"
+      },
+      {
+        "command": "tasksmd.api.query.saved",
+        "title": "Tasks API: query.saved",
+        "category": "Tasks",
+        "enablement": "false"
+      },
+      {
+        "command": "tasksmd.api.edit.create",
+        "title": "Tasks API: edit.create",
+        "category": "Tasks",
+        "enablement": "false"
+      },
+      {
+        "command": "tasksmd.api.edit.update",
+        "title": "Tasks API: edit.update",
+        "category": "Tasks",
+        "enablement": "false"
+      },
+      {
+        "command": "tasksmd.api.edit.setStatus",
+        "title": "Tasks API: edit.setStatus",
+        "category": "Tasks",
+        "enablement": "false"
+      },
+      {
+        "command": "tasksmd.api.edit.toggle",
+        "title": "Tasks API: edit.toggle",
+        "category": "Tasks",
+        "enablement": "false"
+      },
+      {
+        "command": "tasksmd.api.edit.postpone",
+        "title": "Tasks API: edit.postpone",
+        "category": "Tasks",
+        "enablement": "false"
+      },
+      {
+        "command": "tasksmd.api.edit.remove",
+        "title": "Tasks API: edit.remove",
+        "category": "Tasks",
+        "enablement": "false"
+      },
+      {
+        "command": "tasksmd.api.edit.batch",
+        "title": "Tasks API: edit.batch",
+        "category": "Tasks",
+        "enablement": "false"
+      },
+      {
+        "command": "tasksmd.api.ui.openEdit",
+        "title": "Tasks API: ui.openEdit",
+        "category": "Tasks",
+        "enablement": "false"
+      },
+      {
+        "command": "tasksmd.api.ui.openKanban",
+        "title": "Tasks API: ui.openKanban",
+        "category": "Tasks",
+        "enablement": "false"
+      },
+      {
+        "command": "tasksmd.api.ui.openCalendar",
+        "title": "Tasks API: ui.openCalendar",
+        "category": "Tasks",
+        "enablement": "false"
+      },
+      {
+        "command": "tasksmd.api.ui.openQueryResults",
+        "title": "Tasks API: ui.openQueryResults",
+        "category": "Tasks",
+        "enablement": "false"
+      },
+      {
+        "command": "tasksmd.api.ui.reveal",
+        "title": "Tasks API: ui.reveal",
+        "category": "Tasks",
+        "enablement": "false"
       }
     ],
     "configuration": {
@@ -703,6 +805,36 @@
             "한국어"
           ],
           "description": "%tasksmd.config.language%"
+        },
+        "tasksmd.api.writePolicy": {
+          "type": "string",
+          "enum": [
+            "confirm",
+            "allow",
+            "deny"
+          ],
+          "enumDescriptions": [
+            "%tasksmd.config.api.writePolicy.confirm%",
+            "%tasksmd.config.api.writePolicy.allow%",
+            "%tasksmd.config.api.writePolicy.deny%"
+          ],
+          "default": "confirm",
+          "description": "%tasksmd.config.api.writePolicy%"
+        },
+        "tasksmd.api.allowedWriters": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "%tasksmd.config.api.allowedWriters%"
+        },
+        "tasksmd.api.batchLimit": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 5000,
+          "default": 200,
+          "description": "%tasksmd.config.api.batchLimit%"
         }
       }
     },
@@ -768,6 +900,74 @@
         {
           "command": "tasksmd.openSource",
           "when": "activeCustomEditorId == tasksmd.rendered"
+        },
+        {
+          "command": "tasksmd.api.query.run",
+          "when": "false"
+        },
+        {
+          "command": "tasksmd.api.query.explain",
+          "when": "false"
+        },
+        {
+          "command": "tasksmd.api.query.get",
+          "when": "false"
+        },
+        {
+          "command": "tasksmd.api.query.list",
+          "when": "false"
+        },
+        {
+          "command": "tasksmd.api.query.saved",
+          "when": "false"
+        },
+        {
+          "command": "tasksmd.api.edit.create",
+          "when": "false"
+        },
+        {
+          "command": "tasksmd.api.edit.update",
+          "when": "false"
+        },
+        {
+          "command": "tasksmd.api.edit.setStatus",
+          "when": "false"
+        },
+        {
+          "command": "tasksmd.api.edit.toggle",
+          "when": "false"
+        },
+        {
+          "command": "tasksmd.api.edit.postpone",
+          "when": "false"
+        },
+        {
+          "command": "tasksmd.api.edit.remove",
+          "when": "false"
+        },
+        {
+          "command": "tasksmd.api.edit.batch",
+          "when": "false"
+        },
+        {
+          "command": "tasksmd.api.ui.openEdit",
+          "when": "false"
+        },
+        {
+          "command": "tasksmd.api.ui.openKanban",
+          "when": "false"
+        },
+        {
+          "command": "tasksmd.api.ui.openCalendar",
+          "when": "false"
+        },
+        {
+          "command": "tasksmd.api.ui.openQueryResults",
+          "when": "false"
+        },
+        {
+          "command": "tasksmd.api.ui.reveal",
+          "when": "false"
         }
       ],
       "editor/context": [
@@ -1104,19 +1304,20 @@
   "scripts": {
     "build": "node esbuild.config.mjs",
     "watch": "node esbuild.config.mjs --watch",
-    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.browser.json",
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.browser.json && tsc --noEmit -p tsconfig.api.json",
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint src tests",
     "format": "prettier --write .",
-    "package": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\" && pnpm build:prod && vsce package --no-dependencies && node scripts/make-latest.mjs",
+    "package": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\" && pnpm build:prod && pnpm build:api-types && vsce package --no-dependencies && node scripts/make-latest.mjs",
     "publish:vsce": "vsce publish --no-dependencies",
     "publish:ovsx": "ovsx publish --no-dependencies",
     "vscode:prepublish": "pnpm build",
     "test:integration": "pnpm build && node -e \"require('fs').rmSync('dist/tests',{recursive:true,force:true})\" && tsc -p tsconfig.integration.json && vscode-test",
     "test:all": "pnpm test && pnpm test:integration",
     "build:prod": "node esbuild.config.mjs --production",
-    "test:webviews": "vitest run --config vitest.webviews.config.mts"
+    "test:webviews": "vitest run --config vitest.webviews.config.mts",
+    "build:api-types": "tsc -p tsconfig.api.json"
   },
   "dependencies": {
     "dayjs": "^1.11.13",
@@ -1161,5 +1362,6 @@
       "supported": "limited",
       "description": "%tasksmd.capabilities.virtual%"
     }
-  }
+  },
+  "types": "./dist/api-types/api/types.d.ts"
 }

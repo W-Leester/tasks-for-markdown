@@ -15,6 +15,7 @@ window.addEventListener('message', (e: MessageEvent<ToWebview>) => {
   if (m.type !== 'doc/html') return;
   document.documentElement.style.setProperty('--rv-font-size', `${m.fontSize}px`);
   document.documentElement.style.setProperty('--rv-line-height', String(m.lineHeight));
+  document.body.classList.toggle('fields-right', m.fieldsAlign === 'right');
   const y = window.scrollY;
   content.innerHTML = m.html;
   addRowActions();

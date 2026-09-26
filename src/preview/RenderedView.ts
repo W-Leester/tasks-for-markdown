@@ -61,7 +61,7 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
     let indexTimer: ReturnType<typeof setTimeout> | undefined;
     const render = () => {
       try {
-        void webview.postMessage({ type: 'doc/html', html: this.renderHtml(document, webview), fontSize: this.deps.settings.get('rendered.fontSize'), lineHeight: this.deps.settings.get('rendered.lineHeight') });
+        void webview.postMessage({ type: 'doc/html', html: this.renderHtml(document, webview), fontSize: this.deps.settings.get('rendered.fontSize'), lineHeight: this.deps.settings.get('rendered.lineHeight'), fieldsAlign: this.deps.settings.get('rendered.fieldsAlign') });
       } catch (err) {
         this.deps.log(`rendered view: ${err instanceof Error ? err.stack ?? err.message : String(err)}`);
       }
@@ -230,7 +230,16 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
   .tfm-query .tfm-list > li { content-visibility: auto; contain-intrinsic-size: auto 28px; }
   .rv-actions button { border: none; background: var(--rv-bg-2); color: var(--rv-muted); border-radius: 4px; padding: 0 5px; line-height: 18px; font-size: 12px; cursor: pointer; font-family: inherit; }
   .rv-actions button:hover { background: var(--rv-bg-3); color: var(--rv-fg); }
-  .tfm-fields { margin-left: .2em; } .tfm-field { white-space: nowrap; } .tfm-field.tfm-overdue { color: var(--vscode-errorForeground, #f14c4c); }
+  .tfm-fields { margin-left: .2em; } .tfm-field { white-space: nowrap; }
+  /* fieldsAlign = right: description on the left, metadata pushed to the right edge of the column. */
+  body.fields-right li.tfm-task, body.fields-right li.tfm-task > p { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: .6em; }
+  body.fields-right li.tfm-task > p { margin: 0; width: 100%; }
+  body.fields-right li.tfm-task > .tfm-check, body.fields-right li.tfm-task > p > .tfm-check { flex: 0 0 auto; margin-right: 0; }
+  body.fields-right .tfm-desc { flex: 1 1 auto; min-width: 12em; }
+  body.fields-right .tfm-fields, body.fields-right .tfm-badges { flex: 0 0 auto; margin-left: auto; text-align: right; }
+  body.fields-right .tfm-backlink { flex: 0 0 auto; }
+  body.fields-right .rv-actions { flex: 0 0 auto; margin-left: .2em; }
+  body.fields-right li.tfm-task > ul, body.fields-right li.tfm-task > ol { flex-basis: 100%; } .tfm-field.tfm-overdue { color: var(--vscode-errorForeground, #f14c4c); }
   .tfm-field.tfm-invalid { color: var(--vscode-editorWarning-foreground, #cca700); }
   .rv-frontmatter { color: var(--rv-muted); font-size: 1em; margin: 0 0 1.25em; padding: 0 0 .75em; border-bottom: 1px solid var(--rv-stroke); }
   .rv-frontmatter .k { color: var(--rv-fg); font-weight: 600; }

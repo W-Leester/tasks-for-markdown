@@ -71,6 +71,7 @@ group by filename
 | `archive.file` / `afterDays` / `linkStyle` | `Archive.md` / 30 / `wiki` | 아카이브 명령 |
 | `calendar.newTaskFile` | `""` | 캘린더에서 만든 태스크를 넣을 파일 |
 | `api.writePolicy` | `confirm` | 다른 확장이 API로 쓸 때: 확인(`confirm`) / 허용 / 거부 |
+| `rendered.fieldsAlign` | `right` | 렌더 보기 태스크 줄의 필드 위치: 오른쪽 끝(`right`) / 설명 뒤(`inline`) |
 | `rendered.fontSize` / `rendered.lineHeight` | `14.5` / `1.6` | 렌더 보기 본문 글자 크기(px)와 줄 간격 |
 | `rendered.fieldStyle` | `plain` | 렌더 보기 태스크 줄의 필드 표시: 원문처럼(`plain`) / 배지(`badges`) |
 | `calendar.fontSize` | `13` | 캘린더 칸의 태스크 글자 크기(px) |

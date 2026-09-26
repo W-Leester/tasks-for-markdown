@@ -96,7 +96,7 @@ function decorateTaskLines(state: StateCore, deps: PluginDeps): void {
       if (first?.type === 'text' && TASK_START.test(first.content)) first.content = first.content.replace(TASK_START, '');
       if (!inline.children.length) inline.children.push(Object.assign(new state.Token('text', '', 0), { content: '' }));
       const box = new state.Token('html_inline', '', 0);
-      box.content = renderCheckbox(task);
+      box.content = renderCheckbox(task) + '<span class="tfm-desc">';
       inline.children.unshift(box);
 
       // 2. Trim the metadata suffix from trailing text children and append badges.
@@ -117,11 +117,9 @@ function decorateTaskLines(state: StateCore, deps: PluginDeps): void {
         if (last?.type === 'text') last.content = last.content.replace(/\s+$/, '');
       }
       const badges = renderBadges(task, null, o);
-      if (badges) {
-        const tok = new state.Token('html_inline', '', 0);
-        tok.content = ' ' + badges;
-        inline.children.push(tok);
-      }
+      const tok = new state.Token('html_inline', '', 0);
+      tok.content = '</span>' + (badges ? ' ' + badges : '');
+      inline.children.push(tok);
     }
   }
 }

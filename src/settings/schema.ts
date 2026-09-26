@@ -52,6 +52,7 @@ export interface SettingsSchema {
   'api.allowedWriters': string[];
   'api.batchLimit': number;
   'rendered.lineHeight': number;
+  'rendered.fieldsAlign': 'right' | 'inline';
   updateCheckUrl: string;
   language: 'auto' | 'en' | 'ko';
 }
@@ -105,6 +106,7 @@ export const SETTINGS_DEFAULTS: Readonly<SettingsSchema> = {
   'api.allowedWriters': [],
   'api.batchLimit': 200,
   'rendered.lineHeight': 1.6,
+  'rendered.fieldsAlign': 'right',
   updateCheckUrl: '',
   language: 'auto',
 };

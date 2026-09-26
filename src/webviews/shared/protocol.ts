@@ -54,7 +54,7 @@ export type ToWebview =
   | { type: 'query/target'; id: string | null }
   | { type: 'results/query'; target: QueryTargetDto }
   /** Rendered view: the whole note as HTML. */
-  | { type: 'doc/html'; html: string; fontSize: number; lineHeight: number }
+  | { type: 'doc/html'; html: string; fontSize: number; lineHeight: number; fieldsAlign: 'right' | 'inline' }
   | { type: 'stats/result'; requestId: number; stats: StatsDto }
   /** Host-confirmed full-screen state of the panel (also sent after a command toggled it). */
   | { type: 'ui/fullscreen'; on: boolean }

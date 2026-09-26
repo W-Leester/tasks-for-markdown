@@ -70,6 +70,7 @@ group by filename
 | `archive.file` / `afterDays` / `linkStyle` | `Archive.md` / 30 / `wiki` | Archive command |
 | `calendar.newTaskFile` | `""` | File that receives tasks created from the calendar |
 | `api.writePolicy` | `confirm` | Writes through the public API: confirm once per caller / allow / deny |
+| `rendered.fieldsAlign` | `right` | Rendered view: task fields at the right edge (`right`) or after the description (`inline`) |
 | `rendered.fontSize` / `rendered.lineHeight` | `14.5` / `1.6` | Rendered view body font size (px) and line height |
 | `rendered.fieldStyle` | `plain` | Task-line fields in the rendered view: as in the source (`plain`) or pill badges (`badges`) |
 | `calendar.fontSize` | `13` | Font size (px) of tasks in calendar cells |

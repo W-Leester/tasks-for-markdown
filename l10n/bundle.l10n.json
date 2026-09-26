@@ -27,5 +27,8 @@
   "Deny": "Deny",
   "an unknown caller": "an unknown caller",
   "\"{0}\" wants to modify tasks in this workspace through the Tasks API ({1}).": "\"{0}\" wants to modify tasks in this workspace through the Tasks API ({1}).",
-  "API query": "API query"
+  "API query": "API query",
+  "A due date is required (tasksmd.requireDueDate).": "A due date is required (tasksmd.requireDueDate).",
+  "Open task without a due date (tasksmd.requireDueDate).": "Open task without a due date (tasksmd.requireDueDate).",
+  "Set due date…": "Set due date…"
 }

@@ -84,6 +84,7 @@ export function createMcpServer(opts: McpOptions): McpServer {
     inputSchema: { ...fields, description: z.string().describe('Task text, may contain #tags'), file: z.string().describe('Workspace-relative Markdown file'), afterLine: z.number().int().min(0).optional() },
   }, async ({ file, afterLine, description, priority, due, scheduled, start, recurrence, onCompletion, id, dependsOn, status }) => guard(() => {
     const w = ws();
+    if (w.cfg.requireDueDate && !due) throw new CliError('INVALID_ARGUMENT', 'A due date is required (tasksmd.requireDueDate): pass "due"');
     const created = addTask(w, description, file, afterLine);
     const values: Record<string, string | string[] | null> = {};
     for (const [k, v] of Object.entries({ priority, due, scheduled, start, recurrence, onCompletion, id, dependsOn })) if (v !== undefined) values[k] = v as string | string[] | null;

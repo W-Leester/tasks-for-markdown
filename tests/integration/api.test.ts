@@ -101,6 +101,17 @@ suite('public API (getAPI(1))', () => {
     }
   });
 
+  test('requireDueDate blocks create without a due date', async () => {
+    await internal.settings.update('requireDueDate', true, vscode.ConfigurationTarget.Workspace);
+    try {
+      await assert.rejects(api.edit.create({ description: 'no due' }, { path: FILE }), (e: { code: string }) => e.code === 'INVALID_ARGUMENT');
+      const ok = await api.edit.create({ description: 'has due', due: '2026-12-01' }, { path: FILE });
+      assert.strictEqual(ok.due, '2026-12-01');
+    } finally {
+      await internal.settings.update('requireDueDate', undefined, vscode.ConfigurationTarget.Workspace);
+    }
+  });
+
   test('write policy deny and the command surface', async () => {
     await internal.settings.update('api.writePolicy', 'deny', vscode.ConfigurationTarget.Workspace);
     try {

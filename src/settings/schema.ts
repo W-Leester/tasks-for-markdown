@@ -15,6 +15,8 @@ export interface SettingsSchema {
   maxFileSizeKB: number;
   setCreatedDate: boolean;
   setDoneDate: boolean;
+  /** Refuse to create a task without a due date (dialog, API, CLI, MCP) and warn in the editor. */
+  requireDueDate: boolean;
   setCancelledDate: boolean;
   'decorations.relativeDates': boolean;
   'decorations.overdueHighlight': boolean;
@@ -69,6 +71,7 @@ export const SETTINGS_DEFAULTS: Readonly<SettingsSchema> = {
   maxFileSizeKB: 1024,
   setCreatedDate: false,
   setDoneDate: true,
+  requireDueDate: false,
   setCancelledDate: true,
   'decorations.relativeDates': true,
   'decorations.overdueHighlight': true,

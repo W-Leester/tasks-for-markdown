@@ -6,7 +6,7 @@ import { posted, receive } from './setup';
 
 const init: InitState = {
   locale: 'en', l10n: {}, today: '2026-09-22', statuses: [], taskFormat: 'emoji', savedQueries: [],
-  uiState: {}, editModal: { accessKeys: false, hiddenFields: [] }, globalFilter: '', calendarFontSize: 13,
+  uiState: {}, editModal: { accessKeys: false, hiddenFields: [] }, globalFilter: '', calendarFontSize: 13, requireDueDate: false,
 };
 const task = (description: string, line: number): TaskDto => ({
   key: 'file:///n.md', path: 'n.md', line, heading: null, description, status: { symbol: ' ', name: 'Todo', type: 'TODO' },

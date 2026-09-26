@@ -5,7 +5,7 @@ import type { FromWebview, InitState, TaskDto } from '../../src/webviews/shared/
 import { posted, receive } from './setup';
 
 const init: InitState = {
-  locale: 'en', l10n: {}, today: '2026-09-22', taskFormat: 'emoji', savedQueries: [], uiState: {}, editModal: { accessKeys: false, hiddenFields: [] }, globalFilter: '', calendarFontSize: 13,
+  locale: 'en', l10n: {}, today: '2026-09-22', taskFormat: 'emoji', savedQueries: [], uiState: {}, editModal: { accessKeys: false, hiddenFields: [] }, globalFilter: '', calendarFontSize: 13, requireDueDate: false,
   statuses: [
     { symbol: ' ', name: 'Todo', type: 'TODO', nextSymbol: 'x' },
     { symbol: '/', name: 'In Progress', type: 'IN_PROGRESS', nextSymbol: 'x' },

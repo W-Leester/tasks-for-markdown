@@ -309,5 +309,8 @@
   "Deny": "거부",
   "an unknown caller": "알 수 없는 호출자",
   "\"{0}\" wants to modify tasks in this workspace through the Tasks API ({1}).": "\"{0}\"이(가) Tasks API로 이 워크스페이스의 태스크를 수정하려고 합니다({1}).",
-  "API query": "API 쿼리"
+  "API query": "API 쿼리",
+  "A due date is required (tasksmd.requireDueDate).": "마감일이 필요합니다(tasksmd.requireDueDate).",
+  "Open task without a due date (tasksmd.requireDueDate).": "마감일이 없는 미완료 태스크입니다(tasksmd.requireDueDate).",
+  "Set due date…": "마감일 설정…"
 }

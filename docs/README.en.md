@@ -69,6 +69,7 @@ group by filename
 | `notifications.*` | on, `09:00`, 1 day | Daily summary and due-soon digest, OS notifications |
 | `archive.file` / `afterDays` / `linkStyle` | `Archive.md` / 30 / `wiki` | Archive command |
 | `calendar.newTaskFile` | `""` | File that receives tasks created from the calendar |
+| `requireDueDate` | `false` | Refuse new tasks without a due date (dialog, API, CLI, MCP) and warn in the editor |
 | `api.writePolicy` | `confirm` | Writes through the public API: confirm once per caller / allow / deny |
 | `rendered.fieldsAlign` | `right` | Rendered view: task fields at the right edge (`right`) or after the description (`inline`) |
 | `rendered.fontSize` / `rendered.lineHeight` | `14.5` / `1.6` | Rendered view body font size (px) and line height |

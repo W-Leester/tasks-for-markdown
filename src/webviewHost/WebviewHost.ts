@@ -91,6 +91,7 @@ export class WebviewHost implements vscode.Disposable {
       editModal: { accessKeys: this.deps.settings.get('editModal.accessKeys'), hiddenFields: this.deps.settings.get('editModal.hiddenFields') },
       globalFilter: this.deps.settings.get('globalFilter'),
       calendarFontSize: this.deps.settings.get('calendar.fontSize'),
+      requireDueDate: this.deps.settings.get('requireDueDate'),
     };
   }
 
@@ -139,6 +140,7 @@ export class WebviewHost implements vscode.Disposable {
           task = applyFieldValues(task, msg.fields);
           if (typeof msg.fields.status === 'string') task = task.with({ status: registry.bySymbol(msg.fields.status) });
           if (this.deps.settings.get('setCreatedDate')) task = task.with({ created: DateField.fromDate(this.today()) });
+          if (this.deps.settings.get('requireDueDate') && !task.due) throw new Error(t('A due date is required (tasksmd.requireDueDate).'));
           let target = msg.key ? vscode.Uri.parse(msg.key) : undefined;
           let line = msg.line ?? Number.MAX_SAFE_INTEGER;
           if (!target) {

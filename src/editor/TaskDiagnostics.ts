@@ -13,6 +13,7 @@ export const CODE_UNKNOWN_DEPENDENCY = 'unknown-dependency';
 export const CODE_RECURRING_WITHOUT_DATE = 'recurring-without-date';
 export const CODE_INVALID_RECURRENCE = 'invalid-recurrence';
 export const CODE_DEPENDENCY_CYCLE = 'dependency-cycle';
+export const CODE_MISSING_DUE = 'missing-due-date';
 
 const DATE_FIELDS: DateFieldName[] = ['created', 'start', 'scheduled', 'due', 'done', 'cancelled'];
 const DATE_LABEL: Record<DateFieldName, string> = { created: 'created', start: 'start', scheduled: 'scheduled', due: 'due', done: 'done', cancelled: 'cancelled' };
@@ -41,7 +42,7 @@ export class TaskDiagnostics implements vscode.CodeActionProvider, vscode.Dispos
       vscode.workspace.onDidOpenTextDocument((d) => this.schedule(d)),
       vscode.workspace.onDidChangeTextDocument((e) => this.schedule(e.document)),
       vscode.workspace.onDidCloseTextDocument((d) => this.collection.delete(d.uri)),
-      deps.settings.onDidChange(() => this.refreshAll(), ['globalFilter']),
+      deps.settings.onDidChange(() => this.refreshAll(), ['globalFilter', 'requireDueDate']),
     );
     const sub = deps.index.onDidChange(() => this.refreshAll());
     this.disposables.push({ dispose: () => sub.dispose() });
@@ -85,6 +86,12 @@ export class TaskDiagnostics implements vscode.CodeActionProvider, vscode.Dispos
           d.source = DIAG_SOURCE;
           diags.push(d);
         }
+      }
+      if (this.deps.settings.get('requireDueDate') && !task.isCompleted && !task.due) {
+        const d = new vscode.Diagnostic(rangeOf(doc, line, task.description || text.trim()), t('Open task without a due date (tasksmd.requireDueDate).'), vscode.DiagnosticSeverity.Warning);
+        d.code = CODE_MISSING_DUE;
+        d.source = DIAG_SOURCE;
+        diags.push(d);
       }
       if (task.recurrenceText && !isValidRecurrenceText(task.recurrenceText)) {
         const d = new vscode.Diagnostic(rangeOf(doc, line, task.recurrenceText), t('Unrecognised recurrence rule "{0}". Examples: every day, every week on Monday, every month on the last.', task.recurrenceText), vscode.DiagnosticSeverity.Warning);
@@ -143,6 +150,14 @@ export class TaskDiagnostics implements vscode.CodeActionProvider, vscode.Dispos
         if (task.dependsOn.includes(id)) replaceWith(t('Remove dependency on "{0}"', id), task.with({ dependsOn: task.dependsOn.filter((d) => d !== id) }), true);
       } else if (diag.code === CODE_INVALID_RECURRENCE) {
         replaceWith(t('Remove recurrence'), task.with({ recurrenceText: null }));
+      } else if (diag.code === CODE_MISSING_DUE) {
+        const today = (this.deps.clock ?? systemClock).now();
+        const pick = new vscode.CodeAction(t('Set due date…'), vscode.CodeActionKind.QuickFix);
+        pick.diagnostics = [diag];
+        pick.isPreferred = true;
+        pick.command = { command: 'tasksmd.setDueDate', title: t('Set due date…'), arguments: [{ key: doc.uri.toString(), line }] };
+        actions.push(pick);
+        replaceWith(t('Add due date today ({0})', today.format('YYYY-MM-DD')), task.with({ due: DateField.fromDate(today) }));
       } else if (diag.code === CODE_RECURRING_WITHOUT_DATE) {
         const today = (this.deps.clock ?? systemClock).now();
         replaceWith(t('Add due date today ({0})', today.format('YYYY-MM-DD')), task.with({ due: DateField.fromDate(today) }), true);

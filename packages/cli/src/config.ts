@@ -12,6 +12,7 @@ export interface CliConfig {
   setDoneDate: boolean;
   setCancelledDate: boolean;
   setCreatedDate: boolean;
+  requireDueDate: boolean;
   allowFunctions: boolean;
   recurrence: { insertPosition: 'above' | 'below'; idHandling: 'keep' | 'new' | 'remove'; copyDependsOn: boolean; removeScheduledDate: boolean };
   statuses: StatusConfig[];
@@ -26,6 +27,7 @@ const DEFAULTS: Omit<CliConfig, 'root'> = {
   setDoneDate: true,
   setCancelledDate: true,
   setCreatedDate: false,
+  requireDueDate: false,
   allowFunctions: false,
   recurrence: { insertPosition: 'above', idHandling: 'keep', copyDependsOn: true, removeScheduledDate: false },
   statuses: [...DEFAULT_STATUSES],
@@ -80,6 +82,7 @@ export function loadConfig(root: string): CliConfig {
   cfg.setDoneDate = get('setDoneDate', isBool) ?? cfg.setDoneDate;
   cfg.setCancelledDate = get('setCancelledDate', isBool) ?? cfg.setCancelledDate;
   cfg.setCreatedDate = get('setCreatedDate', isBool) ?? cfg.setCreatedDate;
+  cfg.requireDueDate = get('requireDueDate', isBool) ?? cfg.requireDueDate;
   cfg.allowFunctions = get('query.allowFunctions', isBool) ?? cfg.allowFunctions;
   const pos = get('recurrence.insertPosition', isStr);
   if (pos === 'above' || pos === 'below') cfg.recurrence.insertPosition = pos;

@@ -170,6 +170,7 @@ export function createTasksApi(deps: TasksApiDeps, caller: ApiCaller = {}): Task
     task = applyFieldValues(task, { ...toFieldValues(input), description });
     if (input.status !== undefined) task = task.with({ status: statusFor(input.status) });
     if (deps.settings.get('setCreatedDate') && !task.created) task = task.with({ created: DateField.fromDate(today()) });
+    if (deps.settings.get('requireDueDate') && !task.due) fail('INVALID_ARGUMENT', 'A due date is required (tasksmd.requireDueDate)');
     const path = target?.path ?? deps.settings.get('calendar.newTaskFile');
     if (!path) fail('INVALID_ARGUMENT', 'target.path is required (or set tasksmd.calendar.newTaskFile)');
     const uri = uriForPath(path);

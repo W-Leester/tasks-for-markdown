@@ -1,13 +1,13 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/svelte';
 import { beforeEach, describe, expect, it } from 'vitest';
 import EditApp from '../../src/webviews/edit/EditApp.svelte';
-import type { InitState } from '../../src/webviews/shared/protocol';
+import type { FromWebview, InitState } from '../../src/webviews/shared/protocol';
 import { posted, receive } from './setup';
 
 const init: InitState = {
   locale: 'en', l10n: {}, today: '2026-09-22', taskFormat: 'emoji', savedQueries: [], uiState: { editTarget: { key: 'file:///n.md', line: 36 } },
   statuses: [{ symbol: ' ', name: 'Todo', type: 'TODO', nextSymbol: 'x' }, { symbol: 'x', name: 'Done', type: 'DONE', nextSymbol: ' ' }],
-  editModal: { accessKeys: true, hiddenFields: [] }, globalFilter: '', calendarFontSize: 13,
+  editModal: { accessKeys: true, hiddenFields: [] }, globalFilter: '', calendarFontSize: 13, requireDueDate: false,
 };
 
 async function boot() {
@@ -20,6 +20,22 @@ async function boot() {
   receive({ type: 'task/loaded', requestId: load.requestId, task: null, candidates: [], dependants: [] });
   await screen.findByLabelText(/Description|설명/);
 }
+
+describe('EditApp with tasksmd.requireDueDate', () => {
+  it('blocks Apply for a new task without a due date', async () => {
+    render(EditApp);
+    await Promise.resolve();
+    receive({ type: 'state/init', state: { ...init, requireDueDate: true, uiState: { editTarget: { key: 'file:///n.md', line: 3 } } } });
+    await Promise.resolve();
+    const load = [...posted].reverse().find((m: FromWebview) => m.type === 'task/load') as { requestId: number };
+    receive({ type: 'task/loaded', requestId: load.requestId, task: null, candidates: [], dependants: [] });
+    await Promise.resolve();
+    await fireEvent.input(screen.getByLabelText(/Description|설명/), { target: { value: 'needs a date' } });
+    await fireEvent.click(screen.getByRole('button', { name: /Apply|적용/ }));
+    expect(posted.some((m: FromWebview) => m.type === 'task/create')).toBe(false);
+    expect(document.querySelector('.error')?.textContent).toMatch(/due date is required/);
+  });
+});
 
 describe('EditApp', () => {
   beforeEach(() => { posted.length = 0; });

@@ -95,6 +95,15 @@ describe('tasksmd CLI', () => {
     expect(r.tasks.map((t) => t.description)).toEqual(['#task new one']); // the global filter stays in the description, as in Obsidian
   });
 
+  it('requireDueDate refuses add without 📅', async () => {
+    fs.mkdirSync(path.join(root, '.vscode'));
+    fs.writeFileSync(path.join(root, '.vscode', 'settings.json'), '{ "tasksmd.requireDueDate": true }');
+    expect(await cli('add', 'no date here', '--file', 'notes/todo.md', '--json')).toBe(2);
+    expect(JSON.parse(out.join('\n'))).toMatchObject({ error: { code: 'INVALID_ARGUMENT' } });
+    out = [];
+    expect(await cli('add', 'dated 📅 2026-10-01', '--file', 'notes/todo.md', '--json')).toBe(0);
+  });
+
   it('help and unknown command', async () => {
     expect(await cli('--help')).toBe(2);
     expect(out[0]).toContain('Usage');

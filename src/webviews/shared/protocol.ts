@@ -38,6 +38,8 @@ export interface InitState {
   globalFilter: string;
   /** Pixel font size of calendar items (tasksmd.calendar.fontSize). */
   calendarFontSize: number;
+  /** tasksmd.requireDueDate: the create dialog blocks Apply without a due date. */
+  requireDueDate: boolean;
 }
 
 export type TaskFieldName = 'status' | 'priority' | 'due' | 'scheduled' | 'start' | 'created' | 'done' | 'cancelled' | 'description' | 'recurrence' | 'onCompletion' | 'id' | 'dependsOn';

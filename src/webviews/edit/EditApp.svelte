@@ -118,6 +118,7 @@
     error = '';
     if (recurrence.trim() && recurrenceValid === false) { error = t('The recurrence rule is not valid.'); return; }
     if (recurrence.trim() && !due && !scheduled && !start) { error = t('A recurring task needs a due, scheduled or start date.'); return; }
+    if (!original && init?.requireDueDate && !due) { error = t('A due date is required (tasksmd.requireDueDate).'); return; }
     const fields: Partial<Record<TaskFieldName, string | string[] | null>> = {
       description: description.trim(), priority, recurrence: recurrence.trim() || null, onCompletion: onCompletion || null,
       start, scheduled, due, created, done, cancelled, dependsOn, status: statusSymbol,

@@ -234,6 +234,18 @@
 
 **(4) 가상 스크롤.** 칸반 컬럼 150장 이상은 `windowFor()`로 보이는 범위 ± 6장만 렌더(카드 64px 추정, 위·아래 스페이서로 스크롤 높이 유지, `onscroll`로 시작 인덱스 갱신, `bind:clientHeight`로 뷰포트). 카드 높이가 제각각이라 추정치와 어긋나는 부분은 오버스캔이 흡수합니다. 결과 패널 카드와 렌더 보기 쿼리 목록에는 `content-visibility: auto`. 테스트: jsdom에서 `clientHeight`를 600으로 가장해 1,000장 → 60장 미만 렌더, 3장이면 전부 렌더.
 
+### 2.14 Cursor Preview 토글을 대체하기로 한 결정 (1.4.0)
+
+**요청.** "Preview 버튼을 누르면 Cursor의 Preview가 아니라 `Ctrl+Shift+R` 화면이 뜨게 하자", 그리고 그 화면에 "이번 주 할 일"처럼 정렬·범위를 바꾸는 기능.
+
+**조사와 한계(확정).** Cursor의 "Preview | Markdown" 토글은 Cursor가 `file:/**/*.md`에 priority `default`로 등록한 자체 마크다운 편집기(Tiptap/ProseMirror)가 탭 제목 영역에 직접 그리는 DOM입니다. 확장 기여점이 아니고 끄는 설정도 없으며, 확장 호스트에는 관련 API가 없습니다. 따라서 **버튼의 동작을 바꾸거나 버튼을 없애는 것은 불가능**합니다. `Cmd+Shift+V`는 Cursor 편집기가 활성이면 이 토글(weight 600), 일반 텍스트 편집기가 활성이면 VS Code 클래식 미리보기로 갑니다(같은 키, 다른 화면).
+
+**결정.** Cursor 편집기를 **기본에서 밀어내는 방식**으로 같은 결과를 냅니다. `workbench.editorAssociations["*.md"]`를 `tasksmd.rendered`로 두면 노트가 렌더 보기로 열리고, 소스는 VS Code 기본 텍스트 편집기라 Cursor 토글이 나타나지 않으며, 사용자에게는 우리 `렌더 | 소스` 토글 하나만 보입니다. 사용자 승인 하에 진행(2026-09-26).
+
+**구현.** 명령 `tasksmd.renderedAsDefault`(설정/해제 QuickPick, 사용자 설정에 기록), 첫 렌더 보기에서 한 번 제안(`globalState` `rendered.defaultPrompted`), 태스크 없는 노트는 텍스트 편집기로 넘김(`rendered.sourceWhenNoTasks`, 명시적 열기는 예외: `explicitOpen`). 정렬·보기 툴바는 `webviews/rendered/view.ts`(순수 DOM 함수, jsdom 테스트 4건)와 플러그인의 `data-tfm-*` 속성으로 구현, 파일은 불변, 상태는 파일별 `workspaceState`.
+
+**대가(명시).** 이 방식에서는 Cursor의 WYSIWYG 본문 편집을 쓰지 않게 됩니다. 본문은 소스에서 고치고, 태스크 조작은 렌더 보기에서 합니다. 되돌리려면 같은 명령에서 "텍스트 편집기"를 고르면 됩니다.
+
 ---
 
 ## 3. 삭제되었거나 되돌린 것

@@ -7,8 +7,11 @@ import type { Settings } from '../settings/Settings';
 import type { PreviewIntegration } from './PreviewIntegration';
 import { renderDocumentHtml } from './renderDocument';
 import { t } from '../l10n';
+import { systemClock, type Clock } from '../core/dates';
 
 export const RENDERED_VIEW_TYPE = 'tasksmd.rendered';
+const VIEW_STATE_KEY = 'rendered.viewState';
+const DEFAULT_PROMPT_KEY = 'rendered.defaultPrompted';
 
 export interface RenderedViewDeps {
   context: vscode.ExtensionContext;
@@ -19,6 +22,7 @@ export interface RenderedViewDeps {
   preview: PreviewIntegration;
   getStatusRegistry(): StatusRegistry;
   log(message: string): void;
+  clock?: Clock;
 }
 
 type Incoming =
@@ -27,7 +31,8 @@ type Incoming =
   | { type: 'doc/edit'; path: string | null; line: number }
   | { type: 'doc/postpone'; path: string | null; line: number }
   | { type: 'doc/link'; href: string }
-  | { type: 'doc/openSource' };
+  | { type: 'doc/openSource' }
+  | { type: 'doc/view'; sort: string; scope: string };
 
 const DOC_DEBOUNCE_MS = 250;
 const INDEX_DEBOUNCE_MS = 400;
@@ -41,6 +46,8 @@ const INDEX_DEBOUNCE_MS = 400;
 export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vscode.Disposable {
   private readonly panels = new Map<string, vscode.WebviewPanel>();
   private activeDocument: vscode.Uri | null = null;
+  /** Set by the open commands so an explicit open never bounces to the source editor. */
+  explicitOpen = new Set<string>();
 
   constructor(private readonly deps: RenderedViewDeps) {}
 
@@ -49,7 +56,16 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
     return this.activeDocument;
   }
 
-  resolveCustomTextEditor(document: vscode.TextDocument, panel: vscode.WebviewPanel): void {
+  async resolveCustomTextEditor(document: vscode.TextDocument, panel: vscode.WebviewPanel): Promise<void> {
+    const key = document.uri.toString();
+    const explicit = this.explicitOpen.delete(key);
+    // Opened through the default-editor association on a note without tasks (README, docs…): the
+    // text editor is what the user wants. Explicit opens (command, Open With…) always render.
+    if (!explicit && this.deps.settings.get('rendered.sourceWhenNoTasks') && !/^\s*[-*+]\s+\[.\]|^\s*```tasks\b/m.test(document.getText())) {
+      await vscode.commands.executeCommand('vscode.openWith', document.uri, 'default', panel.viewColumn);
+      panel.dispose();
+      return;
+    }
     const { webview } = panel;
     const roots = [this.deps.context.extensionUri, vscode.Uri.joinPath(document.uri, '..'), ...(vscode.workspace.workspaceFolders ?? []).map((f) => f.uri)];
     webview.options = { enableScripts: true, localResourceRoots: roots };
@@ -61,7 +77,7 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
     let indexTimer: ReturnType<typeof setTimeout> | undefined;
     const render = () => {
       try {
-        void webview.postMessage({ type: 'doc/html', html: this.renderHtml(document, webview), fontSize: this.deps.settings.get('rendered.fontSize'), lineHeight: this.deps.settings.get('rendered.lineHeight'), fieldsAlign: this.deps.settings.get('rendered.fieldsAlign') });
+        void webview.postMessage({ type: 'doc/html', html: this.renderHtml(document, webview), fontSize: this.deps.settings.get('rendered.fontSize'), lineHeight: this.deps.settings.get('rendered.lineHeight'), fieldsAlign: this.deps.settings.get('rendered.fieldsAlign'), today: (this.deps.clock ?? systemClock).now().startOf('day').format('YYYY-MM-DD'), view: this.viewState(document.uri) });
       } catch (err) {
         this.deps.log(`rendered view: ${err instanceof Error ? err.stack ?? err.message : String(err)}`);
       }
@@ -121,6 +137,11 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
         case 'doc/openSource':
           await vscode.commands.executeCommand('vscode.openWith', document.uri, 'default', panel.viewColumn);
           break;
+        case 'doc/view': {
+          const all = this.deps.context.workspaceState.get<Record<string, { sort: string; scope: string }>>(VIEW_STATE_KEY, {});
+          await this.deps.context.workspaceState.update(VIEW_STATE_KEY, { ...all, [document.uri.toString()]: { sort: msg.sort, scope: msg.scope } });
+          break;
+        }
       }
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
@@ -167,6 +188,19 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
     }
   }
 
+  private viewState(uri: vscode.Uri): { sort: string; scope: string } {
+    return this.deps.context.workspaceState.get<Record<string, { sort: string; scope: string }>>(VIEW_STATE_KEY, {})[uri.toString()] ?? { sort: 'document', scope: 'all' };
+  }
+
+  /** Once: offer to make the rendered view the default editor for Markdown. */
+  async maybeOfferDefault(): Promise<void> {
+    if (this.deps.context.globalState.get<boolean>(DEFAULT_PROMPT_KEY) || isRenderedDefault()) return;
+    await this.deps.context.globalState.update(DEFAULT_PROMPT_KEY, true);
+    const yes = t('Make it the default'), no = t('Not now');
+    const choice = await vscode.window.showInformationMessage(t('Open Markdown notes in the rendered view by default? You can change this later with "Tasks: Rendered view as default editor".'), yes, no);
+    if (choice === yes) await setRenderedDefault(true);
+  }
+
   renderHtml(document: vscode.TextDocument, webview: vscode.Webview): string {
     const base = this.deps.preview.pluginDeps();
     const fieldStyle = this.deps.settings.get('rendered.fieldStyle');
@@ -200,7 +234,8 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
   :root { color-scheme: light dark; --rv-fg: var(--vscode-editor-foreground, var(--vscode-foreground)); --rv-bg: var(--vscode-editor-background); --rv-bg-2: color-mix(in srgb, var(--rv-fg) 6%, transparent); --rv-bg-3: color-mix(in srgb, var(--rv-fg) 12%, transparent); --rv-stroke: color-mix(in srgb, var(--rv-fg) 12%, transparent); --rv-stroke-2: color-mix(in srgb, var(--rv-fg) 20%, transparent); --rv-muted: color-mix(in srgb, var(--rv-fg) 74%, transparent); --rv-accent: var(--vscode-terminal-ansiBlue, #7bafe9); --rv-mono: var(--vscode-editor-font-family, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace); }
   html, body { margin: 0; padding: 0; background: var(--rv-bg); color: var(--rv-fg); }
   body { font-family: var(--vscode-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif); font-size: var(--rv-font-size, 15px); line-height: var(--rv-line-height, 1.6); letter-spacing: -0.08px; -webkit-font-smoothing: subpixel-antialiased; -moz-osx-font-smoothing: auto; }
-  #content { max-width: 800px; margin: 0 auto; padding: 32px 16px 64px; box-sizing: border-box; }
+  #content { max-width: 800px; margin: 0 auto; padding: 8px 16px 64px; box-sizing: border-box; }
+  .rv-tools { max-width: 800px; margin-left: auto; margin-right: auto; padding-left: 16px; padding-right: 16px; box-sizing: border-box; }
   #content > :first-child { margin-top: 0; }
   p { margin: 0 0 .75em; }
   h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.25; margin: 1.5em 0 .5em; }
@@ -250,6 +285,13 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
   .tfm-query h4.tfm-group, .tfm-query h5.tfm-group, .tfm-query h6.tfm-group { margin: .6em 0 .2em; font-size: 1em; font-weight: 600; }
   .tfm-task-count { color: var(--rv-muted); }
 
+  /* Sort / scope tools (view only) — top-left of the column, opposite the mode toggle. */
+  .rv-tools { position: sticky; top: 0; z-index: 2; display: flex; gap: 12px; align-items: center; padding-top: 6px; padding-bottom: 4px; margin-bottom: 8px; background: var(--rv-bg); font-size: 12px; color: var(--rv-muted); }
+  .rv-select { display: inline-flex; gap: 6px; align-items: center; }
+  .rv-select select { font: inherit; color: var(--rv-fg); background: var(--rv-bg-2); border: 1px solid var(--rv-stroke); border-radius: 4px; padding: 2px 6px; }
+  .rv-hint { margin-left: auto; padding-right: 130px; }
+  li.tfm-task.rv-hidden { display: none !important; }
+  li.tfm-task.rv-dim > .tfm-desc, li.tfm-task.rv-dim > p > .tfm-desc, li.tfm-task.rv-dim > .tfm-fields, li.tfm-task.rv-dim > p > .tfm-fields { opacity: .45; }
   /* Mode toggle in the top-right corner, like Cursor's "Preview | Markdown". */
   .rv-toggle { position: fixed; top: 6px; right: 14px; z-index: 2; display: inline-flex; gap: 2px; padding: 2px; border-radius: 6px; background: var(--rv-bg); font-size: 12px; line-height: 1; }
   .rv-toggle button { border: none; background: transparent; color: var(--rv-muted); padding: 4px 8px; border-radius: 4px; cursor: pointer; font: inherit; }
@@ -258,7 +300,16 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
 </style>
 <title>${t('Tasks: Rendered view')}</title>
 </head>
-<body data-l-edit="${t('Edit')}" data-l-postpone="${t('Postpone')}">
+<body data-l-edit="${t('Edit')}" data-l-postpone="${t('Postpone')}" data-l-hidden="${t('{0} hidden')}">
+<div class="rv-tools">
+  <label class="rv-select"><span>${t('Sort')}</span><select id="view-sort">
+    <option value="document">${t('Document order')}</option><option value="due">${t('Due date')}</option><option value="created">${t('Created date')}</option><option value="priority">${t('Priority')}</option><option value="urgency">${t('Urgency')}</option>
+  </select></label>
+  <label class="rv-select"><span>${t('Show')}</span><select id="view-scope">
+    <option value="all">${t('Everything')}</option><option value="open">${t('Open only')}</option><option value="today">${t('Today (incl. overdue)')}</option><option value="week">${t('This week')}</option><option value="nextWeek">${t('Through next week')}</option><option value="overdue">${t('Overdue')}</option>
+  </select></label>
+  <span id="view-hidden" class="rv-hint"></span>
+</div>
 <div class="rv-toggle" role="group" aria-label="${t('Editor mode')}">
   <button id="mode-rendered" aria-pressed="true">${t('Rendered')}</button>
   <button id="mode-source" title="${t('Open the Markdown source in the text editor')} (Ctrl+Shift+R)">${t('Source')}</button>
@@ -273,6 +324,22 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
     for (const p of this.panels.values()) p.dispose();
     this.panels.clear();
   }
+}
+
+/** Is `*.md` associated with the rendered view (user or workspace settings)? */
+export function isRenderedDefault(): boolean {
+  const assoc = vscode.workspace.getConfiguration('workbench').get<Record<string, string>>('editorAssociations', {});
+  return assoc['*.md'] === RENDERED_VIEW_TYPE;
+}
+
+/** Point `workbench.editorAssociations["*.md"]` at the rendered view (user settings), or remove that entry. */
+export async function setRenderedDefault(on: boolean): Promise<void> {
+  const config = vscode.workspace.getConfiguration('workbench');
+  const current = { ...config.get<Record<string, string>>('editorAssociations', {}) };
+  if (on) current['*.md'] = RENDERED_VIEW_TYPE;
+  else if (current['*.md'] === RENDERED_VIEW_TYPE) delete current['*.md'];
+  await config.update('editorAssociations', current, vscode.ConfigurationTarget.Global);
+  void vscode.window.showInformationMessage(on ? t('Markdown notes now open in the rendered view. Source: the Source button or Ctrl+Shift+R.') : t('Markdown notes open in the text editor again.'));
 }
 
 /** Registers the custom editor and the commands that open it. */
@@ -306,7 +373,9 @@ export function registerRenderedView(context: vscode.ExtensionContext, deps: Ren
       return;
     }
     if (toggle && provider.active?.toString() === uri.toString() && !vscode.window.activeTextEditor) return openSource(uri);
+    provider.explicitOpen.add(uri.toString());
     await vscode.commands.executeCommand('vscode.openWith', uri, RENDERED_VIEW_TYPE, column);
+    void provider.maybeOfferDefault();
     if (column === vscode.ViewColumn.Active) await closeCounterpart(uri, 'rendered');
   };
   const openSource = async (arg: unknown) => {
@@ -319,6 +388,11 @@ export function registerRenderedView(context: vscode.ExtensionContext, deps: Ren
     provider,
     vscode.window.registerCustomEditorProvider(RENDERED_VIEW_TYPE, provider, { webviewOptions: { retainContextWhenHidden: true }, supportsMultipleEditorsPerDocument: true }),
     vscode.commands.registerCommand('tasksmd.openRendered', (arg?: unknown) => openRendered(arg, vscode.ViewColumn.Active, true)),
+    vscode.commands.registerCommand('tasksmd.renderedAsDefault', async () => {
+      const on = t('Rendered view (tasks rendered, click to complete)'), off = t('Text editor');
+      const pick = await vscode.window.showQuickPick([{ label: on, picked: isRenderedDefault(), value: true }, { label: off, picked: !isRenderedDefault(), value: false }], { placeHolder: t('Which editor should open Markdown notes?') });
+      if (pick) await setRenderedDefault(pick.value);
+    }),
     vscode.commands.registerCommand('tasksmd.openRenderedToSide', (arg?: unknown) => openRendered(arg, vscode.ViewColumn.Beside, false)),
     vscode.commands.registerCommand('tasksmd.openSource', (arg?: unknown) => openSource(arg)),
   );

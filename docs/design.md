@@ -752,7 +752,9 @@ flowchart LR
 
 - 본문 800px 중앙 열, 14px/1.42, 제목 1.75·1.5·1.25em, 코드 0.9em, 배경·테두리는 글자색을 6%·12%·20% 섞은 값 — Cursor 편집기의 디자인 토큰을 VS Code 테마 변수로 옮긴 것(7.7).
 - 체크박스 = 완료 전환, 더블클릭 또는 `✎` = 편집 대화상자, `⏩` = 연기(마감·예정일 있는 태스크만), 링크·백링크 = 대상 줄로 이동. 줄에 포커스가 있어도(`focus-within`) 버튼이 보인다.
-- 오른쪽 위 `렌더 | 소스` 토글과 `Ctrl+Shift+R`은 같은 탭 자리에서 전환한다(반대편 편집기를 닫음, 더티 문서 제외). `workbench.editorAssociations`로 기본 에디터 지정 가능.
+- 오른쪽 위 `렌더 | 소스` 토글과 `Ctrl+Shift+R`은 같은 탭 자리에서 전환한다(반대편 편집기를 닫음, 더티 문서 제외).
+- **기본 편집기 대체(1.4.0)**: Cursor의 "Preview | Markdown" 토글은 Cursor 마크다운 편집기(`file:/**/*.md`에 priority default로 등록)가 그리는 DOM이라 확장이 바꿀 수 없다. 대신 `workbench.editorAssociations["*.md"] = tasksmd.rendered`로 그 편집기를 기본에서 밀어내면 노트가 렌더 보기로 열리고 소스는 VS Code 기본 텍스트 편집기라 Cursor 토글이 나타나지 않는다. 명령 `tasksmd.renderedAsDefault`가 설정을 쓰고, 첫 렌더 보기에서 한 번 제안. 태스크 없는 노트는 `resolveCustomTextEditor`가 텍스트 편집기로 넘긴다(명시적 열기는 제외). 대가: Cursor WYSIWYG 본문 편집을 쓰지 않게 됨.
+- **정렬·보기 툴바(1.4.0)**: `webviews/rendered/view.ts`가 DOM만 재배열·숨김(파일 불변). 플러그인이 `li`에 `data-tfm-due/created/happens/priority/urgency/done`을 붙이고, 페이지는 목록마다 태스크 항목만 정렬(비태스크 항목은 제자리, 중첩 목록은 부모와 함께), 범위는 상향식으로 판단해 하위가 맞으면 부모를 흐리게 유지. 상태는 `workspaceState` `rendered.viewState[uri]`.
 
 ### 7.9 쿼리 결과 패널 (1.0.3)
 

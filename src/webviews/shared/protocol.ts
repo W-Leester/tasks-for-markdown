@@ -56,7 +56,7 @@ export type ToWebview =
   | { type: 'query/target'; id: string | null }
   | { type: 'results/query'; target: QueryTargetDto }
   /** Rendered view: the whole note as HTML. */
-  | { type: 'doc/html'; html: string; fontSize: number; lineHeight: number; fieldsAlign: 'right' | 'inline' }
+  | { type: 'doc/html'; html: string; fontSize: number; lineHeight: number; fieldsAlign: 'right' | 'inline'; today: string; view: { sort: string; scope: string } }
   | { type: 'stats/result'; requestId: number; stats: StatsDto }
   /** Host-confirmed full-screen state of the panel (also sent after a command toggled it). */
   | { type: 'ui/fullscreen'; on: boolean }
@@ -87,6 +87,8 @@ export type FromWebview =
   | { type: 'doc/postpone'; path: string | null; line: number }
   | { type: 'doc/link'; href: string }
   | { type: 'doc/openSource' }
+  /** Rendered view: remember the sort/scope the user picked for this note. */
+  | { type: 'doc/view'; sort: string; scope: string }
   | { type: 'ui/notify'; level: 'info' | 'warn' | 'error'; message: string };
 
 /** Minimal typed wrapper around acquireVsCodeApi() for the webview side. */

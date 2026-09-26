@@ -3,12 +3,25 @@
  * task rows and links go back as messages. Plain DOM — no framework needed here.
  */
 import type { FromWebview, ToWebview, WebviewApi } from '../shared/protocol';
+import { applyView, SCOPE_MODES, SORT_MODES, type ScopeMode, type SortMode, type ViewState } from './view';
 
 declare function acquireVsCodeApi(): WebviewApi;
 // Plain objects only here, so no snapshot helper (and no Svelte runtime) is needed.
 const api = acquireVsCodeApi();
 const post = (msg: FromWebview) => api.postMessage(msg);
 const content = document.getElementById('content')!;
+const sortSel = document.getElementById('view-sort') as HTMLSelectElement | null;
+const scopeSel = document.getElementById('view-scope') as HTMLSelectElement | null;
+const hiddenEl = document.getElementById('view-hidden');
+let today = new Date().toISOString().slice(0, 10);
+let view: ViewState = { sort: 'document', scope: 'all' };
+
+function refreshView(): void {
+  const hidden = applyView(content, view, today);
+  if (hiddenEl) hiddenEl.textContent = hidden ? (document.body.dataset.lHidden ?? '{0} hidden').replace('{0}', String(hidden)) : '';
+}
+sortSel?.addEventListener('change', () => { view = { ...view, sort: sortSel.value as SortMode }; post({ type: 'doc/view', ...view }); refreshView(); });
+scopeSel?.addEventListener('change', () => { view = { ...view, scope: scopeSel.value as ScopeMode }; post({ type: 'doc/view', ...view }); refreshView(); });
 
 window.addEventListener('message', (e: MessageEvent<ToWebview>) => {
   const m = e.data;
@@ -16,9 +29,14 @@ window.addEventListener('message', (e: MessageEvent<ToWebview>) => {
   document.documentElement.style.setProperty('--rv-font-size', `${m.fontSize}px`);
   document.documentElement.style.setProperty('--rv-line-height', String(m.lineHeight));
   document.body.classList.toggle('fields-right', m.fieldsAlign === 'right');
+  today = m.today;
+  view = { sort: (SORT_MODES as string[]).includes(m.view.sort) ? (m.view.sort as SortMode) : 'document', scope: (SCOPE_MODES as string[]).includes(m.view.scope) ? (m.view.scope as ScopeMode) : 'all' };
+  if (sortSel) sortSel.value = view.sort;
+  if (scopeSel) scopeSel.value = view.scope;
   const y = window.scrollY;
   content.innerHTML = m.html;
   addRowActions();
+  refreshView();
   window.scrollTo(0, y);
 });
 

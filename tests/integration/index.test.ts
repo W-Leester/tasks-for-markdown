@@ -459,3 +459,21 @@ suite('rendered view', () => {
     }
   });
 });
+
+suite('rendered view as default editor', () => {
+  test('notes with tasks open rendered, notes without tasks fall back to the text editor', async () => {
+    const config = vscode.workspace.getConfiguration('workbench');
+    const before = config.get<Record<string, string>>('editorAssociations');
+    await config.update('editorAssociations', { ...(before ?? {}), '*.md': 'tasksmd.rendered' }, vscode.ConfigurationTarget.Global);
+    try {
+      await vscode.commands.executeCommand('vscode.open', fixtureUri('notes/week-38.md'));
+      await waitFor(() => vscode.window.tabGroups.all.some((g) => g.tabs.some((t) => t.input instanceof vscode.TabInputCustom && t.input.viewType === 'tasksmd.rendered')), 8000, 'rendered tab for a note with tasks');
+      await vscode.commands.executeCommand('workbench.action.closeAllEditors');
+      await vscode.commands.executeCommand('vscode.open', fixtureUri('README.md'));
+      await waitFor(() => vscode.window.activeTextEditor?.document.uri.fsPath.endsWith('README.md') === true, 8000, 'text editor for a note without tasks');
+    } finally {
+      await config.update('editorAssociations', before, vscode.ConfigurationTarget.Global);
+      await vscode.commands.executeCommand('workbench.action.closeAllEditors');
+    }
+  });
+});

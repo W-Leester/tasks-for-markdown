@@ -1,7 +1,7 @@
 import type { MarkdownIt, RendererRule, StateCore, Token } from 'markdown-it';
 import { type RenderOptions, renderBadges, renderCheckbox, renderQueryResult } from '../core/render';
 import { Query, type QueryResult, type QuerySource } from '../core/query';
-import { type StatusRegistry, parseTaskLine, splitTaskLine } from '../core/task';
+import { type StatusRegistry, parseTaskLine, splitTaskLine, urgency } from '../core/task';
 
 export interface PluginDeps {
   getStatusRegistry(): StatusRegistry;
@@ -84,6 +84,14 @@ function decorateTaskLines(state: StateCore, deps: PluginDeps): void {
       open.attrJoin('class', `tfm-task tfm-status-${task.isCompleted ? (task.isCancelled ? 'cancelled' : 'done') : 'open'}`);
       if (open.map) open.attrSet('data-tfm-line', String(open.map[0]));
       open.attrSet('data-symbol', task.status.symbol);
+      // Sort/scope data for the rendered view (cheap; ignored by the built-in preview).
+      if (task.due?.valid) open.attrSet('data-tfm-due', task.due.format());
+      if (task.created?.valid) open.attrSet('data-tfm-created', task.created.format());
+      const happens = task.happens();
+      if (happens?.valid) open.attrSet('data-tfm-happens', happens.format());
+      open.attrSet('data-tfm-priority', task.priority);
+      open.attrSet('data-tfm-urgency', String(Math.round(urgency(task, o.today) * 100) / 100));
+      if (task.isCompleted) open.attrSet('data-tfm-done', '1');
 
       // 1. Replace the leading "[x] " in the first text child with a checkbox. If another
       //    task-list plugin already turned it into an <input>, drop that and use ours.

@@ -312,5 +312,21 @@
   "API query": "API 쿼리",
   "A due date is required (tasksmd.requireDueDate).": "마감일이 필요합니다(tasksmd.requireDueDate).",
   "Open task without a due date (tasksmd.requireDueDate).": "마감일이 없는 미완료 태스크입니다(tasksmd.requireDueDate).",
-  "Set due date…": "마감일 설정…"
+  "Set due date…": "마감일 설정…",
+  "Sort": "정렬",
+  "Document order": "문서 순",
+  "Show": "보기",
+  "Everything": "전체",
+  "Open only": "미완료만",
+  "Today (incl. overdue)": "오늘(초과 포함)",
+  "Through next week": "다음 주까지",
+  "{0} hidden": "{0}개 숨김",
+  "Make it the default": "기본으로 설정",
+  "Not now": "나중에",
+  "Open Markdown notes in the rendered view by default? You can change this later with \"Tasks: Rendered view as default editor\".": "마크다운 노트를 기본으로 렌더 보기에서 열까요? 나중에 \"Tasks: 렌더 보기를 기본 편집기로\"에서 바꿀 수 있습니다.",
+  "Rendered view (tasks rendered, click to complete)": "렌더 보기(태스크 렌더링, 클릭으로 완료)",
+  "Text editor": "텍스트 편집기",
+  "Which editor should open Markdown notes?": "마크다운 노트를 어떤 편집기로 열까요?",
+  "Markdown notes now open in the rendered view. Source: the Source button or Ctrl+Shift+R.": "이제 마크다운 노트가 렌더 보기로 열립니다. 소스는 소스 버튼 또는 Ctrl+Shift+R.",
+  "Markdown notes open in the text editor again.": "마크다운 노트가 다시 텍스트 편집기로 열립니다."
 }

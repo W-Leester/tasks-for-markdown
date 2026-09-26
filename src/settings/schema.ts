@@ -55,6 +55,8 @@ export interface SettingsSchema {
   'api.batchLimit': number;
   'rendered.lineHeight': number;
   'rendered.fieldsAlign': 'right' | 'inline';
+  /** When the rendered view is the default editor, notes without tasks open in the text editor. */
+  'rendered.sourceWhenNoTasks': boolean;
   updateCheckUrl: string;
   language: 'auto' | 'en' | 'ko';
 }
@@ -110,6 +112,7 @@ export const SETTINGS_DEFAULTS: Readonly<SettingsSchema> = {
   'api.batchLimit': 200,
   'rendered.lineHeight': 1.6,
   'rendered.fieldsAlign': 'right',
+  'rendered.sourceWhenNoTasks': true,
   updateCheckUrl: '',
   language: 'auto',
 };

@@ -18,7 +18,7 @@
 - **사이드바** — 오늘 / 예정 7일 / 기한 초과 / 진행 중 / 차단됨 / 미완료 전체 / 완료, 그룹·필터·체크박스, 저장된 쿼리와 그룹별 결과.
 - **쿼리 언어** — ` ```tasks ` 블록(미리보기에서 렌더링), 저장된 쿼리, 시각적 쿼리 빌더에서 Obsidian Tasks 쿼리 언어를 그대로 사용. 필터, 불리언, 정렬, 그룹, 제한, 레이아웃, `explain`, 선택적으로 `filter/sort/group by function`.
 - **반복·상태·의존성** — `🔁 every month on the last`, `when done`, 커스텀 체크박스 상태와 테마 프리셋(Minimal, ITS, Things), `🆔`/`⛔` 의존성과 차단 감지·순환 진단, Obsidian 긴급도 점수.
-- **렌더 보기** — 노트를 미리보기처럼 렌더링하면서 체크박스 클릭·더블클릭 편집·링크 이동이 되는 상호작용 뷰. ```tasks 블록 결과가 그 자리에 표시됩니다(`Ctrl+Shift+R`). Cursor의 Preview 토글이 확장 렌더러를 쓰지 않는 문제를 대신합니다.
+- **렌더 보기** — 노트를 미리보기처럼 렌더링하면서 체크박스 클릭·더블클릭 편집·링크 이동이 되는 상호작용 뷰. ```tasks 블록 결과가 그 자리에 표시되고, 상단 툴바로 마감일·생성일·긴급도 정렬과 오늘·이번 주·다음 주까지 범위를 화면에서만 바꿀 수 있습니다(`Ctrl+Shift+R`). `Tasks: 렌더 보기를 기본 편집기로`로 .md의 기본 편집기로 삼으면 Cursor의 Preview 토글 대신 이 화면이 열립니다.
 - **추가 뷰** — 만들기/편집 대화상자, 칸반(드래그앤드롭), 캘린더(월간/주간, 전체 화면, 드래그로 일정 변경), 주간 통계, 완료 태스크 아카이브, 일일 알림.
 - **Cursor에서도 동작** — 안정 VS Code API만 사용, Open VSX에도 게시.
 
@@ -45,6 +45,7 @@ group by filename
 | 태스크 완료 토글 | `Cmd/Ctrl+Enter` (태스크 줄에서) |
 | 태스크 만들기 / 편집 | `Ctrl+Shift+C` |
 | 렌더 보기로 열기 / 마크다운 소스 편집 (전환) | `Ctrl+Shift+R` |
+| 렌더 보기를 기본 편집기로 (설정/해제) | — |
 | 태스크 빠른 검색 | `Cmd/Ctrl+Shift+;` |
 | 상태 / 우선순위 / 마감일 / 예정일 / 시작일 / 반복 / 의존성 설정, 미루기 | — |
 | 칸반 보드 / 캘린더 / 통계 / 쿼리 빌더 열기 | — |
@@ -72,6 +73,7 @@ group by filename
 | `calendar.newTaskFile` | `""` | 캘린더에서 만든 태스크를 넣을 파일 |
 | `requireDueDate` | `false` | 마감일 없는 새 태스크 거부(대화상자·API·CLI·MCP) + 에디터 경고 |
 | `api.writePolicy` | `confirm` | 다른 확장이 API로 쓸 때: 확인(`confirm`) / 허용 / 거부 |
+| `rendered.sourceWhenNoTasks` | `true` | 렌더 보기가 기본 편집기일 때 태스크 없는 노트는 텍스트 편집기로 |
 | `rendered.fieldsAlign` | `right` | 렌더 보기 태스크 줄의 필드 위치: 오른쪽 끝(`right`) / 설명 뒤(`inline`) |
 | `rendered.fontSize` / `rendered.lineHeight` | `14.5` / `1.6` | 렌더 보기 본문 글자 크기(px)와 줄 간격 |
 | `rendered.fieldStyle` | `plain` | 렌더 보기 태스크 줄의 필드 표시: 원문처럼(`plain`) / 배지(`badges`) |

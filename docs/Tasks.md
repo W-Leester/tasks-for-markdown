@@ -35,6 +35,7 @@
 | M7 | 추가 기능: 알림·아카이브·통계·캘린더·업데이트 확인 | ✅ 완료 | 2026-09-21 · unit 462 / integration 34 |
 | M8 | 마감: i18n·성능·접근성·문서·패키징·게시 | 🟡 코드 완료 · 사용자 작업 대기 | 1.0.0 `.vsix` 생성됨 · 남은 것: 퍼블리셔/토큰 생성, 저장소 공개 여부, M8.7 수동 테스트 |
 | M9 | 공개 API: 확장 API·명령·npm/CLI·MCP·URI | 🟡 M9.1–9.5 완료(1.3.0, npm 발행은 사용자 작업) · M9.6(선택)·9.7 남음 | docs/api-plan.md v0.2, docs/api.md |
+| M10 | 렌더 보기 고도화: 기본 편집기 대체, 정렬·보기 툴바 | ✅ 완료(1.4.0) | post-release-changes 2.14 |
 
 ---
 
@@ -597,6 +598,14 @@
 
 ### M9.7 (F1) URI 핸들러
 - [ ] `vscode://hastycapybara.tasks-for-markdown/open?path=…&line=…`, `/query?text=…`
+
+## M10. 렌더 보기 고도화 (1.4.0)
+
+- [x] `tasksmd.renderedAsDefault`: `workbench.editorAssociations["*.md"]` 설정/해제 QuickPick, 첫 렌더 보기에서 1회 제안
+- [x] 태스크 없는 노트는 텍스트 편집기로(`rendered.sourceWhenNoTasks`), 명시적 열기는 예외
+- [x] 정렬(문서 순·마감일·생성일·우선순위·긴급도)·보기(전체·미완료만·오늘·이번 주·다음 주까지·기한 초과) 툴바 — 화면만, 파일별 기억
+- [x] 플러그인 `data-tfm-*` 속성, `view.ts` 단위 테스트, 통합 테스트(기본 편집기 연결 시 태스크 노트는 렌더·없는 노트는 텍스트)
+- [x] 문서: user-guide, README, design.md 7.8, post-release-changes 2.14(결정 기록)
 
 ## 열린 설계 이슈 추적
 

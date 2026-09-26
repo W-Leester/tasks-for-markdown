@@ -25,4 +25,4 @@ claude mcp add tasks -- npx -y @hastycapybara/tasks-cli mcp --root "$PWD"
 ```
 등록 후 Claude Code에 "이번 주 마감인 업무 태스크 중 안 끝난 거 보여주고 계약서 검토는 완료 처리해 줘"처럼 말하면 `tasks_query`, `tasks_set_status` 도구가 호출됩니다. 도구 목록과 인자는 저장소의 docs/api.md 8절에 있습니다.
 
-라이선스 MIT.
+라이선스 MIT. 태스크 문법과 핵심 로직 일부는 [Obsidian Tasks](https://github.com/obsidian-tasks-group/obsidian-tasks)(MIT)에서 이식했습니다(동봉된 NOTICE.md). Obsidian과 관련이 없습니다.

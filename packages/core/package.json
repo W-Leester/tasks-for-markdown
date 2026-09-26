@@ -21,13 +21,16 @@
   "types": "./dist/main.d.ts",
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "LICENSE",
+    "NOTICE.md"
   ],
   "publishConfig": {
     "access": "public"
   },
   "scripts": {
-    "build": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\" && tsc -p tsconfig.json"
+    "build": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\" && tsc -p tsconfig.json && pnpm run prepack",
+    "prepack": "node -e \"const f=require('fs');for(const n of ['LICENSE','NOTICE.md'])f.copyFileSync('../../'+n,n)\""
   },
   "dependencies": {
     "dayjs": "^1.11.13",

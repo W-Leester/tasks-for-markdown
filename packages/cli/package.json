@@ -22,7 +22,9 @@
   },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "LICENSE",
+    "NOTICE.md"
   ],
   "publishConfig": {
     "access": "public"
@@ -31,7 +33,8 @@
     "node": ">=18"
   },
   "scripts": {
-    "build": "node build.mjs"
+    "build": "node build.mjs && pnpm run prepack",
+    "prepack": "node -e \"const f=require('fs');for(const n of ['LICENSE','NOTICE.md'])f.copyFileSync('../../'+n,n)\""
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.30.1",

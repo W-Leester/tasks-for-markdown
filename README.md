@@ -73,7 +73,7 @@ group by filename
 | `calendar.newTaskFile` | `""` | 캘린더에서 만든 태스크를 넣을 파일 |
 | `requireDueDate` | `false` | 마감일 없는 새 태스크 거부(대화상자·API·CLI·MCP) + 에디터 경고 |
 | `api.writePolicy` | `confirm` | 다른 확장이 API로 쓸 때: 확인(`confirm`) / 허용 / 거부 |
-| `rendered.maxWidth` | `800` | 렌더 보기 본문 열 최대 폭(px), 0이면 전체 폭 |
+| `rendered.maxWidth` | `0` | 렌더 보기 본문 열 최대 폭(px). 0 = 창 전체 폭(기본). 800 등을 주면 가운데 열로 제한 |
 | `rendered.sourceWhenNoTasks` | `true` | 렌더 보기가 기본 편집기일 때 태스크 없는 노트는 텍스트 편집기로 |
 | `rendered.fieldsAlign` | `right` | 렌더 보기 태스크 줄의 필드 위치: 오른쪽 끝(`right`) / 설명 뒤(`inline`) |
 | `rendered.fontSize` / `rendered.lineHeight` | `14.5` / `1.6` | 렌더 보기 본문 글자 크기(px)와 줄 간격 |

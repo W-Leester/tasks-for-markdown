@@ -115,7 +115,7 @@ export const SETTINGS_DEFAULTS: Readonly<SettingsSchema> = {
   'rendered.lineHeight': 1.6,
   'rendered.fieldsAlign': 'right',
   'rendered.sourceWhenNoTasks': true,
-  'rendered.maxWidth': 800,
+  'rendered.maxWidth': 0,
   updateCheckUrl: '',
   language: 'auto',
 };

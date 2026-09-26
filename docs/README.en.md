@@ -71,7 +71,7 @@ group by filename
 | `calendar.newTaskFile` | `""` | File that receives tasks created from the calendar |
 | `requireDueDate` | `false` | Refuse new tasks without a due date (dialog, API, CLI, MCP) and warn in the editor |
 | `api.writePolicy` | `confirm` | Writes through the public API: confirm once per caller / allow / deny |
-| `rendered.maxWidth` | `800` | Max width (px) of the rendered column; 0 = full width |
+| `rendered.maxWidth` | `0` | Max width (px) of the rendered column; 0 = full editor width (default) |
 | `rendered.sourceWhenNoTasks` | `true` | With the rendered view as default editor, notes without tasks open in the text editor |
 | `rendered.fieldsAlign` | `right` | Rendered view: task fields at the right edge (`right`) or after the description (`inline`) |
 | `rendered.fontSize` / `rendered.lineHeight` | `14.5` / `1.6` | Rendered view body font size (px) and line height |

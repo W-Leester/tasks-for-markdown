@@ -2,8 +2,8 @@
 
 ## 한 번만 (계정·토큰)
 
-1. **VS Code Marketplace**: https://marketplace.visualstudio.com/manage 에서 퍼블리셔 `HMCVECDT` 생성 → Azure DevOps에서 PAT(Marketplace › Manage 권한) 발급 → GitHub 저장소 Secrets에 `VSCE_PAT`.
-2. **Open VSX** (Cursor용): https://open-vsx.org 에서 로그인 → 네임스페이스 `HMCVECDT` 생성(`ovsx create-namespace HMCVECDT -p <token>`) → Secrets에 `OVSX_PAT`.
+1. **VS Code Marketplace**: https://marketplace.visualstudio.com/manage 에서 퍼블리셔 `hastycapybara` 생성 → Azure DevOps에서 PAT(Marketplace › Manage 권한) 발급 → GitHub 저장소 Secrets에 `VSCE_PAT`.
+2. **Open VSX** (Cursor용): https://open-vsx.org 에서 로그인 → 네임스페이스 `hastycapybara` 생성(`ovsx create-namespace hastycapybara -p <token>`) → Secrets에 `OVSX_PAT`.
 3. 두 토큰이 없으면 워크플로는 게시 단계를 건너뛰고 `.vsix`만 Release에 첨부한다.
 
 ## 매 릴리스

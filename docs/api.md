@@ -8,7 +8,7 @@
 import * as vscode from 'vscode';
 import type { TasksExtensionExports, TasksApi } from './tasks-api';   // types.d.ts를 복사해 두세요
 
-const ext = vscode.extensions.getExtension<TasksExtensionExports>('HMCVECDT.tasks-for-markdown');
+const ext = vscode.extensions.getExtension<TasksExtensionExports>('hastycapybara.tasks-for-markdown');
 if (!ext) throw new Error('Tasks for Markdown is not installed');
 const tasks: TasksApi = (await ext.activate()).getAPI(1, { extensionId: 'my-publisher.my-extension' });
 

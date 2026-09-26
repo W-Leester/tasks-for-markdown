@@ -11,7 +11,7 @@
 
 | 항목 | 결정 |
 |---|---|
-| 확장 이름 / ID | **Tasks for Markdown** / `HMCVECDT.tasks-for-markdown` |
+| 확장 이름 / ID | **Tasks for Markdown** / `hastycapybara.tasks-for-markdown` |
 | 언어·UI·도구 | TypeScript, Svelte(웹뷰), esbuild, pnpm, Vitest |
 | 원본 코드 | Obsidian Tasks 순수 로직(파서·반복·쿼리·긴급도) MIT 이식 + 저작권 고지 |
 | 스캔 범위 | 워크스페이스 전체 `.md`/`.markdown`, `.gitignore`·`files.exclude` 존중 |
@@ -534,7 +534,7 @@ Marketplace + Open VSX 둘 다(추천)? Pre-release 채널 사용 여부? 저장
 
 **R-1. (Q-1 후속) 퍼블리셔 ID**
 Marketplace에 올리지 않아도 `package.json`의 `publisher` 필드는 필수이고 확장 ID(`publisher.tasks-for-markdown`)에 들어갑니다. 회사/팀 이름을 영문 소문자로 알려 주세요 (예: `acme`). 표시 이름은 "Tasks for Markdown", ID는 `tasks-for-markdown`으로 진행합니다.
-답변: HMCVECDT
+답변: HMCVECDT → 2026-09-26 `hastycapybara`로 변경(hastycapybara.com에 게시 예정, 사내 팀명 불필요)
 
 **R-2. (Q-9) 반복 태스크 세부 동작 — 제 추천 (이의 없으면 확정)**
 - 삽입 위치: 원본 **위** (Obsidian 기본과 동일)

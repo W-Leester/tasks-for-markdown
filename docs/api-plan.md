@@ -2,7 +2,7 @@
 
 작성일 2026-09-26, 확정 2026-09-26. §9의 답변으로 아래 결정을 확정했습니다. §10은 일반적인 API 제공 서비스가 갖추는 요소와 우리가 채택한 것의 대조표입니다.
 
-**확정 요약**: A(확장 API)+B(명령) 먼저 → D(npm/CLI)+C(MCP, 주 대상 Claude Code) → F(URI). 배포는 마켓플레이스 게시와 함께 공개 npm(`@hmcvecdt/tasks-core`, `@hmcvecdt/tasks-cli`), 불가하면 사내 `.tgz`. 쓰기 정책 기본 `confirm`. 편집기 밖 쓰기는 7-a. v1에 `remove`·`batch` 포함. 접근 방식은 `exports.getAPI(1)` + `tasksmd.api.*` 명령(§9 Q7).
+**확정 요약**: A(확장 API)+B(명령) 먼저 → D(npm/CLI)+C(MCP, 주 대상 Claude Code) → F(URI). 배포는 마켓플레이스 게시와 함께 공개 npm(`@hastycapybara/tasks-core`, `@hastycapybara/tasks-cli`), 불가하면 사내 `.tgz`. 쓰기 정책 기본 `confirm`. 편집기 밖 쓰기는 7-a. v1에 `remove`·`batch` 포함. 접근 방식은 `exports.getAPI(1)` + `tasksmd.api.*` 명령(§9 Q7).
 
 ---
 
@@ -29,12 +29,12 @@
 
 | 표면 | 소비자 | 장점 | 단점 | 추천 |
 |---|---|---|---|---|
-| **A. 확장 API** (`vscode.extensions.getExtension('HMCVECDT.tasks-for-markdown').exports`) | 다른 확장 | 타입 있는 직접 호출, 이벤트 구독 가능, VS Code 표준 방식 | 같은 확장 호스트 안에서만 | **1차** |
+| **A. 확장 API** (`vscode.extensions.getExtension('hastycapybara.tasks-for-markdown').exports`) | 다른 확장 | 타입 있는 직접 호출, 이벤트 구독 가능, VS Code 표준 방식 | 같은 확장 호스트 안에서만 | **1차** |
 | **B. 인자 있는 명령** (`vscode.commands.executeCommand('tasksmd.api.query', {...})`) | 다른 확장, 키바인딩, 매크로 확장 | 가장 낮은 진입 장벽, 언어 무관 | 타입 없음, 반환값 JSON만 | **1차** (A의 얇은 래퍼) |
 | **C. MCP 서버** (Model Context Protocol) | Cursor Agent, Claude Code, Claude Desktop 등 AI | AI가 도구로 바로 사용. Cursor는 `.cursor/mcp.json`으로 등록 | 별도 프로세스, 편집기와 상태 공유 방법 필요 | **2차** (가장 큰 효용) |
-| **D. npm 라이브러리 + CLI** (`@hmcvecdt/tasks-core`, `tasksmd` 명령) | 스크립트, CI, C의 기반 | core가 이미 분리되어 있어 비용 낮음 | 배포 채널 하나 더 | **2차** (C와 함께) |
+| **D. npm 라이브러리 + CLI** (`@hastycapybara/tasks-core`, `tasksmd` 명령) | 스크립트, CI, C의 기반 | core가 이미 분리되어 있어 비용 낮음 | 배포 채널 하나 더 | **2차** (C와 함께) |
 | E. 로컬 HTTP 서버 | 외부 앱 | 언어 무관 | 포트·인증·보안 부담, 위 넷으로 충분 | 보류 |
-| F. URI 핸들러 (`vscode://HMCVECDT.tasks-for-markdown/open?…`) | 외부 링크, 다른 앱 | 딥링크 | 읽기 전용 수준 | 3차 (작음) |
+| F. URI 핸들러 (`vscode://hastycapybara.tasks-for-markdown/open?…`) | 외부 링크, 다른 앱 | 딥링크 | 읽기 전용 수준 | 3차 (작음) |
 
 **구조 제안**: 하나의 **API 코어**(`src/api/`)를 만들고, A·B·C·D는 모두 그 코어의 어댑터로 둡니다. 데이터 계약(JSON DTO)을 한 곳에 두어 네 표면이 같은 모양을 반환하게 합니다.
 
@@ -126,7 +126,7 @@ await vscode.commands.executeCommand('tasksmd.api.query.run', { query: 'not done
 
 전송은 stdio(가장 호환성 높음). 서버 실행 파일은 D의 CLI에 포함(`tasksmd mcp`). Cursor 등록 예:
 ```json
-{ "mcpServers": { "tasks": { "command": "npx", "args": ["-y", "@hmcvecdt/tasks-cli", "mcp", "--root", "${workspaceFolder}"] } } }
+{ "mcpServers": { "tasks": { "command": "npx", "args": ["-y", "@hastycapybara/tasks-cli", "mcp", "--root", "${workspaceFolder}"] } } }
 ```
 **중요한 설계 결정**: MCP 서버가 편집기 밖에서 파일을 직접 고치면 편집기가 열어 둔 더티 문서와 충돌할 수 있습니다. 대안 두 가지를 §7에서 비교합니다.
 
@@ -186,7 +186,7 @@ A1→A2→B1이 한 묶음(편집기 안 API), D1→C1이 한 묶음(밖 API)입
   - 어차피 다 할거잖아. A+B부터 해줘.
 - **Q2. MCP 대상.** Cursor Agent / Claude Code / Claude Desktop 중 어디서 쓰실 건가요? (모두 stdio면 동일하지만 등록 문서를 어디 기준으로 쓸지)
   - 아마 주로 클로드코드일거 같아. 그런데 vscode에서 사람이 직접 갖다 쓸수도 있지.
-- **Q3. 배포.** core·CLI를 공개 npm에 올릴까요, 사내 레지스트리/`.tgz`로 둘까요? 패키지 이름 `@hmcvecdt/tasks-core`, `@hmcvecdt/tasks-cli`로 괜찮은지.
+- **Q3. 배포.** core·CLI를 공개 npm에 올릴까요, 사내 레지스트리/`.tgz`로 둘까요? 패키지 이름 `@hastycapybara/tasks-core`, `@hastycapybara/tasks-cli`로 괜찮은지.
   - 어차피 이 플러그인을 마켓플레이스에 올릴거 아냐? 만약 플러그인을 마켓플러그인에 올린다면 npm에 올리고, 그게 나중에 불가능하다면 두번째 방법으로 하면 될 것 같아. 패키지 이름은 다 좋아.
 - **Q4. 쓰기 정책 기본값.** 다른 확장의 쓰기를 기본 허용(`allow`)할지, 첫 호출 때 확인(`confirm`)할지.
   - 첫 호출 때 확인. 어떤 것 때문에 허용절차가 필요한거지?
@@ -297,7 +297,7 @@ A1→A2→B1이 한 묶음(편집기 안 API), D1→C1이 한 묶음(밖 API)입
 | GitHub | Octokit, OpenAPI |
 | VS Code Git | `git.d.ts` 타입 파일을 저장소에 두고 복사해 쓰라고 안내 |
 
-**채택**: `dist/api.d.ts`(확장에 동봉) + npm `@hmcvecdt/tasks-core`의 타입, 문서 `docs/api.md`(한국어, 영문 보조)에 (1) 시작 코드 10줄, (2) 메서드별 인자·반환·오류, (3) 쿼리 문법 링크, (4) 예제 세 개(다른 확장, 키바인딩 명령, Claude Code MCP). MCP 서버는 도구 설명과 `tasks_syntax_reference` 리소스로 자체 문서를 제공합니다.
+**채택**: `dist/api.d.ts`(확장에 동봉) + npm `@hastycapybara/tasks-core`의 타입, 문서 `docs/api.md`(한국어, 영문 보조)에 (1) 시작 코드 10줄, (2) 메서드별 인자·반환·오류, (3) 쿼리 문법 링크, (4) 예제 세 개(다른 확장, 키바인딩 명령, Claude Code MCP). MCP 서버는 도구 설명과 `tasks_syntax_reference` 리소스로 자체 문서를 제공합니다.
 
 ### 10.10 폐기·변경 로그·실험 기능
 
@@ -371,8 +371,8 @@ editor.replaceSelection(line);
 
 **우리 확장 API (A)** — 다른 확장에서. `dist/api.d.ts`를 복사하거나 npm 타입을 씁니다.
 ```ts
-import type { TasksApi } from '@hmcvecdt/tasks-core/api';   // 또는 확장에 동봉된 api.d.ts
-const ext = vscode.extensions.getExtension<{ getAPI(v: 1): TasksApi }>('HMCVECDT.tasks-for-markdown');
+import type { TasksApi } from '@hastycapybara/tasks-core/api';   // 또는 확장에 동봉된 api.d.ts
+const ext = vscode.extensions.getExtension<{ getAPI(v: 1): TasksApi }>('hastycapybara.tasks-for-markdown');
 const tasks = (await ext!.activate()).getAPI(1);
 
 // 조회: 앱과 같은 쿼리 문법
@@ -421,7 +421,7 @@ tasksmd done examples/샘플-태스크.md:14 --expect "- [ ] 계약서 검토 #�
 
 **MCP (C)** — Claude Code에서. 등록 한 번:
 ```bash
-claude mcp add tasks -- npx -y @hmcvecdt/tasks-cli mcp --root "$PWD"
+claude mcp add tasks -- npx -y @hastycapybara/tasks-cli mcp --root "$PWD"
 ```
 그다음 대화에서 "이번 주 마감인 업무 태스크 중 안 끝난 거 보여주고, 계약서 검토는 완료 처리해 줘"라고 하면 에이전트가 도구를 이렇게 호출합니다(사용자에게는 승인 창이 뜸).
 ```json

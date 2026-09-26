@@ -70,10 +70,10 @@ VS Code와 다른 부분만 봅니다.
 
 ### 3-1. Marketplace 퍼블리셔와 `VSCE_PAT`
 
-1. https://marketplace.visualstudio.com/manage 에 Microsoft 계정으로 로그인 → **Create publisher** → ID `HMCVECDT`(package.json의 `publisher`와 같아야 함), 표시 이름은 자유.
+1. https://marketplace.visualstudio.com/manage 에 Microsoft 계정으로 로그인 → **Create publisher** → ID `hastycapybara`(package.json의 `publisher`와 같아야 함), 표시 이름은 자유.
 2. https://dev.azure.com 에서 아무 조직이나 하나 만든 뒤(없으면) 오른쪽 위 사용자 아이콘 → **Personal access tokens** → New Token. Organization은 **All accessible organizations**, Scopes는 **Custom defined** → **Marketplace: Manage**만 체크. 만료는 1년.
 3. 토큰을 복사해 GitHub 저장소 → Settings → Secrets and variables → Actions → **New repository secret** → 이름 `VSCE_PAT`.
-4. 확인: `git tag v1.0.8 && git push origin v1.0.8`을 푸시하면 Actions의 release 워크플로가 `.vsix`를 Release에 첨부하고, 토큰이 있으면 Marketplace에 게시합니다. 첫 게시 후 https://marketplace.visualstudio.com/items?itemName=HMCVECDT.tasks-for-markdown 에서 보입니다(반영까지 몇 분).
+4. 확인: `git tag v1.0.8 && git push origin v1.0.8`을 푸시하면 Actions의 release 워크플로가 `.vsix`를 Release에 첨부하고, 토큰이 있으면 Marketplace에 게시합니다. 첫 게시 후 https://marketplace.visualstudio.com/items?itemName=hastycapybara.tasks-for-markdown 에서 보입니다(반영까지 몇 분).
 
 ### 3-2. Open VSX와 `OVSX_PAT` (Cursor 사용자용)
 
@@ -82,7 +82,7 @@ Cursor의 확장 마켓은 Open VSX를 씁니다. 사내 `.vsix` 배포만 할 �
 2. 퍼블리셔 계약(Publisher Agreement)에 동의합니다(프로필 페이지에 버튼).
 3. 네임스페이스 생성: 로컬에서 한 번만
    ```bash
-   pnpm exec ovsx create-namespace HMCVECDT -p <토큰>
+   pnpm exec ovsx create-namespace hastycapybara -p <토큰>
    ```
 4. GitHub Secrets에 `OVSX_PAT`로 저장. 이후 태그 푸시 때 자동 게시됩니다.
 

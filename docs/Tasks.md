@@ -50,7 +50,7 @@
 - Obsidian Tasks 저장소의 파서 테스트 케이스를 이식한 테스트가 통과한다.
 
 ### M0.1 프로젝트 스캐폴딩
-- [x] `package.json` — 이름/퍼블리셔(`HMCVECDT.tasks-for-markdown`)/engines/activationEvents/scripts
+- [x] `package.json` — 이름/퍼블리셔(`hastycapybara.tasks-for-markdown`)/engines/activationEvents/scripts
 - [x] `tsconfig.json` (strict, noUncheckedIndexedAccess), `esbuild.config.mjs`, `vitest.config.ts`, `eslint.config.mjs`, `.prettierrc`
 - [x] `.vscodeignore`, `.gitignore`, `.vscode/launch.json`, `.vscode/tasks.json`
 - [x] `LICENSE`(MIT), `NOTICE.md`(Obsidian Tasks 고지), `CHANGELOG.md`, `README.md`
@@ -533,7 +533,7 @@
 
 ### M8.6 패키징·게시 (NFR-9, D§13)
 - [x] `pnpm package` → `tasks-for-markdown-1.0.0.vsix` (minified, ~370KB, 23파일), `.vscodeignore` 검증
-- [ ] **(사용자 작업)** Marketplace 퍼블리셔 `HMCVECDT` 생성/PAT 발급 → Secrets `VSCE_PAT` — `docs/release.md`
+- [ ] **(사용자 작업)** Marketplace 퍼블리셔 `hastycapybara` 생성/PAT 발급 → Secrets `VSCE_PAT` — `docs/release.md`
 - [ ] **(사용자 작업)** Open VSX 네임스페이스 생성/토큰 → Secrets `OVSX_PAT`
 - [x] GitHub Actions `release.yml` — 태그 `v*` → 빌드·테스트·패키징·Release 첨부·(시크릿 있으면) 게시
 - [x] `latest.json` 생성 스크립트 + `docs/release.md`(사내 배포 절차)
@@ -583,7 +583,7 @@
 - [ ] pnpm workspace: `packages/core`(현재 `src/core` 이동 또는 재수출), `packages/cli`
 - [ ] 폴더 스캐너(gitignore·`tasksmd.exclude` 존중), 파일 쓰기 구현(7-a: `expectedText` 검사)
 - [ ] CLI: `query`, `explain`, `add`, `done`, `set`, `mcp` 서브커맨드, `--json|--md`, `--root`
-- [ ] 발행: 마켓플레이스 게시와 함께 공개 npm `@hmcvecdt/tasks-core`, `@hmcvecdt/tasks-cli`; 불가 시 `.tgz` 릴리스 첨부
+- [ ] 발행: 마켓플레이스 게시와 함께 공개 npm `@hastycapybara/tasks-core`, `@hastycapybara/tasks-cli`; 불가 시 `.tgz` 릴리스 첨부
 - [ ] 테스트: 임시 폴더 픽스처로 CLI E2E
 
 ### M9.5 (C1) MCP 서버 (주 대상 Claude Code)
@@ -596,7 +596,7 @@
 - [ ] 확장이 로컬 소켓을 열고 토큰 파일로 인증, CLI/MCP는 편집기가 떠 있으면 위임
 
 ### M9.7 (F1) URI 핸들러
-- [ ] `vscode://HMCVECDT.tasks-for-markdown/open?path=…&line=…`, `/query?text=…`
+- [ ] `vscode://hastycapybara.tasks-for-markdown/open?path=…&line=…`, `/query?text=…`
 
 ## 열린 설계 이슈 추적
 

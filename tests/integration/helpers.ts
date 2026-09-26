@@ -3,7 +3,7 @@ import * as path from 'node:path';
 import * as vscode from 'vscode';
 import type { ExtensionApi, ExtensionExports } from '../../src/extension';
 
-export const EXTENSION_ID = 'HMCVECDT.tasks-for-markdown';
+export const EXTENSION_ID = 'hastycapybara.tasks-for-markdown';
 
 export async function getExports(): Promise<ExtensionExports> {
   const ext = vscode.extensions.getExtension<ExtensionExports>(EXTENSION_ID);

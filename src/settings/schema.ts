@@ -57,6 +57,8 @@ export interface SettingsSchema {
   'rendered.fieldsAlign': 'right' | 'inline';
   /** When the rendered view is the default editor, notes without tasks open in the text editor. */
   'rendered.sourceWhenNoTasks': boolean;
+  /** Max width of the rendered column in px; 0 = use the full editor width. */
+  'rendered.maxWidth': number;
   updateCheckUrl: string;
   language: 'auto' | 'en' | 'ko';
 }
@@ -113,6 +115,7 @@ export const SETTINGS_DEFAULTS: Readonly<SettingsSchema> = {
   'rendered.lineHeight': 1.6,
   'rendered.fieldsAlign': 'right',
   'rendered.sourceWhenNoTasks': true,
+  'rendered.maxWidth': 800,
   updateCheckUrl: '',
   language: 'auto',
 };

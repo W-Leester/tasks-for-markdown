@@ -607,6 +607,26 @@
 - [x] 플러그인 `data-tfm-*` 속성, `view.ts` 단위 테스트, 통합 테스트(기본 편집기 연결 시 태스크 노트는 렌더·없는 노트는 텍스트)
 - [x] 문서: user-guide, README, design.md 7.8, post-release-changes 2.14(결정 기록)
 
+## 향후 후보 (미착수)
+
+### 한글 쿼리 문법 (2026-09-27 보류)
+영어 쿼리와 기능이 같은 한글 줄을 파싱 전에 영어로 치환하는 번역 층. 사용자 결정: "나중에 해볼 만한 일". 초안:
+
+| 한글 | 영어 |
+|---|---|
+| `미완료` / `완료` | `not done` / `done` |
+| `마감일이 오늘 이전` · `마감일이 내일 이후` · `마감일이 2026-10-01` · `마감일이 이번 주` · `마감일 없음` | `due before today` · `due after tomorrow` · `due on 2026-10-01` · `due this week` · `no due date` |
+| `예정일이 …` · `시작일이 …` · `생성일이 …` · `완료일이 …` · `일정이 …` | `scheduled` · `start` · `created` · `done` · `happens` |
+| `우선순위가 높음` · `우선순위가 보통 이상` | `priority is high` · `priority is above none` |
+| `설명에 X 포함` · `설명에 X 미포함` · `설명이 /re/ 일치` | `description includes/does not include/regex matches` |
+| `태그에 #X 포함` · `태그 없음` · `경로에 X 포함` · `폴더에 X 포함` · `파일명에 X 포함` · `제목에 X 포함` | `tags include` · `no tags` · `path/folder/filename/heading includes` |
+| `반복 태스크` · `차단됨` · `하위 항목 제외` | `is recurring` · `is blocked` · `exclude sub-items` |
+| `(A) 그리고 (B)` · `또는` · `아닌` | `AND` · `OR` · `NOT` |
+| `마감일 순 정렬` · `마감일 역순 정렬` · `폴더별 그룹` · `20개까지` · `백링크 숨김` · `짧게` | `sort by due` · `sort by due reverse` · `group by folder` · `limit 20` · `hide backlink` · `short mode` |
+
+- [ ] 번역 층 + 사전, 한국어 `explain`, 자동완성 한글 항목, 쿼리 빌더 한글 출력, 영어 224건과 대조하는 한글 호환 테스트
+- [ ] `Tasks: 쿼리를 영어로 변환` 명령(Obsidian 호환용) — 한글 쿼리는 Obsidian에서 동작하지 않음을 문서에 명시
+
 ## 열린 설계 이슈 추적
 
 - [x] D-1 기본 미리보기 양방향 메시지 채널 — M5.0 스파이크: 채널 없음(`openLink`만) → 렌더 전용 + 1.0.4 렌더 보기(커스텀 에디터)로 상호작용 제공. design.md 변경 이력 0.4

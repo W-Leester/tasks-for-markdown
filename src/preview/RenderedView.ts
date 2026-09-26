@@ -77,7 +77,7 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
     let indexTimer: ReturnType<typeof setTimeout> | undefined;
     const render = () => {
       try {
-        void webview.postMessage({ type: 'doc/html', html: this.renderHtml(document, webview), fontSize: this.deps.settings.get('rendered.fontSize'), lineHeight: this.deps.settings.get('rendered.lineHeight'), fieldsAlign: this.deps.settings.get('rendered.fieldsAlign'), today: (this.deps.clock ?? systemClock).now().startOf('day').format('YYYY-MM-DD'), view: this.viewState(document.uri) });
+        void webview.postMessage({ type: 'doc/html', html: this.renderHtml(document, webview), fontSize: this.deps.settings.get('rendered.fontSize'), lineHeight: this.deps.settings.get('rendered.lineHeight'), fieldsAlign: this.deps.settings.get('rendered.fieldsAlign'), maxWidth: this.deps.settings.get('rendered.maxWidth'), today: (this.deps.clock ?? systemClock).now().startOf('day').format('YYYY-MM-DD'), view: this.viewState(document.uri) });
       } catch (err) {
         this.deps.log(`rendered view: ${err instanceof Error ? err.stack ?? err.message : String(err)}`);
       }
@@ -234,8 +234,8 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
   :root { color-scheme: light dark; --rv-fg: var(--vscode-editor-foreground, var(--vscode-foreground)); --rv-bg: var(--vscode-editor-background); --rv-bg-2: color-mix(in srgb, var(--rv-fg) 6%, transparent); --rv-bg-3: color-mix(in srgb, var(--rv-fg) 12%, transparent); --rv-stroke: color-mix(in srgb, var(--rv-fg) 12%, transparent); --rv-stroke-2: color-mix(in srgb, var(--rv-fg) 20%, transparent); --rv-muted: color-mix(in srgb, var(--rv-fg) 74%, transparent); --rv-accent: var(--vscode-terminal-ansiBlue, #7bafe9); --rv-mono: var(--vscode-editor-font-family, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace); }
   html, body { margin: 0; padding: 0; background: var(--rv-bg); color: var(--rv-fg); }
   body { font-family: var(--vscode-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif); font-size: var(--rv-font-size, 15px); line-height: var(--rv-line-height, 1.6); letter-spacing: -0.08px; -webkit-font-smoothing: subpixel-antialiased; -moz-osx-font-smoothing: auto; }
-  #content { max-width: 800px; margin: 0 auto; padding: 8px 16px 64px; box-sizing: border-box; }
-  .rv-tools { max-width: 800px; margin-left: auto; margin-right: auto; padding-left: 16px; padding-right: 16px; box-sizing: border-box; }
+  #content { max-width: var(--rv-max-width, 800px); margin: 0 auto; padding: 8px 16px 64px; box-sizing: border-box; }
+  .rv-tools { max-width: var(--rv-max-width, 800px); margin-left: auto; margin-right: auto; padding-left: 16px; padding-right: 16px; box-sizing: border-box; }
   #content > :first-child { margin-top: 0; }
   p { margin: 0 0 .75em; }
   h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.25; margin: 1.5em 0 .5em; }

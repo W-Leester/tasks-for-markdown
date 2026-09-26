@@ -2,7 +2,7 @@
   "name": "tasks-for-markdown",
   "displayName": "Tasks for Markdown",
   "description": "VS Code와 Cursor에서 쓰는 Obsidian Tasks 호환 마크다운 할 일 관리. Obsidian Tasks-compatible task management for Markdown files.",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "publisher": "hastycapybara",
   "license": "MIT",
   "repository": {
@@ -807,6 +807,13 @@
           "type": "boolean",
           "default": true,
           "description": "%tasksmd.config.rendered.sourceWhenNoTasks%"
+        },
+        "tasksmd.rendered.maxWidth": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 4000,
+          "default": 800,
+          "description": "%tasksmd.config.rendered.maxWidth%"
         },
         "tasksmd.calendar.fontSize": {
           "type": "number",

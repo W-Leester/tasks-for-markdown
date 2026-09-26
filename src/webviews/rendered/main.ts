@@ -29,6 +29,7 @@ window.addEventListener('message', (e: MessageEvent<ToWebview>) => {
   document.documentElement.style.setProperty('--rv-font-size', `${m.fontSize}px`);
   document.documentElement.style.setProperty('--rv-line-height', String(m.lineHeight));
   document.body.classList.toggle('fields-right', m.fieldsAlign === 'right');
+  document.documentElement.style.setProperty('--rv-max-width', m.maxWidth > 0 ? `${m.maxWidth}px` : 'none');
   today = m.today;
   view = { sort: (SORT_MODES as string[]).includes(m.view.sort) ? (m.view.sort as SortMode) : 'document', scope: (SCOPE_MODES as string[]).includes(m.view.scope) ? (m.view.scope as ScopeMode) : 'all' };
   if (sortSel) sortSel.value = view.sort;

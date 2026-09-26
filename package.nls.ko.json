@@ -122,6 +122,7 @@
   "tasksmd.config.requireDueDate": "마감일 필수: 만들기 대화상자·API·CLI·MCP가 📅 없는 새 태스크를 거부하고, 에디터는 마감일 없는 미완료 태스크에 경고를 표시합니다.",
   "tasksmd.config.rendered.sourceWhenNoTasks": "렌더 보기가 마크다운 기본 편집기일 때, 태스크가 없는 노트는 텍스트 편집기로 엽니다.",
   "tasksmd.renderedAsDefault.title": "렌더 보기를 기본 편집기로",
+  "tasksmd.config.rendered.maxWidth": "렌더 보기 본문 열(쿼리 결과 상자 포함)의 최대 폭(px). 0이면 편집기 전체 폭.",
   "tasksmd.config.calendar.fontSize": "캘린더 칸에 표시되는 태스크의 글자 크기(px).",
   "tasksmd.config.calendar.fullScreen": "캘린더의 전체 화면 버튼이 하는 일.",
   "tasksmd.config.calendar.fullScreen.maximize": "사이드바와 하단 패널을 숨기고 캘린더의 에디터 그룹을 최대화합니다.",

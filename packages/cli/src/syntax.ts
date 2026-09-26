@@ -23,6 +23,10 @@ Boolean: (not done) AND (due before today) · (priority is high) OR (tags includ
 Sort: sort by due|scheduled|start|created|done|priority|urgency|description|path|status|tag [reverse]
 Group: group by due|folder|filename|heading|priority|status|tag|path|happens|urgency
 Limit/layout: limit 20 · limit groups 5 · short mode · hide backlink · hide priority · show tree · explain
+The extension's sidebar views are these queries (use them to match what the user sees):
+  Today: not done + happens on or before today · Upcoming 7 days: not done + happens after today + happens on or before in 7 days
+  Overdue: not done + due before today · In progress: status.type is IN_PROGRESS · Blocked: not done + is blocked
+  All open: not done · Done (30 days): done + (done on or after 30 days ago) OR (cancelled on or after 30 days ago)
 Placeholders inside a note: {{query.file.folder}} {{query.file.path}} {{query.file.filename}}
 
 Lines in tool arguments are 0-based (line 0 = first line of the file); the CLI shows 1-based numbers.

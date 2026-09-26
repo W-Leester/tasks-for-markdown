@@ -20,3 +20,4 @@ pnpm-workspace.yaml
 History.md
 dist/latest.json
 vitest.webviews.config.mts
+packages/**

@@ -34,7 +34,7 @@
 | M6 | 웹뷰: 편집 모달 + 칸반 + 쿼리 빌더 | ✅ 완료 | 2026-09-21 · unit 447 / integration 31 |
 | M7 | 추가 기능: 알림·아카이브·통계·캘린더·업데이트 확인 | ✅ 완료 | 2026-09-21 · unit 462 / integration 34 |
 | M8 | 마감: i18n·성능·접근성·문서·패키징·게시 | 🟡 코드 완료 · 사용자 작업 대기 | 1.0.0 `.vsix` 생성됨 · 남은 것: 퍼블리셔/토큰 생성, 저장소 공개 여부, M8.7 수동 테스트 |
-| M9 | 공개 API: 확장 API·명령·npm/CLI·MCP·URI | 🟡 M9.1–9.3 완료(1.1.0) · M9.4–9.7 남음 | docs/api-plan.md v0.2, docs/api.md |
+| M9 | 공개 API: 확장 API·명령·npm/CLI·MCP·URI | 🟡 M9.1–9.4 완료(1.2.0, npm 발행은 사용자 작업) · M9.5–9.7 남음 | docs/api-plan.md v0.2, docs/api.md |
 
 ---
 
@@ -580,11 +580,11 @@
 - [x] 통합 테스트: `executeCommand('tasksmd.api.query.run', {query, limit})`, `edit.create` 거부 시 `{error}`
 
 ### M9.4 (D1) npm 라이브러리 + CLI
-- [ ] pnpm workspace: `packages/core`(현재 `src/core` 이동 또는 재수출), `packages/cli`
-- [ ] 폴더 스캐너(gitignore·`tasksmd.exclude` 존중), 파일 쓰기 구현(7-a: `expectedText` 검사)
-- [ ] CLI: `query`, `explain`, `add`, `done`, `set`, `mcp` 서브커맨드, `--json|--md`, `--root`
-- [ ] 발행: 마켓플레이스 게시와 함께 공개 npm `@hastycapybara/tasks-core`, `@hastycapybara/tasks-cli`; 불가 시 `.tgz` 릴리스 첨부
-- [ ] 테스트: 임시 폴더 픽스처로 CLI E2E
+- [x] pnpm workspace: `packages/core`(`src/core`를 `tsc`로 CJS 빌드, 엔트리 `src/core/main.ts`), `packages/cli`(esbuild 단일 파일 `dist/tasksmd.cjs`)
+- [x] 폴더 스캐너(`.gitignore`·`tasksmd.exclude`·node_modules·.git), 파일 쓰기 `store.ts`(7-a: 줄 원문 검사 → `STALE_LINE`, 반복 삽입 위치, EOL 보존)
+- [x] CLI: `query`, `explain`, `list`, `add`, `done`, `status`, `set`, `postpone`, `remove`, `--json|--md`, `--root`, `--today`, `--expect`, `.vscode/settings.json` 읽기 — `mcp`는 M9.5
+- [ ] **(사용자 작업)** 발행: npm 스코프 `hastycapybara` 생성 후 `pnpm --filter … publish --access public` (docs/release.md); 불가 시 `.tgz` 릴리스 첨부
+- [x] 테스트: `tests/cli.test.ts` 임시 폴더 픽스처 5건(스캔·출력 형식, 쿼리 오류, add/done(반복)/set/postpone/remove/STALE_LINE/NOT_FOUND, settings.json JSONC, help) + 빌드 산출물 스모크(examples/)
 
 ### M9.5 (C1) MCP 서버 (주 대상 Claude Code)
 - [ ] `tasksmd mcp --root <dir>` stdio 서버, 도구: `tasks_query`, `tasks_list_saved_queries`, `tasks_create`, `tasks_update`, `tasks_set_status`, `tasks_postpone`, `tasks_remove`, `tasks_explain_query`; 리소스 `tasks_syntax_reference`

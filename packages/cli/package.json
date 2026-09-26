@@ -1,0 +1,17 @@
+{
+  "name": "@hastycapybara/tasks-cli",
+  "version": "1.2.0",
+  "description": "Command line for Tasks for Markdown: query, add, complete and edit Obsidian Tasks-style task lines in a folder of Markdown notes — no editor required.",
+  "license": "MIT",
+  "author": "hastyCapybara (W.Leester)",
+  "homepage": "https://github.com/W-Leester/tasks-for-markdown",
+  "repository": { "type": "git", "url": "https://github.com/W-Leester/tasks-for-markdown.git", "directory": "packages/cli" },
+  "keywords": ["markdown", "tasks", "obsidian", "todo", "cli"],
+  "bin": { "tasksmd": "./dist/tasksmd.cjs" },
+  "files": ["dist", "README.md"],
+  "publishConfig": { "access": "public" },
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "build": "node build.mjs"
+  }
+}

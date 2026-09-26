@@ -8,7 +8,7 @@
  * workspace-relative path and 0-based line. No `vscode` types leak through this file, so it can
  * be copied into another project as a `.d.ts`.
  */
-import type { GroupDto, SavedQueryDto, TaskDto } from '../webviews/shared/protocol';
+import type { GroupDto, SavedQueryDto, TaskDto } from '../core/dto';
 
 export type { GroupDto, SavedQueryDto, TaskDto };
 

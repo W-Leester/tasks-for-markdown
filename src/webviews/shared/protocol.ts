@@ -4,34 +4,9 @@
  * webview bundle must stay small and browser-only.
  */
 
-export interface TaskDto {
-  /** Index key + line identify the task for edits. */
-  key: string;
-  path: string;
-  line: number;
-  heading: string | null;
-  description: string;
-  status: { symbol: string; name: string; type: string };
-  /** '0' (highest) … '5' (lowest). */
-  priority: string;
-  priorityName: string;
-  created: string | null;
-  start: string | null;
-  scheduled: string | null;
-  due: string | null;
-  done: string | null;
-  cancelled: string | null;
-  recurrence: string | null;
-  onCompletion: string | null;
-  id: string | null;
-  dependsOn: string[];
-  tags: string[];
-  isCompleted: boolean;
-  isDone: boolean;
-  isBlocked: boolean;
-  urgency: number;
-  originalMarkdown: string;
-}
+import type { GroupDto, SavedQueryDto, TaskDto } from '../../core/dto';
+
+export type { GroupDto, SavedQueryDto, TaskDto };
 
 /** A ```tasks block whose results a panel shows: its text, the note it lives in, and a label. */
 export interface QueryTargetDto {
@@ -47,13 +22,6 @@ export interface StatusDto {
   name: string;
   type: string;
   nextSymbol: string;
-}
-
-export interface SavedQueryDto {
-  id: string;
-  name: string;
-  query: string;
-  source: 'settings' | 'file';
 }
 
 export interface InitState {
@@ -91,13 +59,6 @@ export type ToWebview =
   /** Host-confirmed full-screen state of the panel (also sent after a command toggled it). */
   | { type: 'ui/fullscreen'; on: boolean }
   | { type: 'error'; message: string };
-
-export interface GroupDto {
-  name: string;
-  count: number;
-  children: GroupDto[];
-  tasks: TaskDto[];
-}
 
 export type FromWebview =
   | { type: 'ui/ready' }

@@ -23,11 +23,17 @@ jobs:
         run: xvfb-run -a pnpm test:integration
       - name: Package .vsix + latest.json
         run: pnpm package
+      - name: Build and pack npm packages (.tgz attached to the release)
+        run: |
+          pnpm build:packages
+          pnpm --filter @hastycapybara/tasks-core pack --pack-destination .
+          pnpm --filter @hastycapybara/tasks-cli pack --pack-destination .
       - name: GitHub Release with artifacts
         uses: softprops/action-gh-release@v2
         with:
           files: |
             *.vsix
+            *.tgz
             dist/latest.json
           generate_release_notes: true
       # Publishing runs only when the tokens are configured as repository secrets.

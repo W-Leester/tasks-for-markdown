@@ -1,5 +1,12 @@
 # 변경 이력
 
+## 1.2.0 — 2026-09-26
+
+### API
+- **npm 라이브러리 `@hastycapybara/tasks-core`** (packages/core): 확장의 핵심(`src/core`)을 CommonJS + 타입으로 내보냅니다. 파서·직렬화·날짜·반복·쿼리 엔진·인덱스·DTO·HTML 렌더·통계.
+- **CLI `tasksmd`** (`@hastycapybara/tasks-cli`, packages/cli): `query`, `explain`, `list`, `add`, `done`, `status`, `set`, `postpone`, `remove`. 폴더를 직접 훑고(.gitignore·exclude 존중) `.vscode/settings.json`의 `tasksmd.*`를 읽습니다. 완료·반복 처리는 확장과 같은 코드. `--expect`로 줄 원문 검사, JSON/마크다운 출력, `--today`.
+- 태스크 DTO 타입(`TaskDto`, `GroupDto`, `SavedQueryDto`)이 `src/core/dto.ts`로 옮겨져 라이브러리·확장 API·웹뷰가 같은 정의를 씁니다.
+
 ## 1.1.1 — 2026-09-26
 
 ### 변경

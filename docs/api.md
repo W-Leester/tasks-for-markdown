@@ -118,7 +118,56 @@ keybindings.json:
 | `DENIED` | 쓰기 정책 또는 사용자가 거부 |
 | `IO` | 파일 읽기·쓰기 실패, 워크스페이스 없음 |
 
-## 6. 호환 정책
+## 6. 편집기 밖에서: npm 라이브러리 `@hastycapybara/tasks-core`
+
+확장의 핵심(`src/core/`)을 그대로 CommonJS 패키지로 내보낸 것입니다. VS Code 없이 Node 18 이상에서 씁니다.
+
+```ts
+import { TaskIndex, parseFile, Query, StatusRegistry, dayjs, serializeTask, toTaskDto, applyStatusChange } from '@hastycapybara/tasks-core';
+
+const registry = StatusRegistry.default();
+const index = new TaskIndex();
+const text = fs.readFileSync('notes/todo.md', 'utf8');
+const r = parseFile(text, { path: 'notes/todo.md', statusRegistry: registry });
+index.setFile({ key: 'notes/todo.md', path: 'notes/todo.md', tasks: r.tasks, headings: r.headings, frontmatterTags: r.frontmatterTags });
+
+const today = dayjs().startOf('day');
+const result = Query.parse('not done\ndue before today').run({ index, today, allowFunctions: false });
+result.root.tasks.forEach((t) => console.log(serializeTask(t), toTaskDto(t, index, today).due));
+```
+
+| 무엇 | 주요 export |
+|---|---|
+| 줄 파싱·직렬화 | `parseTaskLine`, `parseFile`, `serializeTask`, `Task`, `DateField`, `Priority`, `StatusRegistry`, `DEFAULT_STATUSES` |
+| 완료·반복 | `applyStatusChange`(완료일·취소일·다음 회차), `Recurrence`, `nextInstance` |
+| 날짜 | `dayjs`, `parseNaturalDate`(영어·한국어 자연어), `parseDateRange`, `describeRelative` |
+| 쿼리 | `Query.parse(text).run({ index, today, allowFunctions })`, `Query.explain` |
+| 인덱스·의존성 | `TaskIndex`, `isBlocked`, `dependants` |
+| 표시 | `toTaskDto`(JSON), `renderQueryResult`(HTML), `computeWeeklyStats` |
+
+파일 쓰기는 포함하지 않습니다(라이브러리는 순수 계산만). 쓰기까지 필요하면 CLI를 쓰거나 CLI의 `store.ts` 패턴(줄 원문 검사 후 치환)을 참고하세요.
+
+## 7. 편집기 밖에서: CLI `tasksmd` (`@hastycapybara/tasks-cli`)
+
+```bash
+npx @hastycapybara/tasks-cli query "not done\ndue before today" --root ~/notes --md
+tasksmd add "월간 결산 #업무 ⏫ 📅 2026-10-05" --file notes/inbox.md
+tasksmd done notes/todo.md:12 --expect "- [ ] 원문 줄"
+tasksmd status notes/todo.md:12 /                 # 진행 중
+tasksmd set notes/todo.md:12 --due 2026-10-20 --priority 1 --description "새 설명"
+tasksmd postpone notes/todo.md:12 "next monday"
+tasksmd remove notes/todo.md:12
+tasksmd list --file notes/todo.md --json
+tasksmd explain "priority is above none"
+```
+
+- 대상 폴더는 `--root`(기본 현재 폴더). `.gitignore`, `tasksmd.exclude`, `node_modules`, `.git`을 건너뜁니다.
+- 설정은 `<root>/.vscode/settings.json`의 `tasksmd.*`를 읽습니다: `globalFilter`, `taskFormat`, `setDoneDate`, `setCancelledDate`, `setCreatedDate`, `recurrence.*`, `statuses`, `include`, `exclude`, `query.allowFunctions`. 주석과 뒤따르는 쉼표가 있어도 됩니다.
+- 줄 번호는 1부터. `--today YYYY-MM-DD`로 기준일을 바꿀 수 있습니다(테스트·리포트용).
+- 출력: 터미널이면 마크다운(`원문 줄  (경로:줄)`), 파이프면 JSON. `--json`/`--md`로 고정. 오류는 JSON 모드에서 `{ "error": { code, message } }`, 종료 코드 1(실행 오류)·2(인자 오류).
+- 파일을 직접 고칩니다. 편집기에 저장 안 된 변경이 있는 파일은 저장 후 쓰세요. `--expect`에 줄 원문을 주면 그사이 바뀐 줄은 `STALE_LINE`으로 거부합니다. 완료 처리는 확장과 같은 코드라 완료일·반복 다음 회차·필드 순서가 동일합니다.
+
+## 8. 호환 정책
 
 - `version: 1`. 필드·메서드 **추가**는 1을 유지합니다. 제거·의미 변경은 `getAPI(2)`를 추가하고 1을 최소 한 릴리스 동안 병행합니다.
 - 변경은 CHANGELOG의 "API" 절에 적습니다.

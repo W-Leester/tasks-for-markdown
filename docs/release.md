@@ -6,6 +6,18 @@
 2. **Open VSX** (Cursor용): https://open-vsx.org 에서 로그인 → 네임스페이스 `hastycapybara` 생성(`ovsx create-namespace hastycapybara -p <token>`) → Secrets에 `OVSX_PAT`.
 3. 두 토큰이 없으면 워크플로는 게시 단계를 건너뛰고 `.vsix`만 Release에 첨부한다.
 
+## npm 패키지 (`@hastycapybara/tasks-core`, `@hastycapybara/tasks-cli`)
+
+1. 한 번만: npm 계정에서 조직/스코프 `hastycapybara` 생성, `npm login`.
+2. `packages/*/package.json`의 `version`을 확장과 같은 번호로 맞춘다(pnpm workspace).
+3. 빌드·검증·발행:
+   ```bash
+   pnpm build:packages && pnpm test
+   pnpm --filter @hastycapybara/tasks-core publish --access public
+   pnpm --filter @hastycapybara/tasks-cli publish --access public
+   ```
+4. npm에 올릴 수 없으면 `pnpm --filter <pkg> pack`으로 만든 `.tgz`를 GitHub Release에 첨부하고, 사용자는 `npm i -g ./tasks-cli-<ver>.tgz`로 설치한다.
+
 ## 매 릴리스
 
 ```bash

@@ -434,6 +434,21 @@ claude mcp add tasks -- npx -y @hmcvecdt/tasks-cli mcp --root "$PWD"
 ```
 에이전트가 문법을 모를 때는 `tasks_syntax_reference` 리소스를 읽고, 쿼리가 맞는지 `tasks_explain_query`로 확인한 뒤 실행합니다.
 
+### 10.13 상용 앱 기준: API가 보통 제공하는 것과 사용 방식
+
+| 제공 항목 | 상용 앱 예 | 사람들이 쓰는 방식 | 우리 대응 |
+|---|---|---|---|
+| 리소스 읽기·쓰기 | Slack 메시지·채널, Google Calendar 일정, Stripe 결제·구독, Notion 페이지 | 내부 도구가 화면 없이 데이터 생성·조회 | `query.*`, `edit.*` |
+| 검색·필터·페이지 | Gmail 검색 문법, Notion JSON 필터, GraphQL(Shopify·Linear) | 대시보드·리포트 | 앱과 같은 쿼리 문법, `limit` |
+| 변화 알림(웹훅·이벤트) | Stripe 결제 이벤트, Slack 이벤트, GitHub 푸시/PR | 자동화 트리거 | `events.*`(확장 안), CLI는 재조회 |
+| 인증·권한 범위 | OAuth 범위(Google·Slack·GitHub), 개인 토큰 | "계정으로 연결" 동의 화면 | 로컬이라 토큰 없음, 쓰기 확인(`confirm`) |
+| 자동화 플랫폼·봇 | Zapier/Make/IFTTT 트리거·액션, Slack 앱, 카카오 챗봇 | 코딩 없이 서비스 연결 | MCP 도구, CLI |
+| 임베드·확장 지점 | Stripe 결제 위젯, Slack 모달·슬래시 명령, Figma 플러그인 | 남의 앱 안에 기능 삽입 | `ui.openEdit` 등 화면 열기 |
+| 개발자 부속물 | SDK·타입, 문서·예제, 샌드박스, 요청 한도, 오류 코드, 버전·폐기 예고, 변경 로그 | 5분 안에 첫 호출 성공 | `api.d.ts`, `docs/api.md`, 오류 코드, `getAPI(1)`, CHANGELOG API 절 |
+| AI 에이전트 도구 | Slack·GitHub·Notion·Linear의 MCP 서버 | 말로 시키면 에이전트가 호출 | `tasksmd mcp` |
+
+웹훅·OAuth·자동화 플랫폼은 인터넷 서비스의 것이고, 로컬 도구인 우리에게는 이벤트 객체·쓰기 확인·MCP가 그 자리를 대신합니다.
+
 ---
 
 ## 11. 확정 후 다음 단계

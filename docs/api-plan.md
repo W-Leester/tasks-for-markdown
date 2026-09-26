@@ -314,6 +314,126 @@ A1→A2→B1이 한 묶음(편집기 안 API), D1→C1이 한 묶음(밖 API)입
 - 커서 기반 페이지네이션 — 메모리 내 인덱스라 `limit`으로 충분합니다.
 - 웹훅 — 로컬 프로세스 간에는 이벤트 객체(확장)나 재조회(CLI)가 더 단순합니다.
 
+### 10.12 구체적인 호출 예시 — 남들은 이렇게 하고, 우리는 이렇게 한다
+
+**Todoist REST v2** — 토큰 하나로 필터 조회와 완료 처리.
+```bash
+curl -H "Authorization: Bearer $TOKEN" "https://api.todoist.com/rest/v2/tasks?filter=today%20%7C%20overdue"
+```
+```json
+[{ "id": "7498250", "content": "보고서 작성", "is_completed": false, "priority": 4,
+   "due": { "date": "2026-09-25", "is_recurring": false, "string": "Sep 25" },
+   "labels": ["work"], "project_id": "2203", "url": "https://todoist.com/showTask?id=7498250" }]
+```
+```bash
+curl -X POST -H "Authorization: Bearer $TOKEN" https://api.todoist.com/rest/v2/tasks/7498250/close   # 204 No Content
+```
+
+**Notion API** — 데이터베이스를 JSON 필터로 조회, 페이지 속성 수정. 버전은 헤더로.
+```bash
+curl -X POST https://api.notion.com/v1/databases/$DB/query \
+  -H "Authorization: Bearer $TOKEN" -H "Notion-Version: 2022-06-28" -H "Content-Type: application/json" \
+  -d '{ "filter": { "and": [ { "property": "Status", "status": { "does_not_equal": "Done" } },
+                             { "property": "Due", "date": { "on_or_before": "2026-09-30" } } ] },
+        "sorts": [ { "property": "Due", "direction": "ascending" } ], "page_size": 50 }'
+```
+```json
+{ "object": "list", "results": [ { "object": "page", "id": "b55c9c91-…", "properties": { "Name": { "title": [ { "plain_text": "계약서 검토" } ] },
+  "Due": { "date": { "start": "2026-09-19" } } } } ], "has_more": false, "next_cursor": null }
+```
+오류는 `{ "object": "error", "status": 400, "code": "validation_error", "message": "body failed validation: …" }`.
+
+**GitHub REST** — 이슈를 태스크처럼 쓰는 경우. 상태 변경은 PATCH.
+```bash
+curl -H "Authorization: Bearer $TOKEN" "https://api.github.com/repos/W-Leester/tasks-for-markdown/issues?state=open&labels=bug&per_page=50"
+curl -X PATCH -H "Authorization: Bearer $TOKEN" https://api.github.com/repos/W-Leester/tasks-for-markdown/issues/12 -d '{ "state": "closed" }'
+```
+
+**VS Code 내장 Git 확장** — 확장 간 API의 표준 모양. 우리가 따르는 형태입니다.
+```ts
+import type { GitExtension } from './git';           // 저장소가 배포하는 git.d.ts를 복사해 씀
+const gitExt = vscode.extensions.getExtension<GitExtension>('vscode.git');
+const git = gitExt!.exports.getAPI(1);               // 숫자 버전
+const repo = git.repositories[0];
+await repo.status();
+console.log(repo.state.HEAD?.name);                  // 현재 브랜치
+repo.state.onDidChange(() => { /* 변경 구독 */ });
+```
+
+**Obsidian Tasks** — 유일한 공개 API. 편집 모달을 띄우고 결과 줄을 돌려줍니다.
+```ts
+const tasksApi = this.app.plugins.plugins['obsidian-tasks-plugin'].apiV1;
+const line: string = await tasksApi.createTaskLineModal();   // "- [ ] 새 태스크 📅 2026-10-01"
+editor.replaceSelection(line);
+```
+
+---
+
+**우리 확장 API (A)** — 다른 확장에서. `dist/api.d.ts`를 복사하거나 npm 타입을 씁니다.
+```ts
+import type { TasksApi } from '@hmcvecdt/tasks-core/api';   // 또는 확장에 동봉된 api.d.ts
+const ext = vscode.extensions.getExtension<{ getAPI(v: 1): TasksApi }>('HMCVECDT.tasks-for-markdown');
+const tasks = (await ext!.activate()).getAPI(1);
+
+// 조회: 앱과 같은 쿼리 문법
+const r = await tasks.query.run('not done\ndue before tomorrow\nsort by urgency', { limit: 20 });
+// r = { matched: 5, shown: 5, tasks: [ { path: 'examples/샘플-태스크.md', line: 14, description: '계약서 검토 #업무',
+//        status: { symbol: ' ', name: 'Todo', type: 'TODO' }, priority: '0', due: '2026-09-19', tags: ['#업무'], … } ], groups: null, errors: [] }
+
+// 생성: 대상 파일 끝에 추가 (line 생략) — 첫 쓰기 때 "확장 X가 수정하려 합니다" 확인창
+const created = await tasks.edit.create({ description: '월간 결산', due: '2026-10-05', priority: '1', tags: ['#업무'] }, { path: 'notes/inbox.md' });
+
+// 상태 변경: 줄 원문을 함께 보내면 그사이 바뀐 경우 STALE_LINE으로 거부
+await tasks.edit.setStatus({ path: created.path, line: created.line, expectedText: created.originalMarkdown }, 'x');
+
+// 오류 처리: 예외 대신 코드가 있는 객체
+try { await tasks.edit.toggle({ path: 'x.md', line: 999 }); }
+catch (e) { if ((e as ApiError).code === 'NOT_FOUND') { /* … */ } }
+
+// 구독
+const sub = tasks.events.onDidCompleteTask(({ task, next }) => console.log(`${task.description} 완료`, next ? `다음: ${next.due}` : ''));
+sub.dispose();
+```
+
+**명령 표면 (B)** — 타입 없이, 키바인딩·매크로·다른 언어 확장에서.
+```ts
+const r = await vscode.commands.executeCommand('tasksmd.api.query.run', { query: 'due today' });
+await vscode.commands.executeCommand('tasksmd.api.edit.setStatus', { ref: { path: 'notes/todo.md', line: 12 }, symbol: 'x' });
+// 실패: { error: { code: 'STALE_LINE', message: 'Line 12 changed since it was read' } }
+```
+keybindings.json에서 인자와 함께:
+```json
+{ "key": "ctrl+alt+k", "command": "tasksmd.api.ui.openKanban", "args": { "savedQueryId": "this-week", "mode": "due" } }
+```
+
+**CLI (D)** — 터미널·CI.
+```bash
+tasksmd query "not done
+due before today
+sort by due" --root ~/notes --md
+# - [ ] 계약서 검토 #업무 🔺 📅 2026-09-19  (examples/샘플-태스크.md:14)
+# - [ ] 예산안 제출 #업무 📅 2026-09-16  (examples/샘플-태스크.md:15)
+
+tasksmd query "not done" --json | jq '.tasks[] | select(.priority == "0") | .description'
+tasksmd add "월간 결산 📅 2026-10-05 ⏫" --file notes/inbox.md
+tasksmd done examples/샘플-태스크.md:14 --expect "- [ ] 계약서 검토 #업무 🔺 📅 2026-09-19"
+```
+
+**MCP (C)** — Claude Code에서. 등록 한 번:
+```bash
+claude mcp add tasks -- npx -y @hmcvecdt/tasks-cli mcp --root "$PWD"
+```
+그다음 대화에서 "이번 주 마감인 업무 태스크 중 안 끝난 거 보여주고, 계약서 검토는 완료 처리해 줘"라고 하면 에이전트가 도구를 이렇게 호출합니다(사용자에게는 승인 창이 뜸).
+```json
+{ "tool": "tasks_query", "arguments": { "query": "not done\ntags include #업무\ndue this week" } }
+→ { "matched": 3, "tasks": [ { "path": "examples/샘플-태스크.md", "line": 14, "text": "- [ ] 계약서 검토 #업무 🔺 📅 2026-09-19", "due": "2026-09-19", "priority": "highest" }, … ] }
+
+{ "tool": "tasks_set_status", "arguments": { "path": "examples/샘플-태스크.md", "line": 14,
+    "expectedText": "- [ ] 계약서 검토 #업무 🔺 📅 2026-09-19", "symbol": "x" } }
+→ { "ok": true, "text": "- [x] 계약서 검토 #업무 🔺 📅 2026-09-19 ✅ 2026-09-26" }
+```
+에이전트가 문법을 모를 때는 `tasks_syntax_reference` 리소스를 읽고, 쿼리가 맞는지 `tasks_explain_query`로 확인한 뒤 실행합니다.
+
 ---
 
 ## 11. 확정 후 다음 단계

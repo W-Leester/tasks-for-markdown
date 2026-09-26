@@ -40,7 +40,6 @@
   "Show": "Show",
   "Everything": "Everything",
   "Open only": "Open only",
-  "Today (incl. overdue)": "Today (incl. overdue)",
   "This week": "This week",
   "Through next week": "Through next week",
   "Overdue": "Overdue",
@@ -52,5 +51,6 @@
   "Text editor": "Text editor",
   "Which editor should open Markdown notes?": "Which editor should open Markdown notes?",
   "Markdown notes now open in the rendered view. Source: the Source button or Ctrl+Shift+R.": "Markdown notes now open in the rendered view. Source: the Source button or Ctrl+Shift+R.",
-  "Markdown notes open in the text editor again.": "Markdown notes open in the text editor again."
+  "Markdown notes open in the text editor again.": "Markdown notes open in the text editor again.",
+  "Due by today": "Due by today"
 }

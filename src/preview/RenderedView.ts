@@ -278,7 +278,8 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
   .tfm-field.tfm-invalid { color: var(--vscode-editorWarning-foreground, #cca700); }
   .rv-frontmatter { color: var(--rv-muted); font-size: 1em; margin: 0 0 1.25em; padding: 0 0 .75em; border-bottom: 1px solid var(--rv-stroke); }
   .rv-frontmatter .k { color: var(--rv-fg); font-weight: 600; }
-  li.tfm-task.tfm-status-done > .tfm-desc, li.tfm-task.tfm-status-done { color: var(--rv-muted); }
+  /* Completed tasks: muted, no strike-through (consistent for tight and loose lists; the editor setting decorations.strikeDone covers the text editor). */
+  li.tfm-task.tfm-status-done, li.tfm-task.tfm-status-done .tfm-desc, li.tfm-task.tfm-status-cancelled .tfm-desc { color: var(--rv-muted); text-decoration: none; }
   .tfm-badges { margin-left: .4em; } .tfm-badge { font-size: .78em; line-height: 1.6; background: var(--rv-bg-3); color: var(--rv-fg); }
   .tfm-query { background: var(--rv-bg-2); border: 1px solid var(--rv-stroke); border-radius: 6px; padding: 10px 14px; margin: 0 0 .75em; }
   .tfm-query .tfm-list { margin: .2em 0 .3em; padding-left: 0; } .tfm-query .tfm-list li.tfm-task { margin-left: 0; }
@@ -306,7 +307,7 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
     <option value="document">${t('Document order')}</option><option value="due">${t('Due date')}</option><option value="created">${t('Created date')}</option><option value="priority">${t('Priority')}</option><option value="urgency">${t('Urgency')}</option>
   </select></label>
   <label class="rv-select"><span>${t('Show')}</span><select id="view-scope">
-    <option value="all">${t('Everything')}</option><option value="open">${t('Open only')}</option><option value="today">${t('Today (incl. overdue)')}</option><option value="week">${t('This week')}</option><option value="nextWeek">${t('Through next week')}</option><option value="overdue">${t('Overdue')}</option>
+    <option value="all">${t('Everything')}</option><option value="open">${t('Open only')}</option><option value="today">${t('Due by today')}</option><option value="week">${t('This week')}</option><option value="nextWeek">${t('Through next week')}</option><option value="overdue">${t('Overdue')}</option>
   </select></label>
   <span id="view-hidden" class="rv-hint"></span>
 </div>

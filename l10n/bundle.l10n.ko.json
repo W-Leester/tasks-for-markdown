@@ -318,7 +318,6 @@
   "Show": "보기",
   "Everything": "전체",
   "Open only": "미완료만",
-  "Today (incl. overdue)": "오늘(초과 포함)",
   "Through next week": "다음 주까지",
   "{0} hidden": "{0}개 숨김",
   "Make it the default": "기본으로 설정",
@@ -328,5 +327,6 @@
   "Text editor": "텍스트 편집기",
   "Which editor should open Markdown notes?": "마크다운 노트를 어떤 편집기로 열까요?",
   "Markdown notes now open in the rendered view. Source: the Source button or Ctrl+Shift+R.": "이제 마크다운 노트가 렌더 보기로 열립니다. 소스는 소스 버튼 또는 Ctrl+Shift+R.",
-  "Markdown notes open in the text editor again.": "마크다운 노트가 다시 텍스트 편집기로 열립니다."
+  "Markdown notes open in the text editor again.": "마크다운 노트가 다시 텍스트 편집기로 열립니다.",
+  "Due by today": "오늘까지(초과 포함)"
 }

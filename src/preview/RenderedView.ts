@@ -265,6 +265,10 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
   .tfm-query .tfm-list > li { content-visibility: auto; contain-intrinsic-size: auto 28px; }
   .rv-actions button { border: none; background: var(--rv-bg-2); color: var(--rv-muted); border-radius: 4px; padding: 0 5px; line-height: 18px; font-size: 12px; cursor: pointer; font-family: inherit; }
   .rv-actions button:hover { background: var(--rv-bg-3); color: var(--rv-fg); }
+  /* Faint separator between task rows (document lists and query results) so wrapped fields stay with their task. */
+  li.tfm-task { border-top: 1px solid color-mix(in srgb, var(--rv-fg) 10%, transparent); padding-top: 4px; padding-bottom: 4px; margin: 0; }
+  ul > li.tfm-task:first-child, ol > li.tfm-task:first-child { border-top-color: transparent; }
+  li.tfm-task > ul > li.tfm-task:first-child, li.tfm-task > p + ul > li.tfm-task:first-child { border-top-color: color-mix(in srgb, var(--rv-fg) 10%, transparent); }
   .tfm-fields { margin-left: .2em; } .tfm-field { white-space: nowrap; }
   /* fieldsAlign = right: description on the left, metadata pushed to the right edge of the column. */
   body.fields-right li.tfm-task, body.fields-right li.tfm-task > p { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: .6em; }

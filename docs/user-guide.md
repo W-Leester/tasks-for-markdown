@@ -37,6 +37,8 @@ Obsidian Tasks 플러그인과 같은 문법으로 VS Code / Cursor 안에서 �
 
 **마감일 필수로 하기.** `tasksmd.requireDueDate`를 켜면 만들기 대화상자·API·CLI·MCP가 📅 없는 새 태스크를 거부합니다. 에디터에 직접 `- [ ]`를 치는 것까지 막을 수는 없으므로, 대신 마감일 없는 미완료 태스크에 경고 밑줄을 긋고 전구(빠른 수정)에서 `마감일 설정…` 또는 `오늘 날짜 추가`를 고를 수 있게 합니다. Problems 패널에서 한꺼번에 볼 수 있습니다.
 
+**의존성(🆔/⛔)**은 별도 안내 [dependencies-guide.md](dependencies-guide.md)에 예시와 그림으로 정리했습니다.
+
 ## 3. 사이드바
 
 액티비티 바의 **Tasks** 아이콘:

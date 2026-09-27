@@ -82,7 +82,7 @@ suite('public API (getAPI(1))', () => {
       assert.strictEqual(postponed.due, '2026-10-20');
 
       const batch = await api.edit.batch([
-        { op: 'create', input: { description: 'batch one' }, target: { path: FILE } },
+        { op: 'create', input: { description: 'batch one', due: '2026-11-01' }, target: { path: FILE } },
         { op: 'create', input: { description: 'batch two', due: '2026-11-01' }, target: { path: FILE } },
         { op: 'toggle', ref: { path: FILE, line: postponed.line } },
       ]);

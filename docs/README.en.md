@@ -69,7 +69,7 @@ group by filename
 | `notifications.*` | on, `09:00`, 1 day | Daily summary and due-soon digest, OS notifications |
 | `archive.file` / `afterDays` / `linkStyle` | `Archive.md` / 30 / `wiki` | Archive command |
 | `calendar.newTaskFile` | `""` | File that receives tasks created from the calendar |
-| `requireDueDate` | `false` | Refuse new tasks without a due date (dialog, API, CLI, MCP) and warn in the editor |
+| `requireDueDate` | `true` | Refuse new tasks without a due date (dialog, API, CLI, MCP) and warn in the editor |
 | `api.writePolicy` | `confirm` | Writes through the public API: confirm once per caller / allow / deny |
 | `rendered.maxWidth` | `0` | Max width (px) of the rendered column; 0 = full editor width (default) |
 | `rendered.sourceWhenNoTasks` | `true` | With the rendered view as default editor, notes without tasks open in the text editor |

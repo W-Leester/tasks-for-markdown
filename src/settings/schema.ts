@@ -75,7 +75,7 @@ export const SETTINGS_DEFAULTS: Readonly<SettingsSchema> = {
   maxFileSizeKB: 1024,
   setCreatedDate: false,
   setDoneDate: true,
-  requireDueDate: false,
+  requireDueDate: true,
   setCancelledDate: true,
   'decorations.relativeDates': true,
   'decorations.overdueHighlight': true,

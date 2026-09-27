@@ -27,7 +27,7 @@ const DEFAULTS: Omit<CliConfig, 'root'> = {
   setDoneDate: true,
   setCancelledDate: true,
   setCreatedDate: false,
-  requireDueDate: false,
+  requireDueDate: true,
   allowFunctions: false,
   recurrence: { insertPosition: 'above', idHandling: 'keep', copyDependsOn: true, removeScheduledDate: false },
   statuses: [...DEFAULT_STATUSES],

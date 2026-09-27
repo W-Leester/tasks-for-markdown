@@ -93,12 +93,12 @@ function afterWrite(ws: Workspace, abs: string, line: number): TaskDto {
 }
 
 /** `add`: a task line (with or without the `- [ ] ` prefix) appended to a file or inserted after a line. */
-export function addTask(ws: Workspace, lineText: string, file: string, line?: number): TaskDto {
+export function addTask(ws: Workspace, lineText: string, file: string, line?: number, opts: { dueChecked?: boolean } = {}): TaskDto {
   const raw = /^\s*[-*+]\s+\[.\]/.test(lineText) ? lineText : `- [ ] ${lineText.trim()}`;
   let task = parseTaskLine(raw, { statusRegistry: ws.registry, globalFilter: ws.cfg.globalFilter || undefined });
   if (!task) throw new CliError('INVALID_ARGUMENT', `Not a task line: ${raw}`);
   if (ws.cfg.setCreatedDate && !task.created) task = task.with({ created: DateField.fromDate(ws.today) });
-  if (ws.cfg.requireDueDate && !task.due) throw new CliError('INVALID_ARGUMENT', 'A due date is required (tasksmd.requireDueDate)');
+  if (ws.cfg.requireDueDate && !opts.dueChecked && !task.due) throw new CliError('INVALID_ARGUMENT', 'A due date is required (tasksmd.requireDueDate)');
   const abs = absOf(ws, file);
   const at = insertLine(abs, line ?? Number.POSITIVE_INFINITY, serializeTask(task.with({ indentation: '' }), ws.cfg.taskFormat));
   return afterWrite(ws, abs, at);

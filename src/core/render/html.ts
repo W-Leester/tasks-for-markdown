@@ -12,6 +12,8 @@ export interface RenderOptions {
   globalFilter?: string;
   /** Translate fixed UI strings. */
   t?: (s: string, ...args: (string | number)[]) => string;
+  /** HTML inserted right after the priority badge (query result rows put the backlink there). */
+  afterPriority?: string;
   /** Show raw fields instead of badges (setting preview.renderBadges = false). */
   hideBadges?: boolean;
   /**
@@ -65,6 +67,7 @@ export function renderBadges(task: Task, layout: Layout | null, o: RenderOptions
       : `<span class="tfm-badge tfm-${cls}"${title ? ` title="${esc(title)}"` : ''}>${icon}${short ? '' : ` ${esc(text)}`}</span>`);
 
   if (!hidden.has('priority') && task.priority !== Priority.None) badge(`pri-${PRIORITY_CLASS[task.priority]}`, PRIORITY_EMOJI[task.priority], plain ? '' : PRIORITY_NAME[task.priority], plain ? PRIORITY_NAME[task.priority] : '');
+  if (o.afterPriority) badges.push(o.afterPriority);
   if (!hidden.has('recurrence rule') && task.recurrenceText) badge('recur', '🔁', task.recurrenceText);
   if (!hidden.has('on completion') && task.onCompletion) badge('oncompletion', '🏁', task.onCompletion);
   if (!hidden.has('id') && task.id) badge('id', '🆔', task.id);
@@ -78,11 +81,11 @@ export function renderBadges(task: Task, layout: Layout | null, o: RenderOptions
     badge(`${name}${overdue ? ' tfm-overdue' : ''}`, icon, short ? '' : plain ? f.format() : `${f.format()} · ${rel}`, `${name}: ${f.format()} (${rel})`);
   };
   date('created', '➕', 'created date');
+  date('cancelled', '❌', 'cancelled date');
   date('start', '🛫', 'start date');
   date('scheduled', '⏳', 'scheduled date');
   date('due', '📅', 'due date');
   date('done', '✅', 'done date');
-  date('cancelled', '❌', 'cancelled date');
   if (!badges.length) return '';
   return plain ? `<span class="tfm-fields">${badges.join(' ')}</span>` : `<span class="tfm-badges">${badges.join('')}</span>`;
 }
@@ -105,7 +108,7 @@ export function renderTaskRow(task: Task, layout: Layout | null, o: RenderOption
   const href = o.link?.(task);
   const where = `${task.location.path}:${task.location.line + 1}`;
   const backlink = layout?.hidden.has('backlink') ? '' : `<span class="tfm-backlink">${href ? `<a href="${esc(href)}" title="${esc(where)}">${esc(task.location.path.split('/').pop()!.replace(/\.md$/, ''))}${task.location.heading ? ` › ${esc(task.location.heading)}` : ''}</a>` : esc(where)}</span>`;
-  return `<li class="tfm-task tfm-status-${statusClass(task)}" data-tfm-path="${esc(task.location.path)}" data-tfm-line="${task.location.line}">${renderCheckbox(task)}<span class="tfm-desc">${renderDescriptionText(task, o)}</span>${renderBadges(task, layout, o)}${backlink}</li>`;
+  return `<li class="tfm-task tfm-status-${statusClass(task)}" data-tfm-path="${esc(task.location.path)}" data-tfm-line="${task.location.line}">${renderCheckbox(task)}<span class="tfm-desc">${renderDescriptionText(task, o)}</span>${renderBadges(task, layout, { ...o, afterPriority: backlink })}</li>`;
 }
 
 function renderGroup(node: GroupNode, depth: number, layout: Layout, o: RenderOptions, out: string[]): void {

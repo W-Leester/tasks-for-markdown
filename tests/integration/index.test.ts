@@ -191,9 +191,11 @@ suite('diagnostics', () => {
     const doc = await vscode.workspace.openTextDocument(fixtureUri('notes/project-a.md'));
     const editor = await vscode.window.showTextDocument(doc);
     await editor.edit((eb) => eb.insert(new vscode.Position(doc.lineCount, 0), '\n- [ ] bad 📅 2026-13-40\n- [ ] dep ⛔ nope99\n- [ ] rec 🔁 every day'));
-    await waitFor(() => vscode.languages.getDiagnostics(doc.uri).filter((d) => d.source === 'Tasks').length === 3, 3000, 'three diagnostics');
-    const diags = vscode.languages.getDiagnostics(doc.uri).filter((d) => d.source === 'Tasks');
+    await waitFor(() => vscode.languages.getDiagnostics(doc.uri).filter((d) => d.source === 'Tasks' && d.code !== 'missing-due-date').length === 3, 3000, 'three diagnostics');
+    const diags = vscode.languages.getDiagnostics(doc.uri).filter((d) => d.source === 'Tasks' && d.code !== 'missing-due-date');
     assert.deepEqual(diags.map((d) => d.code).sort(), ['invalid-date', 'recurring-without-date', 'unknown-dependency']);
+    // requireDueDate is on by default: the two new lines without 📅 are also flagged
+    assert.ok(vscode.languages.getDiagnostics(doc.uri).some((d) => d.code === 'missing-due-date'));
     const bad = diags.find((d) => d.code === 'invalid-date')!;
     assert.equal(doc.getText(bad.range), '2026-13-40');
     const actions = await vscode.commands.executeCommand<vscode.CodeAction[]>('vscode.executeCodeActionProvider', doc.uri, bad.range);
@@ -296,11 +298,11 @@ suite('edit dialog', () => {
     await waitFor(() => host.received.includes('task/load'), 8000, 'dialog ready');
     await (host as unknown as { handle(m: unknown): Promise<void> }).handle({
       type: 'task/create', key: uri.toString(), line: 1,
-      fields: { description: 'created from dialog', dependsOn: [`@${dep.location.key}#${dep.location.line}`] },
+      fields: { description: 'created from dialog', due: '2026-10-30', dependsOn: [`@${dep.location.key}#${dep.location.line}`] },
     });
     const lines = fs.readFileSync(uri.fsPath, 'utf8').split('\n');
     const created = lines.find((l) => l.includes('created from dialog'))!;
-    const m = /⛔ ([a-z0-9]{6})$/.exec(created);
+    const m = /⛔ ([a-z0-9]{6})/.exec(created);
     assert.ok(m, created);
     assert.ok(lines.some((l) => l.includes(`Star marker task 🆔 ${m![1]}`)), 'dependency got an id');
     await vscode.commands.executeCommand('workbench.action.closeAllEditors');

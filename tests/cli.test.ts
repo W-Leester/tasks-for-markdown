@@ -84,7 +84,7 @@ describe('tasksmd CLI', () => {
 
   it('honours .vscode/settings.json (setCreatedDate, insertPosition, globalFilter)', async () => {
     fs.mkdirSync(path.join(root, '.vscode'));
-    fs.writeFileSync(path.join(root, '.vscode', 'settings.json'), '{\n  // comment\n  "tasksmd.setCreatedDate": true,\n  "tasksmd.recurrence.insertPosition": "below", /* x */\n  "tasksmd.globalFilter": "#task",\n}\n');
+    fs.writeFileSync(path.join(root, '.vscode', 'settings.json'), '{\n  // comment\n  "tasksmd.requireDueDate": false,\n  "tasksmd.setCreatedDate": true,\n  "tasksmd.recurrence.insertPosition": "below", /* x */\n  "tasksmd.globalFilter": "#task",\n}\n');
     expect(parseJsonc('{"a": 1, // c\n "b": [1,2,],}')).toEqual({ a: 1, b: [1, 2] });
     expect(await cli('add', '#task new one', '--file', 'notes/todo.md', '--json')).toBe(0);
     expect(read('notes/todo.md')).toContain('- [ ] #task new one ➕ 2026-09-26');

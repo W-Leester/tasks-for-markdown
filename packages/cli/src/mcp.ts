@@ -85,7 +85,8 @@ export function createMcpServer(opts: McpOptions): McpServer {
   }, async ({ file, afterLine, description, priority, due, scheduled, start, recurrence, onCompletion, id, dependsOn, status }) => guard(() => {
     const w = ws();
     if (w.cfg.requireDueDate && !due) throw new CliError('INVALID_ARGUMENT', 'A due date is required (tasksmd.requireDueDate): pass "due"');
-    const created = addTask(w, description, file, afterLine);
+    // The due date arrives as a typed field and is applied right after; it was checked above.
+    const created = addTask(w, description, file, afterLine, { dueChecked: true });
     const values: Record<string, string | string[] | null> = {};
     for (const [k, v] of Object.entries({ priority, due, scheduled, start, recurrence, onCompletion, id, dependsOn })) if (v !== undefined) values[k] = v as string | string[] | null;
     if (!Object.keys(values).length && status === undefined) return created;

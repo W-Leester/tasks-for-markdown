@@ -10,6 +10,10 @@ export interface TaskDto {
   path: string;
   line: number;
   heading: string | null;
+  /** Line of the parent list item (task or bullet) in the same file, or null; see depth. */
+  parentLine: number | null;
+  /** Nesting depth: 0 = top-level list item. */
+  depth: number;
   description: string;
   status: { symbol: string; name: string; type: string };
   /** '0' (highest) … '5' (lowest). */
@@ -38,6 +42,14 @@ export interface GroupDto {
   count: number;
   children: GroupDto[];
   tasks: TaskDto[];
+  /** Tree display (leaf groups only): `tasks` nested by parent task, with context children (`matched: false`). */
+  tree?: TreeDto[];
+}
+
+export interface TreeDto {
+  task: TaskDto;
+  matched: boolean;
+  children: TreeDto[];
 }
 
 export interface SavedQueryDto {
@@ -54,6 +66,8 @@ export function toTaskDto(task: Task, index: TaskIndex, today: Dayjs): TaskDto {
     path: task.location.path,
     line: task.location.line,
     heading: task.location.heading,
+    parentLine: task.location.parentLine,
+    depth: task.location.depth,
     description: task.description,
     status: { symbol: task.status.symbol, name: task.status.name, type: task.status.type },
     priority: task.priority,
@@ -83,5 +97,6 @@ export function toGroupDto(node: GroupNode, index: TaskIndex, today: Dayjs): Gro
     count: node.count,
     children: node.children.map((c) => toGroupDto(c, index, today)),
     tasks: node.tasks.map((t) => toTaskDto(t, index, today)),
+    ...(node.tree ? { tree: node.tree.map(function toTree(n): TreeDto { return { task: toTaskDto(n.task, index, today), matched: n.matched, children: n.children.map(toTree) }; }) } : {}),
   };
 }

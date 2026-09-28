@@ -1,5 +1,13 @@
 # 변경 이력
 
+## 1.6.0 — 2026-09-28
+
+### 추가
+- **쿼리 결과 트리 표시.** 하위 태스크가 부모 태스크 밑에 들여써 나옵니다. 결과에 든 태스크의 하위 태스크는 필터에 안 맞아도 흐린 맥락 행으로 함께 보이고, 개수와 `limit`에는 들어가지 않습니다. 기본 켜짐(`tasksmd.query.showTree`), 블록별 `show tree` / `hide tree`. 렌더 보기·클래식 미리보기·쿼리 결과 패널·CLI 마크다운 출력에 적용.
+
+### API
+- `GroupDto.tree`(`{ task, matched, children }[]`), `TaskDto.parentLine`, `TaskDto.depth` 추가(v1 호환). 트리가 켜지면 `groups`가 항상 채워집니다.
+
 ## 1.5.1 — 2026-09-27
 
 ### 변경

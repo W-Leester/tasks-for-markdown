@@ -287,6 +287,8 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
   .tfm-badges { margin-left: .4em; } .tfm-badge { font-size: .78em; line-height: 1.6; background: var(--rv-bg-3); color: var(--rv-fg); }
   .tfm-query { background: var(--rv-bg-2); border: 1px solid var(--rv-stroke); border-radius: 6px; padding: 10px 14px; margin: 0 0 .75em; }
   .tfm-query .tfm-list { margin: .2em 0 .3em; padding-left: 0; } .tfm-query .tfm-list li.tfm-task { margin-left: 0; }
+  .tfm-query ul.tfm-subtree { margin: 0; padding-left: 1.6em; flex-basis: 100%; }
+  .tfm-query li.tfm-context > .tfm-desc, .tfm-query li.tfm-context > .tfm-badges { opacity: .5; }
   .tfm-query h4.tfm-group, .tfm-query h5.tfm-group, .tfm-query h6.tfm-group { margin: .6em 0 .2em; font-size: 1em; font-weight: 600; }
   .tfm-task-count { color: var(--rv-muted); }
 

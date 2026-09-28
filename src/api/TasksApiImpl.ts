@@ -229,7 +229,7 @@ export function createTasksApi(deps: TasksApiDeps, caller: ApiCaller = {}): Task
         const r = deps.queries.run(text, options?.source ? { path: options.source } : undefined);
         if (r.errors.length) fail('INVALID_QUERY', r.errors.map((e) => `Line ${e.line}: ${e.message}`).join('; '), { errors: r.errors });
         const now = today();
-        const groups = r.root.children.length ? toGroupDto(r.root, deps.index, now) : null;
+        const groups = r.root.children.length || r.root.tree ? toGroupDto(r.root, deps.index, now) : null;
         const flat: TaskDto[] = [];
         const walk = (g: { tasks: TaskDto[]; children: { tasks: TaskDto[]; children: unknown[] }[] }) => { flat.push(...g.tasks); for (const c of g.children as (typeof g)[]) walk(c); };
         if (groups) walk(groups);

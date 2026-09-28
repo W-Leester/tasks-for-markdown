@@ -9,13 +9,29 @@ const init: InitState = {
   uiState: {}, editModal: { accessKeys: false, hiddenFields: [] }, globalFilter: '', calendarFontSize: 13, requireDueDate: false,
 };
 const task = (description: string, line: number): TaskDto => ({
-  key: 'file:///n.md', path: 'n.md', line, heading: null, description, status: { symbol: ' ', name: 'Todo', type: 'TODO' },
+  key: 'file:///n.md', path: 'n.md', line, heading: null, parentLine: null, depth: 0, description, status: { symbol: ' ', name: 'Todo', type: 'TODO' },
   priority: '3', priorityName: 'Normal', created: null, start: null, scheduled: null, due: '2026-09-23', done: null, cancelled: null,
   recurrence: null, onCompletion: null, id: null, dependsOn: [], tags: [], isCompleted: false, isDone: false, isBlocked: false, urgency: 1, originalMarkdown: `- [ ] ${description}`,
 });
 const lastRun = () => [...posted].reverse().find((m: FromWebview) => m.type === 'query/run') as { requestId: number; query: string; source?: string | null };
 
 describe('QueryResultsApp', () => {
+  it('renders a tree with indented sub-tasks and faded context rows', async () => {
+    render(QueryResultsApp);
+    await Promise.resolve();
+    receive({ type: 'state/init', state: { ...init, uiState: { queryTarget: { text: 'not done', source: 'a.md', label: 'a.md:1' } } } });
+    await Promise.resolve();
+    const run = lastRun();
+    const parent = task('trip', 0), child = { ...task('hotel', 1), parentLine: 0, depth: 1 };
+    receive({ type: 'query/result', requestId: run.requestId, tasks: [], matched: 1, errors: [],
+      groups: { name: '', count: 1, children: [], tasks: [parent], tree: [{ task: parent, matched: true, children: [{ task: child, matched: false, children: [] }] }] } });
+    await Promise.resolve();
+    const rows = Array.from(document.querySelectorAll<HTMLElement>('.tree-row'));
+    expect(rows.map((r) => r.textContent?.includes('hotel') ? 'hotel' : 'trip')).toEqual(['trip', 'hotel']);
+    expect(rows[1]!.style.marginLeft).toBe('18px');
+    expect(rows[1]!.classList.contains('context')).toBe(true);
+  });
+
   it('runs the block it is given with its source and renders grouped results', async () => {
     render(QueryResultsApp);
     await Promise.resolve();

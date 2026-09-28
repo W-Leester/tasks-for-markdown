@@ -479,3 +479,18 @@ suite('rendered view as default editor', () => {
     }
   });
 });
+
+suite('tree display', () => {
+  test('QueryService applies tasksmd.query.showTree (default on) and hide tree turns it off', async () => {
+    const api = await getApi();
+    assert.ok(api.queries.run('not done').root.tree, 'tree attached by default');
+    assert.strictEqual(api.queries.run('not done\nhide tree').root.tree, undefined);
+    await api.settings.update('query.showTree', false, vscode.ConfigurationTarget.Workspace);
+    try {
+      await waitFor(() => api.queries.run('not done').root.tree === undefined, 3000, 'setting off');
+      assert.ok(api.queries.run('not done\nshow tree').root.tree, 'show tree overrides the setting');
+    } finally {
+      await api.settings.update('query.showTree', undefined, vscode.ConfigurationTarget.Workspace);
+    }
+  });
+});

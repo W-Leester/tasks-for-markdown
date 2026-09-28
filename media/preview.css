@@ -35,3 +35,7 @@ li.tfm-task.tfm-status-cancelled > .tfm-desc { text-decoration: line-through; op
 .tfm-error code { display: block; margin-top: 0.2em; }
 .tfm-explain summary { cursor: pointer; font-size: 0.9em; opacity: 0.8; }
 .tfm-explain pre { font-size: 0.85em; }
+
+/* Tree display (M11): sub-tasks under their parent; context rows (did not match) are faded. */
+.tfm-query ul.tfm-subtree { margin: .1em 0 0; padding-left: 1.4em; }
+.tfm-query li.tfm-context > .tfm-desc, .tfm-query li.tfm-context > .tfm-badges { opacity: .5; }

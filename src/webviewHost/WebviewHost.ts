@@ -111,8 +111,8 @@ export class WebviewHost implements vscode.Disposable {
           this.send({
             type: 'query/result',
             requestId: msg.requestId,
-            tasks: r.root.children.length ? [] : r.root.tasks.map((t) => toTaskDto(t, this.deps.index, today)),
-            groups: r.root.children.length ? toGroupDto(r.root, this.deps.index, today) : null,
+            tasks: r.root.children.length || r.root.tree ? [] : r.root.tasks.map((t) => toTaskDto(t, this.deps.index, today)),
+            groups: r.root.children.length || r.root.tree ? toGroupDto(r.root, this.deps.index, today) : null,
             matched: r.matched,
             errors: [...r.errors.map((e) => `Line ${e.line}: ${e.message}`), ...r.runtimeErrors],
           });

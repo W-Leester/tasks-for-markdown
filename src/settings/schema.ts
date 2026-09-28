@@ -33,6 +33,8 @@ export interface SettingsSchema {
   'recurrence.removeScheduledDate': boolean;
   statuses: StatusConfig[];
   'query.allowFunctions': boolean;
+  /** Tree display of query results by default (M11); per query `show tree` / `hide tree`. */
+  'query.showTree': boolean;
   savedQueries: { name: string; query: string }[];
   'preview.enabled': boolean;
   'preview.renderBadges': boolean;
@@ -92,6 +94,7 @@ export const SETTINGS_DEFAULTS: Readonly<SettingsSchema> = {
   'recurrence.removeScheduledDate': false,
   statuses: [...DEFAULT_STATUSES],
   'query.allowFunctions': false,
+  'query.showTree': true,
   savedQueries: [],
   'preview.enabled': true,
   'preview.renderBadges': true,

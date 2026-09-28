@@ -123,6 +123,7 @@
   "tasksmd.config.rendered.sourceWhenNoTasks": "When the rendered view is the default editor for Markdown, open notes that contain no tasks in the text editor instead.",
   "tasksmd.renderedAsDefault.title": "렌더 보기를 기본 편집기로 (Rendered view as default editor)",
   "tasksmd.config.rendered.maxWidth": "Maximum width (px) of the rendered view's text column, including query result boxes. 0 = full editor width.",
+  "tasksmd.config.query.showTree": "Show query results as a tree: sub-tasks under their parent task, with non-matching sub-tasks faded as context. Override per query with `show tree` / `hide tree`.",
   "tasksmd.config.calendar.fontSize": "Font size (px) of the tasks shown in calendar cells.",
   "tasksmd.config.calendar.fullScreen": "What the calendar's Full screen button does.",
   "tasksmd.config.calendar.fullScreen.maximize": "Hide the side bars and the bottom panel and maximize the calendar's editor group.",

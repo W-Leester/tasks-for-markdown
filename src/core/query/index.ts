@@ -19,4 +19,5 @@ export { Query } from './Query';
 export { tokenize, expandPlaceholders } from './tokenizer';
 export type { Filter, Grouper, GroupNode, Layout, LayoutElement, QueryContext, QueryError, QueryResult, QuerySource, Sorter } from './types';
 export { parseBoolean, fileFolder, fileName, fileRoot } from './filters';
+export { buildTaskTree, type TreeNode } from './tree';
 export { toScriptTask, type ScriptTask } from './functions';

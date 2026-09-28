@@ -46,10 +46,11 @@ export class QueryService implements vscode.Disposable {
 
   run(text: string, source?: QuerySource): QueryResult {
     const today = this.clock.now().startOf('day');
-    const key = `${source?.path ?? ''}\u0000${text}\u0000${this.index.version}\u0000${today.valueOf()}\u0000${this.allowFunctions}`;
+    const showTree = this.settings.get('query.showTree');
+    const key = `${source?.path ?? ''}\u0000${text}\u0000${this.index.version}\u0000${today.valueOf()}\u0000${this.allowFunctions}\u0000${showTree}`;
     const cached = this.results.get(key);
     if (cached) return cached;
-    const result = this.parse(text, source).run({ index: this.index, today, allowFunctions: this.allowFunctions, source });
+    const result = this.parse(text, source).run({ index: this.index, today, allowFunctions: this.allowFunctions, source, showTree });
     if (this.results.size > 100) this.results.clear();
     this.results.set(key, result);
     return result;

@@ -69,6 +69,7 @@ group by filename
 | `notifications.*` | on, `09:00`, 1 day | Daily summary and due-soon digest, OS notifications |
 | `archive.file` / `afterDays` / `linkStyle` | `Archive.md` / 30 / `wiki` | Archive command |
 | `calendar.newTaskFile` | `""` | File that receives tasks created from the calendar |
+| `query.showTree` | `true` | Query results as a tree (sub-tasks under their parent); per block `show tree` / `hide tree` |
 | `requireDueDate` | `true` | Refuse new tasks without a due date (dialog, API, CLI, MCP) and warn in the editor |
 | `api.writePolicy` | `confirm` | Writes through the public API: confirm once per caller / allow / deny |
 | `rendered.maxWidth` | `0` | Max width (px) of the rendered column; 0 = full editor width (default) |

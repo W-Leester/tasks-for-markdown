@@ -43,8 +43,8 @@ export interface QueryOutput {
 export function runQuery(ws: Workspace, text: string, source?: string): QueryOutput {
   const q = Query.parse(text, source ? { path: source } : undefined);
   if (q.errors.length) throw new CliError('INVALID_QUERY', q.errors.map((e) => `line ${e.line}: ${e.message} (${e.text})`).join('; '), { errors: q.errors });
-  const r = q.run({ index: ws.index, today: ws.today, allowFunctions: ws.cfg.allowFunctions, source: source ? { path: source } : undefined });
-  const groups = r.root.children.length ? toGroupDto(r.root, ws.index, ws.today) : null;
+  const r = q.run({ index: ws.index, today: ws.today, allowFunctions: ws.cfg.allowFunctions, showTree: ws.cfg.showTree, source: source ? { path: source } : undefined });
+  const groups = r.root.children.length || r.root.tree ? toGroupDto(r.root, ws.index, ws.today) : null;
   const tasks: TaskDto[] = [];
   const walk = (g: GroupDto) => { tasks.push(...g.tasks); g.children.forEach(walk); };
   if (groups) walk(groups);

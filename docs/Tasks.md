@@ -36,7 +36,7 @@
 | M8 | 마감: i18n·성능·접근성·문서·패키징·게시 | 🟡 코드 완료 · 사용자 작업 대기 | 1.0.0 `.vsix` 생성됨 · 남은 것: 퍼블리셔/토큰 생성, 저장소 공개 여부, M8.7 수동 테스트 |
 | M9 | 공개 API: 확장 API·명령·npm/CLI·MCP·URI | 🟡 M9.1–9.5 완료(1.3.0, npm 발행은 사용자 작업) · M9.6(선택)·9.7 남음 | docs/api-plan.md v0.2, docs/api.md |
 | M10 | 렌더 보기 고도화: 기본 편집기 대체, 정렬·보기 툴바 | ✅ 완료(1.4.0) | post-release-changes 2.14 |
-| M11 | 쿼리 결과 트리 표시 | 🟡 계획 확정(2026-09-28) | 이 문서 M11 |
+| M11 | 쿼리 결과 트리 표시 | ✅ 완료(1.6.0) | 이 문서 M11, design.md 7.10 |
 
 ---
 
@@ -623,14 +623,14 @@
 **적용 화면.** 렌더 보기의 쿼리 블록, VS Code 클래식 미리보기, 쿼리 결과 패널. 사이드바 트리 뷰·칸반·캘린더는 대상 아님(칸반·캘린더는 평평한 목록이 맞음, 사이드바는 후속 검토).
 
 **구현.**
-- [ ] `src/core/query/tree.ts`: `buildTaskTree(tasks, index, { includeContext })` → `TreeNode { task, matched, children }[]`
-- [ ] `Query.run`: 트리가 켜졌으면 각 그룹 노드에 `tree` 부착. `QueryContext.showTree`(설정 기본값), `layout.tree`(`show/hide tree`의 명시값, 없으면 null)
-- [ ] HTML 렌더(`renderQueryResult`): 트리면 `ul.tfm-list > li > ul` 중첩, 맥락 자식은 `.tfm-context`로 흐리게, 자식 백링크 생략
-- [ ] DTO: `GroupDto.tree?: TreeDto[]`(`{ task, matched, children }`), `TaskDto.parentLine`, `TaskDto.depth` 추가(추가만이라 API v1 호환)
-- [ ] 쿼리 결과 패널(Svelte): `tree`가 있으면 들여쓴 카드로
-- [ ] 설정 `tasksmd.query.showTree`, CLI·MCP도 같은 기본값(`.vscode/settings.json` 읽기)
-- [ ] 테스트: 트리 구성(부모·자식·손자, 부모 없는 자식, 글머리표 부모, 맥락 자식, limit), HTML 중첩, 패널 컴포넌트, 통합 1건
-- [ ] 문서: user-guide 4장, README 설정 표, api.md(DTO 필드), CHANGELOG
+- [x] `src/core/query/tree.ts`: `buildTaskTree(tasks, index, { includeContext })` → `TreeNode { task, matched, children }[]`
+- [x] `Query.run`: 트리가 켜졌으면 각 그룹 노드에 `tree` 부착. `QueryContext.showTree`(설정 기본값), `layout.tree`(`show/hide tree`의 명시값, 없으면 null)
+- [x] HTML 렌더(`renderQueryResult`): 트리면 `ul.tfm-list > li > ul` 중첩, 맥락 자식은 `.tfm-context`로 흐리게, 자식 백링크 생략
+- [x] DTO: `GroupDto.tree?: TreeDto[]`(`{ task, matched, children }`), `TaskDto.parentLine`, `TaskDto.depth` 추가(추가만이라 API v1 호환)
+- [x] 쿼리 결과 패널(Svelte): `tree`가 있으면 들여쓴 카드로
+- [x] 설정 `tasksmd.query.showTree`, CLI·MCP도 같은 기본값(`.vscode/settings.json` 읽기)
+- [x] 테스트: 트리 구성(부모·자식·손자, 부모 없는 자식, 글머리표 부모, 맥락 자식, limit), HTML 중첩, 패널 컴포넌트, 통합 1건
+- [x] 문서: user-guide 4장, README 설정 표, api.md(DTO 필드), CHANGELOG
 
 ## 향후 후보 (미착수)
 

@@ -46,6 +46,8 @@ for (const t of r.tasks) console.log(t.path, t.line + 1, t.description, t.due);
 
 `ref.expectedText`에 줄 원문(`TaskDto.originalMarkdown`)을 넣으면 그사이 줄이 바뀐 경우 `STALE_LINE`으로 거부합니다. 오래된 정보로 덮어쓰는 사고를 막으려면 항상 넣는 것을 권합니다.
 
+**트리(1.6.0에 추가, v1 호환).** `query.run`의 결과에서 트리 표시가 켜져 있으면(`tasksmd.query.showTree` 또는 `show tree`) `groups`가 항상 채워지고, 말단 그룹에 `tree: { task, matched, children }[]`가 붙습니다. `matched: false`는 필터에 안 맞지만 부모와 함께 보여 주는 맥락 행입니다. `tasks`(평평한 목록)는 예전처럼 필터에 맞은 것만 담습니다. `TaskDto`에는 `parentLine`(부모 목록 항목의 줄, 없으면 null)과 `depth`가 추가되었습니다.
+
 ### events — 구독
 
 | 메서드 | 설명 |

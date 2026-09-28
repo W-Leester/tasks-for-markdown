@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import TaskCard from '../shared/components/TaskCard.svelte';
   import { setBundle, t } from '../shared/l10n';
-  import type { GroupDto, InitState, QueryTargetDto, TaskDto } from '../shared/protocol';
+  import type { GroupDto, InitState, QueryTargetDto, TaskDto, TreeDto } from '../shared/protocol';
   import { nextRequestId, onMessage, post } from '../shared/vscode.svelte';
 
   /**
@@ -44,14 +44,27 @@
   });
 </script>
 
+{#snippet treeRows(nodes: TreeDto[], level: number)}
+  {#each nodes as n (n.task.key + '#' + n.task.line)}
+    <div class="tree-row" class:context={!n.matched} style:margin-left={`${level * 18}px`}>
+      <TaskCard task={n.task} today={init?.today ?? ''} draggable={false} showFile={level === 0} />
+    </div>
+    {#if n.children.length}{@render treeRows(n.children, level + 1)}{/if}
+  {/each}
+{/snippet}
+
 {#snippet group(node: GroupDto, depth: number)}
   {#if depth > 0}
     <h3 style:margin-left={`${(depth - 1) * 12}px`}>{node.name} <span class="n">{node.count}</span></h3>
   {/if}
   <div class="cards" style:margin-left={`${Math.max(0, depth - 1) * 12}px`}>
-    {#each node.tasks as task (task.key + '#' + task.line)}
-      <TaskCard {task} today={init?.today ?? ''} draggable={false} />
-    {/each}
+    {#if node.tree}
+      {@render treeRows(node.tree, 0)}
+    {:else}
+      {#each node.tasks as task (task.key + '#' + task.line)}
+        <TaskCard {task} today={init?.today ?? ''} draggable={false} />
+      {/each}
+    {/if}
   </div>
   {#each node.children as child (child.name)}
     {@render group(child, depth + 1)}
@@ -106,4 +119,5 @@
   .cards { display: flex; flex-direction: column; gap: 4px; }
   .cards :global(.card) { content-visibility: auto; contain-intrinsic-size: auto 56px; }
   .small { font-size: 0.85em; margin: 0; }
+  .tree-row.context { opacity: 0.55; }
 </style>

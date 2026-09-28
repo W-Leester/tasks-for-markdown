@@ -1,5 +1,5 @@
 import { type Dayjs, describeRelative, relativeToEnglish, type RelativeDate } from '../dates';
-import type { GroupNode, Layout, QueryResult } from '../query';
+import type { GroupNode, Layout, QueryResult, TreeNode } from '../query';
 import { PRIORITY_EMOJI, PRIORITY_NAME, Priority, StatusType, type Task } from '../task';
 
 export interface RenderOptions {
@@ -103,12 +103,12 @@ export function renderCheckbox(task: Task): string {
   return `<input type="checkbox" class="tfm-check" disabled${checked} data-symbol="${esc(task.status.symbol)}" title="[${esc(task.status.symbol)}] ${esc(task.status.name)}">`;
 }
 
-/** One result row in a query block. */
-export function renderTaskRow(task: Task, layout: Layout | null, o: RenderOptions): string {
+/** One result row in a query block. `extra` is used by tree display: nested children, context rows, no backlink on children. */
+export function renderTaskRow(task: Task, layout: Layout | null, o: RenderOptions, extra: { children?: string; context?: boolean; hideBacklink?: boolean } = {}): string {
   const href = o.link?.(task);
   const where = `${task.location.path}:${task.location.line + 1}`;
-  const backlink = layout?.hidden.has('backlink') ? '' : `<span class="tfm-backlink">${href ? `<a href="${esc(href)}" title="${esc(where)}">${esc(task.location.path.split('/').pop()!.replace(/\.md$/, ''))}${task.location.heading ? ` › ${esc(task.location.heading)}` : ''}</a>` : esc(where)}</span>`;
-  return `<li class="tfm-task tfm-status-${statusClass(task)}" data-tfm-path="${esc(task.location.path)}" data-tfm-line="${task.location.line}">${renderCheckbox(task)}<span class="tfm-desc">${renderDescriptionText(task, o)}</span>${renderBadges(task, layout, { ...o, afterPriority: backlink })}</li>`;
+  const backlink = layout?.hidden.has('backlink') || extra.hideBacklink ? '' : `<span class="tfm-backlink">${href ? `<a href="${esc(href)}" title="${esc(where)}">${esc(task.location.path.split('/').pop()!.replace(/\.md$/, ''))}${task.location.heading ? ` › ${esc(task.location.heading)}` : ''}</a>` : esc(where)}</span>`;
+  return `<li class="tfm-task tfm-status-${statusClass(task)}${extra.context ? ' tfm-context' : ''}" data-tfm-path="${esc(task.location.path)}" data-tfm-line="${task.location.line}">${renderCheckbox(task)}<span class="tfm-desc">${renderDescriptionText(task, o)}</span>${renderBadges(task, layout, { ...o, afterPriority: backlink })}${extra.children ?? ''}</li>`;
 }
 
 function renderGroup(node: GroupNode, depth: number, layout: Layout, o: RenderOptions, out: string[]): void {
@@ -120,7 +120,13 @@ function renderGroup(node: GroupNode, depth: number, layout: Layout, o: RenderOp
     }
     return;
   }
-  out.push(`<ul class="tfm-list${layout.hidden.has('tree') ? '' : ' tfm-tree'}">`);
+  if (node.tree) {
+    const rows = (nodes: TreeNode[], depth: number): string =>
+      nodes.map((n) => renderTaskRow(n.task, layout, o, { context: !n.matched, hideBacklink: depth > 0, children: n.children.length ? `<ul class="tfm-list tfm-subtree">${rows(n.children, depth + 1)}</ul>` : '' })).join('');
+    out.push(`<ul class="tfm-list tfm-tree">${rows(node.tree, 0)}</ul>`);
+    return;
+  }
+  out.push('<ul class="tfm-list">');
   for (const task of node.tasks) out.push(renderTaskRow(task, layout, o));
   out.push('</ul>');
 }

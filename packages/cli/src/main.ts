@@ -4,7 +4,7 @@ import { loadConfig } from './config';
 import { StaleLineError } from './store';
 import { startMcpServer } from './mcp';
 import { listSavedQueries } from './savedQueries';
-import type { GroupDto, TaskDto } from '../../../src/core/dto';
+import type { GroupDto, TaskDto, TreeDto } from '../../../src/core/dto';
 
 export interface Io {
   cwd: string;
@@ -77,7 +77,10 @@ function renderQuery(r: QueryOutput, json: boolean): string[] {
   const lines: string[] = [];
   const group = (g: GroupDto, depth: number) => {
     if (depth > 0) lines.push(`${'#'.repeat(Math.min(6, depth + 1))} ${g.name} (${g.count})`);
-    for (const t of g.tasks) lines.push(fmtTask(t));
+    if (g.tree) {
+      const rows = (nodes: TreeDto[], level: number) => { for (const n of nodes) { lines.push(`${'  '.repeat(level)}${fmtTask(n.task)}${n.matched ? '' : '  [context]'}`); rows(n.children, level + 1); } };
+      rows(g.tree, 0);
+    } else for (const t of g.tasks) lines.push(fmtTask(t));
     for (const c of g.children) group(c, depth + 1);
   };
   if (r.groups) group(r.groups, 0);

@@ -17,6 +17,7 @@ export const layoutParser: InstructionParser = (line, query) => {
   const hs = /^(hide|show) (.+)$/.exec(l);
   if (hs) {
     const el = hs[2]!.trim() as LayoutElement;
+    if (el === 'tree') { query.layout.tree = hs[1] === 'show'; return 'handled'; }
     if (!ELEMENTS.includes(el)) throw new Error(`Unknown layout element "${hs[2]}". Known: ${ELEMENTS.join(', ')}`);
     if (hs[1] === 'hide') query.layout.hidden.add(el);
     else query.layout.hidden.delete(el);

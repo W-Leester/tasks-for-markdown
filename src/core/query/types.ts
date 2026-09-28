@@ -1,3 +1,4 @@
+import type { TreeNode } from './tree';
 import type { Dayjs } from '../dates/dayjs';
 import type { TaskIndex } from '../index';
 import type { Task } from '../task';
@@ -13,6 +14,8 @@ export interface QueryContext {
   /** `filter/sort/group by function` are compiled only when true (setting + workspace trust). */
   allowFunctions: boolean;
   source?: QuerySource;
+  /** Default for tree display when the query has no `show tree` / `hide tree` (setting query.showTree). */
+  showTree?: boolean;
 }
 
 export interface Filter {
@@ -55,6 +58,8 @@ export interface Layout {
   shortMode: boolean;
   explain: boolean;
   hideNestedBacklink: boolean;
+  /** `show tree` → true, `hide tree` → false, not mentioned → null (use QueryContext.showTree). */
+  tree: boolean | null;
 }
 
 export interface GroupNode {
@@ -64,6 +69,8 @@ export interface GroupNode {
   tasks: Task[];
   /** Tasks in this node and all descendants. */
   count: number;
+  /** Leaf nodes only, when tree display is on: `tasks` nested by parent task (M11). */
+  tree?: TreeNode[];
 }
 
 export interface QueryResult {

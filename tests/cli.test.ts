@@ -104,6 +104,16 @@ describe('tasksmd CLI', () => {
     expect(await cli('add', 'dated 📅 2026-10-01', '--file', 'notes/todo.md', '--json')).toBe(0);
   });
 
+  it('query --md indents sub-tasks (tree display)', async () => {
+    fs.writeFileSync(path.join(root, 'notes', 'tree.md'), '- [ ] parent 📅 2026-10-01\n  - [ ] child 📅 2026-10-02\n');
+    expect(await cli('query', 'path includes tree.md\nsort by due', '--md')).toBe(0);
+    expect(out[0]).toContain('- [ ] parent');
+    expect(out[1]).toMatch(/^  - \[ \] child/);
+    out = [];
+    expect(await cli('query', 'path includes tree.md\nhide tree', '--md')).toBe(0);
+    expect(out[1]).toMatch(/^- \[ \] child/);
+  });
+
   it('help and unknown command', async () => {
     expect(await cli('--help')).toBe(2);
     expect(out[0]).toContain('Usage');

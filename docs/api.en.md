@@ -47,6 +47,8 @@ for (const t of r.tasks) console.log(t.path, t.line + 1, t.description, t.due);
 
 Put the exact line (`TaskDto.originalMarkdown`) in `ref.expectedText` and the write is refused with `STALE_LINE` if the line changed meanwhile. Always doing so prevents overwriting with stale data.
 
+**Tree (added in 1.6.0, compatible with v1).** When tree display is on (`tasksmd.query.showTree` or `show tree`), `query.run` always fills `groups`, and leaf groups carry `tree: { task, matched, children }[]`. `matched: false` marks context rows (children shown with their parent although they did not match). The flat `tasks` list still holds only matching tasks. `TaskDto` gains `parentLine` (line of the parent list item, or null) and `depth`.
+
 ### events
 
 | Method | What it does |

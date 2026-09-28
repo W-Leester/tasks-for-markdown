@@ -1,3 +1,4 @@
+import { buildTaskTree } from './tree';
 import type { Task } from '../task';
 import { tokenize } from './tokenizer';
 import type { Filter, Grouper, GroupNode, Layout, QueryContext, QueryError, QueryResult, QuerySource, Sorter } from './types';
@@ -14,7 +15,7 @@ export class Query {
   readonly errors: QueryError[] = [];
   limit: number | null = null;
   groupLimit: number | null = null;
-  readonly layout: Layout = { hidden: new Set(), shortMode: false, explain: false, hideNestedBacklink: false };
+  readonly layout: Layout = { hidden: new Set(), shortMode: false, explain: false, hideNestedBacklink: false, tree: null };
   /** Instruction lines in order, for explain output. */
   readonly instructions: string[] = [];
 
@@ -83,6 +84,13 @@ export class Query {
     if (this.limit !== null) tasks = tasks.slice(0, this.limit);
 
     const root = this.groupTasks(tasks, ctx, safe);
+    if (this.layout.tree ?? ctx.showTree ?? false) {
+      const attach = (n: GroupNode): void => {
+        if (n.children.length) n.children.forEach(attach);
+        else n.tree = buildTaskTree(n.tasks, ctx.index, { includeContext: true });
+      };
+      attach(root);
+    }
     return { root, matched, shown: root.count, explain: this.explain(), errors: this.errors, runtimeErrors };
   }
 

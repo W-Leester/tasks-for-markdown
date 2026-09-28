@@ -4,9 +4,9 @@
  * webview bundle must stay small and browser-only.
  */
 
-import type { GroupDto, SavedQueryDto, TaskDto } from '../../core/dto';
+import type { GroupDto, SavedQueryDto, TaskDto, TreeDto } from '../../core/dto';
 
-export type { GroupDto, SavedQueryDto, TaskDto };
+export type { GroupDto, SavedQueryDto, TaskDto, TreeDto };
 
 /** A ```tasks block whose results a panel shows: its text, the note it lives in, and a label. */
 export interface QueryTargetDto {

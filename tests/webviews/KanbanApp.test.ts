@@ -13,7 +13,7 @@ const init: InitState = {
   ],
 };
 const task = (i: number): TaskDto => ({
-  key: 'file:///n.md', path: 'n.md', line: i, heading: null, description: `task ${i}`, status: { symbol: ' ', name: 'Todo', type: 'TODO' },
+  key: 'file:///n.md', path: 'n.md', line: i, heading: null, parentLine: null, depth: 0, description: `task ${i}`, status: { symbol: ' ', name: 'Todo', type: 'TODO' },
   priority: '3', priorityName: 'Normal', created: null, start: null, scheduled: null, due: null, done: null, cancelled: null,
   recurrence: null, onCompletion: null, id: null, dependsOn: [], tags: [], isCompleted: false, isDone: false, isBlocked: false, urgency: 1, originalMarkdown: `- [ ] task ${i}`,
 });

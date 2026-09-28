@@ -8,9 +8,9 @@
  * workspace-relative path and 0-based line. No `vscode` types leak through this file, so it can
  * be copied into another project as a `.d.ts`.
  */
-import type { GroupDto, SavedQueryDto, TaskDto } from '../core/dto';
+import type { GroupDto, SavedQueryDto, TaskDto, TreeDto } from '../core/dto';
 
-export type { GroupDto, SavedQueryDto, TaskDto };
+export type { GroupDto, SavedQueryDto, TaskDto, TreeDto };
 
 export type ApiErrorCode =
   | 'STALE_LINE' // the line changed since it was read (expectedText / index mismatch)

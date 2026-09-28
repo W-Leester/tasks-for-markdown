@@ -36,6 +36,7 @@
 | M8 | 마감: i18n·성능·접근성·문서·패키징·게시 | 🟡 코드 완료 · 사용자 작업 대기 | 1.0.0 `.vsix` 생성됨 · 남은 것: 퍼블리셔/토큰 생성, 저장소 공개 여부, M8.7 수동 테스트 |
 | M9 | 공개 API: 확장 API·명령·npm/CLI·MCP·URI | 🟡 M9.1–9.5 완료(1.3.0, npm 발행은 사용자 작업) · M9.6(선택)·9.7 남음 | docs/api-plan.md v0.2, docs/api.md |
 | M10 | 렌더 보기 고도화: 기본 편집기 대체, 정렬·보기 툴바 | ✅ 완료(1.4.0) | post-release-changes 2.14 |
+| M11 | 쿼리 결과 트리 표시 | 🟡 계획 확정(2026-09-28) | 이 문서 M11 |
 
 ---
 
@@ -606,6 +607,30 @@
 - [x] 정렬(문서 순·마감일·생성일·우선순위·긴급도)·보기(전체·미완료만·오늘·이번 주·다음 주까지·기한 초과) 툴바 — 화면만, 파일별 기억
 - [x] 플러그인 `data-tfm-*` 속성, `view.ts` 단위 테스트, 통합 테스트(기본 편집기 연결 시 태스크 노트는 렌더·없는 노트는 텍스트)
 - [x] 문서: user-guide, README, design.md 7.8, post-release-changes 2.14(결정 기록)
+
+## M11. 쿼리 결과 트리 표시 (계획 확정 2026-09-28)
+
+**목표.** 쿼리 결과에서 하위 태스크를 부모 태스크 밑에 들여써 보여 준다. 지금은 모든 결과가 평평한 목록이라 "여행 계획 세우기"의 하위인 "항공권 검색"이 따로 떨어져 나온다.
+
+**규칙** (Obsidian Tasks의 `show tree`를 따름):
+- 같은 그룹 안에서, 부모 태스크(같은 파일, 바로 위 목록 항목이 태스크인 경우)가 결과에 있으면 자식은 최상위가 아니라 부모 밑에 들어간다. 최상위 순서는 정렬 결과 그대로, 자식은 파일 순서.
+- 결과에 든 태스크의 **자식은 필터와 무관하게 함께 보인다**(맥락 표시). 필터에 맞지 않는 자식은 흐리게 그린다. 개수(`N of M tasks`)와 `limit`은 필터에 맞은 태스크만 센다.
+- 부모가 결과에 없고 자식만 맞으면 자식이 최상위에 나온다(백링크로 위치 확인).
+- 부모가 태스크가 아닌 일반 글머리표이면 트리로 잇지 않는다(인덱스는 태스크 줄만 보관).
+- 기본값: 설정 `tasksmd.query.showTree`(기본 켜짐). 쿼리마다 `show tree` / `hide tree`로 덮어쓴다. Obsidian은 기본 꺼짐이라 Obsidian에서 같은 블록을 보면 평평하게 나온다(결과 집합은 동일).
+- 트리 안의 자식은 부모와 파일이 같으므로 백링크를 생략한다.
+
+**적용 화면.** 렌더 보기의 쿼리 블록, VS Code 클래식 미리보기, 쿼리 결과 패널. 사이드바 트리 뷰·칸반·캘린더는 대상 아님(칸반·캘린더는 평평한 목록이 맞음, 사이드바는 후속 검토).
+
+**구현.**
+- [ ] `src/core/query/tree.ts`: `buildTaskTree(tasks, index, { includeContext })` → `TreeNode { task, matched, children }[]`
+- [ ] `Query.run`: 트리가 켜졌으면 각 그룹 노드에 `tree` 부착. `QueryContext.showTree`(설정 기본값), `layout.tree`(`show/hide tree`의 명시값, 없으면 null)
+- [ ] HTML 렌더(`renderQueryResult`): 트리면 `ul.tfm-list > li > ul` 중첩, 맥락 자식은 `.tfm-context`로 흐리게, 자식 백링크 생략
+- [ ] DTO: `GroupDto.tree?: TreeDto[]`(`{ task, matched, children }`), `TaskDto.parentLine`, `TaskDto.depth` 추가(추가만이라 API v1 호환)
+- [ ] 쿼리 결과 패널(Svelte): `tree`가 있으면 들여쓴 카드로
+- [ ] 설정 `tasksmd.query.showTree`, CLI·MCP도 같은 기본값(`.vscode/settings.json` 읽기)
+- [ ] 테스트: 트리 구성(부모·자식·손자, 부모 없는 자식, 글머리표 부모, 맥락 자식, limit), HTML 중첩, 패널 컴포넌트, 통합 1건
+- [ ] 문서: user-guide 4장, README 설정 표, api.md(DTO 필드), CHANGELOG
 
 ## 향후 후보 (미착수)
 

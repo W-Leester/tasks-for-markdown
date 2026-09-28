@@ -1,0 +1,5 @@
+{
+  // This repository's own workspace settings: the test fixtures contain sample tasks
+  // (parser and integration fixtures) that should not show up in queries while developing.
+  "tasksmd.exclude": ["**/node_modules/**", "**/.git/**", "**/tests/**"]
+}

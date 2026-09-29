@@ -118,7 +118,7 @@
   "tasksmd.config.api.allowedWriters": "묻지 않고 API로 쓸 수 있는 확장 ID 목록(확인 대화상자가 채웁니다).",
   "tasksmd.config.api.batchLimit": "tasksmd API batch 호출 한 번에 허용하는 최대 작업 수.",
   "tasksmd.config.rendered.fieldsAlign": "렌더 보기에서 태스크 줄의 필드(날짜·우선순위 등) 위치.",
-  "tasksmd.config.rendered.fieldsAlign.columns": "열 배치: 상태 | 설명 + 우선순위 + 태그 | 마감일 | 반복 | 작성일 | 나머지 필드. 줄마다 세로로 정렬됩니다.",
+  "tasksmd.config.rendered.fieldsAlign.columns": "열 배치: 상태 | 설명 + 우선순위 + 태그 | 마감일 | 작성일 | 나머지 필드 전부. 줄마다 세로로 정렬됩니다.",
   "tasksmd.config.rendered.fieldsAlign.right": "설명은 왼쪽, 필드는 열의 오른쪽 끝으로.",
   "tasksmd.config.rendered.fieldsAlign.inline": "원문처럼 설명 바로 뒤에.",
   "tasksmd.config.requireDueDate": "마감일 필수: 만들기 대화상자·API·CLI·MCP가 📅 없는 새 태스크를 거부하고, 에디터는 마감일 없는 미완료 태스크에 경고를 표시합니다.",

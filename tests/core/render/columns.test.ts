@@ -12,21 +12,22 @@ const today = dayjs('2026-09-29');
 const parse = (l: string) => parseTaskLine(l, { statusRegistry: reg })!;
 
 describe('column layout (M12)', () => {
-  it('puts priority and tags after the description, then due / recurrence / created / more cells (all four always present)', () => {
+  it('puts priority and tags after the description, then due / created / everything-else cells (all three always present)', () => {
     const c = renderColumns(parse('- [ ] write report #work #proj ⏫ 🔁 every week 🆔 r1 ➕ 2026-09-20 ⏳ 2026-09-30 📅 2026-10-02'), null, { today, fieldStyle: 'plain' });
     expect(c.afterDescription).toContain('⏫');
     expect(c.afterDescription.indexOf('⏫')).toBeLessThan(c.afterDescription.indexOf('#work'));
     expect(c.afterDescription).toContain('#proj');
     const cells = [...c.cells.matchAll(/<span class="tfm-col tfm-col-(\w+)"[^>]*>(.*?)<\/span>(?=<span class="tfm-col|$)/gs)].map((m) => [m[1], m[2]]);
-    expect(cells.map((x) => x[0])).toEqual(['due', 'recur', 'created', 'more']);
+    expect(cells.map((x) => x[0])).toEqual(['due', 'created', 'more']);
     expect(cells[0]![1]).toContain('2026-10-02');
-    expect(cells[1]![1]).toContain('every week');
-    expect(cells[2]![1]).toContain('2026-09-20');
-    expect(cells[3]![1]).toContain('r1');
-    expect(cells[3]![1]).toContain('2026-09-30');
-    expect(cells[3]![1]).not.toContain('2026-09-20');
+    expect(cells[1]![1]).toContain('2026-09-20');
+    expect(cells[2]![1]).toContain('every week');
+    expect(cells[2]![1]).toContain('r1');
+    expect(cells[2]![1]).toContain('2026-09-30');
+    expect(cells[2]![1]).not.toContain('2026-09-20');
+    expect(cells[2]![1]).not.toContain('2026-10-02');
     const empty = renderColumns(parse('- [ ] plain'), null, { today });
-    expect(empty.cells.match(/tfm-col tfm-col-/g)).toHaveLength(4); // empty cells keep the grid aligned
+    expect(empty.cells.match(/tfm-col tfm-col-/g)).toHaveLength(3); // empty cells keep the grid aligned
     expect(empty.afterDescription).toBe('');
   });
 

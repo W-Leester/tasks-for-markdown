@@ -118,7 +118,7 @@
   "tasksmd.config.api.allowedWriters": "Extension ids allowed to write through the API without asking (filled in by the confirmation dialog).",
   "tasksmd.config.api.batchLimit": "Maximum number of operations in one tasksmd API batch call.",
   "tasksmd.config.rendered.fieldsAlign": "Where task fields (dates, priority, …) sit on a task line in the rendered view.",
-  "tasksmd.config.rendered.fieldsAlign.columns": "Columns: status | description + priority + tags | due | recurrence | created | other fields, aligned from row to row.",
+  "tasksmd.config.rendered.fieldsAlign.columns": "Columns: status | description + priority + tags | due | created | everything else, aligned from row to row.",
   "tasksmd.config.rendered.fieldsAlign.right": "Description on the left, fields pushed to the right edge of the column.",
   "tasksmd.config.rendered.fieldsAlign.inline": "Fields directly after the description, like the source line.",
   "tasksmd.config.requireDueDate": "Require a due date: the create dialog, the API, the CLI and the MCP server refuse a new task without 📅, and the editor warns on open tasks that have none.",

@@ -96,9 +96,9 @@ export function renderBadges(task: Task, layout: Layout | null, o: RenderOptions
   return plain ? `<span class="tfm-fields">${badges.join(' ')}</span>` : `<span class="tfm-badges">${badges.join('')}</span>`;
 }
 
-const MORE_FIELDS = new Set(['oncompletion', 'id', 'dependson', 'created', 'cancelled', 'start', 'scheduled', 'done']);
+const MORE_FIELDS = new Set(['oncompletion', 'id', 'dependson', 'cancelled', 'start', 'scheduled', 'done']);
 
-/** Column cells for the rendered view (M12). Every cell is always present so the grid stays aligned. */
+/** Column cells for the rendered view (M12): status | description+priority+tags | due | recurrence | created | more. Every cell is always present so the grid stays aligned. */
 export function renderColumns(task: Task, layout: Layout | null, o: RenderOptions, extra: { backlink?: string } = {}): { afterDescription: string; cells: string } {
   const part = (fields: string[]) => renderBadges(task, layout, { ...o, only: new Set(fields) });
   const pri = part(['pri']);
@@ -106,11 +106,12 @@ export function renderColumns(task: Task, layout: Layout | null, o: RenderOption
   const cell = (cls: string, title: string, html: string) => `<span class="tfm-col tfm-col-${cls}" title="${esc(title)}">${html}</span>`;
   const t = o.t ?? fmt;
   return {
-    afterDescription: `${pri ? ` <span class="tfm-col-pri">${pri}</span>` : ''}${extra.backlink ? ` ${extra.backlink}` : ''}`,
+    // Column 2 = description + priority + tags (+ backlink on query rows); then due | recurrence | created | more.
+    afterDescription: `${pri ? ` <span class="tfm-col-pri">${pri}</span>` : ''}${tags ? ` <span class="tfm-col-tags">${tags}</span>` : ''}${extra.backlink ? ` ${extra.backlink}` : ''}`,
     cells:
       cell('due', t('Due date'), part(['due'])) +
-      cell('tags', t('Tags'), tags) +
       cell('recur', t('Repeat'), part(['recur'])) +
+      cell('created', t('Created'), part(['created'])) +
       cell('more', t('More'), part([...MORE_FIELDS])),
   };
 }

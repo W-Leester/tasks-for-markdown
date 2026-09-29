@@ -100,6 +100,7 @@
   "tasksmd.config.calendar.newTaskFile": "Workspace-relative Markdown file that receives tasks created from the calendar (and other views without a target). Empty = the active Markdown editor.",
   "tasksmd.openCalendar.title": "캘린더 열기 (Open calendar)",
   "tasksmd.rendered.displayName": "Tasks: 렌더 보기 (Tasks: Rendered view)",
+  "tasksmd.previewRender.title": "Preview 렌더",
   "tasksmd.openRendered.title": "렌더 보기로 열기 (Open rendered view)",
   "tasksmd.openRenderedToSide.title": "렌더 보기를 옆에 열기 (Open rendered view to the side)",
   "tasksmd.openSource.title": "마크다운 소스 편집 (Edit Markdown source)",

@@ -396,6 +396,8 @@ export function registerRenderedView(context: vscode.ExtensionContext, deps: Ren
     provider,
     vscode.window.registerCustomEditorProvider(RENDERED_VIEW_TYPE, provider, { webviewOptions: { retainContextWhenHidden: true }, supportsMultipleEditorsPerDocument: true }),
     vscode.commands.registerCommand('tasksmd.openRendered', (arg?: unknown) => openRendered(arg, vscode.ViewColumn.Active, true)),
+    // Text button in the editor title bar (no icon, so the title "Preview 렌더" is shown as the label).
+    vscode.commands.registerCommand('tasksmd.previewRender', (arg?: unknown) => openRendered(arg, vscode.ViewColumn.Active, false)),
     vscode.commands.registerCommand('tasksmd.renderedAsDefault', async () => {
       const on = t('Rendered view (tasks rendered, click to complete)'), off = t('Text editor');
       const pick = await vscode.window.showQuickPick([{ label: on, picked: isRenderedDefault(), value: true }, { label: off, picked: !isRenderedDefault(), value: false }], { placeHolder: t('Which editor should open Markdown notes?') });

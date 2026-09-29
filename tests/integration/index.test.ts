@@ -206,6 +206,25 @@ suite('diagnostics', () => {
   });
 });
 
+suite('front matter', () => {
+  test('warns about an unclosed front matter fence and offers to remove it', async () => {
+    const doc = await vscode.workspace.openTextDocument({ language: 'markdown', content: '---\n\n## tags: [x]\n\n- [ ] a 📅 2026-10-01\n' });
+    await vscode.window.showTextDocument(doc);
+    try {
+      await waitFor(() => vscode.languages.getDiagnostics(doc.uri).some((d) => d.code === 'unclosed-front-matter'), 3000, 'front matter warning');
+      const diag = vscode.languages.getDiagnostics(doc.uri).find((d) => d.code === 'unclosed-front-matter')!;
+      const actions = await vscode.commands.executeCommand<vscode.CodeAction[]>('vscode.executeCodeActionProvider', doc.uri, diag.range);
+      const fix = actions.find((a) => a.title.includes('---'));
+      assert.ok(fix?.edit);
+      await vscode.workspace.applyEdit(fix!.edit!);
+      assert.strictEqual(doc.lineAt(0).text, '');
+      await waitFor(() => !vscode.languages.getDiagnostics(doc.uri).some((d) => d.code === 'unclosed-front-matter'), 3000, 'warning cleared');
+    } finally {
+      await vscode.commands.executeCommand('workbench.action.revertAndCloseActiveEditor');
+    }
+  });
+});
+
 suite('dependencies', () => {
   const guard = new FixtureGuard();
   teardown(() => guard.restore());

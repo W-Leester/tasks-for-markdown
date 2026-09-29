@@ -328,5 +328,7 @@
   "Which editor should open Markdown notes?": "마크다운 노트를 어떤 편집기로 열까요?",
   "Markdown notes now open in the rendered view. Source: the Source button or Ctrl+Shift+R.": "이제 마크다운 노트가 렌더 보기로 열립니다. 소스는 소스 버튼 또는 Ctrl+Shift+R.",
   "Markdown notes open in the text editor again.": "마크다운 노트가 다시 텍스트 편집기로 열립니다.",
-  "Due by today": "오늘까지(초과 포함)"
+  "Due by today": "오늘까지(초과 포함)",
+  "Front matter is opened with \"---\" but never closed: the Markdown preview will show an empty page.": "첫 줄의 \"---\"로 front matter가 시작됐지만 닫히지 않았습니다. 마크다운 미리보기가 빈 화면으로 나옵니다.",
+  "Remove the opening \"---\"": "맨 위의 \"---\" 삭제"
 }

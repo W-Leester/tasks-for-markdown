@@ -14,6 +14,7 @@ export const CODE_RECURRING_WITHOUT_DATE = 'recurring-without-date';
 export const CODE_INVALID_RECURRENCE = 'invalid-recurrence';
 export const CODE_DEPENDENCY_CYCLE = 'dependency-cycle';
 export const CODE_MISSING_DUE = 'missing-due-date';
+export const CODE_UNCLOSED_FRONT_MATTER = 'unclosed-front-matter';
 
 const DATE_FIELDS: DateFieldName[] = ['created', 'start', 'scheduled', 'due', 'done', 'cancelled'];
 const DATE_LABEL: Record<DateFieldName, string> = { created: 'created', start: 'start', scheduled: 'scheduled', due: 'due', done: 'done', cancelled: 'cancelled' };
@@ -65,6 +66,18 @@ export class TaskDiagnostics implements vscode.CodeActionProvider, vscode.Dispos
     const diags: vscode.Diagnostic[] = [];
     const registry = this.deps.getStatusRegistry();
     const globalFilter = this.deps.settings.get('globalFilter') || undefined;
+    // A lone `---` on the first line opens YAML front matter; without a closing `---` the built-in
+    // Markdown preview treats the whole note as front matter and shows an empty page.
+    if (doc.lineCount > 0 && doc.lineAt(0).text.trim() === '---') {
+      let closed = false;
+      for (let l = 1; l < doc.lineCount && !closed; l++) closed = /^(---|\.\.\.)\s*$/.test(doc.lineAt(l).text);
+      if (!closed) {
+        const d = new vscode.Diagnostic(doc.lineAt(0).range, t('Front matter is opened with "---" but never closed: the Markdown preview will show an empty page.'), vscode.DiagnosticSeverity.Warning);
+        d.code = CODE_UNCLOSED_FRONT_MATTER;
+        d.source = DIAG_SOURCE;
+        diags.push(d);
+      }
+    }
     for (let line = 0; line < doc.lineCount; line++) {
       const text = doc.lineAt(line).text;
       if (!isTaskLine(text)) continue;
@@ -124,6 +137,15 @@ export class TaskDiagnostics implements vscode.CodeActionProvider, vscode.Dispos
     const format = this.deps.settings.get('taskFormat');
     for (const diag of context.diagnostics) {
       if (diag.source !== DIAG_SOURCE) continue;
+      if (diag.code === CODE_UNCLOSED_FRONT_MATTER) {
+        const a = new vscode.CodeAction(t('Remove the opening "---"'), vscode.CodeActionKind.QuickFix);
+        a.diagnostics = [diag];
+        a.isPreferred = true;
+        a.edit = new vscode.WorkspaceEdit();
+        a.edit.delete(doc.uri, doc.lineAt(0).rangeIncludingLineBreak);
+        actions.push(a);
+        continue;
+      }
       const line = diag.range.start.line;
       const text = doc.lineAt(line).text;
       const task = parseTaskLine(text, { statusRegistry: registry });

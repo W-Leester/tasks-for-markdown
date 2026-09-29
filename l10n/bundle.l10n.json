@@ -52,5 +52,7 @@
   "Which editor should open Markdown notes?": "Which editor should open Markdown notes?",
   "Markdown notes now open in the rendered view. Source: the Source button or Ctrl+Shift+R.": "Markdown notes now open in the rendered view. Source: the Source button or Ctrl+Shift+R.",
   "Markdown notes open in the text editor again.": "Markdown notes open in the text editor again.",
-  "Due by today": "Due by today"
+  "Due by today": "Due by today",
+  "Front matter is opened with \"---\" but never closed: the Markdown preview will show an empty page.": "Front matter is opened with \"---\" but never closed: the Markdown preview will show an empty page.",
+  "Remove the opening \"---\"": "Remove the opening \"---\""
 }

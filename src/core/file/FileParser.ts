@@ -1,4 +1,4 @@
-import { type StatusRegistry, Task, isTaskLine, parseTaskLine, type TaskLocation } from '../task';
+import { type StatusRegistry, Task, isTaskLine, parseTaskLine, type TaskLocation, type TaskNote } from '../task';
 
 export interface FileParseOptions {
   /** Index key; defaults to `path`. */
@@ -22,10 +22,10 @@ export interface FileParseResult {
 
 const HEADING_RE = /^\s{0,3}(#{1,6})\s+(.*?)\s*#*\s*$/u;
 const FENCE_RE = /^\s*(`{3,}|~{3,})/u;
-const LIST_ITEM_RE = /^([ \t]*)([-*+]|\d+[.)])[ \t]+/u;
+export const LIST_ITEM_RE = /^([ \t]*)([-*+]|\d+[.)])[ \t]+/u;
 const TAB_WIDTH = 4;
 
-function indentWidth(ws: string): number {
+export function indentWidth(ws: string): number {
   let w = 0;
   for (const ch of ws) w += ch === '\t' ? TAB_WIDTH - (w % TAB_WIDTH) : 1;
   return w;
@@ -84,6 +84,8 @@ export function parseFile(text: string, options: FileParseOptions): FileParseRes
   let heading: string | null = null;
   // Stack of open list items: [indent width, line number].
   const stack: { indent: number; line: number }[] = [];
+  // Notes collected per task line (direct non-checkbox children).
+  const notesByLine = new Map<number, TaskNote[]>();
 
   for (let i = start; i < lines.length; i++) {
     const line = lines[i]!;
@@ -129,10 +131,19 @@ export function parseFile(text: string, options: FileParseOptions): FileParseRes
     const depth = stack.length;
     stack.push({ indent, line: i });
 
-    if (!isTaskLine(line)) continue;
-    const location: TaskLocation = { key: options.key ?? options.path, path: options.path, line: i, heading, frontmatterTags, depth, parentLine };
+    if (!isTaskLine(line)) {
+      const notes = parentLine === null ? undefined : notesByLine.get(parentLine);
+      const text = line.slice(lm[0].length).trim();
+      if (notes && text) notes.push({ line: i, text });
+      continue;
+    }
+    const notes: TaskNote[] = [];
+    const location: TaskLocation = { key: options.key ?? options.path, path: options.path, line: i, heading, frontmatterTags, depth, parentLine, notes };
     const task = parseTaskLine(line, { statusRegistry: options.statusRegistry, globalFilter: options.globalFilter, location });
-    if (task) tasks.push(task);
+    if (task) {
+      tasks.push(task);
+      notesByLine.set(i, notes);
+    }
   }
 
   return { tasks, headings, frontmatterTags };

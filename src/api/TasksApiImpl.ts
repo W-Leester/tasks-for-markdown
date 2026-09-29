@@ -136,8 +136,9 @@ export function createTasksApi(deps: TasksApiDeps, caller: ApiCaller = {}): Task
 
   // ---- field helpers -----------------------------------------------------------------------
   const toFieldValues = (changes: TaskFieldChanges): FieldValues => {
-    const { status, ...rest } = changes as TaskFieldChanges & { tags?: unknown };
+    const { status, notes, ...rest } = changes as TaskFieldChanges & { tags?: unknown };
     void status;
+    void notes;
     const out: FieldValues = {};
     for (const [k, v] of Object.entries(rest)) {
       if (k === 'tags') continue;
@@ -153,6 +154,11 @@ export function createTasksApi(deps: TasksApiDeps, caller: ApiCaller = {}): Task
     const registry = deps.getStatusRegistry();
     if (typeof symbol !== 'string' || symbol.length !== 1) fail('INVALID_ARGUMENT', 'status must be a single character');
     return registry.all().find((s) => s.symbol === symbol) ?? fail('INVALID_ARGUMENT', `Unknown status symbol "${symbol}"`);
+  };
+  const notesOf = (changes: TaskFieldChanges): string[] | undefined => {
+    if (changes.notes === undefined) return undefined;
+    if (!Array.isArray(changes.notes) || changes.notes.some((n) => typeof n !== 'string')) fail('INVALID_ARGUMENT', 'notes must be an array of strings');
+    return changes.notes;
   };
   const applyStatus = async (task: Task, symbol: string): Promise<Task> => {
     const target = statusFor(symbol);
@@ -182,7 +188,7 @@ export function createTasksApi(deps: TasksApiDeps, caller: ApiCaller = {}): Task
     const line = target?.line ?? MAX_LINE;
     if (!Number.isInteger(line) || line < 0) fail('INVALID_ARGUMENT', 'target.line must be a non-negative integer');
     logWrite('edit.create', `${path}:${line === MAX_LINE ? 'end' : line + 1}`);
-    const at = await deps.editService.insertNewTask(uri, line, task);
+    const at = await deps.editService.insertNewTask(uri, line, task, notesOf(input));
     const written = deps.index.taskAt(uri.toString(), at);
     return dto(written ?? task.with({ location: { ...task.location, key: uri.toString(), path: deps.indexService.displayPath(uri), line: at } } as Partial<Task>));
   };
@@ -191,7 +197,9 @@ export function createTasksApi(deps: TasksApiDeps, caller: ApiCaller = {}): Task
     let task = await requireTask(ref);
     logWrite('edit.update', `${ref.path}:${ref.line + 1}`);
     const values = toFieldValues(changes);
-    if (Object.keys(values).length) task = await deps.editService.update(task, applyFieldValues(task, values).toFields());
+    const notes = notesOf(changes);
+    if (Object.keys(values).length) task = await deps.editService.update(task, applyFieldValues(task, values).toFields(), notes);
+    else if (notes) { await deps.editService.setNotes(task, notes); task = fresh(task); }
     if (changes.status !== undefined) task = await applyStatus(task, changes.status);
     return dto(fresh(task));
   };

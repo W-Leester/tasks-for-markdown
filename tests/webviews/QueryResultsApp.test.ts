@@ -9,7 +9,7 @@ const init: InitState = {
   uiState: {}, editModal: { accessKeys: false, hiddenFields: [] }, globalFilter: '', calendarFontSize: 13, requireDueDate: false,
 };
 const task = (description: string, line: number): TaskDto => ({
-  key: 'file:///n.md', path: 'n.md', line, heading: null, parentLine: null, depth: 0, description, status: { symbol: ' ', name: 'Todo', type: 'TODO' },
+  key: 'file:///n.md', path: 'n.md', line, heading: null, parentLine: null, depth: 0, notes: [], description, status: { symbol: ' ', name: 'Todo', type: 'TODO' },
   priority: '3', priorityName: 'Normal', created: null, start: null, scheduled: null, due: '2026-09-23', done: null, cancelled: null,
   recurrence: null, onCompletion: null, id: null, dependsOn: [], tags: [], isCompleted: false, isDone: false, isBlocked: false, urgency: 1, originalMarkdown: `- [ ] ${description}`,
 });

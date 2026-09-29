@@ -14,6 +14,8 @@ export interface TaskDto {
   parentLine: number | null;
   /** Nesting depth: 0 = top-level list item. */
   depth: number;
+  /** Notes: the task's direct child bullets without a checkbox (line + text). */
+  notes: { line: number; text: string }[];
   description: string;
   status: { symbol: string; name: string; type: string };
   /** '0' (highest) … '5' (lowest). */
@@ -68,6 +70,7 @@ export function toTaskDto(task: Task, index: TaskIndex, today: Dayjs): TaskDto {
     heading: task.location.heading,
     parentLine: task.location.parentLine,
     depth: task.location.depth,
+    notes: (task.location.notes ?? []).map((n) => ({ line: n.line, text: n.text })),
     description: task.description,
     status: { symbol: task.status.symbol, name: task.status.name, type: task.status.type },
     priority: task.priority,

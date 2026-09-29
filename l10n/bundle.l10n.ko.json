@@ -334,5 +334,12 @@
   "Tags": "태그",
   "More": "더보기",
   "Scheduled, start, depends on, created, on completion": "예정일, 시작일, 의존, 생성일, 완료 시 동작",
-  "done / cancelled": "완료일 / 취소일"
+  "done / cancelled": "완료일 / 취소일",
+  "Add note": "메모 추가",
+  "Note — Enter to save, Esc to cancel": "메모 — Enter로 저장, Esc로 취소",
+  "{0} notes": "메모 {0}개",
+  "notes": "메모",
+  "Notes": "메모",
+  "One note per line — saved as bullets under the task": "한 줄에 메모 하나 — 태스크 아래 글머리표로 저장됩니다",
+  "Empty note": "메모 내용이 비어 있습니다"
 }

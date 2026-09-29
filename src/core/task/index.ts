@@ -4,7 +4,7 @@ export { DEFAULT_STATUSES, Status, StatusRegistry, type StatusConfig } from './S
 export { ALL_STATUS_TYPES, StatusType, isStatusType } from './StatusType';
 export { extractTags } from './tags';
 export { Task, type DateFieldName, type TaskFields } from './Task';
-export { type TaskLocation, unknownLocation } from './TaskLocation';
+export { type TaskLocation, type TaskNote, unknownLocation } from './TaskLocation';
 export { TASK_LINE_RE, isTaskLine, parseTaskLine, splitTaskLine, type ParseOptions, type TaskLineParts } from './TaskParser';
 export type { TaskFormat } from './formats/types';
 export { serializeTask, serializeTaskBody } from './TaskSerializer';

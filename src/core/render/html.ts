@@ -99,15 +99,15 @@ export function renderBadges(task: Task, layout: Layout | null, o: RenderOptions
 const MORE_FIELDS = new Set(['recur', 'oncompletion', 'id', 'dependson', 'cancelled', 'start', 'scheduled', 'done']);
 
 /** Column cells for the rendered view (M12): status | description+priority+tags | due | created | everything else. Every cell is always present so the grid stays aligned. */
-export function renderColumns(task: Task, layout: Layout | null, o: RenderOptions, extra: { backlink?: string } = {}): { afterDescription: string; cells: string } {
+export function renderColumns(task: Task, layout: Layout | null, o: RenderOptions, extra: { backlink?: string; notes?: string } = {}): { afterDescription: string; cells: string } {
   const part = (fields: string[]) => renderBadges(task, layout, { ...o, only: new Set(fields) });
   const pri = part(['pri']);
   const tags = task.tags.map((tag) => `<span class="tfm-tag">${esc(tag)}</span>`).join(' ');
   const cell = (cls: string, title: string, html: string) => `<span class="tfm-col tfm-col-${cls}" title="${esc(title)}">${html}</span>`;
   const t = o.t ?? fmt;
   return {
-    // Column 2 = description + priority + tags (+ backlink on query rows); then due | created | everything else.
-    afterDescription: `${pri ? ` <span class="tfm-col-pri">${pri}</span>` : ''}${tags ? ` <span class="tfm-col-tags">${tags}</span>` : ''}${extra.backlink ? ` ${extra.backlink}` : ''}`,
+    // Column 2 = description + priority + tags (+ backlink and notes on query rows); then due | created | everything else.
+    afterDescription: `${pri ? ` <span class="tfm-col-pri">${pri}</span>` : ''}${tags ? ` <span class="tfm-col-tags">${tags}</span>` : ''}${extra.backlink ? ` ${extra.backlink}` : ''}${extra.notes ? ` ${extra.notes}` : ''}`,
     cells:
       cell('due', t('Due date'), part(['due'])) +
       cell('created', t('Created'), part(['created'])) +
@@ -139,13 +139,23 @@ export function renderTaskRow(task: Task, layout: Layout | null, o: RenderOption
   const href = o.link?.(task);
   const where = `${task.location.path}:${task.location.line + 1}`;
   const backlink = layout?.hidden.has('backlink') || extra.hideBacklink ? '' : `<span class="tfm-backlink">${href ? `<a href="${esc(href)}" title="${esc(where)}">${esc(task.location.path.split('/').pop()!.replace(/\.md$/, ''))}${task.location.heading ? ` › ${esc(task.location.heading)}` : ''}</a>` : esc(where)}</span>`;
+  const notes = renderNotes(task, o);
   const open = `<li class="tfm-task tfm-status-${statusClass(task)}${extra.context ? ' tfm-context' : ''}" data-tfm-path="${esc(task.location.path)}" data-tfm-line="${task.location.line}">${renderCheckbox(task)}`;
   if (o.columns) {
-    const c = renderColumns(task, layout, o, { backlink });
+    const c = renderColumns(task, layout, o, { backlink, notes });
     const desc = renderDescriptionText(task, { ...o, stripTags: true });
     return `${open}<span class="tfm-desc">${desc}${c.afterDescription}</span>${c.cells}${extra.children ?? ''}</li>`;
   }
-  return `${open}<span class="tfm-desc">${renderDescriptionText(task, o)}</span>${renderBadges(task, layout, { ...o, afterPriority: backlink })}${extra.children ?? ''}</li>`;
+  return `${open}<span class="tfm-desc">${renderDescriptionText(task, o)}</span>${renderBadges(task, layout, { ...o, afterPriority: backlink })}${notes ? ' ' + notes : ''}${extra.children ?? ''}</li>`;
+}
+
+/** `💬 N` for a task's notes, expandable without scripts (`<details>`) so the built-in preview can open it too. */
+export function renderNotes(task: Task, o: RenderOptions): string {
+  const notes = task.location.notes ?? [];
+  if (!notes.length) return '';
+  const t = o.t ?? fmt;
+  const title = notes.map((n) => n.text).join('\n');
+  return `<details class="tfm-notes"><summary title="${esc(title)}" aria-label="${esc(t('{0} notes', notes.length))}">💬 ${notes.length}</summary><ul class="tfm-notes-list">${notes.map((n) => `<li>${esc(n.text)}</li>`).join('')}</ul></details>`;
 }
 
 function renderGroup(node: GroupNode, depth: number, layout: Layout, o: RenderOptions, out: string[]): void {

@@ -42,7 +42,7 @@ window.addEventListener('message', (e: MessageEvent<ToWebview>) => {
   window.scrollTo(0, y);
 });
 
-/** Obsidian-style per-row buttons (✎ edit, ⏩ postpone) that appear on hover. */
+/** Obsidian-style per-row buttons (✎ edit, ⏩ postpone, 💬 note) that appear on hover. */
 function addRowActions(): void {
   const labels = document.body.dataset;
   for (const li of Array.from(content.querySelectorAll<HTMLElement>('li.tfm-task'))) {
@@ -60,6 +60,7 @@ function addRowActions(): void {
     };
     button('edit', '✎', labels.lEdit ?? 'Edit');
     if (li.querySelector(':scope > .tfm-fields .tfm-due, :scope > .tfm-fields .tfm-scheduled, :scope > .tfm-badges .tfm-due, :scope > .tfm-badges .tfm-scheduled, :scope > p > .tfm-fields .tfm-due, :scope > p > .tfm-fields .tfm-scheduled, :scope > .tfm-col .tfm-due, :scope > .tfm-col .tfm-scheduled, :scope > p > .tfm-col .tfm-due, :scope > p > .tfm-col .tfm-scheduled')) button('postpone', '⏩', labels.lPostpone ?? 'Postpone');
+    button('note', '💬', labels.lNote ?? 'Add note');
     // Before any nested list so the buttons stay on the task's own line.
     const nested = li.querySelector(':scope > ul, :scope > ol');
     const para = li.querySelector(':scope > p');
@@ -83,7 +84,9 @@ content.addEventListener('click', (e) => {
   if (action) {
     e.preventDefault();
     const ref = taskRef(action);
-    if (ref) post({ type: action.dataset.act === 'postpone' ? 'doc/postpone' : 'doc/edit', ...ref });
+    if (!ref) return;
+    if (action.dataset.act === 'note') openNoteForm(action.closest<HTMLElement>('li.tfm-task')!, ref);
+    else post({ type: action.dataset.act === 'postpone' ? 'doc/postpone' : 'doc/edit', ...ref });
     return;
   }
   if (target.closest('input.tfm-check')) {
@@ -99,7 +102,33 @@ content.addEventListener('click', (e) => {
   }
 });
 
+/** Input under the task row; Enter adds the note (an indented bullet) to the file, Esc/blur closes it. */
+function openNoteForm(li: HTMLElement, ref: { path: string | null; line: number }): void {
+  content.querySelector('.rv-note-form')?.remove();
+  const form = document.createElement('div');
+  form.className = 'rv-note-form';
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.placeholder = document.body.dataset.lNotePlaceholder ?? 'Note — Enter to save, Esc to cancel';
+  form.appendChild(input);
+  const nested = li.querySelector(':scope > ul, :scope > ol');
+  if (nested) li.insertBefore(form, nested);
+  else li.appendChild(form);
+  const close = () => form.remove();
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { e.preventDefault(); close(); return; }
+    if (e.key !== 'Enter' || e.isComposing) return;
+    e.preventDefault();
+    const text = input.value.trim();
+    if (text) post({ type: 'doc/addNote', ...ref, text });
+    close();
+  });
+  input.addEventListener('blur', () => { if (!input.value.trim()) close(); });
+  input.focus();
+}
+
 content.addEventListener('dblclick', (e) => {
+  if ((e.target as Element).closest('.rv-note-form, .tfm-notes')) return;
   const ref = taskRef(e.target as Element);
   if (!ref) return;
   e.preventDefault();

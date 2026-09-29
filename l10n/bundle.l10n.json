@@ -58,5 +58,9 @@
   "Tags": "Tags",
   "More": "More",
   "Scheduled, start, depends on, created, on completion": "Scheduled, start, depends on, created, on completion",
-  "done / cancelled": "done / cancelled"
+  "done / cancelled": "done / cancelled",
+  "Add note": "Add note",
+  "Note — Enter to save, Esc to cancel": "Note — Enter to save, Esc to cancel",
+  "{0} notes": "{0} notes",
+  "Empty note": "Empty note"
 }

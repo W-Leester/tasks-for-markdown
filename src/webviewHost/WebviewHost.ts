@@ -4,6 +4,7 @@ import type { TaskIndex } from '../core/index';
 import { DateField, type StatusRegistry, StatusType, Task, generateTaskId, parseTaskLine } from '../core/task';
 import { Recurrence } from '../core/recurrence';
 import { computeWeeklyStats } from '../core/stats';
+import { noteBlock } from '../core/file';
 import { dependants } from '../core/index';
 import type { IndexService } from '../index/IndexService';
 import type { QueryService } from '../services/QueryService';
@@ -130,7 +131,7 @@ export class WebviewHost implements vscode.Disposable {
         }
         case 'task/setFields': {
           const task = this.deps.index.taskAt(msg.key, msg.line);
-          if (task) await this.applyFields(task, msg.fields);
+          if (task) await this.applyFields(task, msg.fields, msg.notes);
           break;
         }
         case 'task/create': {
@@ -164,7 +165,7 @@ export class WebviewHost implements vscode.Disposable {
             }
           }
           this.deps.log(`task/create -> ${target.toString()} line ${line}: ${task.description}`);
-          await this.deps.editService.insertNewTask(target, line, task);
+          await this.deps.editService.insertNewTask(target, line, task, msg.notes);
           break;
         }
         case 'task/open': {
@@ -202,7 +203,15 @@ export class WebviewHost implements vscode.Disposable {
           this.deps.log(`task/load key=${msg.key} line=${msg.line} -> ${task ? 'edit "' + task.description + '"' : 'new task'}`);
           const candidates = this.deps.index.all().filter((t) => !t.isCompleted && t !== task).map((t) => toTaskDto(t, this.deps.index, today));
           const deps = task ? dependants(task, this.deps.index).map((t) => toTaskDto(t, this.deps.index, today)) : [];
-          this.send({ type: 'task/loaded', requestId: msg.requestId, task: task ? toTaskDto(task, this.deps.index, today) : null, candidates, dependants: deps });
+          const dto = task ? toTaskDto(task, this.deps.index, today) : null;
+          if (dto) {
+            // Notes straight from the document: the fallback parse above has none, and the index may lag.
+            try {
+              const doc = await vscode.workspace.openTextDocument(vscode.Uri.parse(dto.key));
+              dto.notes = noteBlock(doc.getText().split('\n'), dto.line).notes.map((n) => ({ line: n.line, text: n.text }));
+            } catch { /* keep the indexed notes */ }
+          }
+          this.send({ type: 'task/loaded', requestId: msg.requestId, task: dto, candidates, dependants: deps });
           break;
         }
         case 'query/explain': {
@@ -288,11 +297,12 @@ export class WebviewHost implements vscode.Disposable {
     }
     return out;
   }
-  private async applyFields(task: Task, fields: Partial<Record<TaskFieldName, string | string[] | null>>): Promise<void> {
+  private async applyFields(task: Task, fields: Partial<Record<TaskFieldName, string | string[] | null>>, notes?: string[]): Promise<void> {
     const { status, ...rest } = fields;
     if (Array.isArray(rest.dependsOn)) rest.dependsOn = await this.resolveDependencyRefs(rest.dependsOn);
     let current = this.deps.index.taskAt(task.location.key, task.location.line) ?? task;
-    if (Object.keys(rest).length) current = await this.deps.editService.update(current, applyFieldValues(current, rest).toFields());
+    if (Object.keys(rest).length) current = await this.deps.editService.update(current, applyFieldValues(current, rest).toFields(), notes);
+    else if (notes) await this.deps.editService.setNotes(current, notes);
     if (typeof status === 'string') {
       const target = this.deps.getStatusRegistry().bySymbol(status);
       const fresh = this.deps.index.taskAt(current.location.key, current.location.line) ?? current;

@@ -48,6 +48,8 @@ for (const t of r.tasks) console.log(t.path, t.line + 1, t.description, t.due);
 
 **트리(1.6.0에 추가, v1 호환).** `query.run`의 결과에서 트리 표시가 켜져 있으면(`tasksmd.query.showTree` 또는 `show tree`) `groups`가 항상 채워지고, 말단 그룹에 `tree: { task, matched, children }[]`가 붙습니다. `matched: false`는 필터에 안 맞지만 부모와 함께 보여 주는 맥락 행입니다. `tasks`(평평한 목록)는 예전처럼 필터에 맞은 것만 담습니다. `TaskDto`에는 `parentLine`(부모 목록 항목의 줄, 없으면 null)과 `depth`가 추가되었습니다.
 
+**메모(1.8.0에 추가, v1 호환).** `TaskDto.notes: { line, text }[]` — 태스크 바로 아래 단계의 체크박스 없는 글머리표. `edit.create`와 `edit.update`의 `changes.notes: string[]`로 메모 전체를 바꿉니다(`[]`면 삭제). 기존 메모 줄은 제자리에서 고쳐 쓰고, 늘어난 만큼 추가, 줄어든 만큼 삭제하며 하위 태스크는 건드리지 않습니다.
+
 ### events — 구독
 
 | 메서드 | 설명 |

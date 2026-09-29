@@ -138,6 +138,20 @@ function decorateTaskLines(state: StateCore, deps: PluginDeps): void {
       }
       inline.children.push(tok);
     }
+    markNotes(tokens);
+  }
+}
+
+/** Notes (M13): direct child list items of a task that are not tasks themselves get `tfm-note`. */
+function markNotes(tokens: Token[]): void {
+  const stack: Token[] = [];
+  for (const tok of tokens) {
+    if (tok.type === 'list_item_open') {
+      const parent = stack[stack.length - 1];
+      const isTask = /\btfm-task\b/u.test(String(tok.attrGet('class') ?? ''));
+      if (parent && !isTask && /\btfm-task\b/u.test(String(parent.attrGet('class') ?? ''))) tok.attrJoin('class', 'tfm-note');
+      stack.push(tok);
+    } else if (tok.type === 'list_item_close') stack.pop();
   }
 }
 

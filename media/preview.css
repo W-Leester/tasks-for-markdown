@@ -38,5 +38,13 @@ li.tfm-task.tfm-status-cancelled .tfm-desc { text-decoration: line-through; opac
 .tfm-explain pre { font-size: 0.85em; }
 
 /* Tree display (M11): sub-tasks under their parent; context rows (did not match) are faded. */
+/* Notes (M13): 💬 N on query rows opens the note list; plain bullets under a task in the note. */
+.tfm-notes { display: inline-block; vertical-align: top; margin-left: .4em; font-size: .85em; }
+.tfm-notes[open] { display: block; margin: .1em 0 .2em 1.4em; }
+.tfm-notes > summary { list-style: none; cursor: pointer; opacity: .75; }
+.tfm-notes > summary::-webkit-details-marker { display: none; }
+.tfm-notes-list { margin: .15em 0 0 1.1em; padding: 0; opacity: .85; }
+li.tfm-note { opacity: .8; }
+
 .tfm-query ul.tfm-subtree { margin: .1em 0 0; padding-left: 1.4em; }
 .tfm-query li.tfm-context > .tfm-desc, .tfm-query li.tfm-context > .tfm-badges { opacity: .5; }

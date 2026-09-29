@@ -49,6 +49,8 @@ Put the exact line (`TaskDto.originalMarkdown`) in `ref.expectedText` and the wr
 
 **Tree (added in 1.6.0, compatible with v1).** When tree display is on (`tasksmd.query.showTree` or `show tree`), `query.run` always fills `groups`, and leaf groups carry `tree: { task, matched, children }[]`. `matched: false` marks context rows (children shown with their parent although they did not match). The flat `tasks` list still holds only matching tasks. `TaskDto` gains `parentLine` (line of the parent list item, or null) and `depth`.
 
+**Notes (added in 1.8.0, compatible with v1).** `TaskDto.notes: { line, text }[]` — the task's direct child bullets without a checkbox. `changes.notes: string[]` on `edit.create` and `edit.update` replaces all notes (`[]` removes them). Existing note lines are rewritten in place, extra ones added or removed; sub-tasks are never touched.
+
 ### events
 
 | Method | What it does |

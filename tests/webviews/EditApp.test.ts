@@ -59,6 +59,52 @@ describe('EditApp field order and More section (M12)', () => {
   });
 });
 
+describe('EditApp notes (M13)', () => {
+  const base = { key: 'file:///n.md', path: 'n.md', line: 3, heading: null, parentLine: null, depth: 0, description: 'review contract', status: { symbol: ' ', name: 'Todo', type: 'TODO' },
+    priority: '3', priorityName: 'none', created: null, start: null, scheduled: null, due: '2026-10-02', done: null, cancelled: null,
+    recurrence: null, onCompletion: null, id: null, dependsOn: [], tags: [], isCompleted: false, isDone: false, isBlocked: false, urgency: 1, originalMarkdown: '' };
+  const open = async (task: unknown) => {
+    posted.length = 0;
+    render(EditApp);
+    await Promise.resolve();
+    receive({ type: 'state/init', state: { ...init, uiState: { editTarget: { key: 'file:///n.md', line: 3 } } } });
+    await Promise.resolve();
+    const load = [...posted].reverse().find((m: FromWebview) => m.type === 'task/load') as { requestId: number };
+    receive({ type: 'task/loaded', requestId: load.requestId, task: task as never, candidates: [], dependants: [] });
+    await Promise.resolve();
+  };
+  const apply = () => fireEvent.click(screen.getByRole('button', { name: /Apply|적용/ }));
+
+  it('loads existing notes (More opens, count on the button) and sends the edited list', async () => {
+    await open({ ...base, notes: [{ line: 4, text: 'clause 3' }, { line: 5, text: 'waiting for reply' }] });
+    const area = document.getElementById('f-notes') as HTMLTextAreaElement;
+    expect(area.value).toBe('clause 3\nwaiting for reply');
+    expect(screen.getByRole('button', { name: /More/ }).textContent).toContain('💬 2');
+    await fireEvent.input(area, { target: { value: 'clause 3 ok\n\n  ' } });
+    await apply();
+    const set = posted.find((m: FromWebview) => m.type === 'task/setFields') as { notes?: string[] };
+    expect(set.notes).toEqual(['clause 3 ok']);
+  });
+
+  it('does not send notes when they were not changed', async () => {
+    await open({ ...base, notes: [{ line: 4, text: 'clause 3' }] });
+    await apply();
+    const set = posted.find((m: FromWebview) => m.type === 'task/setFields') as { notes?: string[] };
+    expect(set).toBeDefined();
+    expect(set.notes).toBeUndefined();
+  });
+
+  it('a new task can be created with notes', async () => {
+    await open(null);
+    await fireEvent.input(screen.getByLabelText(/Description|설명/), { target: { value: 'new one' } });
+    await fireEvent.click(screen.getByRole('button', { name: /More/ }));
+    await fireEvent.input(document.getElementById('f-notes')!, { target: { value: 'first\nsecond' } });
+    await apply();
+    const create = posted.find((m: FromWebview) => m.type === 'task/create') as { notes?: string[] };
+    expect(create.notes).toEqual(['first', 'second']);
+  });
+});
+
 describe('EditApp with tasksmd.requireDueDate', () => {
   it('blocks Apply for a new task without a due date', async () => {
     render(EditApp);

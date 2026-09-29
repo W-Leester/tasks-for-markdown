@@ -62,6 +62,8 @@ export interface TaskFieldChanges {
   dependsOn?: string[];
   /** Status symbol (the character inside `[ ]`); applied last, with done/cancelled dates and recurrence. */
   status?: string;
+  /** Replace the task's notes (indented plain bullets under it), one entry per note; `[]` removes them. */
+  notes?: string[];
 }
 
 export interface NewTask extends TaskFieldChanges {

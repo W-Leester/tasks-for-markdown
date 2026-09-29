@@ -18,6 +18,7 @@ The extension indexes every `- [ ]` line in the workspace and lets you see, quer
 - **Sidebar** — Today / Next 7 days / Overdue / In progress / Blocked / All open / Done, grouping, filter, checkboxes; saved queries with grouped results.
 - **Query language** — the Obsidian Tasks query language in ` ```tasks ` blocks (rendered in the Markdown preview), in saved queries and in a visual query builder. Filters, boolean logic, sort by, group by, limits, layout options, `explain`, and optional `filter/sort/group by function`.
 - **Recurrence, statuses, dependencies** — `🔁 every month on the last`, `when done`, custom checkbox statuses with theme presets (Minimal, ITS, Things), `🆔`/`⛔` dependencies with blocked detection and cycle diagnostics, Obsidian's urgency score.
+- **Notes** — indented plain bullets under a task are its notes (Obsidian-compatible). Add one from the rendered view with `💬`, see `💬 2` on query rows and cards, edit them in the dialog's More section.
 - **More views** — Create/edit dialog, kanban (drag & drop), calendar (month/week, full screen, drag to reschedule), weekly statistics, archive of completed tasks, daily notifications.
 - **Works in Cursor** — only stable VS Code APIs; also published to Open VSX.
 

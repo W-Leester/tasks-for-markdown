@@ -13,6 +13,16 @@ export interface TaskLocation {
   depth: number;
   /** Line of the parent list item (task or not), or null. */
   parentLine: number | null;
+  /** Notes: the task's direct child list items without a checkbox, in file order. */
+  notes?: readonly TaskNote[];
+}
+
+/** One note line under a task (`  - text`). */
+export interface TaskNote {
+  /** 0-based line number. */
+  line: number;
+  /** Item text without the list marker. */
+  text: string;
 }
 
 export function unknownLocation(path = '', line = 0): TaskLocation {

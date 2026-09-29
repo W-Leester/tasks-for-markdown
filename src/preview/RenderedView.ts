@@ -30,6 +30,7 @@ type Incoming =
   | { type: 'doc/toggle'; path: string | null; line: number }
   | { type: 'doc/edit'; path: string | null; line: number }
   | { type: 'doc/postpone'; path: string | null; line: number }
+  | { type: 'doc/addNote'; path: string | null; line: number; text: string }
   | { type: 'doc/link'; href: string }
   | { type: 'doc/openSource' }
   | { type: 'doc/view'; sort: string; scope: string };
@@ -129,6 +130,12 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
         case 'doc/postpone': {
           const task = this.taskFor(msg.path, msg.line, document);
           if (task) await vscode.commands.executeCommand('tasksmd.postpone', task);
+          break;
+        }
+        case 'doc/addNote': {
+          const task = this.taskFor(msg.path, msg.line, document);
+          if (!task) throw new Error(t('That task is no longer at line {0}; the view has been refreshed.', msg.line + 1));
+          await this.deps.editService.addNote(task, msg.text);
           break;
         }
         case 'doc/link':
@@ -298,7 +305,16 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
   body.fields-right .tfm-fields, body.fields-right .tfm-badges { flex: 0 0 auto; margin-left: auto; text-align: right; }
   body.fields-right .tfm-backlink { flex: 0 0 auto; }
   body.fields-right .rv-actions { flex: 0 0 auto; margin-left: .2em; }
-  body.fields-right li.tfm-task > ul, body.fields-right li.tfm-task > ol { flex-basis: 100%; } .tfm-field.tfm-overdue { color: var(--vscode-errorForeground, #f14c4c); }
+  body.fields-right li.tfm-task > ul, body.fields-right li.tfm-task > ol { flex-basis: 100%; }
+  /* Notes (M13): plain bullets under a task, muted with a 💬 marker; the add-note input; 💬 N on query rows. */
+  li.tfm-note { list-style: none; color: var(--rv-muted); font-size: .93em; }
+  li.tfm-note::before { content: '💬'; display: inline-block; width: 1.9em; margin-left: -1.9em; font-size: .8em; opacity: .7; }
+  body.fields-columns li.tfm-task:has(> .tfm-desc > .tfm-notes[open]) > .tfm-check { align-self: start; margin-top: .3em; }
+  li.tfm-note > p:first-child { display: inline; }
+  .rv-note-form { display: block; flex-basis: 100%; grid-column: 1 / -1; margin: 4px 0 4px 1.6em; }
+  .rv-note-form input { width: 100%; max-width: 40em; box-sizing: border-box; background: var(--rv-bg-2); color: var(--rv-fg); border: 1px solid var(--rv-accent); border-radius: 4px; padding: 3px 7px; font: inherit; font-size: .93em; outline: none; }
+  .tfm-notes > summary { color: var(--rv-muted); }
+  .tfm-notes-list { color: var(--rv-muted); } .tfm-field.tfm-overdue { color: var(--vscode-errorForeground, #f14c4c); }
   .tfm-field.tfm-invalid { color: var(--vscode-editorWarning-foreground, #cca700); }
   .rv-frontmatter { color: var(--rv-muted); font-size: 1em; margin: 0 0 1.25em; padding: 0 0 .75em; border-bottom: 1px solid var(--rv-stroke); }
   .rv-frontmatter .k { color: var(--rv-fg); font-weight: 600; }
@@ -328,7 +344,7 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
 </style>
 <title>${t('Tasks: Rendered view')}</title>
 </head>
-<body data-l-edit="${t('Edit')}" data-l-postpone="${t('Postpone')}" data-l-hidden="${t('{0} hidden')}">
+<body data-l-edit="${t('Edit')}" data-l-postpone="${t('Postpone')}" data-l-note="${t('Add note')}" data-l-note-placeholder="${t('Note — Enter to save, Esc to cancel')}" data-l-hidden="${t('{0} hidden')}">
 <div class="rv-tools">
   <label class="rv-select"><span>${t('Sort')}</span><select id="view-sort">
     <option value="document">${t('Document order')}</option><option value="due">${t('Due date')}</option><option value="created">${t('Created date')}</option><option value="priority">${t('Priority')}</option><option value="urgency">${t('Urgency')}</option>

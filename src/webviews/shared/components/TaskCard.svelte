@@ -41,6 +41,7 @@
     {:else if task.scheduled}<span class="tfm-chip">⏳ {shortDate(task.scheduled)}</span>{/if}
     {#if task.recurrence}<span class="tfm-chip" title={task.recurrence}>🔁</span>{/if}
     {#if task.isBlocked}<span class="tfm-chip today">⛔</span>{/if}
+    {#if task.notes?.length}<span class="tfm-chip" title={task.notes.map((n) => n.text).join('\n')}>💬 {task.notes.length}</span>{/if}
     {#if showFile}<span class="tfm-chip file">{task.path.split('/').pop()?.replace(/\.md$/, '')}</span>{/if}
   </div>
 </div>

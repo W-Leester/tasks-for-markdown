@@ -68,8 +68,9 @@ export type FromWebview =
   | { type: 'query/run'; requestId: number; query: string; source?: string | null }
   | { type: 'task/toggle'; key: string; line: number }
   | { type: 'task/setField'; key: string; line: number; field: TaskFieldName; value: string | string[] | null }
-  | { type: 'task/setFields'; key: string; line: number; fields: Partial<Record<TaskFieldName, string | string[] | null>> }
-  | { type: 'task/create'; key: string | null; line: number | null; fields: Partial<Record<TaskFieldName, string | string[] | null>> }
+  /** `notes` (edit dialog): replace the task's notes, one per entry. */
+  | { type: 'task/setFields'; key: string; line: number; fields: Partial<Record<TaskFieldName, string | string[] | null>>; notes?: string[] }
+  | { type: 'task/create'; key: string | null; line: number | null; fields: Partial<Record<TaskFieldName, string | string[] | null>>; notes?: string[] }
   | { type: 'task/open'; key: string; line: number }
   | { type: 'task/edit'; key: string; line: number }
   | { type: 'task/load'; requestId: number; key: string | null; line: number | null }
@@ -85,6 +86,8 @@ export type FromWebview =
   | { type: 'doc/toggle'; path: string | null; line: number }
   | { type: 'doc/edit'; path: string | null; line: number }
   | { type: 'doc/postpone'; path: string | null; line: number }
+  /** Add a note (indented bullet) under the task. */
+  | { type: 'doc/addNote'; path: string | null; line: number; text: string }
   | { type: 'doc/link'; href: string }
   | { type: 'doc/openSource' }
   /** Rendered view: remember the sort/scope the user picked for this note. */

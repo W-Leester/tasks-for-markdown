@@ -37,10 +37,13 @@
   let depSearch = $state('');
   let showMore = $state(false); // 7~12순위 필드(예정·시작·의존·생성·완료 시 동작, 편집 시 완료/취소일)
   let tags = $state(''); // trailing tags of the description, edited separately
+  let notes = $state(''); // one note (indented bullet under the task) per line
+  let originalNotes = '';
   let error = $state('');
   let recurrenceRequest = 0;
 
   const isEdit = $derived(original !== null);
+  const noteCount = $derived(notes.split('\n').filter((n) => n.trim()).length);
   const hidden = (f: string) => init?.editModal.hiddenFields.includes(f) ?? false;
   const ak = (k: string) => (init?.editModal.accessKeys ? k : undefined);
 
@@ -65,8 +68,9 @@
     statusSymbol = task?.status.symbol ?? (init?.statuses.find((s) => s.type === 'TODO')?.symbol ?? ' ');
     dependsOn = task?.dependsOn ? [...task.dependsOn] : [];
     onCompletion = task?.onCompletion ?? '';
+    notes = originalNotes = (task?.notes ?? []).map((n) => n.text).join('\n');
     // Open "more" when the task already uses one of those fields, so no value is hidden.
-    showMore = !!(task && (task.scheduled || task.start || task.dependsOn.length || task.created || task.onCompletion || task.done || task.cancelled));
+    showMore = !!(task && (task.scheduled || task.start || task.dependsOn.length || task.created || task.onCompletion || task.done || task.cancelled || task.notes?.length));
     if (!task && init?.globalFilter && !description.includes(init.globalFilter)) description = `${init.globalFilter} `;
     validateRecurrence();
     loading = false;
@@ -136,8 +140,10 @@
       description: fullDescription, priority, recurrence: recurrence.trim() || null, onCompletion: onCompletion || null,
       start, scheduled, due, created, done, cancelled, dependsOn, status: statusSymbol,
     };
-    if (original) post({ type: 'task/setFields', key: original.key, line: original.line, fields });
-    else post({ type: 'task/create', key: target.key, line: target.line, fields });
+    // Notes are sent only when changed, so an untouched dialog never rewrites the lines under the task.
+    const noteList = notes.trim() !== originalNotes.trim() ? notes.split('\n').map((n) => n.trim()).filter(Boolean) : undefined;
+    if (original) post({ type: 'task/setFields', key: original.key, line: original.line, fields, ...(noteList ? { notes: noteList } : {}) });
+    else post({ type: 'task/create', key: target.key, line: target.line, fields, ...(noteList ? { notes: noteList } : {}) });
     post({ type: 'ui/close' });
   }
   function cancel() { post({ type: 'ui/close' }); }
@@ -215,8 +221,8 @@
         </div>
       {/if}
 
-      <button type="button" class="link more" aria-expanded={showMore} onclick={() => (showMore = !showMore)}>{showMore ? '▾' : '▸'} {t('More')}</button>
-      <span class="tfm-muted small">{t('Scheduled, start, depends on, created, on completion')}{isEdit ? `, ${t('done / cancelled')}` : ''}</span>
+      <button type="button" class="link more" aria-expanded={showMore} onclick={() => (showMore = !showMore)}>{showMore ? '▾' : '▸'} {t('More')}{noteCount ? ` · 💬 ${noteCount}` : ''}</button>
+      <span class="tfm-muted small">{t('Scheduled, start, depends on, created, on completion')}{isEdit ? `, ${t('done / cancelled')}` : ''}, {t('notes')}</span>
 
       {#if showMore}
         {#if !hidden('scheduled')}<label for="f-scheduled">{t('Scheduled')} <kbd>C</kbd></label><DateInput id="f-scheduled" bind:value={scheduled} today={init.today} label={t('Scheduled')} accesskey={ak('c')} />{/if}
@@ -252,6 +258,13 @@
           <div class="radios">
             <label class="radio"><input type="radio" name="oc" value="" bind:group={onCompletion} /> {t('Keep')}</label>
             <label class="radio"><input type="radio" name="oc" value="delete" bind:group={onCompletion} /> {t('Delete')}</label>
+          </div>
+        {/if}
+
+        {#if !hidden('notes')}
+          <label for="f-notes">{t('Notes')}</label>
+          <div>
+            <textarea id="f-notes" class="tfm-input wide" rows={Math.min(8, Math.max(2, noteCount + 1))} placeholder={t('One note per line — saved as bullets under the task')} bind:value={notes}></textarea>
           </div>
         {/if}
 

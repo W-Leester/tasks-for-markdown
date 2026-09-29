@@ -2,8 +2,9 @@
 li.tfm-task { list-style: none; margin-left: -1.2em; }
 li.tfm-task > .tfm-check { margin: 0 0.45em 0 0; vertical-align: -0.1em; pointer-events: none; }
 li.tfm-task.tfm-status-done > .tfm-desc, li.tfm-task.tfm-status-done { color: var(--vscode-disabledForeground, #888); }
-li.tfm-task.tfm-status-done > .tfm-desc { text-decoration: line-through; }
-li.tfm-task.tfm-status-cancelled > .tfm-desc { text-decoration: line-through; opacity: 0.7; }
+/* Done: muted only. Cancelled: struck through. Descendant selectors also cover loose lists (<li><p>…). */
+li.tfm-task.tfm-status-done .tfm-desc { text-decoration: none; }
+li.tfm-task.tfm-status-cancelled .tfm-desc { text-decoration: line-through; opacity: 0.7; }
 
 .tfm-badges { display: inline-flex; flex-wrap: wrap; gap: 0.3em; margin-left: 0.5em; vertical-align: middle; }
 .tfm-badge {

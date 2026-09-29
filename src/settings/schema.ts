@@ -21,6 +21,8 @@ export interface SettingsSchema {
   'decorations.relativeDates': boolean;
   'decorations.overdueHighlight': boolean;
   'decorations.strikeDone': boolean;
+  /** Strike through cancelled tasks ([-]) in the editor, independently of done tasks. */
+  'decorations.strikeCancelled': boolean;
   'decorations.dimFields': boolean;
   'decorations.gutterIcons': boolean;
   'codeLens.mode': 'off' | 'cursorLine' | 'all';
@@ -82,6 +84,7 @@ export const SETTINGS_DEFAULTS: Readonly<SettingsSchema> = {
   'decorations.relativeDates': true,
   'decorations.overdueHighlight': true,
   'decorations.strikeDone': false,
+  'decorations.strikeCancelled': true,
   'decorations.dimFields': true,
   'decorations.gutterIcons': true,
   'codeLens.mode': 'cursorLine',

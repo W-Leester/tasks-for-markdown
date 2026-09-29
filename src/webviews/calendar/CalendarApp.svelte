@@ -160,7 +160,7 @@
           ondblclick={(e) => { if (e.target === e.currentTarget) startCreate(day); }}>
           <div class="day"><span class="num">{Number(day.slice(8))}</span>{#if items.length > maxItems}<span class="tfm-muted more">+{items.length - maxItems}</span>{/if}</div>
           {#each view === 'month' ? items.slice(0, maxItems) : items as item (item.task.key + item.task.line + item.field)}
-            <div class="item {item.field}" class:done={item.task.isCompleted} class:overdue={!item.task.isCompleted && item.field === 'due' && daysBetween(init.today, item.date) < 0}
+            <div class="item {item.field}" class:done={item.task.isCompleted} class:cancelled={item.task.status.type === 'CANCELLED'} class:overdue={!item.task.isCompleted && item.field === 'due' && daysBetween(init.today, item.date) < 0}
               draggable="true" role="button" tabindex="0" title={`${item.task.description}\n${item.task.path}:${item.task.line + 1}`}
               ondragstart={(e) => onDragStart(e, item)}
               onclick={() => post({ type: 'task/edit', key: item.task.key, line: item.task.line })}
@@ -207,7 +207,8 @@
   .item.scheduled { background: color-mix(in srgb, var(--vscode-charts-yellow, #cca700) 25%, transparent); }
   .item.start { background: color-mix(in srgb, var(--vscode-charts-green, #89d185) 25%, transparent); }
   .item.overdue { background: var(--tfm-overdue-bg); color: var(--tfm-error); }
-  .item.done { opacity: 0.55; text-decoration: line-through; }
+  .item.done { opacity: 0.55; }
+  .item.cancelled { text-decoration: line-through; }
   .item:focus-visible, .item:hover { outline: 1px solid var(--tfm-accent); }
   .new { font-size: 0.85em; width: 100%; box-sizing: border-box; }
   .small { font-size: 0.85em; margin: 6px 0 0; }

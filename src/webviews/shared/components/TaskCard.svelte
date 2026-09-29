@@ -17,6 +17,7 @@
 <div
   class="card"
   class:done={task.isCompleted}
+  class:cancelled={task.status.type === 'CANCELLED'}
   class:overdue
   role="button"
   tabindex="0"
@@ -47,7 +48,8 @@
 <style>
   .card { background: var(--tfm-bg); border: 1px solid var(--tfm-border); border-radius: var(--tfm-radius); padding: 6px 8px; cursor: grab; user-select: none; }
   .card:hover { border-color: var(--tfm-accent); }
-  .card.done .desc { text-decoration: line-through; color: var(--tfm-muted); }
+  .card.done .desc { color: var(--tfm-muted); }
+  .card.cancelled .desc { text-decoration: line-through; }
   .card.overdue { border-left: 3px solid var(--tfm-error); }
   .row { display: flex; gap: 6px; align-items: flex-start; }
   .row input { margin: 3px 0 0; }

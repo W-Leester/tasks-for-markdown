@@ -103,7 +103,7 @@ export class TaskDecorations implements vscode.Disposable {
 
       if (s.get('decorations.gutterIcons')) gutter[gutterKind(task)].push(range);
       if (task.isCompleted) {
-        if (s.get('decorations.strikeDone')) completed.push(range);
+        if (task.isCancelled ? s.get('decorations.strikeCancelled') : s.get('decorations.strikeDone')) completed.push(range);
       } else {
         if (s.get('decorations.overdueHighlight') && task.due?.date) {
           if (task.due.date.isBefore(today)) overdue.push(range);

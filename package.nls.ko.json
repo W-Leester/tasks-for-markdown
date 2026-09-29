@@ -124,6 +124,7 @@
   "tasksmd.renderedAsDefault.title": "렌더 보기를 기본 편집기로",
   "tasksmd.config.rendered.maxWidth": "렌더 보기 본문 열(쿼리 결과 상자 포함)의 최대 폭(px). 0이면 편집기 전체 폭.",
   "tasksmd.config.query.showTree": "쿼리 결과를 트리로 표시: 하위 태스크를 부모 밑에 두고, 필터에 맞지 않는 하위는 맥락으로 흐리게 보여 줍니다. 쿼리마다 `show tree` / `hide tree`로 덮어씁니다.",
+  "tasksmd.config.decorations.strikeCancelled": "취소된 태스크([-])에 에디터에서 취소선을 긋고 흐리게 표시합니다. 완료된 태스크는 tasksmd.decorations.strikeDone으로 따로 정합니다.",
   "tasksmd.config.calendar.fontSize": "캘린더 칸에 표시되는 태스크의 글자 크기(px).",
   "tasksmd.config.calendar.fullScreen": "캘린더의 전체 화면 버튼이 하는 일.",
   "tasksmd.config.calendar.fullScreen.maximize": "사이드바와 하단 패널을 숨기고 캘린더의 에디터 그룹을 최대화합니다.",

@@ -29,9 +29,49 @@ function applyColumns(hidden: readonly string[]): void {
   for (const c of HIDEABLE_COLUMNS) document.body.classList.toggle(`hide-col-${c}`, hiddenColumns.includes(c));
   document.body.style.setProperty('--rv-cols', columnTracks(hiddenColumns));
   for (const box of colBoxes) box.checked = !hiddenColumns.includes(box.dataset.col!);
+  applyBlocks();
   const summary = colsMenu?.querySelector('summary');
   if (summary) summary.textContent = hiddenColumns.length ? (summary.dataset.lHidden ?? 'Columns · {0} hidden').replace('{0}', String(hiddenColumns.length)) : (summary.dataset.lLabel ?? 'Columns');
 }
+// Per-block columns (M15): a thin header over each ```tasks result; hover shows titles with ✕, hidden ones come back via + chips.
+let blockColumns: Record<string, string[]> = {};
+const colLabel = (c: string) => (document.body.dataset as Record<string, string | undefined>)[`lCol${c[0]!.toUpperCase()}${c.slice(1)}`] ?? c;
+function applyBlocks(): void {
+  for (const block of Array.from(content.querySelectorAll<HTMLElement>('.tfm-query-block[data-tfm-query-key]'))) applyBlock(block);
+}
+function applyBlock(block: HTMLElement): void {
+  const key = block.dataset.tfmQueryKey!;
+  const own = HIDEABLE_COLUMNS.filter((c) => (blockColumns[key] ?? []).includes(c) && !hiddenColumns.includes(c));
+  const hidden = [...hiddenColumns, ...own];
+  for (const c of HIDEABLE_COLUMNS) block.classList.toggle(`hide-col-${c}`, own.includes(c));
+  block.style.setProperty('--rv-cols', columnTracks(hidden));
+  const query = block.querySelector<HTMLElement>(':scope > .tfm-query');
+  if (!query || !query.querySelector('li.tfm-task')) return;
+  let head = query.querySelector<HTMLElement>(':scope > .rv-colhead');
+  if (!head) {
+    head = document.createElement('div');
+    head.className = 'rv-colhead';
+    query.insertBefore(head, query.firstChild);
+  }
+  const labels = document.body.dataset;
+  const esc = (s: string) => s.replace(/[&<>"]/g, (ch) => `&#${ch.charCodeAt(0)};`);
+  head.innerHTML =
+    `<span></span><span class="rv-colhead-cell">${esc(colLabel('desc'))}</span>` +
+    HIDEABLE_COLUMNS.filter((c) => !hidden.includes(c))
+      .map((c) => `<span class="rv-colhead-cell">${esc(colLabel(c))}<button type="button" data-hide="${c}" title="${esc(labels.lColHide ?? 'Hide column')}" aria-label="${esc(`${labels.lColHide ?? 'Hide column'}: ${colLabel(c)}`)}">✕</button></span>`)
+      .join('') +
+    (own.length ? `<span class="rv-colhead-chips">${own.map((c) => `<button type="button" data-show="${c}" title="${esc(labels.lColShow ?? 'Show column')}">+ ${esc(colLabel(c))}</button>`).join('')}</span>` : '');
+}
+function setBlockHidden(block: HTMLElement, hidden: string[]): void {
+  const key = block.dataset.tfmQueryKey!;
+  if (hidden.length) blockColumns[key] = hidden;
+  else delete blockColumns[key];
+  applyBlock(block);
+  post({ type: 'doc/blockColumns', key, hidden });
+  // Keep the header open for the next click.
+  block.querySelector<HTMLElement>('.rv-colhead button')?.focus();
+}
+
 for (const box of colBoxes) {
   box.addEventListener('change', () => {
     applyColumns(colBoxes.filter((b) => !b.checked).map((b) => b.dataset.col!));
@@ -49,7 +89,7 @@ window.addEventListener('message', (e: MessageEvent<ToWebview>) => {
   const m = e.data;
   if (m.type === 'doc/columns') { applyColumns(m.hidden); return; }
   if (m.type !== 'doc/html') return;
-  applyColumns(m.hiddenColumns ?? []);
+  blockColumns = { ...(m.blockColumns ?? {}) };
   document.documentElement.style.setProperty('--rv-font-size', `${m.fontSize}px`);
   document.documentElement.style.setProperty('--rv-line-height', String(m.lineHeight));
   document.body.classList.toggle('fields-right', m.fieldsAlign === 'right');
@@ -61,6 +101,7 @@ window.addEventListener('message', (e: MessageEvent<ToWebview>) => {
   if (scopeSel) scopeSel.value = view.scope;
   const y = window.scrollY;
   content.innerHTML = m.html;
+  applyColumns(m.hiddenColumns ?? []);
   addRowActions();
   refreshView();
   window.scrollTo(0, y);
@@ -104,6 +145,15 @@ function taskRef(el: Element | null): { path: string | null; line: number } | nu
 
 content.addEventListener('click', (e) => {
   const target = e.target as Element;
+  const colButton = target.closest<HTMLButtonElement>('.rv-colhead button');
+  if (colButton) {
+    e.preventDefault();
+    const block = colButton.closest<HTMLElement>('.tfm-query-block')!;
+    const current = blockColumns[block.dataset.tfmQueryKey!] ?? [];
+    if (colButton.dataset.hide) setBlockHidden(block, [...current, colButton.dataset.hide]);
+    else setBlockHidden(block, current.filter((c) => c !== colButton.dataset.show));
+    return;
+  }
   const action = target.closest<HTMLButtonElement>('.rv-actions button');
   if (action) {
     e.preventDefault();

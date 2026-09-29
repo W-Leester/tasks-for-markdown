@@ -343,5 +343,7 @@
   "One note per line — saved as bullets under the task": "한 줄에 메모 하나 — 태스크 아래 글머리표로 저장됩니다",
   "Empty note": "메모 내용이 비어 있습니다",
   "Columns · {0} hidden": "열 · {0}개 숨김",
-  "Other fields": "나머지 필드"
+  "Other fields": "나머지 필드",
+  "Hide column": "열 숨기기",
+  "Show column": "열 다시 보이기"
 }

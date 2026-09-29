@@ -14,6 +14,8 @@ const VIEW_STATE_KEY = 'rendered.viewState';
 /** Columns hidden in the rendered view (M14) — one choice for all notes. */
 const HIDDEN_COLUMNS_KEY = 'rendered.hiddenColumns';
 export const HIDEABLE_COLUMNS = ['due', 'created', 'more'] as const;
+/** Columns hidden per ```tasks block (M15): note URI → query key → hidden columns. */
+const BLOCK_COLUMNS_KEY = 'rendered.blockColumns';
 const DEFAULT_PROMPT_KEY = 'rendered.defaultPrompted';
 
 export interface RenderedViewDeps {
@@ -37,7 +39,8 @@ type Incoming =
   | { type: 'doc/link'; href: string }
   | { type: 'doc/openSource' }
   | { type: 'doc/view'; sort: string; scope: string }
-  | { type: 'doc/columns'; hidden: string[] };
+  | { type: 'doc/columns'; hidden: string[] }
+  | { type: 'doc/blockColumns'; key: string; hidden: string[] };
 
 const DOC_DEBOUNCE_MS = 250;
 const INDEX_DEBOUNCE_MS = 400;
@@ -82,7 +85,7 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
     let indexTimer: ReturnType<typeof setTimeout> | undefined;
     const render = () => {
       try {
-        void webview.postMessage({ type: 'doc/html', html: this.renderHtml(document, webview), fontSize: this.deps.settings.get('rendered.fontSize'), lineHeight: this.deps.settings.get('rendered.lineHeight'), fieldsAlign: this.deps.settings.get('rendered.fieldsAlign'), maxWidth: this.deps.settings.get('rendered.maxWidth'), today: (this.deps.clock ?? systemClock).now().startOf('day').format('YYYY-MM-DD'), view: this.viewState(document.uri), hiddenColumns: this.hiddenColumns() });
+        void webview.postMessage({ type: 'doc/html', html: this.renderHtml(document, webview), fontSize: this.deps.settings.get('rendered.fontSize'), lineHeight: this.deps.settings.get('rendered.lineHeight'), fieldsAlign: this.deps.settings.get('rendered.fieldsAlign'), maxWidth: this.deps.settings.get('rendered.maxWidth'), today: (this.deps.clock ?? systemClock).now().startOf('day').format('YYYY-MM-DD'), view: this.viewState(document.uri), hiddenColumns: this.hiddenColumns(), blockColumns: this.blockColumns(document.uri) });
       } catch (err) {
         this.deps.log(`rendered view: ${err instanceof Error ? err.stack ?? err.message : String(err)}`);
       }
@@ -155,6 +158,16 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
           for (const p of this.panels.values()) if (p !== panel) void p.webview.postMessage({ type: 'doc/columns', hidden });
           break;
         }
+        case 'doc/blockColumns': {
+          if (typeof msg.key !== 'string' || !msg.key) break;
+          const hidden = HIDEABLE_COLUMNS.filter((c) => Array.isArray(msg.hidden) && msg.hidden.includes(c));
+          const all = this.deps.context.workspaceState.get<Record<string, Record<string, string[]>>>(BLOCK_COLUMNS_KEY, {});
+          const note = { ...(all[document.uri.toString()] ?? {}) };
+          if (hidden.length) note[msg.key] = hidden;
+          else delete note[msg.key];
+          await this.deps.context.workspaceState.update(BLOCK_COLUMNS_KEY, { ...all, [document.uri.toString()]: note });
+          break;
+        }
         case 'doc/view': {
           const all = this.deps.context.workspaceState.get<Record<string, { sort: string; scope: string }>>(VIEW_STATE_KEY, {});
           await this.deps.context.workspaceState.update(VIEW_STATE_KEY, { ...all, [document.uri.toString()]: { sort: msg.sort, scope: msg.scope } });
@@ -204,6 +217,10 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
       editor.selection = new vscode.Selection(range.end, range.end);
       editor.revealRange(range, vscode.TextEditorRevealType.InCenterIfOutsideViewport);
     }
+  }
+
+  private blockColumns(uri: vscode.Uri): Record<string, string[]> {
+    return this.deps.context.workspaceState.get<Record<string, Record<string, string[]>>>(BLOCK_COLUMNS_KEY, {})[uri.toString()] ?? {};
   }
 
   private hiddenColumns(): string[] {
@@ -316,6 +333,7 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
     body.fields-columns li.tfm-task { grid-template-columns: 1.4em minmax(0, 1fr); }
     body.fields-columns .tfm-col { grid-column: 2; }
     body.fields-columns .tfm-col:empty { display: none; }
+    body.fields-columns .rv-colhead { display: none; }
   }
   /* fieldsAlign = right: description on the left, metadata pushed to the right edge of the column. */
   body.fields-right li.tfm-task, body.fields-right li.tfm-task > p { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: .6em; }
@@ -360,7 +378,22 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
   .rv-cols > summary::after { content: ' ▾'; color: var(--rv-muted); }
   .rv-cols-menu { position: absolute; top: calc(100% + 4px); left: 0; z-index: 3; display: flex; flex-direction: column; gap: 4px; padding: 8px 12px; background: var(--rv-bg-2); border: 1px solid var(--rv-stroke); border-radius: 6px; box-shadow: 0 4px 14px rgba(0,0,0,.25); white-space: nowrap; color: var(--rv-fg); }
   .rv-cols-menu label { display: flex; gap: 6px; align-items: center; cursor: pointer; }
-  body.hide-col-due .tfm-col-due, body.hide-col-created .tfm-col-created, body.hide-col-more .tfm-col-more { display: none !important; }
+  body.hide-col-due .tfm-col-due, body.hide-col-created .tfm-col-created, body.hide-col-more .tfm-col-more,
+  .tfm-query-block.hide-col-due .tfm-col-due, .tfm-query-block.hide-col-created .tfm-col-created, .tfm-query-block.hide-col-more .tfm-col-more { display: none !important; }
+  /* Column header over query results (M15): a thin line until hovered/focused, then titles with ✕ and + chips. */
+  .rv-colhead { display: none; }
+  body.fields-columns .rv-colhead { display: grid; position: relative; grid-template-columns: var(--rv-cols, 1.4em minmax(8em, 1fr) 8.6em 8.6em minmax(0, 18em)); column-gap: .9em; align-items: center;
+    height: 9px; margin: -4px 0 2px; overflow: hidden; color: var(--rv-muted); border-bottom: 1px solid color-mix(in srgb, var(--rv-fg) 14%, transparent); transition: height .12s; }
+  body.fields-columns .rv-colhead > * { opacity: 0; transition: opacity .12s; }
+  body.fields-columns .rv-colhead:hover, body.fields-columns .rv-colhead:focus-within { height: 24px; }
+  body.fields-columns .rv-colhead:hover > *, body.fields-columns .rv-colhead:focus-within > * { opacity: 1; }
+  /* Same font size as the rows so the em-based grid tracks line up; only the text is small. */
+  .rv-colhead-cell, .rv-colhead-chips { font-size: 11px; }
+  .rv-colhead-cell { display: inline-flex; align-items: center; gap: 3px; min-width: 0; white-space: nowrap; overflow: hidden; }
+  .rv-colhead button { border: none; background: transparent; color: var(--rv-muted); font: inherit; padding: 0 4px; border-radius: 3px; cursor: pointer; line-height: 16px; }
+  .rv-colhead button:hover, .rv-colhead button:focus-visible { background: var(--rv-bg-3); color: var(--rv-fg); }
+  .rv-colhead-chips { position: absolute; right: 0; top: 50%; transform: translateY(-50%); display: inline-flex; gap: 4px; background: var(--rv-bg-2); padding-left: 6px; }
+  .rv-colhead-chips button { border: 1px solid var(--rv-stroke); }
   .rv-select select { font: inherit; color: var(--rv-fg); background: var(--rv-bg-2); border: 1px solid var(--rv-stroke); border-radius: 4px; padding: 2px 6px; }
   .rv-hint { margin-left: auto; padding-right: 130px; }
   li.tfm-task.rv-hidden { display: none !important; }
@@ -373,7 +406,7 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
 </style>
 <title>${t('Tasks: Rendered view')}</title>
 </head>
-<body data-l-edit="${t('Edit')}" data-l-postpone="${t('Postpone')}" data-l-note="${t('Add note')}" data-l-note-placeholder="${t('Note — Enter to save, Esc to cancel')}" data-l-hidden="${t('{0} hidden')}">
+<body data-l-col-desc="${t('Description')}" data-l-col-due="${t('Due date')}" data-l-col-created="${t('Created date')}" data-l-col-more="${t('Other fields')}" data-l-col-hide="${t('Hide column')}" data-l-col-show="${t('Show column')}" data-l-edit="${t('Edit')}" data-l-postpone="${t('Postpone')}" data-l-note="${t('Add note')}" data-l-note-placeholder="${t('Note — Enter to save, Esc to cancel')}" data-l-hidden="${t('{0} hidden')}">
 <div class="rv-tools">
   <label class="rv-select"><span>${t('Sort')}</span><select id="view-sort">
     <option value="document">${t('Document order')}</option><option value="due">${t('Due date')}</option><option value="created">${t('Created date')}</option><option value="priority">${t('Priority')}</option><option value="urgency">${t('Urgency')}</option>

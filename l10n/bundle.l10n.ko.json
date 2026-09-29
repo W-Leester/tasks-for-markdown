@@ -330,5 +330,9 @@
   "Markdown notes open in the text editor again.": "마크다운 노트가 다시 텍스트 편집기로 열립니다.",
   "Due by today": "오늘까지(초과 포함)",
   "Front matter is opened with \"---\" but never closed: the Markdown preview will show an empty page.": "첫 줄의 \"---\"로 front matter가 시작됐지만 닫히지 않았습니다. 마크다운 미리보기가 빈 화면으로 나옵니다.",
-  "Remove the opening \"---\"": "맨 위의 \"---\" 삭제"
+  "Remove the opening \"---\"": "맨 위의 \"---\" 삭제",
+  "Tags": "태그",
+  "More": "더보기",
+  "Scheduled, start, depends on, created, on completion": "예정일, 시작일, 의존, 생성일, 완료 시 동작",
+  "done / cancelled": "완료일 / 취소일"
 }

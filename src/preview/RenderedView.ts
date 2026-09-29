@@ -204,11 +204,12 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
   renderHtml(document: vscode.TextDocument, webview: vscode.Webview): string {
     const base = this.deps.preview.pluginDeps();
     const fieldStyle = this.deps.settings.get('rendered.fieldStyle');
+    const columns = this.deps.settings.get('rendered.fieldsAlign') === 'columns';
     const deps = {
       ...base,
       enabled: () => true,
       // Task lines follow the rendered-view setting; query results keep their badges (relative dates matter there).
-      renderOptions: (source?: Parameters<typeof base.renderOptions>[0], context?: 'line' | 'query') => ({ ...base.renderOptions(source, context), ...(context === 'line' ? { fieldStyle } : {}) }),
+      renderOptions: (source?: Parameters<typeof base.renderOptions>[0], context?: 'line' | 'query') => ({ ...base.renderOptions(source, context), ...(context === 'line' || columns ? { fieldStyle } : {}), columns }),
     };
     return renderDocumentHtml(document.getText(), deps, {
       frontMatter: true,
@@ -270,6 +271,23 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
   ul > li.tfm-task:first-child, ol > li.tfm-task:first-child { border-top-color: transparent; }
   li.tfm-task > ul > li.tfm-task:first-child, li.tfm-task > p + ul > li.tfm-task:first-child { border-top-color: color-mix(in srgb, var(--rv-fg) 10%, transparent); }
   .tfm-fields { margin-left: .2em; } .tfm-field { white-space: nowrap; }
+  /* fieldsAlign = columns (M12): the same grid on every task row so due / tags / recurrence line up vertically. */
+  body.fields-columns li.tfm-task { display: grid; grid-template-columns: 1.4em minmax(8em, 1fr) 8.6em 9em 9.5em minmax(0, 12em); column-gap: .9em; align-items: baseline; }
+  body.fields-columns li.tfm-task > p { display: contents; }
+  body.fields-columns li.tfm-task > .tfm-check, body.fields-columns li.tfm-task > p > .tfm-check { margin: 0; align-self: center; }
+  body.fields-columns .tfm-desc { min-width: 0; }
+  body.fields-columns .tfm-col { min-width: 0; font-size: .92em; }
+  body.fields-columns .tfm-col-due, body.fields-columns .tfm-col-recur { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  body.fields-columns .tfm-col-tags .tfm-tag { color: var(--vscode-textLink-foreground); }
+  body.fields-columns .tfm-col-more { color: var(--rv-muted); font-size: .82em; line-height: 1.5; }
+  body.fields-columns .tfm-col-pri { margin-left: .2em; }
+  body.fields-columns .tfm-col .tfm-badge { margin: 1px 0; }
+  body.fields-columns li.tfm-task > ul, body.fields-columns li.tfm-task > ol { grid-column: 1 / -1; margin: 0; padding-left: 1.6em; }
+  @media (max-width: 640px) {
+    body.fields-columns li.tfm-task { grid-template-columns: 1.4em minmax(0, 1fr); }
+    body.fields-columns .tfm-col { grid-column: 2; }
+    body.fields-columns .tfm-col:empty { display: none; }
+  }
   /* fieldsAlign = right: description on the left, metadata pushed to the right edge of the column. */
   body.fields-right li.tfm-task, body.fields-right li.tfm-task > p { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: .6em; }
   body.fields-right li.tfm-task > p { margin: 0; width: 100%; }

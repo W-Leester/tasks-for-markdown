@@ -56,7 +56,7 @@ export type ToWebview =
   | { type: 'query/target'; id: string | null }
   | { type: 'results/query'; target: QueryTargetDto }
   /** Rendered view: the whole note as HTML. */
-  | { type: 'doc/html'; html: string; fontSize: number; lineHeight: number; fieldsAlign: 'right' | 'inline'; maxWidth: number; today: string; view: { sort: string; scope: string } }
+  | { type: 'doc/html'; html: string; fontSize: number; lineHeight: number; fieldsAlign: 'columns' | 'right' | 'inline'; maxWidth: number; today: string; view: { sort: string; scope: string } }
   | { type: 'stats/result'; requestId: number; stats: StatsDto }
   /** Host-confirmed full-screen state of the panel (also sent after a command toggled it). */
   | { type: 'ui/fullscreen'; on: boolean }

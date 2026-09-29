@@ -75,7 +75,7 @@ group by filename
 | `api.writePolicy` | `confirm` | Writes through the public API: confirm once per caller / allow / deny |
 | `rendered.maxWidth` | `0` | Max width (px) of the rendered column; 0 = full editor width (default) |
 | `rendered.sourceWhenNoTasks` | `true` | With the rendered view as default editor, notes without tasks open in the text editor |
-| `rendered.fieldsAlign` | `right` | Rendered view: task fields at the right edge (`right`) or after the description (`inline`) |
+| `rendered.fieldsAlign` | `columns` | Rendered view: fields in aligned columns (`columns`: status, description, due, tags, recurrence, other), at the right edge (`right`) or after the description (`inline`) |
 | `rendered.fontSize` / `rendered.lineHeight` | `14.5` / `1.6` | Rendered view body font size (px) and line height |
 | `rendered.fieldStyle` | `plain` | Task-line fields in the rendered view: as in the source (`plain`) or pill badges (`badges`) |
 | `calendar.fontSize` | `13` | Font size (px) of tasks in calendar cells |

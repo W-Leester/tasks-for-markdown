@@ -29,6 +29,7 @@ window.addEventListener('message', (e: MessageEvent<ToWebview>) => {
   document.documentElement.style.setProperty('--rv-font-size', `${m.fontSize}px`);
   document.documentElement.style.setProperty('--rv-line-height', String(m.lineHeight));
   document.body.classList.toggle('fields-right', m.fieldsAlign === 'right');
+  document.body.classList.toggle('fields-columns', m.fieldsAlign === 'columns');
   document.documentElement.style.setProperty('--rv-max-width', m.maxWidth > 0 ? `${m.maxWidth}px` : 'none');
   today = m.today;
   view = { sort: (SORT_MODES as string[]).includes(m.view.sort) ? (m.view.sort as SortMode) : 'document', scope: (SCOPE_MODES as string[]).includes(m.view.scope) ? (m.view.scope as ScopeMode) : 'all' };
@@ -58,11 +59,13 @@ function addRowActions(): void {
       actions.appendChild(b);
     };
     button('edit', '✎', labels.lEdit ?? 'Edit');
-    if (li.querySelector(':scope > .tfm-fields .tfm-due, :scope > .tfm-fields .tfm-scheduled, :scope > .tfm-badges .tfm-due, :scope > .tfm-badges .tfm-scheduled, :scope > p > .tfm-fields .tfm-due, :scope > p > .tfm-fields .tfm-scheduled')) button('postpone', '⏩', labels.lPostpone ?? 'Postpone');
+    if (li.querySelector(':scope > .tfm-fields .tfm-due, :scope > .tfm-fields .tfm-scheduled, :scope > .tfm-badges .tfm-due, :scope > .tfm-badges .tfm-scheduled, :scope > p > .tfm-fields .tfm-due, :scope > p > .tfm-fields .tfm-scheduled, :scope > .tfm-col .tfm-due, :scope > .tfm-col .tfm-scheduled, :scope > p > .tfm-col .tfm-due, :scope > p > .tfm-col .tfm-scheduled')) button('postpone', '⏩', labels.lPostpone ?? 'Postpone');
     // Before any nested list so the buttons stay on the task's own line.
     const nested = li.querySelector(':scope > ul, :scope > ol');
     const para = li.querySelector(':scope > p');
-    if (para) para.appendChild(actions);
+    const desc = li.querySelector(':scope > .tfm-desc, :scope > p > .tfm-desc');
+    if (document.body.classList.contains('fields-columns') && desc) desc.appendChild(actions); // keep the grid cells in place
+    else if (para) para.appendChild(actions);
     else if (nested) li.insertBefore(actions, nested);
     else li.appendChild(actions);
   }

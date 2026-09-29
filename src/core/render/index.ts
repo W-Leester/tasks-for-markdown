@@ -1,1 +1,1 @@
-export { escapeHtml, renderBadges, renderCheckbox, renderDescriptionText, renderQueryResult, renderTaskRow, type RenderOptions } from './html';
+export { escapeHtml, renderColumns, stripTags, renderBadges, renderCheckbox, renderDescriptionText, renderQueryResult, renderTaskRow, type RenderOptions } from './html';

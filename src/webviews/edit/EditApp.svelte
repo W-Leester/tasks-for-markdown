@@ -35,7 +35,8 @@
   let dependsOn: string[] = $state([]); // ids or "@key#line" refs for tasks without ids
   let onCompletion = $state('');
   let depSearch = $state('');
-  let showOtherDates = $state(false);
+  let showMore = $state(false); // 7~12순위 필드(예정·시작·의존·생성·완료 시 동작, 편집 시 완료/취소일)
+  let tags = $state(''); // trailing tags of the description, edited separately
   let error = $state('');
   let recurrenceRequest = 0;
 
@@ -50,7 +51,9 @@
 
   function fill(task: TaskDto | null) {
     original = task;
-    description = task?.description ?? '';
+    const split = splitTrailingTags(task?.description ?? '');
+    description = split.text;
+    tags = split.tags;
     priority = task?.priority ?? '3';
     recurrence = task?.recurrence ?? '';
     start = task?.start ?? null;
@@ -62,7 +65,8 @@
     statusSymbol = task?.status.symbol ?? (init?.statuses.find((s) => s.type === 'TODO')?.symbol ?? ' ');
     dependsOn = task?.dependsOn ? [...task.dependsOn] : [];
     onCompletion = task?.onCompletion ?? '';
-    showOtherDates = !!(task?.created || task?.done || task?.cancelled);
+    // Open "more" when the task already uses one of those fields, so no value is hidden.
+    showMore = !!(task && (task.scheduled || task.start || task.dependsOn.length || task.created || task.onCompletion || task.done || task.cancelled));
     if (!task && init?.globalFilter && !description.includes(init.globalFilter)) description = `${init.globalFilter} `;
     validateRecurrence();
     loading = false;
@@ -95,10 +99,19 @@
   });
   const selectedDeps = $derived(dependsOn.map((ref) => ({ ref, task: candidates.find((c) => refOf(c) === ref) ?? null })));
 
+  /** `보고서 작성 #업무 #A` → text `보고서 작성`, tags `#업무 #A`. Tags inside the sentence stay in the text. */
+  function splitTrailingTags(desc: string): { text: string; tags: string } {
+    const m = /((?:\s+#[^\s#]+)+)\s*$/u.exec(' ' + desc);
+    if (!m) return { text: desc, tags: '' };
+    return { text: (' ' + desc).slice(0, m.index).trim(), tags: m[1]!.trim().split(/\s+/).join(' ') };
+  }
+  const tagList = $derived(tags.split(/[\s,]+/).map((x) => x.trim()).filter(Boolean).map((x) => (x.startsWith('#') ? x : '#' + x)));
+  const fullDescription = $derived([description.trim(), ...tagList.filter((tg) => !description.includes(tg))].filter(Boolean).join(' '));
+
   const previewLine = $derived.by(() => {
     if (!init) return '';
     const st = status ? new Status({ symbol: status.symbol, name: status.name, nextSymbol: status.nextSymbol, type: status.type as StatusType }) : Status.unknown(statusSymbol);
-    const task = Task.blank(description.trim(), st).with({
+    const task = Task.blank(fullDescription, st).with({
       priority: priority as Priority,
       recurrenceText: recurrence.trim() || null,
       onCompletion: onCompletion || null,
@@ -120,7 +133,7 @@
     if (recurrence.trim() && !due && !scheduled && !start) { error = t('A recurring task needs a due, scheduled or start date.'); return; }
     if (!original && init?.requireDueDate && !due) { error = t('A due date is required (tasksmd.requireDueDate).'); return; }
     const fields: Partial<Record<TaskFieldName, string | string[] | null>> = {
-      description: description.trim(), priority, recurrence: recurrence.trim() || null, onCompletion: onCompletion || null,
+      description: fullDescription, priority, recurrence: recurrence.trim() || null, onCompletion: onCompletion || null,
       start, scheduled, due, created, done, cancelled, dependsOn, status: statusSymbol,
     };
     if (original) post({ type: 'task/setFields', key: original.key, line: original.line, fields });
@@ -161,6 +174,14 @@
 
   {#if init && !loading}
     <div class="grid">
+      {#if !hidden('status')}
+        <label for="f-status">{t('Status')} <kbd>T</kbd></label>
+        <select id="f-status" class="tfm-input" accesskey={ak('t')} bind:value={statusSymbol}>
+          {#each statuses as s (s.symbol)}<option value={s.symbol}>[{s.symbol}] {s.name} · {s.type}</option>{/each}
+          {#if !status}<option value={statusSymbol}>[{statusSymbol}] ?</option>{/if}
+        </select>
+      {/if}
+
       <label for="f-description">{t('Description')} <kbd>D</kbd></label>
       <textarea id="f-description" class="tfm-input" rows="2" accesskey={ak('d')} bind:value={description}></textarea>
 
@@ -171,6 +192,13 @@
             <label class="radio"><input type="radio" name="priority" value={p} bind:group={priority} accesskey={i === 0 ? ak('p') : undefined} /> {PRIORITY_EMOJI[p]} {t(PRIORITY_LABELS[p]!)}</label>
           {/each}
         </div>
+      {/if}
+
+      {#if !hidden('due')}<label for="f-due">{t('Due')} <kbd>U</kbd></label><DateInput id="f-due" bind:value={due} today={init.today} label={t('Due')} accesskey={ak('u')} />{/if}
+
+      {#if !hidden('tags')}
+        <label for="f-tags">{t('Tags')} <kbd>G</kbd></label>
+        <input id="f-tags" class="tfm-input wide" type="text" accesskey={ak('g')} placeholder="#업무 #프로젝트A" bind:value={tags} />
       {/if}
 
       {#if !hidden('recurrence')}
@@ -187,57 +215,50 @@
         </div>
       {/if}
 
-      {#if !hidden('start')}<label for="f-start">{t('Start')} <kbd>S</kbd></label><DateInput id="f-start" bind:value={start} today={init.today} label={t('Start')} accesskey={ak('s')} />{/if}
-      {#if !hidden('scheduled')}<label for="f-scheduled">{t('Scheduled')} <kbd>C</kbd></label><DateInput id="f-scheduled" bind:value={scheduled} today={init.today} label={t('Scheduled')} accesskey={ak('c')} />{/if}
-      {#if !hidden('due')}<label for="f-due">{t('Due')} <kbd>U</kbd></label><DateInput id="f-due" bind:value={due} today={init.today} label={t('Due')} accesskey={ak('u')} />{/if}
+      <button type="button" class="link more" aria-expanded={showMore} onclick={() => (showMore = !showMore)}>{showMore ? '▾' : '▸'} {t('More')}</button>
+      <span class="tfm-muted small">{t('Scheduled, start, depends on, created, on completion')}{isEdit ? `, ${t('done / cancelled')}` : ''}</span>
 
-      {#if !hidden('otherDates')}
-        <button type="button" class="link" onclick={() => (showOtherDates = !showOtherDates)}>{showOtherDates ? '▾' : '▸'} {t('Created / done / cancelled dates')}</button>
-        <span></span>
-        {#if showOtherDates}
-          <label for="f-created">{t('Created')}</label><DateInput id="f-created" bind:value={created} today={init.today} label={t('Created')} />
+      {#if showMore}
+        {#if !hidden('scheduled')}<label for="f-scheduled">{t('Scheduled')} <kbd>C</kbd></label><DateInput id="f-scheduled" bind:value={scheduled} today={init.today} label={t('Scheduled')} accesskey={ak('c')} />{/if}
+        {#if !hidden('start')}<label for="f-start">{t('Start')} <kbd>S</kbd></label><DateInput id="f-start" bind:value={start} today={init.today} label={t('Start')} accesskey={ak('s')} />{/if}
+
+        {#if !hidden('dependencies')}
+          <span class="lbl">{t('Depends on')}</span>
+          <div class="deps">
+            <div class="chips">
+              {#each selectedDeps as { ref, task } (ref)}
+                <span class="tfm-chip">{task ? task.description.slice(0, 40) : ref} {#if task?.id}<span class="tfm-muted">({task.id})</span>{/if}
+                  <button type="button" class="x" aria-label={t('Remove')} onclick={() => (dependsOn = dependsOn.filter((d) => d !== ref))}>×</button></span>
+              {/each}
+            </div>
+            <input class="tfm-input wide" type="text" placeholder={t('Search tasks that must finish first…')} bind:value={depSearch} />
+            {#if filteredCandidates.length}
+              <ul class="results" role="listbox">
+                {#each filteredCandidates as c (c.key + c.line)}
+                  <li><button type="button" onclick={() => { dependsOn = [...dependsOn, refOf(c)]; depSearch = ''; }}>{c.description || '(empty)'} <span class="tfm-muted">{c.path}:{c.line + 1}{c.id ? ` · 🆔 ${c.id}` : ` · ${t('(an id will be generated)')}`}</span></button></li>
+                {/each}
+              </ul>
+            {/if}
+            {#if dependants.length}
+              <div class="tfm-muted small">{t('Blocks')}: {dependants.map((d) => d.description.slice(0, 30)).join(', ')}</div>
+            {/if}
+          </div>
+        {/if}
+
+        {#if !hidden('otherDates')}<label for="f-created">{t('Created')}</label><DateInput id="f-created" bind:value={created} today={init.today} label={t('Created')} />{/if}
+
+        {#if !hidden('onCompletion')}
+          <span class="lbl">{t('On completion')}</span>
+          <div class="radios">
+            <label class="radio"><input type="radio" name="oc" value="" bind:group={onCompletion} /> {t('Keep')}</label>
+            <label class="radio"><input type="radio" name="oc" value="delete" bind:group={onCompletion} /> {t('Delete')}</label>
+          </div>
+        {/if}
+
+        {#if isEdit && !hidden('otherDates')}
           <label for="f-done">{t('Done')}</label><DateInput id="f-done" bind:value={done} today={init.today} label={t('Done')} />
           <label for="f-cancelled">{t('Cancelled')}</label><DateInput id="f-cancelled" bind:value={cancelled} today={init.today} label={t('Cancelled')} />
         {/if}
-      {/if}
-
-      {#if !hidden('status')}
-        <label for="f-status">{t('Status')} <kbd>T</kbd></label>
-        <select id="f-status" class="tfm-input" accesskey={ak('t')} bind:value={statusSymbol}>
-          {#each statuses as s (s.symbol)}<option value={s.symbol}>[{s.symbol}] {s.name} · {s.type}</option>{/each}
-          {#if !status}<option value={statusSymbol}>[{statusSymbol}] ?</option>{/if}
-        </select>
-      {/if}
-
-      {#if !hidden('dependencies')}
-        <span class="lbl">{t('Depends on')}</span>
-        <div class="deps">
-          <div class="chips">
-            {#each selectedDeps as { ref, task } (ref)}
-              <span class="tfm-chip">{task ? task.description.slice(0, 40) : ref} {#if task?.id}<span class="tfm-muted">({task.id})</span>{/if}
-                <button type="button" class="x" aria-label={t('Remove')} onclick={() => (dependsOn = dependsOn.filter((d) => d !== ref))}>×</button></span>
-            {/each}
-          </div>
-          <input class="tfm-input wide" type="text" placeholder={t('Search tasks that must finish first…')} bind:value={depSearch} />
-          {#if filteredCandidates.length}
-            <ul class="results" role="listbox">
-              {#each filteredCandidates as c (c.key + c.line)}
-                <li><button type="button" onclick={() => { dependsOn = [...dependsOn, refOf(c)]; depSearch = ''; }}>{c.description || '(empty)'} <span class="tfm-muted">{c.path}:{c.line + 1}{c.id ? ` · 🆔 ${c.id}` : ` · ${t('(an id will be generated)')}`}</span></button></li>
-              {/each}
-            </ul>
-          {/if}
-          {#if dependants.length}
-            <div class="tfm-muted small">{t('Blocks')}: {dependants.map((d) => d.description.slice(0, 30)).join(', ')}</div>
-          {/if}
-        </div>
-      {/if}
-
-      {#if !hidden('onCompletion')}
-        <span class="lbl">{t('On completion')}</span>
-        <div class="radios">
-          <label class="radio"><input type="radio" name="oc" value="" bind:group={onCompletion} /> {t('Keep')}</label>
-          <label class="radio"><input type="radio" name="oc" value="delete" bind:group={onCompletion} /> {t('Delete')}</label>
-        </div>
       {/if}
     </div>
 
@@ -280,4 +301,5 @@
   .preview code { background: var(--vscode-textCodeBlock-background); padding: 2px 6px; border-radius: 3px; word-break: break-all; }
   .error { color: var(--tfm-error); margin-top: 6px; }
   .actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px; }
+  .link.more { justify-self: start; }
 </style>

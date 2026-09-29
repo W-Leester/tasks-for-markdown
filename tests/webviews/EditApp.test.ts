@@ -21,6 +21,44 @@ async function boot() {
   await screen.findByLabelText(/Description|설명/);
 }
 
+describe('EditApp field order and More section (M12)', () => {
+  const open = async (task: unknown) => {
+    render(EditApp);
+    await Promise.resolve();
+    receive({ type: 'state/init', state: { ...init, uiState: { editTarget: { key: 'file:///n.md', line: 3 } } } });
+    await Promise.resolve();
+    const load = [...posted].reverse().find((m: FromWebview) => m.type === 'task/load') as { requestId: number };
+    receive({ type: 'task/loaded', requestId: load.requestId, task: task as never, candidates: [], dependants: [] });
+    await Promise.resolve();
+  };
+  const labels = () => Array.from(document.querySelectorAll('.grid > label, .grid > .lbl')).map((l) => l.textContent?.replace(/\s+[A-Z]$/, '').trim());
+
+  it('shows status, description, priority, due, tags, repeat first; More is collapsed for a new task and has no done/cancelled', async () => {
+    await open(null);
+    expect(labels().slice(0, 6)).toEqual(['Status', 'Description', 'Priority', 'Due', 'Tags', 'Repeat']);
+    expect(document.getElementById('f-scheduled')).toBeNull();
+    await fireEvent.click(screen.getByRole('button', { name: /More/ }));
+    expect(document.getElementById('f-scheduled')).not.toBeNull();
+    expect(document.getElementById('f-done')).toBeNull();
+    expect(document.getElementById('f-cancelled')).toBeNull();
+  });
+
+  it('editing: trailing tags go to the Tags field and come back on Apply; More opens when a hidden field has a value; done/cancelled available', async () => {
+    const task = { key: 'file:///n.md', path: 'n.md', line: 3, heading: null, parentLine: null, depth: 0, description: 'write #urgent report #work #proj', status: { symbol: ' ', name: 'Todo', type: 'TODO' },
+      priority: '3', priorityName: 'none', created: null, start: null, scheduled: '2026-10-01', due: '2026-10-02', done: null, cancelled: null,
+      recurrence: null, onCompletion: null, id: null, dependsOn: [], tags: ['#urgent', '#work', '#proj'], isCompleted: false, isDone: false, isBlocked: false, urgency: 1, originalMarkdown: '' };
+    await open(task);
+    expect((document.getElementById('f-description') as HTMLTextAreaElement).value).toBe('write #urgent report');
+    expect((document.getElementById('f-tags') as HTMLInputElement).value).toBe('#work #proj');
+    expect(document.getElementById('f-scheduled')).not.toBeNull(); // opened because scheduled has a value
+    expect(document.getElementById('f-done')).not.toBeNull();
+    await fireEvent.input(document.getElementById('f-tags')!, { target: { value: 'work later' } });
+    await fireEvent.click(screen.getByRole('button', { name: /Apply|적용/ }));
+    const set = posted.find((m: FromWebview) => m.type === 'task/setFields') as { fields: { description: string } };
+    expect(set.fields.description).toBe('write #urgent report #work #later');
+  });
+});
+
 describe('EditApp with tasksmd.requireDueDate', () => {
   it('blocks Apply for a new task without a due date', async () => {
     render(EditApp);

@@ -77,7 +77,7 @@ group by filename
 | `api.writePolicy` | `confirm` | 다른 확장이 API로 쓸 때: 확인(`confirm`) / 허용 / 거부 |
 | `rendered.maxWidth` | `0` | 렌더 보기 본문 열 최대 폭(px). 0 = 창 전체 폭(기본). 800 등을 주면 가운데 열로 제한 |
 | `rendered.sourceWhenNoTasks` | `true` | 렌더 보기가 기본 편집기일 때 태스크 없는 노트는 텍스트 편집기로 |
-| `rendered.fieldsAlign` | `right` | 렌더 보기 태스크 줄의 필드 위치: 오른쪽 끝(`right`) / 설명 뒤(`inline`) |
+| `rendered.fieldsAlign` | `columns` | 렌더 보기 태스크 줄의 필드 배치: 열(`columns`: 상태·설명·마감·태그·반복·나머지) / 오른쪽 끝(`right`) / 설명 뒤(`inline`) |
 | `rendered.fontSize` / `rendered.lineHeight` | `14.5` / `1.6` | 렌더 보기 본문 글자 크기(px)와 줄 간격 |
 | `rendered.fieldStyle` | `plain` | 렌더 보기 태스크 줄의 필드 표시: 원문처럼(`plain`) / 배지(`badges`) |
 | `calendar.fontSize` | `13` | 캘린더 칸의 태스크 글자 크기(px) |

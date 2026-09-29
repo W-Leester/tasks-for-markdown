@@ -1,5 +1,5 @@
 import type { MarkdownIt, RendererRule, StateCore, Token } from 'markdown-it';
-import { type RenderOptions, renderBadges, renderCheckbox, renderQueryResult } from '../core/render';
+import { type RenderOptions, renderBadges, renderCheckbox, renderColumns, renderQueryResult, stripTags } from '../core/render';
 import { Query, type QueryResult, type QuerySource } from '../core/query';
 import { type StatusRegistry, parseTaskLine, splitTaskLine, urgency } from '../core/task';
 
@@ -124,9 +124,18 @@ function decorateTaskLines(state: StateCore, deps: PluginDeps): void {
         const last = inline.children[inline.children.length - 1];
         if (last?.type === 'text') last.content = last.content.replace(/\s+$/, '');
       }
-      const badges = renderBadges(task, null, o);
       const tok = new state.Token('html_inline', '', 0);
-      tok.content = '</span>' + (badges ? ' ' + badges : '');
+      if (o.columns) {
+        // Column layout (rendered view, M12): tags move to their own column, so drop them from the text.
+        for (const child of inline.children) if (child.type === 'text') child.content = stripTags(child.content);
+        const last = inline.children[inline.children.length - 1];
+        if (last?.type === 'text') last.content = last.content.replace(/\s+$/, '');
+        const c = renderColumns(task, null, o);
+        tok.content = c.afterDescription + '</span>' + c.cells;
+      } else {
+        const badges = renderBadges(task, null, o);
+        tok.content = '</span>' + (badges ? ' ' + badges : '');
+      }
       inline.children.push(tok);
     }
   }

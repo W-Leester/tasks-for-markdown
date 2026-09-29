@@ -14,6 +14,10 @@ export interface RenderOptions {
   t?: (s: string, ...args: (string | number)[]) => string;
   /** HTML inserted right after the priority badge (query result rows put the backlink there). */
   afterPriority?: string;
+  /** Rendered view column layout (M12): description | due | tags | recurrence | more. */
+  columns?: boolean;
+  /** Internal: only emit these fields, without the wrapping span. */
+  only?: ReadonlySet<string>;
   /** Show raw fields instead of badges (setting preview.renderBadges = false). */
   hideBadges?: boolean;
   /**
@@ -61,13 +65,14 @@ export function renderBadges(task: Task, layout: Layout | null, o: RenderOptions
   const short = layout?.shortMode ?? false;
   const plain = o.fieldStyle === 'plain';
   const badges: string[] = [];
+  const wanted = (field: string) => !o.only || o.only.has(field);
   const badge = (cls: string, icon: string, text: string, title = '') =>
-    badges.push(plain
+    wanted(cls.split(/[ -]/)[0]!) && badges.push(plain
       ? `<span class="tfm-field tfm-${cls}"${title ? ` title="${esc(title)}"` : ''}>${icon}${text ? ` ${esc(text)}` : ''}</span>`
       : `<span class="tfm-badge tfm-${cls}"${title ? ` title="${esc(title)}"` : ''}>${icon}${short ? '' : ` ${esc(text)}`}</span>`);
 
   if (!hidden.has('priority') && task.priority !== Priority.None) badge(`pri-${PRIORITY_CLASS[task.priority]}`, PRIORITY_EMOJI[task.priority], plain ? '' : PRIORITY_NAME[task.priority], plain ? PRIORITY_NAME[task.priority] : '');
-  if (o.afterPriority) badges.push(o.afterPriority);
+  if (o.afterPriority && !o.only) badges.push(o.afterPriority);
   if (!hidden.has('recurrence rule') && task.recurrenceText) badge('recur', '🔁', task.recurrenceText);
   if (!hidden.has('on completion') && task.onCompletion) badge('oncompletion', '🏁', task.onCompletion);
   if (!hidden.has('id') && task.id) badge('id', '🆔', task.id);
@@ -87,12 +92,38 @@ export function renderBadges(task: Task, layout: Layout | null, o: RenderOptions
   date('due', '📅', 'due date');
   date('done', '✅', 'done date');
   if (!badges.length) return '';
+  if (o.only) return badges.join(plain ? ' ' : '');
   return plain ? `<span class="tfm-fields">${badges.join(' ')}</span>` : `<span class="tfm-badges">${badges.join('')}</span>`;
 }
 
+const MORE_FIELDS = new Set(['oncompletion', 'id', 'dependson', 'created', 'cancelled', 'start', 'scheduled', 'done']);
+
+/** Column cells for the rendered view (M12). Every cell is always present so the grid stays aligned. */
+export function renderColumns(task: Task, layout: Layout | null, o: RenderOptions, extra: { backlink?: string } = {}): { afterDescription: string; cells: string } {
+  const part = (fields: string[]) => renderBadges(task, layout, { ...o, only: new Set(fields) });
+  const pri = part(['pri']);
+  const tags = task.tags.map((tag) => `<span class="tfm-tag">${esc(tag)}</span>`).join(' ');
+  const cell = (cls: string, title: string, html: string) => `<span class="tfm-col tfm-col-${cls}" title="${esc(title)}">${html}</span>`;
+  const t = o.t ?? fmt;
+  return {
+    afterDescription: `${pri ? ` <span class="tfm-col-pri">${pri}</span>` : ''}${extra.backlink ? ` ${extra.backlink}` : ''}`,
+    cells:
+      cell('due', t('Due date'), part(['due'])) +
+      cell('tags', t('Tags'), tags) +
+      cell('recur', t('Repeat'), part(['recur'])) +
+      cell('more', t('More'), part([...MORE_FIELDS])),
+  };
+}
+
+/** Remove `#tags` from displayed description text (column mode shows them in their own column). */
+export function stripTags(text: string): string {
+  return text.replace(/(^|\s)#[^\s#]+/gu, '$1').replace(/[ \t]{2,}/g, ' ');
+}
+
 /** Description with tags wrapped, global filter removed; plain text (no inline markdown) — used for query results. */
-export function renderDescriptionText(task: Task, o: RenderOptions): string {
+export function renderDescriptionText(task: Task, o: RenderOptions & { stripTags?: boolean }): string {
   let d = task.description;
+  if (o.stripTags) d = stripTags(d).trim();
   if (o.globalFilter) d = d.replace(o.globalFilter, '').replace(/\s{2,}/g, ' ').trim();
   const html = esc(d).replace(/(^|\s)(#[^\s#]+)/g, (_, sp, tag) => `${sp}<span class="tfm-tag">${tag}</span>`);
   return html || `<em class="tfm-empty">${esc((o.t ?? fmt)('(empty task)'))}</em>`;
@@ -108,7 +139,13 @@ export function renderTaskRow(task: Task, layout: Layout | null, o: RenderOption
   const href = o.link?.(task);
   const where = `${task.location.path}:${task.location.line + 1}`;
   const backlink = layout?.hidden.has('backlink') || extra.hideBacklink ? '' : `<span class="tfm-backlink">${href ? `<a href="${esc(href)}" title="${esc(where)}">${esc(task.location.path.split('/').pop()!.replace(/\.md$/, ''))}${task.location.heading ? ` › ${esc(task.location.heading)}` : ''}</a>` : esc(where)}</span>`;
-  return `<li class="tfm-task tfm-status-${statusClass(task)}${extra.context ? ' tfm-context' : ''}" data-tfm-path="${esc(task.location.path)}" data-tfm-line="${task.location.line}">${renderCheckbox(task)}<span class="tfm-desc">${renderDescriptionText(task, o)}</span>${renderBadges(task, layout, { ...o, afterPriority: backlink })}${extra.children ?? ''}</li>`;
+  const open = `<li class="tfm-task tfm-status-${statusClass(task)}${extra.context ? ' tfm-context' : ''}" data-tfm-path="${esc(task.location.path)}" data-tfm-line="${task.location.line}">${renderCheckbox(task)}`;
+  if (o.columns) {
+    const c = renderColumns(task, layout, o, { backlink });
+    const desc = renderDescriptionText(task, { ...o, stripTags: true });
+    return `${open}<span class="tfm-desc">${desc}${c.afterDescription}</span>${c.cells}${extra.children ?? ''}</li>`;
+  }
+  return `${open}<span class="tfm-desc">${renderDescriptionText(task, o)}</span>${renderBadges(task, layout, { ...o, afterPriority: backlink })}${extra.children ?? ''}</li>`;
 }
 
 function renderGroup(node: GroupNode, depth: number, layout: Layout, o: RenderOptions, out: string[]): void {

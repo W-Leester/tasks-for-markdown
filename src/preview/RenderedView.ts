@@ -11,6 +11,9 @@ import { systemClock, type Clock } from '../core/dates';
 
 export const RENDERED_VIEW_TYPE = 'tasksmd.rendered';
 const VIEW_STATE_KEY = 'rendered.viewState';
+/** Columns hidden in the rendered view (M14) — one choice for all notes. */
+const HIDDEN_COLUMNS_KEY = 'rendered.hiddenColumns';
+export const HIDEABLE_COLUMNS = ['due', 'created', 'more'] as const;
 const DEFAULT_PROMPT_KEY = 'rendered.defaultPrompted';
 
 export interface RenderedViewDeps {
@@ -33,7 +36,8 @@ type Incoming =
   | { type: 'doc/addNote'; path: string | null; line: number; text: string }
   | { type: 'doc/link'; href: string }
   | { type: 'doc/openSource' }
-  | { type: 'doc/view'; sort: string; scope: string };
+  | { type: 'doc/view'; sort: string; scope: string }
+  | { type: 'doc/columns'; hidden: string[] };
 
 const DOC_DEBOUNCE_MS = 250;
 const INDEX_DEBOUNCE_MS = 400;
@@ -78,7 +82,7 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
     let indexTimer: ReturnType<typeof setTimeout> | undefined;
     const render = () => {
       try {
-        void webview.postMessage({ type: 'doc/html', html: this.renderHtml(document, webview), fontSize: this.deps.settings.get('rendered.fontSize'), lineHeight: this.deps.settings.get('rendered.lineHeight'), fieldsAlign: this.deps.settings.get('rendered.fieldsAlign'), maxWidth: this.deps.settings.get('rendered.maxWidth'), today: (this.deps.clock ?? systemClock).now().startOf('day').format('YYYY-MM-DD'), view: this.viewState(document.uri) });
+        void webview.postMessage({ type: 'doc/html', html: this.renderHtml(document, webview), fontSize: this.deps.settings.get('rendered.fontSize'), lineHeight: this.deps.settings.get('rendered.lineHeight'), fieldsAlign: this.deps.settings.get('rendered.fieldsAlign'), maxWidth: this.deps.settings.get('rendered.maxWidth'), today: (this.deps.clock ?? systemClock).now().startOf('day').format('YYYY-MM-DD'), view: this.viewState(document.uri), hiddenColumns: this.hiddenColumns() });
       } catch (err) {
         this.deps.log(`rendered view: ${err instanceof Error ? err.stack ?? err.message : String(err)}`);
       }
@@ -144,6 +148,13 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
         case 'doc/openSource':
           await vscode.commands.executeCommand('vscode.openWith', document.uri, 'default', panel.viewColumn);
           break;
+        case 'doc/columns': {
+          const hidden = HIDEABLE_COLUMNS.filter((c) => Array.isArray(msg.hidden) && msg.hidden.includes(c));
+          await this.deps.context.globalState.update(HIDDEN_COLUMNS_KEY, hidden);
+          // Other open rendered views follow the new choice.
+          for (const p of this.panels.values()) if (p !== panel) void p.webview.postMessage({ type: 'doc/columns', hidden });
+          break;
+        }
         case 'doc/view': {
           const all = this.deps.context.workspaceState.get<Record<string, { sort: string; scope: string }>>(VIEW_STATE_KEY, {});
           await this.deps.context.workspaceState.update(VIEW_STATE_KEY, { ...all, [document.uri.toString()]: { sort: msg.sort, scope: msg.scope } });
@@ -193,6 +204,11 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
       editor.selection = new vscode.Selection(range.end, range.end);
       editor.revealRange(range, vscode.TextEditorRevealType.InCenterIfOutsideViewport);
     }
+  }
+
+  private hiddenColumns(): string[] {
+    const saved = this.deps.context.globalState.get<string[]>(HIDDEN_COLUMNS_KEY, []);
+    return HIDEABLE_COLUMNS.filter((c) => saved.includes(c));
   }
 
   private viewState(uri: vscode.Uri): { sort: string; scope: string } {
@@ -283,7 +299,7 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
   li.tfm-task > ul > li.tfm-task:first-child, li.tfm-task > p + ul > li.tfm-task:first-child { border-top-color: color-mix(in srgb, var(--rv-fg) 10%, transparent); }
   .tfm-fields { margin-left: .2em; } .tfm-field { white-space: nowrap; }
   /* fieldsAlign = columns (M12): the same grid on every task row so due / tags / recurrence line up vertically. */
-  body.fields-columns li.tfm-task { display: grid; grid-template-columns: 1.4em minmax(8em, 1fr) 8.6em 8.6em minmax(0, 18em); column-gap: .9em; align-items: baseline; }
+  body.fields-columns li.tfm-task { display: grid; grid-template-columns: var(--rv-cols, 1.4em minmax(8em, 1fr) 8.6em 8.6em minmax(0, 18em)); column-gap: .9em; align-items: baseline; }
   body.fields-columns li.tfm-task > p { display: contents; }
   body.fields-columns li.tfm-task > .tfm-check, body.fields-columns li.tfm-task > p > .tfm-check { margin: 0; align-self: center; }
   body.fields-columns .tfm-desc { min-width: 0; }
@@ -336,6 +352,15 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
   /* Sort / scope tools (view only) — top-left of the column, opposite the mode toggle. */
   .rv-tools { position: sticky; top: 0; z-index: 2; display: flex; gap: 12px; align-items: center; padding-top: 6px; padding-bottom: 4px; margin-bottom: 8px; background: var(--rv-bg); font-size: 12px; color: var(--rv-muted); }
   .rv-select { display: inline-flex; gap: 6px; align-items: center; }
+  /* Column menu (M14): only in the column layout. */
+  .rv-cols { display: none; position: relative; }
+  body.fields-columns .rv-cols { display: inline-block; }
+  .rv-cols > summary { list-style: none; cursor: pointer; color: var(--rv-fg); background: var(--rv-bg-2); border: 1px solid var(--rv-stroke); border-radius: 4px; padding: 2px 8px; }
+  .rv-cols > summary::-webkit-details-marker { display: none; }
+  .rv-cols > summary::after { content: ' ▾'; color: var(--rv-muted); }
+  .rv-cols-menu { position: absolute; top: calc(100% + 4px); left: 0; z-index: 3; display: flex; flex-direction: column; gap: 4px; padding: 8px 12px; background: var(--rv-bg-2); border: 1px solid var(--rv-stroke); border-radius: 6px; box-shadow: 0 4px 14px rgba(0,0,0,.25); white-space: nowrap; color: var(--rv-fg); }
+  .rv-cols-menu label { display: flex; gap: 6px; align-items: center; cursor: pointer; }
+  body.hide-col-due .tfm-col-due, body.hide-col-created .tfm-col-created, body.hide-col-more .tfm-col-more { display: none !important; }
   .rv-select select { font: inherit; color: var(--rv-fg); background: var(--rv-bg-2); border: 1px solid var(--rv-stroke); border-radius: 4px; padding: 2px 6px; }
   .rv-hint { margin-left: auto; padding-right: 130px; }
   li.tfm-task.rv-hidden { display: none !important; }
@@ -356,6 +381,13 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
   <label class="rv-select"><span>${t('Show')}</span><select id="view-scope">
     <option value="all">${t('Everything')}</option><option value="open">${t('Open only')}</option><option value="today">${t('Due by today')}</option><option value="week">${t('This week')}</option><option value="nextWeek">${t('Through next week')}</option><option value="overdue">${t('Overdue')}</option>
   </select></label>
+  <details id="view-cols" class="rv-cols"><summary data-l-label="${t('Columns')}" data-l-hidden="${t('Columns · {0} hidden')}">${t('Columns')}</summary>
+    <div class="rv-cols-menu">
+      <label><input type="checkbox" data-col="due" checked> ${t('Due date')}</label>
+      <label><input type="checkbox" data-col="created" checked> ${t('Created date')}</label>
+      <label><input type="checkbox" data-col="more" checked> ${t('Other fields')}</label>
+    </div>
+  </details>
   <span id="view-hidden" class="rv-hint"></span>
 </div>
 <div class="rv-toggle" role="group" aria-label="${t('Editor mode')}">

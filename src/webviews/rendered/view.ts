@@ -104,3 +104,13 @@ export function applyView(root: ParentNode, view: ViewState, today: string): num
   }
   return hidden;
 }
+
+/** Columns the toolbar menu can hide (M14); status and description always stay. */
+export const HIDEABLE_COLUMNS = ['due', 'created', 'more'] as const;
+export type HideableColumn = (typeof HIDEABLE_COLUMNS)[number];
+const TRACKS: Record<HideableColumn, string> = { due: '8.6em', created: '8.6em', more: 'minmax(0, 18em)' };
+
+/** grid-template-columns for the column layout without the hidden columns, so the rest close up. */
+export function columnTracks(hidden: readonly string[]): string {
+  return ['1.4em', 'minmax(8em, 1fr)', ...HIDEABLE_COLUMNS.filter((c) => !hidden.includes(c)).map((c) => TRACKS[c])].join(' ');
+}

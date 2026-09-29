@@ -52,3 +52,40 @@ describe('rendered view hover buttons are visible wherever they are placed', () 
     document.head.innerHTML = '';
   });
 });
+
+describe('rendered view column menu (M14)', () => {
+  it('columnTracks drops hidden tracks so the rest close up', async () => {
+    const { columnTracks } = await import('../../src/webviews/rendered/view');
+    expect(columnTracks([])).toBe('1.4em minmax(8em, 1fr) 8.6em 8.6em minmax(0, 18em)');
+    expect(columnTracks(['created'])).toBe('1.4em minmax(8em, 1fr) 8.6em minmax(0, 18em)');
+    expect(columnTracks(['due', 'created', 'more', 'bogus'])).toBe('1.4em minmax(8em, 1fr)');
+  });
+
+  it('applies hiddenColumns from the host, and a toggle posts doc/columns and updates classes, tracks and label', async () => {
+    document.body.innerHTML = `<details id="view-cols"><summary data-l-label="열" data-l-hidden="열 · {0}개 숨김">열</summary>
+      <input type="checkbox" data-col="due" checked><input type="checkbox" data-col="created" checked><input type="checkbox" data-col="more" checked></details><div id="content"></div>`;
+    window.scrollTo = () => undefined;
+    const { vi } = await import('vitest');
+    vi.resetModules();
+    await import('../../src/webviews/rendered/main');
+    receive({ type: 'doc/html', html: '<p>x</p>', fontSize: 14, lineHeight: 1.6, fieldsAlign: 'columns', maxWidth: 0, today: '2026-09-30', view: { sort: 'document', scope: 'all' }, hiddenColumns: ['more'] });
+    const box = (c: string) => document.querySelector<HTMLInputElement>(`input[data-col="${c}"]`)!;
+    expect(document.body.classList.contains('hide-col-more')).toBe(true);
+    expect(box('more').checked).toBe(false);
+    expect(document.querySelector('summary')!.textContent).toBe('열 · 1개 숨김');
+
+    posted.length = 0;
+    box('created').checked = false;
+    box('created').dispatchEvent(new Event('change'));
+    expect(posted).toEqual([{ type: 'doc/columns', hidden: ['created', 'more'] }]);
+    expect(document.body.classList.contains('hide-col-created')).toBe(true);
+    expect(document.body.style.getPropertyValue('--rv-cols')).toBe('1.4em minmax(8em, 1fr) 8.6em');
+    expect(document.querySelector('summary')!.textContent).toBe('열 · 2개 숨김');
+
+    // Another rendered view changed the choice.
+    receive({ type: 'doc/columns', hidden: [] });
+    expect(document.body.className).not.toMatch(/hide-col/);
+    expect(box('created').checked).toBe(true);
+    expect(document.querySelector('summary')!.textContent).toBe('열');
+  });
+});

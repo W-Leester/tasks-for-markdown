@@ -3,7 +3,7 @@
  * task rows and links go back as messages. Plain DOM — no framework needed here.
  */
 import type { FromWebview, ToWebview, WebviewApi } from '../shared/protocol';
-import { applyView, SCOPE_MODES, SORT_MODES, type ScopeMode, type SortMode, type ViewState } from './view';
+import { applyView, columnTracks, HIDEABLE_COLUMNS, SCOPE_MODES, SORT_MODES, type ScopeMode, type SortMode, type ViewState } from './view';
 
 declare function acquireVsCodeApi(): WebviewApi;
 // Plain objects only here, so no snapshot helper (and no Svelte runtime) is needed.
@@ -20,12 +20,36 @@ function refreshView(): void {
   const hidden = applyView(content, view, today);
   if (hiddenEl) hiddenEl.textContent = hidden ? (document.body.dataset.lHidden ?? '{0} hidden').replace('{0}', String(hidden)) : '';
 }
+// Column menu (M14): hide due / created / other-fields columns in every note; the host remembers the choice.
+const colsMenu = document.getElementById('view-cols') as HTMLDetailsElement | null;
+const colBoxes = Array.from(document.querySelectorAll<HTMLInputElement>('#view-cols input[data-col]'));
+let hiddenColumns: string[] = [];
+function applyColumns(hidden: readonly string[]): void {
+  hiddenColumns = HIDEABLE_COLUMNS.filter((c) => hidden.includes(c));
+  for (const c of HIDEABLE_COLUMNS) document.body.classList.toggle(`hide-col-${c}`, hiddenColumns.includes(c));
+  document.body.style.setProperty('--rv-cols', columnTracks(hiddenColumns));
+  for (const box of colBoxes) box.checked = !hiddenColumns.includes(box.dataset.col!);
+  const summary = colsMenu?.querySelector('summary');
+  if (summary) summary.textContent = hiddenColumns.length ? (summary.dataset.lHidden ?? 'Columns · {0} hidden').replace('{0}', String(hiddenColumns.length)) : (summary.dataset.lLabel ?? 'Columns');
+}
+for (const box of colBoxes) {
+  box.addEventListener('change', () => {
+    applyColumns(colBoxes.filter((b) => !b.checked).map((b) => b.dataset.col!));
+    post({ type: 'doc/columns', hidden: hiddenColumns });
+  });
+}
+// Close the menu on outside click or Esc.
+document.addEventListener('click', (e) => { if (colsMenu?.open && !colsMenu.contains(e.target as Node)) colsMenu.open = false; });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && colsMenu?.open) { colsMenu.open = false; colsMenu.querySelector('summary')?.focus(); } });
+
 sortSel?.addEventListener('change', () => { view = { ...view, sort: sortSel.value as SortMode }; post({ type: 'doc/view', ...view }); refreshView(); });
 scopeSel?.addEventListener('change', () => { view = { ...view, scope: scopeSel.value as ScopeMode }; post({ type: 'doc/view', ...view }); refreshView(); });
 
 window.addEventListener('message', (e: MessageEvent<ToWebview>) => {
   const m = e.data;
+  if (m.type === 'doc/columns') { applyColumns(m.hidden); return; }
   if (m.type !== 'doc/html') return;
+  applyColumns(m.hiddenColumns ?? []);
   document.documentElement.style.setProperty('--rv-font-size', `${m.fontSize}px`);
   document.documentElement.style.setProperty('--rv-line-height', String(m.lineHeight));
   document.body.classList.toggle('fields-right', m.fieldsAlign === 'right');

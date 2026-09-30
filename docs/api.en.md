@@ -10,13 +10,13 @@ There are three ways in, and each feature is offered through all three:
 | CLI `tasksmd` | Terminal, scripts, other programs | Nothing else — reads and writes the files directly | §7 |
 | MCP `tasksmd mcp` | AI assistants such as Claude Desktop or Cursor's agent | Nothing else — reads and writes the files directly | §8 |
 
-**Type definitions (one file).** [src/api/types.ts](../src/api/types.ts) is self-contained — no imports (since 1.13.0). Copy that single file into your project as `tasks-api.ts` (or `.d.ts`) for autocompletion and type checking. It also ships inside the extension as `dist/api-types/api/types.d.ts`. An npm types package, `@hastycapybara/tasks-api`, will be published with the Marketplace release.
+**Type definitions (one file).** [src/api/types.ts](../src/api/types.ts) is self-contained — no imports. Copy that single file into your project as `tasks-api.ts` (or `.d.ts`) for autocompletion and type checking. It also ships inside the extension as `dist/api-types/api/types.d.ts`. Or install it from npm: `npm i -D @hastycapybara/tasks-api` → `import type { TasksApi } from '@hastycapybara/tasks-api'`.
 
 ## 1. Getting started (from another extension)
 
 ```ts
 import * as vscode from 'vscode';
-import type { TasksExtensionExports, TasksApi } from './tasks-api';   // copy types.d.ts into your project
+import type { TasksExtensionExports, TasksApi } from '@hastycapybara/tasks-api';   // or a copy of src/api/types.ts
 
 const ext = vscode.extensions.getExtension<TasksExtensionExports>('hastycapybara.tasks-for-markdown');
 if (!ext) throw new Error('Tasks for Markdown is not installed');
@@ -30,7 +30,7 @@ for (const t of r.tasks) console.log(t.path, t.line + 1, t.description, t.due);
 - Every method returns a `Promise` and rejects with a `TasksApiError` shaped `{ code, message, details? }` (§5).
 - Everything is plain JSON: dates are `YYYY-MM-DD`, a task is addressed by `{ path, line }` (workspace-relative path, 0-based line).
 
-### Feature detection (1.13.0)
+### Feature detection
 
 The API version stays `1` while features are only added. Check what the installed extension supports by **feature name**, not by version number:
 
@@ -39,16 +39,15 @@ if (tasks.features?.includes('notes.add')) await tasks.edit.addNote(ref, 'Reply 
 const info = await tasks.info();   // { extensionVersion, apiVersion: 1, features, settings: { requireDueDate, taskFormat, globalFilter } }
 if (info.settings.requireDueDate) { /* make the due date mandatory in your create form */ }
 ```
-(On 1.12 and older, `tasks.features` is `undefined`.)
 
 | Feature | Added in | What |
 |---|---|---|
-| `tree` | 1.6.0 | `GroupDto.tree`, `TaskDto.parentLine` / `depth` |
-| `notes` | 1.8.0 | `TaskDto.notes`, `notes` on `create` / `update` (replace all) |
-| `notes.add` | 1.13.0 | `edit.addNote`, batch `addNote` |
-| `info` | 1.13.0 | `extensionVersion`, `features`, `info()` |
-| `events.status` | 1.13.0 | `events.onDidChangeStatus` |
-| `isBlocking` | 1.13.0 | `TaskDto.isBlocking` |
+| `tree` | 1.0.0 | `GroupDto.tree`, `TaskDto.parentLine` / `depth` |
+| `notes` | 1.0.0 | `TaskDto.notes`, `notes` on `create` / `update` (replace all) |
+| `notes.add` | 1.0.0 | `edit.addNote`, batch `addNote` |
+| `info` | 1.0.0 | `extensionVersion`, `features`, `info()` |
+| `events.status` | 1.0.0 | `events.onDidChangeStatus` |
+| `isBlocking` | 1.0.0 | `TaskDto.isBlocking` |
 - Requirements: the extension is installed and activated in the same VS Code/Cursor window, and a workspace folder is open. Outside the editor use the library, the CLI or the MCP server (§6–8).
 
 ## 2. Methods
@@ -73,16 +72,16 @@ if (info.settings.requireDueDate) { /* make the due date mandatory in your creat
 | `toggle(ref)` | Move to the status' next symbol |
 | `postpone(ref, to)` | Move the due date (or scheduled date when there is no due date) to `YYYY-MM-DD` or natural language (`tomorrow`, `next monday`, `in 2 weeks`) |
 | `remove(ref)` | Delete the line |
-| `addNote(ref, text)` | Add one note: an indented bullet after the task's existing notes (or right below the task) — the same as 💬 in the rendered view. Returns the task with its notes (1.13.0) |
+| `addNote(ref, text)` | Add one note: an indented bullet after the task's existing notes (or right below the task) — the same as 💬 in the rendered view. Returns the task with its notes |
 | `batch(ops)` | Run `create`, `update`, `setStatus`, `toggle`, `postpone`, `remove` and `addNote` ops in order; stops at the first failure with `details.completed` and `details.results`. Limit `tasksmd.api.batchLimit` (200). **Not atomic** — earlier operations are not rolled back |
 
 Put the exact line (`TaskDto.originalMarkdown`) in `ref.expectedText` and the write is refused with `STALE_LINE` if the line changed meanwhile. Always doing so prevents overwriting with stale data.
 
-**Tree (added in 1.6.0, compatible with v1).** When tree display is on (`tasksmd.query.showTree` or `show tree`), `query.run` always fills `groups`, and leaf groups carry `tree: { task, matched, children }[]`. `matched: false` marks context rows (children shown with their parent although they did not match). The flat `tasks` list still holds only matching tasks. `TaskDto` gains `parentLine` (line of the parent list item, or null) and `depth`.
+**Tree.** When tree display is on (`tasksmd.query.showTree` or `show tree`), `query.run` always fills `groups`, and leaf groups carry `tree: { task, matched, children }[]`. `matched: false` marks context rows (children shown with their parent although they did not match). The flat `tasks` list still holds only matching tasks. `TaskDto` gains `parentLine` (line of the parent list item, or null) and `depth`.
 
-**Notes (added in 1.8.0, compatible with v1).** `TaskDto.notes: { line, text }[]` — the task's direct child bullets without a checkbox. `changes.notes: string[]` on `edit.create` and `edit.update` replaces all notes (`[]` removes them). Existing note lines are rewritten in place, extra ones added or removed; sub-tasks are never touched. To append one note use `addNote` (a read-modify-write of the whole list could overwrite a note the user changed meanwhile).
+**Notes.** `TaskDto.notes: { line, text }[]` — the task's direct child bullets without a checkbox. `changes.notes: string[]` on `edit.create` and `edit.update` replaces all notes (`[]` removes them). Existing note lines are rewritten in place, extra ones added or removed; sub-tasks are never touched. To append one note use `addNote` (a read-modify-write of the whole list could overwrite a note the user changed meanwhile).
 
-**Dependencies (🆔/⛔).** `isBlocked` = this task waits for an unfinished task (⛔). `isBlocking` = an unfinished task waits for this one — finishing it unblocks something (1.13.0). Both are only `true` for open tasks.
+**Dependencies (🆔/⛔).** `isBlocked` = this task waits for an unfinished task (⛔). `isBlocking` = an unfinished task waits for this one — finishing it unblocks something. Both are only `true` for open tasks.
 
 ### events
 
@@ -90,7 +89,7 @@ Put the exact line (`TaskDto.originalMarkdown`) in `ref.expectedText` and the wr
 |---|---|
 | `onDidChangeTasks(listener)` | Paths of files whose tasks changed or were removed (debounced index event) |
 | `onDidCompleteTask(listener)` | Fires when a task goes from open to completed; `next` holds the new occurrence of a recurring task |
-| `onDidChangeStatus(listener)` | Every status change (done, cancelled, in progress, reopened, custom statuses): `{ before, after, next?, deleted }`, whether made in the editor, sidebar, boards or through the API. Not fired when the symbol stays the same (1.13.0) |
+| `onDidChangeStatus(listener)` | Every status change (done, cancelled, in progress, reopened, custom statuses): `{ before, after, next?, deleted }`, whether made in the editor, sidebar, boards or through the API. Not fired when the symbol stays the same |
 
 All return `{ dispose() }`.
 
@@ -240,8 +239,8 @@ Cursor: `.cursor/mcp.json`; VS Code: `.vscode/mcp.json`:
 | `tasks_list_saved_queries` | Saved queries |
 | `tasks_create { file, description, afterLine?, due?, priority?, tags?, notes?, created?, … }` | Create (end of file, or after a line). `tags` are appended to the description, `notes` become notes under the task. Needs `due` when the due-date requirement is on |
 | `tasks_update { path, line, expectedText?, …fields, notes? }` | Change fields (`null` removes); `notes` replaces all notes; `status` last. Date fields: `due`, `scheduled`, `start`, `created`, `done`, `cancelled` |
-| `tasks_add_note { path, line, expectedText?, text }` | Add one note (1.13.0) |
-| `tasks_info` | Version, features and the settings that affect writes, such as `requireDueDate` (1.13.0) |
+| `tasks_add_note { path, line, expectedText?, text }` | Add one note |
+| `tasks_info` | Version, features and the settings that affect writes, such as `requireDueDate` |
 | `tasks_set_status { path, line, expectedText?, symbol }` | Set status; `x` adds the done date and the next occurrence |
 | `tasks_postpone { path, line, expectedText?, to }` | Move the due (or scheduled) date; natural language allowed |
 | `tasks_remove { path, line, expectedText? }` | Delete the line |

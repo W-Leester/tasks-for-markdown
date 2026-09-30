@@ -1,8 +1,13 @@
 {
   "name": "tasks-for-markdown",
   "displayName": "Tasks for Markdown",
-  "description": "Obsidian Tasks 플러그인에서 출발한, VS Code와 Cursor용 마크다운 할 일 관리. Task management for Markdown in VS Code and Cursor, inspired by and compatible with the Obsidian Tasks plugin.",
-  "version": "1.13.0",
+  "description": "Obsidian Tasks-style task management for Markdown in VS Code and Cursor: queries, rendered view, kanban, calendar, recurrence and notes. Inspired by and compatible with the Obsidian Tasks plugin.",
+  "icon": "media/icon.png",
+  "galleryBanner": {
+    "color": "#171d35",
+    "theme": "dark"
+  },
+  "version": "1.0.0",
   "publisher": "hastycapybara",
   "license": "MIT",
   "repository": {
@@ -19,14 +24,23 @@
     "vscode": "^1.90.0"
   },
   "categories": [
-    "Other"
+    "Other",
+    "Visualization"
   ],
   "keywords": [
     "markdown",
     "tasks",
     "todo",
     "obsidian",
-    "checklist"
+    "obsidian-tasks",
+    "checklist",
+    "kanban",
+    "calendar",
+    "gtd",
+    "productivity",
+    "recurring",
+    "dataview",
+    "mcp"
   ],
   "activationEvents": [
     "onLanguage:markdown",
@@ -1396,7 +1410,7 @@
     "build:prod": "node esbuild.config.mjs --production",
     "test:webviews": "vitest run --config vitest.webviews.config.mts",
     "build:api-types": "tsc -p tsconfig.api.json",
-    "build:packages": "pnpm --filter @hastycapybara/tasks-core build && pnpm --filter @hastycapybara/tasks-cli build"
+    "build:packages": "pnpm --filter @hastycapybara/tasks-core build && pnpm --filter @hastycapybara/tasks-cli build && pnpm --filter @hastycapybara/tasks-api build"
   },
   "dependencies": {
     "dayjs": "^1.11.13",

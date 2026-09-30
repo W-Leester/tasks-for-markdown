@@ -10,6 +10,11 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
+    # Tokens at job level: a step's own `env` is not visible to that step's `if`.
+    env:
+      VSCE_PAT: ${{ secrets.VSCE_PAT }}
+      OVSX_PAT: ${{ secrets.OVSX_PAT }}
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -28,6 +33,7 @@ jobs:
           pnpm build:packages
           pnpm --filter @hastycapybara/tasks-core pack --pack-destination .
           pnpm --filter @hastycapybara/tasks-cli pack --pack-destination .
+          pnpm --filter @hastycapybara/tasks-api pack --pack-destination .
       - name: GitHub Release with artifacts
         uses: softprops/action-gh-release@v2
         with:
@@ -39,11 +45,14 @@ jobs:
       # Publishing runs only when the tokens are configured as repository secrets.
       - name: Publish to VS Code Marketplace
         if: ${{ env.VSCE_PAT != '' }}
-        env:
-          VSCE_PAT: ${{ secrets.VSCE_PAT }}
         run: pnpm exec vsce publish --no-dependencies --packagePath *.vsix
       - name: Publish to Open VSX
         if: ${{ env.OVSX_PAT != '' }}
-        env:
-          OVSX_PAT: ${{ secrets.OVSX_PAT }}
         run: pnpm exec ovsx publish *.vsix -p "$OVSX_PAT"
+      - name: Publish npm packages
+        if: ${{ env.NPM_TOKEN != '' }}
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+          for pkg in tasks-core tasks-cli tasks-api; do
+            pnpm --filter "@hastycapybara/${pkg}" publish --access public --no-git-checks
+          done

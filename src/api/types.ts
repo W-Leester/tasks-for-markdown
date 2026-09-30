@@ -22,11 +22,11 @@ export interface TaskDto {
   line: number;
   /** Nearest heading above the task (without `#`), or null. */
   heading: string | null;
-  /** Line of the parent list item (task or bullet) in the same file, or null; see depth. (1.6.0) */
+  /** Line of the parent list item (task or bullet) in the same file, or null; see depth. */
   parentLine: number | null;
-  /** Nesting depth: 0 = top-level list item. (1.6.0) */
+  /** Nesting depth: 0 = top-level list item. */
   depth: number;
-  /** Notes: the task's direct child bullets without a checkbox, with their lines. (1.8.0) */
+  /** Notes: the task's direct child bullets without a checkbox, with their lines. */
   notes: { line: number; text: string }[];
   /** Task text without the field emojis (tags included). */
   description: string;
@@ -55,7 +55,7 @@ export interface TaskDto {
   isDone: boolean;
   /** Waiting for an unfinished task it depends on (⛔). */
   isBlocked: boolean;
-  /** Another unfinished task depends on this one — finishing it unblocks something. (1.13.0) */
+  /** Another unfinished task depends on this one — finishing it unblocks something. */
   isBlocking: boolean;
   /** Obsidian Tasks' urgency score. */
   urgency: number;
@@ -69,7 +69,7 @@ export interface GroupDto {
   count: number;
   children: GroupDto[];
   tasks: TaskDto[];
-  /** Tree display (leaf groups only): `tasks` nested by parent task, with context children (`matched: false`). (1.6.0) */
+  /** Tree display (leaf groups only): `tasks` nested by parent task, with context children (`matched: false`). */
   tree?: TreeDto[];
 }
 
@@ -228,7 +228,7 @@ export interface TaskStatusChangeEvent {
 export type ApiFeature = 'tree' | 'notes' | 'notes.add' | 'info' | 'events.status' | 'isBlocking';
 
 export interface ApiInfo {
-  /** Version of the installed extension, e.g. `1.13.0`. */
+  /** Version of the installed extension, e.g. `1.0.0`. */
   extensionVersion: string;
   apiVersion: 1;
   features: ApiFeature[];
@@ -249,11 +249,11 @@ export interface ApiDisposable {
 
 export interface TasksApi {
   readonly version: 1;
-  /** Version of the installed extension, e.g. `1.13.0`. (1.13.0) */
+  /** Version of the installed extension, e.g. `1.0.0`. */
   readonly extensionVersion: string;
-  /** Optional capabilities this build supports — check before using a newer field or method. (1.13.0) */
+  /** Optional capabilities this build supports — check before using a newer field or method. */
   readonly features: readonly ApiFeature[];
-  /** Version, features and the settings that affect edits (e.g. whether a due date is required). (1.13.0) */
+  /** Version, features and the settings that affect edits (e.g. whether a due date is required). */
   info(): Promise<ApiInfo>;
 
   query: {
@@ -280,7 +280,7 @@ export interface TasksApi {
     postpone(ref: TaskRef, to: string): Promise<TaskDto>;
     /** Delete the task line. */
     remove(ref: TaskRef): Promise<void>;
-    /** Add one note (an indented bullet) under the task, after its existing notes. Returns the task with its notes. (1.13.0) */
+    /** Add one note (an indented bullet) under the task, after its existing notes. Returns the task with its notes. */
     addNote(ref: TaskRef, text: string): Promise<TaskDto>;
     /** Run several edits in order. Stops at the first failure; the error's `details` says how many completed. */
     batch(ops: EditOp[]): Promise<BatchResult>;
@@ -289,7 +289,7 @@ export interface TasksApi {
   events: {
     onDidChangeTasks(listener: (e: TasksChangeEvent) => void): ApiDisposable;
     onDidCompleteTask(listener: (e: TaskCompletedEvent) => void): ApiDisposable;
-    /** Every status change (done, cancelled, in progress, reopened…) from the editor, sidebar, views or the API. (1.13.0) */
+    /** Every status change (done, cancelled, in progress, reopened…) from the editor, sidebar, views or the API. */
     onDidChangeStatus(listener: (e: TaskStatusChangeEvent) => void): ApiDisposable;
   };
 

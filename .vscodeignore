@@ -22,4 +22,5 @@ dist/latest.json
 vitest.webviews.config.mts
 packages/**
 .tasks/**
-examples/Query_Test.md
+examples/**
+media/icon_v1.png

@@ -1,0 +1,37 @@
+{
+  "name": "@hastycapybara/tasks-api",
+  "version": "1.0.0",
+  "description": "TypeScript types for the public API of the Tasks for Markdown VS Code/Cursor extension (getAPI(1)): queries, edits, notes, events. Types only — no runtime code.",
+  "license": "MIT",
+  "author": "hastyCapybara (W.Leester)",
+  "homepage": "https://github.com/W-Leester/tasks-for-markdown/blob/main/docs/api.en.md",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/W-Leester/tasks-for-markdown.git",
+    "directory": "packages/api"
+  },
+  "keywords": [
+    "vscode",
+    "markdown",
+    "tasks",
+    "obsidian",
+    "types"
+  ],
+  "types": "./index.d.ts",
+  "files": [
+    "index.d.ts",
+    "README.md",
+    "LICENSE",
+    "NOTICE.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc -p ../../tsconfig.api.json && node -e \"require('fs').copyFileSync('../../dist/api-types/api/types.d.ts','index.d.ts')\" && pnpm run prepack",
+    "prepack": "node -e \"const f=require('fs');for(const n of ['LICENSE','NOTICE.md'])f.copyFileSync('../../'+n,n)\""
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0"
+  }
+}

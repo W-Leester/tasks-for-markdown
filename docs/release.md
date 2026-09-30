@@ -1,5 +1,41 @@
 # 릴리스 절차
 
+## 첫 공개 순서 (1.0.0, 사용자가 할 일)
+
+코드·문서·패키지 준비는 끝났다(M18). 아래를 위에서부터 한 번씩 하면 된다.
+
+1. **수동 점검.** Cursor에 설치된 1.0.0으로 [manual-checklist.md](manual-checklist.md)를 한 바퀴. 문제가 있으면 고친 뒤 다시 패키징.
+2. **VS Code Marketplace 퍼블리셔와 토큰.**
+   - https://marketplace.visualstudio.com/manage → Microsoft 계정으로 로그인 → *Create publisher*: ID `hastycapybara`(package.json의 `publisher`와 정확히 같아야 함), 표시 이름은 자유.
+   - https://dev.azure.com 에서 같은 계정으로 조직을 하나 만든 뒤 *User settings › Personal access tokens › New token*: Organization **All accessible organizations**, Scopes **Marketplace › Manage**. 만료일은 길게.
+3. **Open VSX 네임스페이스와 토큰** (Cursor가 이 마켓을 쓴다).
+   - https://open-vsx.org → GitHub로 로그인 → 프로필에서 **Eclipse 계정 연결과 Publisher Agreement 서명**(안 하면 게시가 거부됨).
+   - *Settings › Access Tokens*에서 토큰 발급.
+   - 네임스페이스 만들기(한 번): `npx ovsx create-namespace hastycapybara -p <토큰>`.
+4. **npm 조직과 토큰.**
+   - https://www.npmjs.com 가입 → *Add Organization*: 이름 `hastycapybara`(무료, 공개 패키지).
+   - *Access Tokens › Generate New Token › Granular*: 패키지·스코프 `@hastycapybara` **Read and write**. (계정에 2단계 인증이 켜져 있으면 "Bypass 2FA"가 가능한 토큰이어야 자동 게시가 된다.)
+5. **저장소 공개.** GitHub 저장소 *Settings › General › Danger Zone › Change visibility › Public* (또는 `gh repo edit W-Leester/tasks-for-markdown --visibility public --accept-visibility-change-consequences`). 공개해야 마켓 README의 이미지·링크가 보인다. 커밋 작성자 이메일이 공개된다.
+6. **Secrets 등록.** 저장소 *Settings › Secrets and variables › Actions › New repository secret*: `VSCE_PAT`, `OVSX_PAT`, `NPM_TOKEN`.
+7. **태그 푸시.**
+   ```bash
+   git tag v1.0.0 && git push origin v1.0.0
+   ```
+   GitHub Actions의 *Release* 워크플로가 테스트 → `.vsix`·npm `.tgz` 만들기 → GitHub Release 첨부 → VS Code Marketplace·Open VSX·npm 게시까지 한다. 진행 상황은 저장소 *Actions* 탭.
+8. **확인.** 몇 분 뒤 VS Code 확장 검색 "Tasks for Markdown", Cursor 확장 검색(Open VSX), https://www.npmjs.com/org/hastycapybara 에서 세 패키지. 사내 `.vsix` 사용자에게는 마켓에서 설치하라고 안내(1.13.0 → 1.0.0은 번호가 낮아 업데이트 알림이 안 뜸).
+
+**손으로 게시하고 싶다면**(워크플로 대신, 토큰은 위와 같음):
+```bash
+pnpm package
+pnpm exec vsce publish --no-dependencies --packagePath tasks-for-markdown-1.0.0.vsix -p <VSCE_PAT>
+pnpm exec ovsx publish tasks-for-markdown-1.0.0.vsix -p <OVSX_PAT>
+pnpm build:packages
+npm login   # 한 번
+for p in tasks-core tasks-cli tasks-api; do pnpm --filter @hastycapybara/$p publish --access public; done
+```
+
+**문제가 생기면.** Marketplace는 같은 버전을 다시 올릴 수 없다(내리기는 가능: `vsce unpublish`). 고칠 게 있으면 1.0.1로 올린다. npm은 게시 후 72시간 안에만 `npm unpublish` 가능.
+
 ## 한 번만 (계정·토큰)
 
 1. **VS Code Marketplace**: https://marketplace.visualstudio.com/manage 에서 퍼블리셔 `hastycapybara` 생성 → Azure DevOps에서 PAT(Marketplace › Manage 권한) 발급 → GitHub 저장소 Secrets에 `VSCE_PAT`.
@@ -66,7 +102,7 @@ git tag v<ver> && git push origin v<ver>
 - [x] **저장소 공개 (결정 2026-09-30).** 공개 전 비밀 값 검사(2026-09-30: 파일·140개 커밋 이력에서 토큰·키 없음). 커밋 작성자 이메일이 공개된다.
 - [x] **마켓 페이지 언어 (결정 2026-09-30):** README.md 영어 기본, README.ko.md로 연결. README 이미지는 PNG/GIF만(마켓이 SVG 거부).
 - [x] **npm 동시 배포 (결정 2026-09-30):** tasks-core, tasks-cli, tasks-api.
-- [ ] **CHANGELOG 정리.** 내부 이력을 "1.0.0 — 첫 공개" 요약으로 묶을지 결정(사용자 결정: 1.0.0 때 정리). docs/post-release-changes.md(1.4.0 이후 갱신 안 됨)도 이때 정리.
+- [x] **CHANGELOG 정리 (2026-09-30).** CHANGELOG.md는 "1.0.0 — 첫 공개"(영어·한국어 요약)부터 시작. 내부 이력(내부 1.0.0~1.13.0)과 옛 post-release-changes.md는 docs/history-internal.md로 옮김.
 - [ ] **npm 패키지 발행**: `@hastycapybara/tasks-core`, `@hastycapybara/tasks-cli`, 그리고 타입 패키지 `@hastycapybara/tasks-api`(src/api/types.ts로 만든 `.d.ts`만 담은 패키지; 폴더 `packages/api` 신설). npm 계정·스코프 `hastycapybara` 필요.
 - [ ] 계정: Marketplace 퍼블리셔 `hastycapybara`, Open VSX 네임스페이스, npm 스코프(위 "한 번만" 절).
 - [ ] 마켓플레이스 소개문(package.json `description`, README 첫머리)과 Obsidian Tasks 출처 문구 최종 확인. 로고·이름을 우리 것처럼 쓰지 않았는지.

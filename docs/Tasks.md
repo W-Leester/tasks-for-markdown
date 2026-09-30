@@ -35,7 +35,7 @@
 | M7 | 추가 기능: 알림·아카이브·통계·캘린더·업데이트 확인 | ✅ 완료 | 2026-09-21 · unit 462 / integration 34 |
 | M8 | 마감: i18n·성능·접근성·문서·패키징·게시 | 🟡 코드 완료 · 사용자 작업 대기 | 1.0.0 `.vsix` 생성됨 · 남은 것: 퍼블리셔/토큰 생성, 저장소 공개 여부, M8.7 수동 테스트 |
 | M9 | 공개 API: 확장 API·명령·npm/CLI·MCP·URI | 🟡 M9.1–9.5 완료(1.3.0, npm 발행은 사용자 작업) · M9.6(선택)·9.7 남음 | docs/api-plan.md v0.2, docs/api.md |
-| M10 | 렌더 보기 고도화: 기본 편집기 대체, 정렬·보기 툴바 | ✅ 완료(1.4.0) | post-release-changes 2.14 |
+| M10 | 렌더 보기 고도화: 기본 편집기 대체, 정렬·보기 툴바 | ✅ 완료(1.4.0) | history-internal.md 2부 2.14 |
 | M11 | 쿼리 결과 트리 표시 | ✅ 완료(1.6.0) | 이 문서 M11, design.md 7.10 |
 | M12 | 대화상자 필드 순서·더보기, 렌더 보기 열 배치 | ✅ 완료(1.7.0) | 이 문서 M12, design.md 7.11 |
 | M13 | 태스크 메모(하위 글머리표): 렌더 보기 추가·표시·대화상자 | ✅ 완료(1.8.0) | 이 문서 M13, design.md 7.12 |
@@ -43,7 +43,7 @@
 | M15 | 열 제목 줄(쿼리 결과·본문), 툴바와 같은 전역 열 숨기기 | ✅ 완료(1.11.0; 1.10.0은 블록별) | 이 문서 M15, design.md 7.14 |
 | M16 | 렌더 보기 열 너비 조절(제목 줄 경계 끌기) | ✅ 완료(1.12.0) | 이 문서 M16, design.md 7.15 |
 | M17 | 외부 연동 보강(독립 타입, 메모·기능 확인·상태 알림·isBlocking, CLI·MCP), 출처 표시 | ✅ 완료(1.13.0) | 이 문서 M17, release.md |
-| M18 | 마켓플레이스 정식 공개 준비(1.0.0 재시작, 저장소 공개, 영어 README, npm) | 🟡 진행 중(2026-09-30) | 이 문서 M18, release.md |
+| M18 | 마켓플레이스 정식 공개 준비(1.0.0 재시작, 저장소 공개, 영어 README, npm) | ✅ 준비 완료(1.0.0) — 계정·공개·태그는 사용자(release.md "첫 공개 순서") | 이 문서 M18, release.md |
 
 ---
 
@@ -564,7 +564,7 @@
 - [x] (상시 규칙) 새 설정 키는 `package.json` + `schema.ts` + nls(en/ko) + README 설정 표를 같이 갱신 — `tests/settings/schema.test.ts`가 package.json↔schema 불일치를 잡음
 - [x] (상시 규칙) 새 명령은 `package.json` + 등록 코드 + nls + README 명령 표를 같이 갱신
 - [x] (상시 규칙) Obsidian Tasks에서 이식한 파일에는 출처·라이선스 주석, `NOTICE.md` 유지 (NFR-8)
-- [x] (상시 규칙) 마일스톤 종료 시 이 문서의 "진행 현황" 표와 `CHANGELOG.md` 갱신 — 1.0 이후 변경은 `docs/post-release-changes.md`
+- [x] (상시 규칙) 마일스톤 종료 시 이 문서의 "진행 현황" 표와 `CHANGELOG.md` 갱신 — 공개 이후는 `CHANGELOG.md`, 공개 전 내부 이력은 `docs/history-internal.md`
 - [x] (상시 규칙) 설계 변경이 생기면 design.md와 SVG(`docs/imgs/`) 재생성 — design.md 0.5: 3.2 트리 현행화, 5.6 추가 메시지, 5.7 렌더 보기 시퀀스(`05-7-rendered-view.svg`), 7.8/7.9 목업(`07-8-rendered.svg`, `07-9-query-results.svg`), 7.4/7.5/9/14 보강
 
 ## M9. 공개 API (docs/api-plan.md v0.2)
@@ -613,7 +613,7 @@
 - [x] 태스크 없는 노트는 텍스트 편집기로(`rendered.sourceWhenNoTasks`), 명시적 열기는 예외
 - [x] 정렬(문서 순·마감일·생성일·우선순위·긴급도)·보기(전체·미완료만·오늘·이번 주·다음 주까지·기한 초과) 툴바 — 화면만, 파일별 기억
 - [x] 플러그인 `data-tfm-*` 속성, `view.ts` 단위 테스트, 통합 테스트(기본 편집기 연결 시 태스크 노트는 렌더·없는 노트는 텍스트)
-- [x] 문서: user-guide, README, design.md 7.8, post-release-changes 2.14(결정 기록)
+- [x] 문서: user-guide, README, design.md 7.8, history-internal.md 2부 2.14(결정 기록)
 
 ## M11. 쿼리 결과 트리 표시 (계획 확정 2026-09-28)
 
@@ -850,13 +850,13 @@
 **알려 둘 영향.** 사내에서 `.vsix`로 1.13.0을 쓰던 사용자는 1.0.0이 더 낮은 번호라 업데이트 알림을 받지 못한다 → 마켓(자동 업데이트)으로 옮기거나 1.0.0을 직접 설치하도록 안내.
 
 ### 할 일
-- [ ] 아이콘 `media/icon.png` (완료: 2026-09-30)
-- [ ] 패키지 정보·제외 목록
-- [ ] README 영어 기본 + README.ko.md, 링크 정리, PNG 스크린샷
-- [ ] 버전 표기 1.0.0 기준 정리(API 문서·타입 주석), 버전 번호 1.0.0
-- [ ] CHANGELOG 1.0.0 + docs/history-internal.md
-- [ ] npm 타입 패키지 `packages/api`, 워크플로 npm 게시
-- [ ] 전체 검증, 설치 파일 확인, release.md 절차 갱신
+- [x] 아이콘 `media/icon.png` (완료: 2026-09-30)
+- [x] 패키지 정보·제외 목록
+- [x] README 영어 기본 + README.ko.md, 링크 정리, PNG 스크린샷
+- [x] 버전 표기 1.0.0 기준 정리(API 문서·타입 주석), 버전 번호 1.0.0
+- [x] CHANGELOG 1.0.0 + docs/history-internal.md
+- [x] npm 타입 패키지 `packages/api`, 워크플로 npm 게시
+- [x] 전체 검증, 설치 파일 확인, release.md 절차 갱신
 
 ## 향후 후보 (미착수)
 

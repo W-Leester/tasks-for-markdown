@@ -1,36 +1,38 @@
 # Tasks for Markdown
 
-**VS Code**와 **Cursor**에서 쓰는 Obsidian Tasks 호환 할 일 관리 확장입니다. (English: [docs/README.en.md](docs/README.en.md))
+Obsidian Tasks-compatible task management for Markdown files in **VS Code** and **Cursor**. (한국어: [README.ko.md](README.ko.md))
 
-> 이 확장은 Obsidian의 [Tasks 플러그인](https://github.com/obsidian-tasks-group/obsidian-tasks)에서 출발했습니다. 태스크 문법과 쿼리 언어, 그리고 그 프로젝트가 오랫동안 다듬어 온 설계 위에 VS Code·Cursor용으로 다시 만든 것입니다. 좋은 도구를 공개해 준 원작자와 기여자들께 감사드립니다. 아래 [감사의 말](#감사의-말)을 참고하세요.
+> This extension started from the [Tasks plugin](https://github.com/obsidian-tasks-group/obsidian-tasks) for Obsidian. It rebuilds that plugin's task syntax, query language and years of careful design for VS Code and Cursor. Thank you to its authors and contributors — see [Credits](#credits).
 
-할 일은 노트 안의 체크리스트 줄 그대로 남습니다 — 별도 데이터베이스도, 종속도 없습니다:
+Your tasks stay in your notes as plain checklist lines — no database, no lock-in:
 
 ```markdown
-- [ ] 보고서 작성 #업무 ⏫ 🔁 every week 🛫 2026-09-20 ⏳ 2026-09-22 📅 2026-09-25
-- [x] 회의록 정리 ✅ 2026-09-21
+- [ ] Write the report #work ⏫ 🔁 every week 🛫 2026-09-20 ⏳ 2026-09-22 📅 2026-09-25
+- [x] Tidy meeting notes ✅ 2026-09-21
 ```
 
-확장은 워크스페이스의 모든 `- [ ]` 줄을 인덱싱해서 에디터, 사이드바, 칸반 보드, 캘린더, 마크다운 미리보기 어디서든 보고·검색하고·완료할 수 있게 합니다. 완료하면 파일의 그 줄이 수정됩니다(완료일 추가, 반복 태스크는 다음 회차 생성).
+The extension indexes every `- [ ]` line in the workspace and lets you see, query and complete tasks wherever you are: the editor, a sidebar, a kanban board, a calendar, the Markdown preview. Completing a task rewrites the line in the file (with a done date, and the next instance for recurring tasks).
 
-## 주요 기능
+![Rendered view: tasks in columns with notes, a live query block and hover actions](docs/images/rendered-view.png)
 
-- **[Obsidian Tasks](https://publish.obsidian.md/tasks/)와 같은 문법** — 이모지 필드(📅 ⏳ 🛫 ➕ ✅ ❌ 🔁 🏁 🆔 ⛔, 우선순위 🔺⏫🔼🔽⏬)와 Dataview 인라인 필드(`[due:: 2026-09-25]`)를 모두 읽고, 쓸 포맷은 설정으로 고릅니다. 필드 순서까지 Obsidian과 동일하게 써서 파일을 서로 바꿔 써도 됩니다.
-- **에디터 보조** — 태스크 줄 자동완성(`due`, `priority high`, `every week`, `next fri` / `3일 후` 같은 자연어 날짜), 커서 줄 위 CodeLens 액션, 호버 카드, 상대 날짜 힌트, 기한 초과 강조, Quick Fix가 있는 진단.
-- **사이드바** — 오늘 / 예정 7일 / 기한 초과 / 진행 중 / 차단됨 / 미완료 전체 / 완료, 그룹·필터·체크박스, 저장된 쿼리와 그룹별 결과.
-- **쿼리 언어** — ` ```tasks ` 블록(미리보기에서 렌더링), 저장된 쿼리, 시각적 쿼리 빌더에서 Obsidian Tasks 쿼리 언어를 그대로 사용. 필터, 불리언, 정렬, 그룹, 제한, 레이아웃, `explain`, 선택적으로 `filter/sort/group by function`.
-- **반복·상태·의존성** — `🔁 every month on the last`, `when done`, 커스텀 체크박스 상태와 테마 프리셋(Minimal, ITS, Things), `🆔`/`⛔` 의존성과 차단 감지·순환 진단, Obsidian 긴급도 점수.
-- **렌더 보기** — 노트를 미리보기처럼 렌더링하면서 체크박스 클릭·더블클릭 편집·링크 이동이 되는 상호작용 뷰. ```tasks 블록 결과가 그 자리에 표시되고, 상단 툴바로 마감일·생성일·긴급도 정렬과 오늘·이번 주·다음 주까지 범위, 그리고 `열 ▾`로 보일 열(마감일·생성일·나머지 필드)을 화면에서만 바꿀 수 있습니다(`Ctrl+Shift+R`). `Tasks: 렌더 보기를 기본 편집기로`로 .md의 기본 편집기로 삼으면 Cursor의 Preview 토글 대신 이 화면이 열립니다.
-- **메모** — 태스크 아래 들여쓴 일반 글머리표가 메모입니다(Obsidian 호환). 렌더 보기에서 `💬`로 바로 남기고, 쿼리 결과·카드에는 `💬 2`로 표시되며, 편집 대화상자 더보기에서 고칠 수 있습니다.
-- **추가 뷰** — 만들기/편집 대화상자, 칸반(드래그앤드롭), 캘린더(월간/주간, 전체 화면, 드래그로 일정 변경), 주간 통계, 완료 태스크 아카이브, 일일 알림.
-- **Cursor에서도 동작** — 안정 VS Code API만 사용, Open VSX에도 게시.
+## Highlights
 
-## 시작하기
+- **Same syntax as [Obsidian Tasks](https://publish.obsidian.md/tasks/)** — emoji fields (📅 ⏳ 🛫 ➕ ✅ ❌ 🔁 🏁 🆔 ⛔, priorities 🔺⏫🔼🔽⏬) and Dataview inline fields (`[due:: 2026-09-25]`) are both read; you choose which one is written. Lines are written in Obsidian's exact field order, so files stay interchangeable.
+- **Editor assistance** — auto-suggest on task lines (`due`, `priority high`, `every week`, natural-language dates like `next fri` / `3일 후`), CodeLens actions above the current task, hover cards, relative-date hints, overdue highlighting, diagnostics with quick fixes.
+- **Sidebar** — Today / Next 7 days / Overdue / In progress / Blocked / All open / Done, grouping, filter, checkboxes; saved queries with grouped results.
+- **Query language** — the Obsidian Tasks query language in ` ```tasks ` blocks (rendered in the Markdown preview), in saved queries and in a visual query builder. Filters, boolean logic, sort by, group by, limits, layout options, `explain`, and optional `filter/sort/group by function`.
+- **Recurrence, statuses, dependencies** — `🔁 every month on the last`, `when done`, custom checkbox statuses with theme presets (Minimal, ITS, Things), `🆔`/`⛔` dependencies with blocked detection and cycle diagnostics, Obsidian's urgency score.
+- **Rendered view** — an interactive preview of the note: click checkboxes, double-click to edit, hover a task for ✎ edit · ⏩ postpone · 💬 note, follow links, and see ` ```tasks ` results in place. Tasks line up in columns (status · description · due · created · other fields); hide or resize columns from the column header or the `Columns ▾` menu, and sort or narrow the view (due, created, urgency; today, this week, next week) without touching the file (`Ctrl+Shift+R`). Make it the default editor for `.md` with the `Tasks: Rendered view as default editor` command — in Cursor it replaces the built-in Preview toggle.
+- **Notes** — indented plain bullets under a task are its notes (Obsidian-compatible). Add one from the rendered view with `💬`, see `💬 2` on query rows and cards, edit them in the dialog's More section.
+- **More views** — Create/edit dialog, kanban (drag & drop), calendar (month/week, full screen, drag to reschedule), weekly statistics, archive of completed tasks, daily notifications.
+- **Works in Cursor** — only stable VS Code APIs; also published to Open VSX.
 
-1. 확장을 설치합니다 (Marketplace / Open VSX / `.vsix`).
-2. 마크다운 파일이 있는 폴더를 엽니다. 액티비티 바에 **Tasks** 아이콘이 생깁니다.
-3. 체크리스트 줄에 커서를 두고 `Cmd/Ctrl+Enter`로 토글하거나, `Ctrl+Shift+C`로 편집 대화상자를 엽니다.
-4. 노트에 ` ```tasks ` 블록을 쓰고 마크다운 미리보기를 엽니다:
+## Getting started
+
+1. Install the extension (Marketplace / Open VSX / `.vsix`).
+2. Open a folder with Markdown files. The **Tasks** icon appears in the Activity Bar.
+3. Put the cursor on a checklist line and press `Cmd/Ctrl+Enter` to toggle it, or `Ctrl+Shift+C` to open the edit dialog.
+4. Type ` ```tasks ` in a note and open the Markdown preview:
 
 ````markdown
 ```tasks
@@ -41,103 +43,105 @@ group by filename
 ```
 ````
 
-## 명령 (명령 팔레트 → "Tasks:")
+## Commands (Command Palette → "Tasks:")
 
-| 명령 | 기본 키 |
+| Command | Default key |
 |---|---|
-| 태스크 완료 토글 | `Cmd/Ctrl+Enter` (태스크 줄에서) |
-| 태스크 만들기 / 편집 | `Ctrl+Shift+C` |
-| 렌더 보기로 열기 / 마크다운 소스 편집 (전환) | `Ctrl+Shift+R` |
-| 렌더 보기를 기본 편집기로 (설정/해제) | — |
-| 태스크 빠른 검색 | `Cmd/Ctrl+Shift+;` |
-| 상태 / 우선순위 / 마감일 / 예정일 / 시작일 / 반복 / 의존성 설정, 미루기 | — |
-| 칸반 보드 / 캘린더 / 통계 / 쿼리 빌더 열기 | — |
-| 완료 태스크 아카이브… | — |
-| 쿼리 블록 삽입, 커서 위치 쿼리 결과 보기(에디터 옆 패널, 커서 따라가기), 커서 위치 쿼리 설명 | — |
-| 상태 프리셋 불러오기…, 이 파일의 태스크 포맷 변환… | — |
+| Toggle task done | `Cmd/Ctrl+Enter` (on a task line) |
+| Create or edit task | `Ctrl+Shift+C` |
+| Quick search tasks | `Cmd/Ctrl+Shift+;` |
+| Set status / priority / due / scheduled / start / recurrence / dependencies, Postpone | — |
+| Open rendered view / edit Markdown source (toggle) — interactive preview with live ```tasks results | `Ctrl+Shift+R` |
+| Rendered view as default editor (on/off) | — |
+| Open kanban board / calendar / statistics / query builder / query results (beside the editor, follows the cursor) | — |
+| Archive completed tasks… | — |
+| Insert query block, Explain query under cursor | — |
+| Load status preset…, Convert task format in this file… | — |
 
-## 설정 (`tasksmd.*`)
+## Settings (`tasksmd.*`)
 
-| 설정 | 기본값 | 설명 |
+| Setting | Default | What it does |
 |---|---|---|
-| `taskFormat` | `emoji` | 필드를 쓸 때 사용할 포맷 (`emoji` / `dataview`) |
-| `globalFilter` | `""` | 이 문자열(예: `#task`)이 있는 줄만 태스크로 취급 |
-| `include` / `exclude` / `respectGitignore` / `maxFileSizeKB` | | 스캔 범위 |
-| `setDoneDate` / `setCancelledDate` / `setCreatedDate` | `true` / `true` / `false` | ✅ ❌ ➕ 자동 날짜 |
-| `statuses` | 기본 4종 | 커스텀 체크박스 심볼·이름·다음 심볼·타입 |
-| `recurrence.insertPosition` / `idHandling` / `copyDependsOn` / `removeScheduledDate` | `above` / `keep` / `true` / `false` | 다음 회차 생성 규칙 |
-| `decorations.*`, `codeLens.mode`, `autoSuggest.*` | | 에디터 보조 |
-| `preview.enabled` / `preview.renderBadges` | `true` | 마크다운 미리보기 렌더링 |
-| `savedQueries` | `[]` | 저장된 쿼리 (`.tasks/queries/*.md`도 함께 읽음) |
-| `query.allowFunctions` | `false` | 쿼리의 `by function` JavaScript 허용 (신뢰된 워크스페이스만) |
-| `editModal.accessKeys` / `editModal.hiddenFields` | `true` / `[]` | 편집 대화상자 |
-| `notifications.*` | 켜짐, `09:00`, 1일 | 일일 요약·마감 임박 알림, OS 알림 |
-| `archive.file` / `afterDays` / `linkStyle` | `Archive.md` / 30 / `wiki` | 아카이브 명령 |
-| `calendar.newTaskFile` | `""` | 캘린더에서 만든 태스크를 넣을 파일 |
-| `query.showTree` | `true` | 쿼리 결과를 트리로(하위 태스크를 부모 밑에). 블록별 `show tree` / `hide tree` |
-| `decorations.strikeCancelled` | `true` | 취소된 태스크(`[-]`)에 에디터 취소선. 완료(`[x]`)는 `decorations.strikeDone`(기본 꺼짐) |
-| `requireDueDate` | `true` | 마감일 없는 새 태스크 거부(대화상자·API·CLI·MCP) + 에디터 경고 |
-| `api.writePolicy` | `confirm` | 다른 확장이 API로 쓸 때: 확인(`confirm`) / 허용 / 거부 |
-| `rendered.maxWidth` | `0` | 렌더 보기 본문 열 최대 폭(px). 0 = 창 전체 폭(기본). 800 등을 주면 가운데 열로 제한 |
-| `rendered.sourceWhenNoTasks` | `true` | 렌더 보기가 기본 편집기일 때 태스크 없는 노트는 텍스트 편집기로 |
-| `rendered.fieldsAlign` | `columns` | 렌더 보기 태스크 줄의 필드 배치: 열(`columns`: 상태·설명+우선순위+태그·마감·작성일·나머지) / 오른쪽 끝(`right`) / 설명 뒤(`inline`) |
-| `rendered.fontSize` / `rendered.lineHeight` | `14.5` / `1.6` | 렌더 보기 본문 글자 크기(px)와 줄 간격 |
-| `rendered.fieldStyle` | `plain` | 렌더 보기 태스크 줄의 필드 표시: 원문처럼(`plain`) / 배지(`badges`) |
-| `calendar.fontSize` | `13` | 캘린더 칸의 태스크 글자 크기(px) |
-| `calendar.fullScreen` | `maximize` | 전체 화면 버튼: 에디터 그룹 최대화만(`maximize`) / 창도 전체 화면(`window`) |
-| `updateCheckUrl` | `""` | `.vsix` 설치본용 `latest.json` 위치 |
+| `taskFormat` | `emoji` | Format used when writing fields (`emoji` or `dataview`) |
+| `globalFilter` | `""` | Only lines containing this text (e.g. `#task`) are tasks |
+| `include` / `exclude` / `respectGitignore` / `maxFileSizeKB` | | What gets scanned |
+| `setDoneDate` / `setCancelledDate` / `setCreatedDate` | `true` / `true` / `false` | Automatic ✅ ❌ ➕ dates |
+| `statuses` | 4 core statuses | Custom checkbox symbols, names, next symbol and type |
+| `recurrence.insertPosition` / `idHandling` / `copyDependsOn` / `removeScheduledDate` | `above` / `keep` / `true` / `false` | Next-instance behaviour |
+| `decorations.*`, `codeLens.mode`, `autoSuggest.*` | | Editor assistance |
+| `preview.enabled` / `preview.renderBadges` | `true` | Markdown preview rendering |
+| `savedQueries` | `[]` | Saved queries (also `.tasks/queries/*.md`) |
+| `query.allowFunctions` | `false` | Allow `by function` JavaScript in queries (trusted workspaces only) |
+| `editModal.accessKeys` / `editModal.hiddenFields` | `true` / `[]` | Edit dialog |
+| `notifications.*` | on, `09:00`, 1 day | Daily summary and due-soon digest, OS notifications |
+| `archive.file` / `afterDays` / `linkStyle` | `Archive.md` / 30 / `wiki` | Archive command |
+| `calendar.newTaskFile` | `""` | File that receives tasks created from the calendar |
+| `query.showTree` | `true` | Query results as a tree (sub-tasks under their parent); per block `show tree` / `hide tree` |
+| `decorations.strikeCancelled` | `true` | Strike through cancelled tasks (`[-]`) in the editor; done tasks use `decorations.strikeDone` (off) |
+| `requireDueDate` | `true` | Refuse new tasks without a due date (dialog, API, CLI, MCP) and warn in the editor |
+| `api.writePolicy` | `confirm` | Writes through the public API: confirm once per caller / allow / deny |
+| `rendered.maxWidth` | `0` | Max width (px) of the rendered column; 0 = full editor width (default) |
+| `rendered.sourceWhenNoTasks` | `true` | With the rendered view as default editor, notes without tasks open in the text editor |
+| `rendered.fieldsAlign` | `columns` | Rendered view: fields in aligned columns (`columns`: status, description+priority+tags, due, created, everything else), at the right edge (`right`) or after the description (`inline`) |
+| `rendered.fontSize` / `rendered.lineHeight` | `14.5` / `1.6` | Rendered view body font size (px) and line height |
+| `rendered.fieldStyle` | `plain` | Task-line fields in the rendered view: as in the source (`plain`) or pill badges (`badges`) |
+| `calendar.fontSize` | `13` | Font size (px) of tasks in calendar cells |
+| `calendar.fullScreen` | `maximize` | Full screen button: maximize the editor group only, or `window` for the whole window |
+| `updateCheckUrl` | `""` | `latest.json` location for `.vsix` installs |
 
-## API와 자동화
+## API and automation
 
-다른 프로그램에서 태스크를 읽고 쓰는 통로가 네 가지 있습니다. 상세는 [docs/api.md](docs/api.md).
+Four ways for other programs to read and write tasks. Details in [docs/api.en.md](docs/api.en.md).
 
-| 어디서 | 방법 |
+| From | How |
 |---|---|
-| 다른 VS Code/Cursor 확장 | `getExtension('hastycapybara.tasks-for-markdown').exports.getAPI(1, { extensionId })` → `query.run(...)`, `edit.setStatus(...)`, `edit.addNote(...)` 등. 타입 정의는 import 없는 한 파일 [src/api/types.ts](src/api/types.ts)를 복사해 쓰면 됩니다 |
-| 키바인딩·매크로 | 명령 `tasksmd.api.<ns>.<method>` (예: `tasksmd.api.query.run` + `{ "query": "due today" }`) |
-| 터미널·스크립트·CI | `npx @hastycapybara/tasks-cli query "not done\ndue before today" --root ~/notes` — 편집기 없이 동작 |
-| AI 에이전트 (Claude Code 등) | `claude mcp add tasks -- npx -y @hastycapybara/tasks-cli mcp --root "$PWD"` 후 말로 지시 |
+| Another VS Code/Cursor extension | `getExtension('hastycapybara.tasks-for-markdown').exports.getAPI(1, { extensionId })` → `query.run(...)`, `edit.setStatus(...)`, `edit.addNote(...)`. For types, copy the self-contained file [src/api/types.ts](src/api/types.ts) |
+| Keybindings, macros | Commands `tasksmd.api.<ns>.<method>` (e.g. `tasksmd.api.query.run` with `{ "query": "due today" }`) |
+| Terminal, scripts, CI | `npx @hastycapybara/tasks-cli query "not done\ndue before today" --root ~/notes` — no editor needed |
+| AI agents (Claude Code, Cursor, …) | `claude mcp add tasks -- npx -y @hastycapybara/tasks-cli mcp --root "$PWD"`, then ask in plain language |
 
 ```ts
-// 다른 확장에서
+// from another extension
 const tasks = (await ext.activate()).getAPI(1, { extensionId: 'my.extension' });
-const r = await tasks.query.run('not done\nhappens on or before today');   // 사이드바 "오늘"과 같은 결과
+const r = await tasks.query.run('not done\nhappens on or before today');   // same as the sidebar's "Today"
 await tasks.edit.setStatus({ path: r.tasks[0].path, line: r.tasks[0].line, expectedText: r.tasks[0].originalMarkdown }, 'x');
 ```
 
-쓰기는 기본 설정에서 호출자마다 한 번 확인창이 뜹니다(`tasksmd.api.writePolicy`). 값은 전부 JSON이고 오류는 `{ code, message }`입니다. 메모 읽기·쓰기, 의존 관계(`isBlocked`/`isBlocking`)는 확장 API·CLI·MCP 모두 됩니다. 기본 설정에서는 새 태스크에 마감일이 필수이고, 설치된 버전이 지원하는 기능과 설정은 `info()`(CLI `tasksmd info`, MCP `tasks_info`)로 확인합니다. Node 라이브러리만 필요하면 `@hastycapybara/tasks-core`.
+Writes ask the user once per caller by default (`tasksmd.api.writePolicy`). Everything is plain JSON; errors are `{ code, message }`. Notes and dependencies (`isBlocked` / `isBlocking`) work through the extension API, the CLI and MCP alike. By default new tasks need a due date; check the installed version's features and settings with `info()` (CLI `tasksmd info`, MCP `tasks_info`). Need only the Node library? `@hastycapybara/tasks-core`.
 
-## 마크다운 미리보기에 관해
+## Notes on the Markdown preview
 
-내장 미리보기는 태스크 줄을 체크박스와 뱃지로, ` ```tasks ` 블록을 실시간 결과로 렌더링하고 태스크가 바뀌면 자동 갱신됩니다. 다만 클래식 미리보기는 클릭을 확장으로 전달할 수 없어서 체크박스는 표시 전용입니다 — 토글은 에디터, 사이드바, 칸반에서 하세요.
+The built-in preview renders task lines with checkboxes and badges and ` ```tasks ` blocks as live results, refreshed whenever tasks change. The classic preview cannot send clicks back to extensions, so checkboxes there are display-only — toggle tasks from the editor, the sidebar or the kanban board instead.
 
-## 문서
+## Documentation
 
-- [사용자 가이드](docs/user-guide.md) · [의존성(🆔/⛔) 이해하기](docs/dependencies-guide.md) · 편집기 밖에서는 [npm 라이브러리 `@hastycapybara/tasks-core`](packages/core/README.md)와 [CLI `tasksmd`](packages/cli/README.md)(MCP 서버 포함, Claude Code 연동은 docs/api.md 8절)
-- [요구사항](docs/requirements.md) · [설계](docs/design.md) · [개발 체크리스트](docs/Tasks.md) · [성능](docs/perf.md) · [릴리스 절차](docs/release.md) · [1.0 이후 변경 기록](docs/post-release-changes.md) · [수동 점검·사용자 작업 안내](docs/manual-checklist.md) · [공개 API](docs/api.md) · [API 계획](docs/api-plan.md)
+- [Public API (extension API, commands, library, CLI, MCP server)](docs/api.en.md)
 
-## 개발
+- [User guide (Korean)](docs/user-guide.md)
+- [Requirements](docs/requirements.md) · [Design](docs/design.md) · [Development checklist](docs/Tasks.md) · [Performance](docs/perf.md)
+
+## Development
 
 ```bash
 pnpm install
-pnpm build              # 확장 + 웹뷰 번들
-pnpm test               # 단위 테스트 (vitest)
-pnpm test:integration   # VS Code를 띄워 통합 테스트
-pnpm package            # production 빌드 + .vsix + latest.json
+pnpm build              # extension + webview bundles
+pnpm test               # unit tests (vitest)
+pnpm test:integration   # runs a VS Code instance
+pnpm package            # production build + .vsix + latest.json
 ```
 
-VS Code/Cursor에서 `F5`를 누르면 확장이 로드된 개발용 창이 열립니다.
+Press `F5` in VS Code to launch an Extension Development Host.
 
-## 감사의 말
+## Credits
 
-이 확장은 [Obsidian Tasks](https://github.com/obsidian-tasks-group/obsidian-tasks)가 없었다면 존재하지 않았습니다. 태스크 문법, 쿼리 언어, 핵심 로직 일부(파서, 반복, 긴급도)를 그 프로젝트에서 이식했고(MIT 라이선스), 기능 하나하나의 동작도 그 문서를 기준으로 맞췄습니다. 플러그인을 처음 만든 Martin Schenck, 오랫동안 이끌어 온 Clare Macrae, 그리고 모든 기여자께 깊이 감사드립니다.
+This extension would not exist without [Obsidian Tasks](https://github.com/obsidian-tasks-group/obsidian-tasks). The task syntax, the query language and parts of the core logic (parser, recurrence, urgency) are ported from it (MIT license), and its documentation is the reference for how each feature behaves. Many thanks to Martin Schenck, who created the plugin, Clare Macrae, who has led it for years, and every contributor.
 
-- Obsidian을 쓰신다면 원본 플러그인을 써 보세요: [Tasks 문서](https://publish.obsidian.md/tasks/) · [저장소](https://github.com/obsidian-tasks-group/obsidian-tasks)
-- 원본 프로젝트를 후원할 수 있습니다: [GitHub Sponsors (Clare Macrae)](https://github.com/sponsors/claremacrae)
-- 이식한 코드와 라이선스 고지는 [NOTICE.md](NOTICE.md)에 있습니다.
+- If you use Obsidian, try the original plugin: [Tasks documentation](https://publish.obsidian.md/tasks/) · [repository](https://github.com/obsidian-tasks-group/obsidian-tasks)
+- You can support the original project: [GitHub Sponsors (Clare Macrae)](https://github.com/sponsors/claremacrae)
+- Ported code and license notices: [NOTICE.md](NOTICE.md)
 
-이 프로젝트는 Obsidian Tasks 프로젝트나 Obsidian(Dynalist Inc.)과 관련이 없으며, 그들의 보증을 받지 않았습니다.
+This project is not affiliated with or endorsed by the Obsidian Tasks project or Obsidian (Dynalist Inc.).
 
-## 라이선스
+## License
 
 MIT

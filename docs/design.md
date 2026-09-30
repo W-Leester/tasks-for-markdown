@@ -854,6 +854,17 @@ flowchart LR
 - (1.10.0의 블록 식별 `data-tfm-query-key`·`workspaceState['rendered.blockColumns']`는 개정으로 제거.)
 - 제목 줄은 행과 같은 grid(`--rv-cols`)와 같은 글자 크기를 써서 em 단위 트랙이 맞는다(글씨만 작게).
 
+### 7.15 열 너비 조절 (M16)
+
+```
+   설명                    ┃마감일 ✕     ┃생성일 ✕     ┃나머지 필드 ✕
+                           ↑ 손잡이: 열의 왼쪽 경계. 왼쪽으로 끌면 그 열이 넓어지고 설명 열이 줄어듦
+```
+
+- 트랙: `1.4em minmax(8em, 1fr) <due>em <created>em minmax(0, <more>em)` — `columnTracks(hidden, widths)`가 `--rv-cols`를 만든다.
+- 끌기: pointerdown 시 시작 x와 너비를 잡고, 새 너비 = 시작 너비 − dx/행 글자 크기(px→em), 3~40em으로 제한. pointermove마다 `--rv-cols`만 갱신하고 pointerup에서 한 번 저장(`doc/columnWidths`).
+- 저장: `globalState['rendered.columnWidths']`(모든 노트 공통), `doc/html.columnWidths`로 복원, 다른 패널에 전파.
+
 ---
 
 ## 8. 저장소와 설정
@@ -1004,6 +1015,7 @@ GitHub Actions: PR마다 `typecheck + lint + test`, 태그 `v*` 푸시 시 패�
 
 | 날짜 | 버전 | 내용 |
 |---|---|---|
+| 2026-09-30 | 1.2 | 7.15 열 너비 조절 계획(M16) |
 | 2026-09-30 | 1.1 | 7.14 개정: 전역 열 설정 연동, 본문 목록에도 제목 줄 — 1.11.0 구현 |
 | 2026-09-30 | 1.0 | 7.14 쿼리 결과 열 제목 줄(M15) — 1.10.0 구현 |
 | 2026-09-30 | 0.9 | 7.13 렌더 보기 열 숨기기(M14) — 1.9.0 구현 |

@@ -921,8 +921,8 @@
     "keybindings": [
       {
         "command": "tasksmd.toggleDone",
-        "key": "ctrl+alt+x",
-        "mac": "cmd+alt+x",
+        "key": "ctrl+shift+enter",
+        "mac": "ctrl+shift+enter",
         "when": "editorTextFocus && editorLangId == markdown && tasksmd.onTaskLine"
       },
       {

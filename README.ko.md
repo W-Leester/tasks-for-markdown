@@ -31,7 +31,7 @@
 
 1. 확장을 설치합니다 (Marketplace / Open VSX / `.vsix`).
 2. 마크다운 파일이 있는 폴더를 엽니다. 액티비티 바에 **Tasks** 아이콘이 생깁니다.
-3. 체크리스트 줄에 커서를 두고 `Cmd+Alt+X`(Windows/Linux `Ctrl+Alt+X`)로 토글하거나, `Ctrl+Shift+C`로 편집 대화상자를 엽니다.
+3. 체크리스트 줄에 커서를 두고 `Ctrl+Shift+Enter`(macOS에서도 Ctrl 키)로 토글하거나, `Ctrl+Shift+C`로 편집 대화상자를 엽니다.
 4. 노트에 ` ```tasks ` 블록을 쓰고 마크다운 미리보기를 엽니다:
 
 ````markdown
@@ -47,7 +47,7 @@ group by filename
 
 | 명령 | 기본 키 |
 |---|---|
-| 태스크 완료 토글 | `Cmd+Alt+X` / `Ctrl+Alt+X` (태스크 줄에서) |
+| 태스크 완료 토글 | `Ctrl+Shift+Enter` (태스크 줄에서, macOS에서도 Ctrl) |
 | 태스크 만들기 / 편집 | `Ctrl+Shift+C` |
 | 렌더 보기로 열기 / 마크다운 소스 편집 (전환) | `Ctrl+Shift+R` |
 | 렌더 보기를 기본 편집기로 (설정/해제) | — |

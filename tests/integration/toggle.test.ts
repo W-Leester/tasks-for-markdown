@@ -6,11 +6,11 @@ import { FixtureGuard, findTask, fixtureUri, getApi, localToday, sleep, waitFor 
 const today = () => localToday();
 
 suite('toggle', () => {
-  test('Cmd/Ctrl+Alt+X is bound to toggleDone in Markdown editors (not Cmd+Enter, which Markdown All in One takes)', () => {
+  test('Ctrl+Shift+Enter is bound to toggleDone in Markdown editors (not Cmd+Enter, which Markdown All in One takes)', () => {
     const pkg = vscode.extensions.getExtension('hastycapybara.tasks-for-markdown')!.packageJSON as { contributes: { keybindings: { command: string; key: string; mac?: string; when?: string }[] } };
     const kb = pkg.contributes.keybindings.filter((k) => k.command === 'tasksmd.toggleDone');
-    assert.deepEqual(kb.map((k) => [k.key, k.mac]), [['ctrl+alt+x', 'cmd+alt+x']]);
-    assert.ok(!pkg.contributes.keybindings.some((k) => /enter/.test(`${k.key} ${k.mac ?? ''}`) && k.command.startsWith('tasksmd.')), 'no tasksmd binding on Enter');
+    assert.deepEqual(kb.map((k) => [k.key, k.mac]), [['ctrl+shift+enter', 'ctrl+shift+enter']]);
+    assert.ok(!pkg.contributes.keybindings.some((k) => /^(cmd|ctrl)\+enter$/.test(k.mac ?? k.key) && k.command.startsWith('tasksmd.')), 'no tasksmd binding on Cmd/Ctrl+Enter');
   });
 
 

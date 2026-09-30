@@ -859,7 +859,7 @@
 - [x] 전체 검증, 설치 파일 확인, release.md 절차 갱신
 - [x] 명령 이름: 영어 화면에는 영어만, 한국어 화면에는 한국어만(package.nls.json에서 한국어 제거, 테스트로 고정) — 사용자 결정 2026-09-30
 - [x] 수동 점검 문서: Cursor는 `Cmd+K`가 AI 인라인 편집이라 `Cmd+K` 두 단계 단축키 대신 명령 팔레트 안내
-- [x] `Cmd/Ctrl+Enter`가 Markdown All in One과 충돌(수동 점검에서 발견, 2026-10-01). 넘겨주기 방식(`tasksmd.enterKey`)도 Cursor에서 Markdown All in One에 밀려 실패 → 되돌리고 **완료 토글 기본 키를 `Cmd+Alt+X`(Windows/Linux `Ctrl+Alt+X`)로 변경**(사용자 결정). Cursor·VS Code 기본 단축키, Markdown All in One, 설치된 확장 어디에도 쓰이지 않음을 확인. `[x]`와 연상
+- [x] `Cmd/Ctrl+Enter`가 Markdown All in One과 충돌(수동 점검에서 발견, 2026-10-01). 넘겨주기 방식(`tasksmd.enterKey`)도 Cursor에서 Markdown All in One에 밀려 실패 → 되돌리고 **완료 토글 기본 키를 `Ctrl+Shift+Enter`(macOS에서도 Ctrl, `Ctrl+Shift+C`·`R`과 같은 계열)로 변경**(사용자 결정 2026-10-01; 잠시 `Cmd+Alt+X`였음). macOS에서는 Cursor 기본 단축키·Markdown All in One·설치된 확장 어디에도 없음. Windows/Linux에서는 편집기 "위에 줄 삽입"과 겹치나 태스크 줄 위에서만 우선
 - [x] 원격(Remote SSH, localhost) 수동 점검: 인덱싱·렌더 보기·칸반 정상. 바깥 수정 반영은 저장 안 된 편집기 때문에 재확인 필요
 
 ## 향후 후보 (미착수)

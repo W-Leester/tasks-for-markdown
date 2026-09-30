@@ -13,7 +13,20 @@ export const RENDERED_VIEW_TYPE = 'tasksmd.rendered';
 const VIEW_STATE_KEY = 'rendered.viewState';
 /** Columns hidden in the rendered view (M14) — one choice for all notes. */
 const HIDDEN_COLUMNS_KEY = 'rendered.hiddenColumns';
+/** Column widths in em (M16) — one choice for all notes. */
+const COLUMN_WIDTHS_KEY = 'rendered.columnWidths';
 export const HIDEABLE_COLUMNS = ['due', 'created', 'more'] as const;
+
+/** Only known columns with a width in the allowed range (3–40em) are kept. */
+function cleanWidths(input: unknown): Record<string, number> {
+  const out: Record<string, number> = {};
+  if (!input || typeof input !== 'object') return out;
+  for (const c of HIDEABLE_COLUMNS) {
+    const w = (input as Record<string, unknown>)[c];
+    if (typeof w === 'number' && Number.isFinite(w)) out[c] = Math.round(Math.min(40, Math.max(3, w)) * 10) / 10;
+  }
+  return out;
+}
 const DEFAULT_PROMPT_KEY = 'rendered.defaultPrompted';
 
 export interface RenderedViewDeps {
@@ -37,7 +50,8 @@ type Incoming =
   | { type: 'doc/link'; href: string }
   | { type: 'doc/openSource' }
   | { type: 'doc/view'; sort: string; scope: string }
-  | { type: 'doc/columns'; hidden: string[] };
+  | { type: 'doc/columns'; hidden: string[] }
+  | { type: 'doc/columnWidths'; widths: Record<string, number> };
 
 const DOC_DEBOUNCE_MS = 250;
 const INDEX_DEBOUNCE_MS = 400;
@@ -82,7 +96,7 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
     let indexTimer: ReturnType<typeof setTimeout> | undefined;
     const render = () => {
       try {
-        void webview.postMessage({ type: 'doc/html', html: this.renderHtml(document, webview), fontSize: this.deps.settings.get('rendered.fontSize'), lineHeight: this.deps.settings.get('rendered.lineHeight'), fieldsAlign: this.deps.settings.get('rendered.fieldsAlign'), maxWidth: this.deps.settings.get('rendered.maxWidth'), today: (this.deps.clock ?? systemClock).now().startOf('day').format('YYYY-MM-DD'), view: this.viewState(document.uri), hiddenColumns: this.hiddenColumns() });
+        void webview.postMessage({ type: 'doc/html', html: this.renderHtml(document, webview), fontSize: this.deps.settings.get('rendered.fontSize'), lineHeight: this.deps.settings.get('rendered.lineHeight'), fieldsAlign: this.deps.settings.get('rendered.fieldsAlign'), maxWidth: this.deps.settings.get('rendered.maxWidth'), today: (this.deps.clock ?? systemClock).now().startOf('day').format('YYYY-MM-DD'), view: this.viewState(document.uri), hiddenColumns: this.hiddenColumns(), columnWidths: this.columnWidths() });
       } catch (err) {
         this.deps.log(`rendered view: ${err instanceof Error ? err.stack ?? err.message : String(err)}`);
       }
@@ -155,6 +169,12 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
           for (const p of this.panels.values()) if (p !== panel) void p.webview.postMessage({ type: 'doc/columns', hidden });
           break;
         }
+        case 'doc/columnWidths': {
+          const widths = cleanWidths(msg.widths);
+          await this.deps.context.globalState.update(COLUMN_WIDTHS_KEY, widths);
+          for (const p of this.panels.values()) if (p !== panel) void p.webview.postMessage({ type: 'doc/columnWidths', widths });
+          break;
+        }
         case 'doc/view': {
           const all = this.deps.context.workspaceState.get<Record<string, { sort: string; scope: string }>>(VIEW_STATE_KEY, {});
           await this.deps.context.workspaceState.update(VIEW_STATE_KEY, { ...all, [document.uri.toString()]: { sort: msg.sort, scope: msg.scope } });
@@ -204,6 +224,10 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
       editor.selection = new vscode.Selection(range.end, range.end);
       editor.revealRange(range, vscode.TextEditorRevealType.InCenterIfOutsideViewport);
     }
+  }
+
+  private columnWidths(): Record<string, number> {
+    return cleanWidths(this.deps.context.globalState.get<Record<string, number>>(COLUMN_WIDTHS_KEY, {}));
   }
 
   private hiddenColumns(): string[] {
@@ -369,11 +393,17 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
   body.fields-columns .rv-colhead { display: grid; position: relative; grid-template-columns: var(--rv-cols, 1.4em minmax(8em, 1fr) 8.6em 8.6em minmax(0, 18em)); column-gap: .9em; align-items: center;
     height: 9px; margin: -4px 0 2px; overflow: hidden; color: var(--rv-muted); border-bottom: 1px solid color-mix(in srgb, var(--rv-fg) 14%, transparent); transition: height .12s; }
   body.fields-columns .rv-colhead > * { opacity: 0; transition: opacity .12s; }
-  body.fields-columns .rv-colhead:hover, body.fields-columns .rv-colhead:focus-within { height: 24px; }
-  body.fields-columns .rv-colhead:hover > *, body.fields-columns .rv-colhead:focus-within > * { opacity: 1; }
+  body.fields-columns .rv-colhead:hover, body.fields-columns .rv-colhead:focus-within, body.rv-resizing .rv-colhead { height: 24px; }
+  body.fields-columns .rv-colhead:hover > *, body.fields-columns .rv-colhead:focus-within > *, body.rv-resizing .rv-colhead > * { opacity: 1; }
   /* Same font size as the rows so the em-based grid tracks line up; only the text is small. */
-  .rv-colhead-cell, .rv-colhead-chips { font-size: 11px; }
-  .rv-colhead-cell { display: inline-flex; align-items: center; gap: 3px; min-width: 0; white-space: nowrap; overflow: hidden; }
+  .rv-colhead-text, .rv-colhead button, .rv-colhead-chips { font-size: 11px; }
+  .rv-colhead-cell { position: relative; display: inline-flex; align-items: center; gap: 3px; min-width: 0; white-space: nowrap; }
+  .rv-colhead-text { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  /* Width grip (M16): the column's left edge, centred in the column gap. */
+  .rv-colgrip { position: absolute; top: 0; bottom: 0; left: calc(-.45em - 5px); width: 10px; cursor: col-resize; touch-action: none; outline: none; }
+  .rv-colgrip::after { content: ''; position: absolute; top: 3px; bottom: 3px; left: 4px; width: 2px; border-radius: 1px; background: color-mix(in srgb, var(--rv-fg) 22%, transparent); }
+  .rv-colgrip:hover::after, .rv-colgrip:focus-visible::after, .rv-colgrip.rv-active::after { background: var(--rv-accent); }
+  body.rv-resizing, body.rv-resizing * { cursor: col-resize !important; user-select: none; }
   .rv-colhead button { border: none; background: transparent; color: var(--rv-muted); font: inherit; padding: 0 4px; border-radius: 3px; cursor: pointer; line-height: 16px; }
   .rv-colhead button:hover, .rv-colhead button:focus-visible { background: var(--rv-bg-3); color: var(--rv-fg); }
   .rv-colhead-chips { position: absolute; right: 0; top: 50%; transform: translateY(-50%); display: inline-flex; gap: 4px; background: var(--rv-bg-2); padding-left: 6px; }
@@ -390,7 +420,7 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
 </style>
 <title>${t('Tasks: Rendered view')}</title>
 </head>
-<body data-l-col-desc="${t('Description')}" data-l-col-due="${t('Due date')}" data-l-col-created="${t('Created date')}" data-l-col-more="${t('Other fields')}" data-l-col-hide="${t('Hide column')}" data-l-col-show="${t('Show column')}" data-l-edit="${t('Edit')}" data-l-postpone="${t('Postpone')}" data-l-note="${t('Add note')}" data-l-note-placeholder="${t('Note — Enter to save, Esc to cancel')}" data-l-hidden="${t('{0} hidden')}">
+<body data-l-col-width="${t('Column width')}" data-l-col-width-hint="${t('Drag to resize, double-click to reset')}" data-l-col-desc="${t('Description')}" data-l-col-due="${t('Due date')}" data-l-col-created="${t('Created date')}" data-l-col-more="${t('Other fields')}" data-l-col-hide="${t('Hide column')}" data-l-col-show="${t('Show column')}" data-l-edit="${t('Edit')}" data-l-postpone="${t('Postpone')}" data-l-note="${t('Add note')}" data-l-note-placeholder="${t('Note — Enter to save, Esc to cancel')}" data-l-hidden="${t('{0} hidden')}">
 <div class="rv-tools">
   <label class="rv-select"><span>${t('Sort')}</span><select id="view-sort">
     <option value="document">${t('Document order')}</option><option value="due">${t('Due date')}</option><option value="created">${t('Created date')}</option><option value="priority">${t('Priority')}</option><option value="urgency">${t('Urgency')}</option>

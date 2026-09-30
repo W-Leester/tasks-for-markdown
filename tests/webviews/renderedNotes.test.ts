@@ -139,3 +139,56 @@ describe('column header (M15, revised: global setting)', () => {
     }
   });
 });
+
+describe('column widths (M16)', () => {
+  it('columnTracks uses custom widths, clamped to 3–40em; bad values fall back to defaults', async () => {
+    const { columnTracks, clampWidth } = await import('../../src/webviews/rendered/view');
+    expect(columnTracks([], { due: 12, more: 25 })).toBe('1.4em minmax(8em, 1fr) 12em 8.6em minmax(0, 25em)');
+    expect(columnTracks(['due'], { due: 12, created: 1, more: Number.NaN })).toBe('1.4em minmax(8em, 1fr) 3em minmax(0, 18em)');
+    expect(clampWidth(99)).toBe(40);
+    expect(clampWidth(10.04)).toBe(10);
+  });
+
+  it('drag the left edge (wider to the left), keyboard steps, double-click resets; saves once per drag', async () => {
+    const row = `<li class="tfm-task" data-tfm-line="0"><input type="checkbox" class="tfm-check"><span class="tfm-desc">t</span><span class="tfm-col tfm-col-due"></span><span class="tfm-col tfm-col-created"></span><span class="tfm-col tfm-col-more"></span></li>`;
+    document.body.innerHTML = `<details id="view-cols"><summary>열</summary><input type="checkbox" data-col="due" checked><input type="checkbox" data-col="created" checked><input type="checkbox" data-col="more" checked></details><div id="content"></div>`;
+    window.scrollTo = () => undefined;
+    const { vi } = await import('vitest');
+    vi.resetModules();
+    await import('../../src/webviews/rendered/main');
+    receive({ type: 'doc/html', html: `<ul>${row}</ul>`, fontSize: 14, lineHeight: 1.6, fieldsAlign: 'columns', maxWidth: 0, today: '2026-09-30', view: { sort: 'document', scope: 'all' }, hiddenColumns: [], columnWidths: { created: 10 } });
+    const cols = () => document.body.style.getPropertyValue('--rv-cols');
+    const grip = (c: string) => document.querySelector<HTMLElement>(`.rv-colgrip[data-col="${c}"]`)!;
+    expect(cols()).toBe('1.4em minmax(8em, 1fr) 8.6em 10em minmax(0, 18em)');
+    expect(grip('created').getAttribute('aria-valuenow')).toBe('10');
+
+    // Drag: 32px to the left at jsdom's 16px font size → +2em. Only the release saves.
+    posted.length = 0;
+    const g = grip('due');
+    g.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, clientX: 200, button: 0 }));
+    expect(document.body.classList.contains('rv-resizing')).toBe(true);
+    g.dispatchEvent(new MouseEvent('pointermove', { bubbles: true, clientX: 184 }));
+    g.dispatchEvent(new MouseEvent('pointermove', { bubbles: true, clientX: 168 }));
+    expect(cols()).toBe('1.4em minmax(8em, 1fr) 10.6em 10em minmax(0, 18em)');
+    expect(posted.filter((m) => m.type === 'doc/columnWidths')).toHaveLength(0);
+    g.dispatchEvent(new MouseEvent('pointerup', { bubbles: true, clientX: 168 }));
+    expect(document.body.classList.contains('rv-resizing')).toBe(false);
+    expect(posted).toEqual([{ type: 'doc/columnWidths', widths: { created: 10, due: 10.6 } }]);
+
+    // Keyboard: → narrows by 0.5em, Home resets; focus stays on the grip.
+    posted.length = 0;
+    grip('more').focus();
+    grip('more').dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+    expect(cols()).toBe('1.4em minmax(8em, 1fr) 10.6em 10em minmax(0, 17.5em)');
+    expect(document.activeElement).toBe(grip('more'));
+    grip('more').dispatchEvent(new KeyboardEvent('keydown', { key: 'Home', bubbles: true }));
+    expect(cols()).toBe('1.4em minmax(8em, 1fr) 10.6em 10em minmax(0, 18em)');
+    expect(posted.at(-1)).toEqual({ type: 'doc/columnWidths', widths: { created: 10, due: 10.6 } });
+
+    // Double-click resets; another view's change is applied.
+    grip('created').dispatchEvent(new MouseEvent('dblclick', { bubbles: true }));
+    expect(cols()).toBe('1.4em minmax(8em, 1fr) 10.6em 8.6em minmax(0, 18em)');
+    receive({ type: 'doc/columnWidths', widths: {} });
+    expect(cols()).toBe('1.4em minmax(8em, 1fr) 8.6em 8.6em minmax(0, 18em)');
+  });
+});

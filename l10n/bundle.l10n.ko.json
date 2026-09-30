@@ -345,5 +345,7 @@
   "Columns · {0} hidden": "열 · {0}개 숨김",
   "Other fields": "나머지 필드",
   "Hide column": "열 숨기기",
-  "Show column": "열 다시 보이기"
+  "Show column": "열 다시 보이기",
+  "Column width": "열 너비",
+  "Drag to resize, double-click to reset": "끌어서 너비 조절, 더블클릭하면 기본값"
 }

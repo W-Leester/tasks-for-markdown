@@ -41,7 +41,7 @@
 | M13 | 태스크 메모(하위 글머리표): 렌더 보기 추가·표시·대화상자 | ✅ 완료(1.8.0) | 이 문서 M13, design.md 7.12 |
 | M14 | 렌더 보기 열 숨기기(툴바 `열 ▾`) | ✅ 완료(1.9.0) | 이 문서 M14, design.md 7.13 |
 | M15 | 열 제목 줄(쿼리 결과·본문), 툴바와 같은 전역 열 숨기기 | ✅ 완료(1.11.0; 1.10.0은 블록별) | 이 문서 M15, design.md 7.14 |
-| M16 | 렌더 보기 열 너비 조절(제목 줄 경계 끌기) | 🟡 계획 확정(2026-09-30) | 이 문서 M16, design.md 7.15 |
+| M16 | 렌더 보기 열 너비 조절(제목 줄 경계 끌기) | ✅ 완료(1.12.0) | 이 문서 M16, design.md 7.15 |
 
 ---
 
@@ -777,9 +777,9 @@
 - 좁은 창(열 접힘)에서는 적용하지 않는다.
 
 ### 할 일
-- [ ] `columnTracks(hidden, widths)`, 손잡이(포인터 끌기·더블클릭·키보드), 끄는 동안 제목 줄 유지
-- [ ] 호스트: `doc/columnWidths { widths }` → globalState, `doc/html.columnWidths`, 다른 패널에 전파
-- [ ] 테스트(트랙 계산·범위, 끌기/키보드/더블클릭 → 메시지), 스크린샷, 문서(user-guide, CHANGELOG)
+- [x] `columnTracks(hidden, widths)`, 손잡이(포인터 끌기·더블클릭·키보드), 끄는 동안 제목 줄 유지
+- [x] 호스트: `doc/columnWidths { widths }` → globalState, `doc/html.columnWidths`, 다른 패널에 전파
+- [x] 테스트(트랙 계산·범위, 끌기/키보드/더블클릭 → 메시지), 스크린샷, 문서(user-guide, CHANGELOG)
 
 ## 향후 후보 (미착수)
 

@@ -3,7 +3,7 @@
  * task rows and links go back as messages. Plain DOM — no framework needed here.
  */
 import type { FromWebview, ToWebview, WebviewApi } from '../shared/protocol';
-import { applyView, columnTracks, HIDEABLE_COLUMNS, SCOPE_MODES, SORT_MODES, type ScopeMode, type SortMode, type ViewState } from './view';
+import { applyView, clampWidth, type ColumnWidths, columnTracks, HIDEABLE_COLUMNS, type HideableColumn, widthOf, SCOPE_MODES, SORT_MODES, type ScopeMode, type SortMode, type ViewState } from './view';
 
 declare function acquireVsCodeApi(): WebviewApi;
 // Plain objects only here, so no snapshot helper (and no Svelte runtime) is needed.
@@ -24,10 +24,14 @@ function refreshView(): void {
 const colsMenu = document.getElementById('view-cols') as HTMLDetailsElement | null;
 const colBoxes = Array.from(document.querySelectorAll<HTMLInputElement>('#view-cols input[data-col]'));
 let hiddenColumns: string[] = [];
+let columnWidths: ColumnWidths = {};
+function applyWidths(): void {
+  document.body.style.setProperty('--rv-cols', columnTracks(hiddenColumns, columnWidths));
+}
 function applyColumns(hidden: readonly string[]): void {
   hiddenColumns = HIDEABLE_COLUMNS.filter((c) => hidden.includes(c));
   for (const c of HIDEABLE_COLUMNS) document.body.classList.toggle(`hide-col-${c}`, hiddenColumns.includes(c));
-  document.body.style.setProperty('--rv-cols', columnTracks(hiddenColumns));
+  applyWidths();
   for (const box of colBoxes) box.checked = !hiddenColumns.includes(box.dataset.col!);
   applyHeaders();
   const summary = colsMenu?.querySelector('summary');
@@ -41,9 +45,12 @@ function headerHtml(): string {
   const esc = (s: string) => s.replace(/[&<>"]/g, (ch) => `&#${ch.charCodeAt(0)};`);
   const hide = labels.lColHide ?? 'Hide column';
   return (
-    `<span></span><span class="rv-colhead-cell">${esc(colLabel('desc'))}</span>` +
+    `<span></span><span class="rv-colhead-cell"><span class="rv-colhead-text">${esc(colLabel('desc'))}</span></span>` +
     HIDEABLE_COLUMNS.filter((c) => !hiddenColumns.includes(c))
-      .map((c) => `<span class="rv-colhead-cell">${esc(colLabel(c))}<button type="button" data-hide="${c}" title="${esc(hide)}" aria-label="${esc(`${hide}: ${colLabel(c)}`)}">✕</button></span>`)
+      .map((c) =>
+        `<span class="rv-colhead-cell">` +
+        `<span class="rv-colgrip" role="separator" aria-orientation="vertical" tabindex="0" data-col="${c}" aria-valuenow="${widthOf(c, columnWidths)}" aria-valuemin="3" aria-valuemax="40" aria-label="${esc(`${labels.lColWidth ?? 'Column width'}: ${colLabel(c)}`)}" title="${esc(labels.lColWidthHint ?? 'Drag to resize, double-click to reset')}"></span>` +
+        `<span class="rv-colhead-text">${esc(colLabel(c))}</span><button type="button" data-hide="${c}" title="${esc(hide)}" aria-label="${esc(`${hide}: ${colLabel(c)}`)}">✕</button></span>`)
       .join('') +
     (hiddenColumns.length ? `<span class="rv-colhead-chips">${hiddenColumns.map((c) => `<button type="button" data-show="${c}" title="${esc(labels.lColShow ?? 'Show column')}">+ ${esc(colLabel(c))}</button>`).join('')}</span>` : '')
   );
@@ -82,6 +89,62 @@ function setHiddenColumns(hidden: string[], focusFrom?: Element): void {
   if (at >= 0) content.querySelectorAll<HTMLElement>('.rv-colhead')[at]?.querySelector<HTMLElement>('button')?.focus();
 }
 
+// Column widths (M16): drag a column's left edge in the header; double-click or Home resets; ←/→ step 0.5em.
+function setWidth(c: HideableColumn, em: number | null): void {
+  if (em === null) delete columnWidths[c];
+  else columnWidths[c] = clampWidth(em);
+  applyWidths();
+}
+function saveWidths(): void {
+  post({ type: 'doc/columnWidths', widths: { ...columnWidths } as Record<string, number> });
+}
+/** Rebuild the headers (aria values) and put focus back on the same grip. */
+function refreshHeaders(grip: HTMLElement): void {
+  const heads = Array.from(content.querySelectorAll('.rv-colhead'));
+  const at = heads.indexOf(grip.closest('.rv-colhead')!);
+  const col = grip.dataset.col;
+  applyHeaders();
+  content.querySelectorAll('.rv-colhead')[at]?.querySelector<HTMLElement>(`.rv-colgrip[data-col="${col}"]`)?.focus();
+}
+content.addEventListener('pointerdown', (e) => {
+  const grip = (e.target as Element).closest<HTMLElement>('.rv-colgrip');
+  if (!grip || e.button !== 0) return;
+  e.preventDefault();
+  const c = grip.dataset.col as HideableColumn;
+  const startX = e.clientX;
+  const start = widthOf(c, columnWidths);
+  // Tracks are in em of the row font; the header uses the same font size.
+  const px = parseFloat(getComputedStyle(grip.closest('.rv-colhead')!).fontSize) || 14;
+  document.body.classList.add('rv-resizing');
+  grip.classList.add('rv-active');
+  try { grip.setPointerCapture(e.pointerId); } catch { /* not supported */ }
+  const move = (ev: PointerEvent) => setWidth(c, start - (ev.clientX - startX) / px);
+  const up = () => {
+    grip.removeEventListener('pointermove', move);
+    grip.removeEventListener('pointerup', up);
+    grip.removeEventListener('pointercancel', up);
+    document.body.classList.remove('rv-resizing');
+    grip.classList.remove('rv-active');
+    saveWidths();
+    applyHeaders();
+  };
+  grip.addEventListener('pointermove', move);
+  grip.addEventListener('pointerup', up);
+  grip.addEventListener('pointercancel', up);
+});
+content.addEventListener('keydown', (e) => {
+  const grip = (e.target as Element).closest<HTMLElement>('.rv-colgrip');
+  if (!grip) return;
+  const c = grip.dataset.col as HideableColumn;
+  // The grip is the column's left edge: ← moves it left (wider), → right (narrower).
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') setWidth(c, widthOf(c, columnWidths) + (e.key === 'ArrowLeft' ? 0.5 : -0.5));
+  else if (e.key === 'Home') setWidth(c, null);
+  else return;
+  e.preventDefault();
+  saveWidths();
+  refreshHeaders(grip);
+});
+
 for (const box of colBoxes) {
   box.addEventListener('change', () => setHiddenColumns(colBoxes.filter((b) => !b.checked).map((b) => b.dataset.col!)));
 }
@@ -95,6 +158,7 @@ scopeSel?.addEventListener('change', () => { view = { ...view, scope: scopeSel.v
 window.addEventListener('message', (e: MessageEvent<ToWebview>) => {
   const m = e.data;
   if (m.type === 'doc/columns') { applyColumns(m.hidden); return; }
+  if (m.type === 'doc/columnWidths') { columnWidths = { ...m.widths }; applyWidths(); applyHeaders(); return; }
   if (m.type !== 'doc/html') return;
   document.documentElement.style.setProperty('--rv-font-size', `${m.fontSize}px`);
   document.documentElement.style.setProperty('--rv-line-height', String(m.lineHeight));
@@ -107,6 +171,7 @@ window.addEventListener('message', (e: MessageEvent<ToWebview>) => {
   if (scopeSel) scopeSel.value = view.scope;
   const y = window.scrollY;
   content.innerHTML = m.html;
+  columnWidths = { ...(m.columnWidths ?? {}) };
   applyColumns(m.hiddenColumns ?? []);
   addRowActions();
   refreshView();
@@ -206,7 +271,15 @@ function openNoteForm(li: HTMLElement, ref: { path: string | null; line: number 
 }
 
 content.addEventListener('dblclick', (e) => {
-  if ((e.target as Element).closest('.rv-note-form, .tfm-notes')) return;
+  const grip = (e.target as Element).closest<HTMLElement>('.rv-colgrip');
+  if (grip) {
+    e.preventDefault();
+    setWidth(grip.dataset.col as HideableColumn, null);
+    saveWidths();
+    refreshHeaders(grip);
+    return;
+  }
+  if ((e.target as Element).closest('.rv-note-form, .tfm-notes, .rv-colhead')) return;
   const ref = taskRef(e.target as Element);
   if (!ref) return;
   e.preventDefault();

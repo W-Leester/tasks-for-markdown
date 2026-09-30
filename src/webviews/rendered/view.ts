@@ -108,9 +108,25 @@ export function applyView(root: ParentNode, view: ViewState, today: string): num
 /** Columns the toolbar menu can hide (M14); status and description always stay. */
 export const HIDEABLE_COLUMNS = ['due', 'created', 'more'] as const;
 export type HideableColumn = (typeof HIDEABLE_COLUMNS)[number];
-const TRACKS: Record<HideableColumn, string> = { due: '8.6em', created: '8.6em', more: 'minmax(0, 18em)' };
+/** Default column widths in em (M16); "more" is a maximum and may shrink in narrow windows. */
+export const DEFAULT_WIDTHS: Record<HideableColumn, number> = { due: 8.6, created: 8.6, more: 18 };
+export const MIN_WIDTH = 3;
+export const MAX_WIDTH = 40;
+export type ColumnWidths = Partial<Record<HideableColumn, number>>;
 
-/** grid-template-columns for the column layout without the hidden columns, so the rest close up. */
-export function columnTracks(hidden: readonly string[]): string {
-  return ['1.4em', 'minmax(8em, 1fr)', ...HIDEABLE_COLUMNS.filter((c) => !hidden.includes(c)).map((c) => TRACKS[c])].join(' ');
+/** Clamp to the allowed range, rounded to 0.1em. */
+export function clampWidth(em: number): number {
+  return Math.round(Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, em)) * 10) / 10;
+}
+
+/** The width in effect for a column: a valid saved value, else the default. */
+export function widthOf(c: HideableColumn, widths: ColumnWidths = {}): number {
+  const w = widths[c];
+  return typeof w === 'number' && Number.isFinite(w) ? clampWidth(w) : DEFAULT_WIDTHS[c];
+}
+
+/** grid-template-columns for the column layout without the hidden columns (the rest close up), with custom widths. */
+export function columnTracks(hidden: readonly string[], widths: ColumnWidths = {}): string {
+  const track = (c: HideableColumn) => (c === 'more' ? `minmax(0, ${widthOf(c, widths)}em)` : `${widthOf(c, widths)}em`);
+  return ['1.4em', 'minmax(8em, 1fr)', ...HIDEABLE_COLUMNS.filter((c) => !hidden.includes(c)).map(track)].join(' ');
 }

@@ -45,23 +45,13 @@ export function tasksMarkdownItPlugin(md: MarkdownIt, deps: PluginDeps): void {
       const query = deps.parseQuery(text, source);
       const result = deps.runQuery(text, source);
       const line = token.map ? ` data-line="${token.map[0]}"` : '';
-      return `<div class="tfm-query-block"${line} data-tfm-query-key="${queryKey(text)}">${renderQueryResult(result, query.layout, text, deps.renderOptions(source, 'query'))}</div>\n`;
+      return `<div class="tfm-query-block"${line}>${renderQueryResult(result, query.layout, text, deps.renderOptions(source, 'query'))}</div>\n`;
     } catch (err) {
       deps.log?.(`preview: tasks block failed: ${err instanceof Error ? err.stack ?? err.message : String(err)}`);
       return defaultFence(tokens, idx, options, env, self);
     }
   };
   md.renderer.rules.fence = fence;
-}
-
-/** Stable id of a ```tasks block by its query text (FNV-1a), so per-block view settings survive line moves. */
-export function queryKey(text: string): string {
-  let h = 0x811c9dc5;
-  for (const ch of text.trim().replace(/\r\n/g, '\n')) {
-    h ^= ch.codePointAt(0)!;
-    h = Math.imul(h, 0x01000193) >>> 0;
-  }
-  return h.toString(36);
 }
 
 /** Checkbox markup other task-list plugins (markdown-it-task-lists, Markdown All in One) inject. */

@@ -49,25 +49,3 @@ describe('notes in the rendered note (M13)', () => {
     expect(html).not.toMatch(/tfm-note">일반 하위/);
   });
 });
-
-describe('query block key (M15)', () => {
-  it('is stable across whitespace/CRLF and line moves, differs by query text, and is on the block', async () => {
-    const { queryKey } = await import('../../../src/preview/markdownItPlugin');
-    expect(queryKey('not done\nsort by due\n')).toBe(queryKey('  not done\r\nsort by due'));
-    expect(queryKey('not done')).not.toBe(queryKey('done'));
-    const deps: PluginDeps = {
-      getStatusRegistry: () => reg,
-      runQuery: (q, source) => Query.parse(q, source).run({ index, today, allowFunctions: false, source }),
-      parseQuery: (q, source) => Query.parse(q, source),
-      renderOptions: () => ({ today }),
-      sourceFromEnv: () => undefined,
-      globalFilter: () => undefined,
-      enabled: () => true,
-    };
-    const a = renderDocumentHtml('```tasks\nnot done\n```', deps);
-    const b = renderDocumentHtml('# moved\n\ntext\n\n```tasks\nnot done\n```', deps);
-    const key = (html: string) => /data-tfm-query-key="([^"]+)"/.exec(html)?.[1];
-    expect(key(a)).toBe(queryKey('not done'));
-    expect(key(b)).toBe(key(a));
-  });
-});

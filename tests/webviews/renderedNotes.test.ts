@@ -90,46 +90,52 @@ describe('rendered view column menu (M14)', () => {
   });
 });
 
-describe('query result column header (M15)', () => {
-  const row = (line: number) => `<li class="tfm-task" data-tfm-path="n.md" data-tfm-line="${line}"><input type="checkbox" class="tfm-check"><span class="tfm-desc">t${line}</span><span class="tfm-col tfm-col-due"></span><span class="tfm-col tfm-col-created"></span><span class="tfm-col tfm-col-more"></span></li>`;
-  const block = (key: string) => `<div class="tfm-query-block" data-tfm-query-key="${key}"><div class="tfm-query"><ul class="tfm-list">${row(1)}${row(2)}</ul></div></div>`;
-  const html = `<ul>${row(0)}</ul>${block('aa')}${block('bb')}<div class="tfm-query-block" data-tfm-query-key="empty"><div class="tfm-query"><div class="tfm-empty-result">none</div></div></div>`;
+describe('column header (M15, revised: global setting)', () => {
+  const row = (line: number) => `<li class="tfm-task" data-tfm-line="${line}"><input type="checkbox" class="tfm-check"><span class="tfm-desc">t${line}</span><span class="tfm-col tfm-col-due"></span><span class="tfm-col tfm-col-created"></span><span class="tfm-col tfm-col-more"></span></li>`;
+  const block = `<div class="tfm-query-block"><div class="tfm-query"><ul class="tfm-list">${row(10)}${row(11)}</ul></div></div>`;
+  const html = `<ul>${row(0)}<li>plain<ul>${row(2)}</ul></li></ul><ul><li>no tasks</li></ul>${block}<div class="tfm-query-block"><div class="tfm-query"><div class="tfm-empty-result">none</div></div></div>`;
 
-  it('adds a header to result blocks only; ✕ hides a column in that block, + brings it back; global hides are union and not offered', async () => {
-    document.body.innerHTML = `<details id="view-cols"><summary>열</summary><input type="checkbox" data-col="due" checked><input type="checkbox" data-col="created" checked><input type="checkbox" data-col="more" checked></details><div id="content"></div>`;
+  it('headers on result boxes and top-level note task lists; ✕ and + change the global setting and the toolbar checks', async () => {
+    document.body.innerHTML = `<details id="view-cols"><summary data-l-label="열" data-l-hidden="열 · {0}개 숨김">열</summary><input type="checkbox" data-col="due" checked><input type="checkbox" data-col="created" checked><input type="checkbox" data-col="more" checked></details><div id="content"></div>`;
     Object.assign(document.body.dataset, { lColDesc: '설명', lColDue: '마감일', lColCreated: '생성일', lColMore: '나머지 필드', lColHide: '열 숨기기', lColShow: '열 다시 보이기' });
     window.scrollTo = () => undefined;
     const { vi } = await import('vitest');
     vi.resetModules();
     await import('../../src/webviews/rendered/main');
-    receive({ type: 'doc/html', html, fontSize: 14, lineHeight: 1.6, fieldsAlign: 'columns', maxWidth: 0, today: '2026-09-30', view: { sort: 'document', scope: 'all' }, hiddenColumns: ['more'], blockColumns: { bb: ['created'] } });
+    receive({ type: 'doc/html', html, fontSize: 14, lineHeight: 1.6, fieldsAlign: 'columns', maxWidth: 0, today: '2026-09-30', view: { sort: 'document', scope: 'all' }, hiddenColumns: ['more'] });
 
-    const blockEl = (k: string) => document.querySelector<HTMLElement>(`[data-tfm-query-key="${k}"]`)!;
-    const headText = (k: string) => Array.from(blockEl(k).querySelectorAll('.rv-colhead-cell')).map((c) => c.textContent);
-    expect(document.querySelectorAll('.rv-colhead')).toHaveLength(2); // not in the note body, not in an empty result
-    // Global "more" hidden: not offered anywhere; block bb also hides "created" and offers it back.
-    expect(headText('aa')).toEqual(['설명', '마감일✕', '생성일✕']);
-    expect(headText('bb')).toEqual(['설명', '마감일✕']);
-    expect(blockEl('bb').querySelector('[data-show]')!.textContent).toBe('+ 생성일');
-    expect(blockEl('bb').classList.contains('hide-col-created')).toBe(true);
-    expect(blockEl('bb').style.getPropertyValue('--rv-cols')).toBe('1.4em minmax(8em, 1fr) 8.6em');
-    expect(blockEl('aa').style.getPropertyValue('--rv-cols')).toBe('1.4em minmax(8em, 1fr) 8.6em 8.6em');
-
-    posted.length = 0;
-    blockEl('aa').querySelector<HTMLButtonElement>('[data-hide="due"]')!.click();
-    expect(posted).toEqual([{ type: 'doc/blockColumns', key: 'aa', hidden: ['due'] }]);
-    expect(headText('aa')).toEqual(['설명', '생성일✕']);
-    expect(blockEl('aa').classList.contains('hide-col-due')).toBe(true);
-    expect(blockEl('bb').classList.contains('hide-col-due')).toBe(false); // other block untouched
+    const heads = () => Array.from(document.querySelectorAll<HTMLElement>('.rv-colhead'));
+    // First note list (has a task row) and the result box with tasks; not the nested list, the task-less list or the empty result.
+    expect(heads().map((h) => h.tagName)).toEqual(['LI', 'DIV']);
+    expect(heads()[0]!.parentElement!.firstElementChild).toBe(heads()[0]);
+    const titles = (h: HTMLElement) => Array.from(h.querySelectorAll('.rv-colhead-cell')).map((c) => c.textContent);
+    for (const h of heads()) {
+      expect(titles(h)).toEqual(['설명', '마감일✕', '생성일✕']);
+      expect(h.querySelector('[data-show]')!.textContent).toBe('+ 나머지 필드');
+    }
+    const box = (c: string) => document.querySelector<HTMLInputElement>(`#view-cols input[data-col="${c}"]`)!;
 
     posted.length = 0;
-    blockEl('bb').querySelector<HTMLButtonElement>('[data-show="created"]')!.click();
-    expect(posted).toEqual([{ type: 'doc/blockColumns', key: 'bb', hidden: [] }]);
-    expect(blockEl('bb').querySelector('[data-show]')).toBeNull();
-    expect(headText('bb')).toEqual(['설명', '마감일✕', '생성일✕']);
+    heads()[1]!.querySelector<HTMLButtonElement>('[data-hide="created"]')!.click();
+    expect(posted).toEqual([{ type: 'doc/columns', hidden: ['created', 'more'] }]);
+    expect(box('created').checked).toBe(false);
+    expect(document.body.classList.contains('hide-col-created')).toBe(true);
+    expect(document.body.style.getPropertyValue('--rv-cols')).toBe('1.4em minmax(8em, 1fr) 8.6em');
+    for (const h of heads()) expect(titles(h)).toEqual(['설명', '마감일✕']); // every header follows
+    expect(document.querySelector('summary')!.textContent).toBe('열 · 2개 숨김');
 
-    // Showing "more" again from the toolbar adds its title back to every header.
-    receive({ type: 'doc/columns', hidden: [] });
-    expect(headText('bb')).toEqual(['설명', '마감일✕', '생성일✕', '나머지 필드✕']);
+    posted.length = 0;
+    heads()[0]!.querySelector<HTMLButtonElement>('[data-show="more"]')!.click();
+    expect(posted).toEqual([{ type: 'doc/columns', hidden: ['created'] }]);
+    expect(box('more').checked).toBe(true);
+    for (const h of heads()) expect(titles(h)).toEqual(['설명', '마감일✕', '나머지 필드✕']);
+
+    // Toolbar change updates the headers too.
+    box('created').checked = true;
+    box('created').dispatchEvent(new Event('change'));
+    for (const h of heads()) {
+      expect(titles(h)).toEqual(['설명', '마감일✕', '생성일✕', '나머지 필드✕']);
+      expect(h.querySelector('.rv-colhead-chips')).toBeNull();
+    }
   });
 });

@@ -56,7 +56,7 @@ export type ToWebview =
   | { type: 'query/target'; id: string | null }
   | { type: 'results/query'; target: QueryTargetDto }
   /** Rendered view: the whole note as HTML. */
-  | { type: 'doc/html'; html: string; fontSize: number; lineHeight: number; fieldsAlign: 'columns' | 'right' | 'inline'; maxWidth: number; today: string; view: { sort: string; scope: string }; hiddenColumns?: string[]; blockColumns?: Record<string, string[]> }
+  | { type: 'doc/html'; html: string; fontSize: number; lineHeight: number; fieldsAlign: 'columns' | 'right' | 'inline'; maxWidth: number; today: string; view: { sort: string; scope: string }; hiddenColumns?: string[] }
   /** Rendered view: the hidden columns changed in another rendered view (M14). */
   | { type: 'doc/columns'; hidden: string[] }
   | { type: 'stats/result'; requestId: number; stats: StatsDto }
@@ -96,8 +96,6 @@ export type FromWebview =
   | { type: 'doc/view'; sort: string; scope: string }
   /** Rendered view: columns hidden via the toolbar menu (all notes). */
   | { type: 'doc/columns'; hidden: string[] }
-  /** Rendered view: columns hidden in one ```tasks block (key = query text hash). */
-  | { type: 'doc/blockColumns'; key: string; hidden: string[] }
   | { type: 'ui/notify'; level: 'info' | 'warn' | 'error'; message: string };
 
 /** Minimal typed wrapper around acquireVsCodeApi() for the webview side. */

@@ -42,6 +42,7 @@
 | M14 | 렌더 보기 열 숨기기(툴바 `열 ▾`) | ✅ 완료(1.9.0) | 이 문서 M14, design.md 7.13 |
 | M15 | 열 제목 줄(쿼리 결과·본문), 툴바와 같은 전역 열 숨기기 | ✅ 완료(1.11.0; 1.10.0은 블록별) | 이 문서 M15, design.md 7.14 |
 | M16 | 렌더 보기 열 너비 조절(제목 줄 경계 끌기) | ✅ 완료(1.12.0) | 이 문서 M16, design.md 7.15 |
+| M17 | 외부 연동 보강(독립 타입, 메모·기능 확인·상태 알림·isBlocking, CLI·MCP), 출처 표시 | 🟡 계획 확정(2026-09-30) | 이 문서 M17, release.md |
 
 ---
 
@@ -780,6 +781,47 @@
 - [x] `columnTracks(hidden, widths)`, 손잡이(포인터 끌기·더블클릭·키보드), 끄는 동안 제목 줄 유지
 - [x] 호스트: `doc/columnWidths { widths }` → globalState, `doc/html.columnWidths`, 다른 패널에 전파
 - [x] 테스트(트랙 계산·범위, 끌기/키보드/더블클릭 → 메시지), 스크린샷, 문서(user-guide, CHANGELOG)
+
+## M17. 외부 연동 보강 — API·CLI·MCP 공백 채우기, 출처 표시 (계획 확정 2026-09-30)
+
+점검 결과(2026-09-30)와 사용자 결정. 모두 **추가만** 하므로 API 버전 1 유지.
+
+**1. 독립 타입 파일.** `src/api/types.ts`가 내부 `core/dto`를 불러와서, 이 파일 하나만 복사하면 컴파일되지 않는다. 공개 타입(TaskDto·GroupDto·TreeDto·SavedQueryDto 포함)을 이 파일 안에 직접 정의해 **import 없는 한 파일**로 만든다. 내부 DTO와 모양이 어긋나면 컴파일 단계에서 잡히도록 양방향 대입 검사를 둔다. 다른 개발자에게는 GitHub의 이 파일(또는 VSIX 안 `dist/api-types/api/types.d.ts`)을 복사하라고 안내. npm 타입 패키지 `@hastycapybara/tasks-api`는 1.0.0 공개 때(release.md에 기록).
+
+**2. 메모 쓰기를 세 곳 모두에.**
+- 확장 API: `edit.addNote(ref, text)`(한 줄 추가, 렌더 보기 💬와 같은 동작), `batch`의 `{ op: 'addNote' }`, 명령 `tasksmd.api.edit.addNote`.
+- CLI: `tasksmd note <path:line> <text>`(한 줄 추가), `tasksmd add … --note <text>`, `tasksmd set <path:line> --notes "a\nb"`(전체 교체, 빈 값이면 삭제).
+- MCP: `tasks_add_note` 도구, `tasks_create`·`tasks_update`에 `notes`.
+- 공통 로직: 파일 줄 배열에서 메모를 넣고 바꾸는 순수 함수를 core에 두고(CLI·MCP), 확장은 같은 규칙(`noteBlock`)으로 WorkspaceEdit.
+
+**3. AI용 문법 설명서(`tasks://syntax`, `tasks_syntax_reference`).** 메모 형식(태스크 아래 들여쓴 체크박스 없는 글머리표)과 마감일 필수 규칙(`requireDueDate`, 기본 켜짐)을 추가.
+
+**4. 마감일 필수.** api.md(한·영)에 "기본 설정에서는 `edit.create`에 `due` 필수, 없으면 `INVALID_ARGUMENT`"를 명시. 설정 값은 6의 `info()`로 알려 준다. API가 이 설정을 무시하게 하지는 않는다(사용자 규칙).
+
+**5.** = 2의 `addNote`.
+
+**6. 기능 확인.** `api.extensionVersion`(예 `1.13.0`), `api.features`(지원 기능 이름 목록), `api.info()` → `{ extensionVersion, apiVersion: 1, features, settings: { requireDueDate, taskFormat, globalFilter } }`. 기능 이름과 추가된 버전을 api.md 표로 관리: `tree`(1.6.0), `notes`(1.8.0), `notes.add`·`info`·`events.status`·`isBlocking`(1.13.0).
+
+**7. 상태 변경 알림.** `events.onDidChangeStatus({ before, after, next?, deleted })` — 완료뿐 아니라 진행 중·취소·다시 열기 등 모든 상태 변경(에디터·사이드바·API 어디서든).
+
+**8. `TaskDto.isBlocking`.** 다른 미완료 태스크가 이 태스크를 ⛔로 기다리는지. 확장·CLI·MCP 결과에 모두 들어간다(공통 DTO).
+
+**9. MCP 필드 보강.** `tasks_create`·`tasks_update`에 `created`·`done`·`cancelled` 날짜, `tasks_create`에 `tags`(설명 끝에 붙임), 위 `notes`.
+
+**10.** 렌더 보기 열기 API는 만들지 않는다(사용자 결정: 렌더 보기는 사람이 에디터에서 직접 보는 화면).
+
+**출처 표시(Obsidian Tasks에 대한 존중).** README(한·영) 첫머리에 "Obsidian Tasks 플러그인에서 출발했다"는 문장, 감사의 말 보강(원작자·기여자에게 감사, 원본 문서·저장소 링크, Obsidian 사용자에게 원본 권유, 후원 페이지가 있으면 링크), 마켓플레이스 소개 문구. 로고·이름을 우리 것처럼 쓰지 않고 "관련 없음" 문구 유지.
+
+**문서.** 버전 관리와 배포 때 빠뜨리면 안 되는 항목을 [release.md](release.md) "빠뜨리지 말 것" 체크리스트로 정리(세 곳 동시 반영, 기능 목록·버전 표, 타입 파일, 1.0.0 공개 시 버전 번호 문제 등).
+
+### 할 일
+- [ ] release.md 체크리스트 (먼저)
+- [ ] 독립 타입 파일 + 내부 DTO와 양방향 검사 + import 없음 검사
+- [ ] core: 메모 삽입/교체 순수 함수, `TaskDto.isBlocking`
+- [ ] 확장 API: `addNote`, batch·명령, `extensionVersion`·`features`·`info()`, `onDidChangeStatus`
+- [ ] CLI: `note`, `add --note`, `set --notes`
+- [ ] MCP: `tasks_add_note`, create/update의 notes·created·done·cancelled·tags, 문법 설명서
+- [ ] 테스트(단위·CLI·MCP·통합), 문서(api.md·api.en.md, README 한·영, CHANGELOG, NOTICE 점검)
 
 ## 향후 후보 (미착수)
 

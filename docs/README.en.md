@@ -2,6 +2,8 @@
 
 Obsidian Tasks-compatible task management for Markdown files in **VS Code** and **Cursor**.
 
+> This extension started from the [Tasks plugin](https://github.com/obsidian-tasks-group/obsidian-tasks) for Obsidian. It rebuilds that plugin's task syntax, query language and years of careful design for VS Code and Cursor. Thank you to its authors and contributors — see [Credits](#credits).
+
 Your tasks stay in your notes as plain checklist lines — no database, no lock-in:
 
 ```markdown
@@ -89,7 +91,7 @@ Four ways for other programs to read and write tasks. Details in [docs/api.en.md
 
 | From | How |
 |---|---|
-| Another VS Code/Cursor extension | `getExtension('hastycapybara.tasks-for-markdown').exports.getAPI(1, { extensionId })` → `query.run(...)`, `edit.setStatus(...)`. Types ship with the extension in `dist/api-types/api/types.d.ts` |
+| Another VS Code/Cursor extension | `getExtension('hastycapybara.tasks-for-markdown').exports.getAPI(1, { extensionId })` → `query.run(...)`, `edit.setStatus(...)`, `edit.addNote(...)`. For types, copy the self-contained file [src/api/types.ts](../src/api/types.ts) |
 | Keybindings, macros | Commands `tasksmd.api.<ns>.<method>` (e.g. `tasksmd.api.query.run` with `{ "query": "due today" }`) |
 | Terminal, scripts, CI | `npx @hastycapybara/tasks-cli query "not done\ndue before today" --root ~/notes` — no editor needed |
 | AI agents (Claude Code, Cursor, …) | `claude mcp add tasks -- npx -y @hastycapybara/tasks-cli mcp --root "$PWD"`, then ask in plain language |
@@ -101,7 +103,7 @@ const r = await tasks.query.run('not done\nhappens on or before today');   // sa
 await tasks.edit.setStatus({ path: r.tasks[0].path, line: r.tasks[0].line, expectedText: r.tasks[0].originalMarkdown }, 'x');
 ```
 
-Writes ask the user once per caller by default (`tasksmd.api.writePolicy`). Everything is plain JSON; errors are `{ code, message }`. Need only the Node library? `@hastycapybara/tasks-core`.
+Writes ask the user once per caller by default (`tasksmd.api.writePolicy`). Everything is plain JSON; errors are `{ code, message }`. Notes and dependencies (`isBlocked` / `isBlocking`) work through the extension API, the CLI and MCP alike. By default new tasks need a due date; check the installed version's features and settings with `info()` (CLI `tasksmd info`, MCP `tasks_info`). Need only the Node library? `@hastycapybara/tasks-core`.
 
 ## Notes on the Markdown preview
 
@@ -128,7 +130,13 @@ Press `F5` in VS Code to launch an Extension Development Host.
 
 ## Credits
 
-Task syntax, the query language and parts of the core logic (parser, recurrence, urgency) are ported from [Obsidian Tasks](https://github.com/obsidian-tasks-group/obsidian-tasks) (MIT). See [NOTICE.md](../NOTICE.md). This project is not affiliated with Obsidian.
+This extension would not exist without [Obsidian Tasks](https://github.com/obsidian-tasks-group/obsidian-tasks). The task syntax, the query language and parts of the core logic (parser, recurrence, urgency) are ported from it (MIT license), and its documentation is the reference for how each feature behaves. Many thanks to Martin Schenck, who created the plugin, Clare Macrae, who has led it for years, and every contributor.
+
+- If you use Obsidian, try the original plugin: [Tasks documentation](https://publish.obsidian.md/tasks/) · [repository](https://github.com/obsidian-tasks-group/obsidian-tasks)
+- You can support the original project: [GitHub Sponsors (Clare Macrae)](https://github.com/sponsors/claremacrae)
+- Ported code and license notices: [NOTICE.md](../NOTICE.md)
+
+This project is not affiliated with or endorsed by the Obsidian Tasks project or Obsidian (Dynalist Inc.).
 
 ## License
 

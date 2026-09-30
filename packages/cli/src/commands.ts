@@ -9,7 +9,8 @@ import { applyFieldValues, type FieldValues } from '../../../src/services/taskFi
 import type { CliConfig } from './config';
 import { registryFrom } from './config';
 import { buildIndex, indexFile, relPath } from './scan';
-import { StaleLineError, deleteLine, insertLine, readLine, replaceLine } from './store';
+import { StaleLineError, deleteLine, insertLine, readLine, replaceLine, rewriteAround } from './store';
+import { addNoteLines, cleanNoteTexts, setNoteLines } from '../../../src/core/file';
 
 export class CliError extends Error {
   constructor(readonly code: string, message: string, readonly details?: unknown) {
@@ -93,7 +94,7 @@ function afterWrite(ws: Workspace, abs: string, line: number): TaskDto {
 }
 
 /** `add`: a task line (with or without the `- [ ] ` prefix) appended to a file or inserted after a line. */
-export function addTask(ws: Workspace, lineText: string, file: string, line?: number, opts: { dueChecked?: boolean } = {}): TaskDto {
+export function addTask(ws: Workspace, lineText: string, file: string, line?: number, opts: { dueChecked?: boolean; notes?: readonly string[] } = {}): TaskDto {
   const raw = /^\s*[-*+]\s+\[.\]/.test(lineText) ? lineText : `- [ ] ${lineText.trim()}`;
   let task = parseTaskLine(raw, { statusRegistry: ws.registry, globalFilter: ws.cfg.globalFilter || undefined });
   if (!task) throw new CliError('INVALID_ARGUMENT', `Not a task line: ${raw}`);
@@ -101,6 +102,11 @@ export function addTask(ws: Workspace, lineText: string, file: string, line?: nu
   if (ws.cfg.requireDueDate && !opts.dueChecked && !task.due) throw new CliError('INVALID_ARGUMENT', 'A due date is required (tasksmd.requireDueDate)');
   const abs = absOf(ws, file);
   const at = insertLine(abs, line ?? Number.POSITIVE_INFINITY, serializeTask(task.with({ indentation: '' }), ws.cfg.taskFormat));
+  const notes = cleanNoteTexts(opts.notes ?? []);
+  if (notes.length) {
+    const written = afterWrite(ws, abs, at);
+    rewriteAround(abs, at, written.originalMarkdown, (lines) => setNoteLines(lines, at, notes));
+  }
   return afterWrite(ws, abs, at);
 }
 
@@ -154,6 +160,31 @@ export function postpone(ws: Workspace, ref: { path: string; line: number }, to:
   if (!date) throw new CliError('INVALID_ARGUMENT', `Cannot understand date "${to}"`);
   const field = task.due ? 'due' : task.scheduled ? 'scheduled' : 'due';
   return setFields(ws, ref, { [field]: date.format('YYYY-MM-DD') });
+}
+
+/** Optional capabilities of the CLI/MCP (same names as the extension API's `features`, minus editor-only events). */
+export const CLI_FEATURES = ['tree', 'notes', 'notes.add', 'info', 'isBlocking'] as const;
+
+/** `info` / tasks_info: version, capabilities and the settings that change what edits are accepted. */
+export function info(ws: Workspace, version: string): { version: string; features: string[]; settings: { requireDueDate: boolean; taskFormat: string; globalFilter: string } } {
+  return { version, features: [...CLI_FEATURES], settings: { requireDueDate: ws.cfg.requireDueDate, taskFormat: ws.cfg.taskFormat, globalFilter: ws.cfg.globalFilter } };
+}
+
+/** `note`: add one note (indented bullet) under the task, after its existing notes — like 💬 in the editor. */
+export function addNote(ws: Workspace, ref: { path: string; line: number }, text: string, expected?: string): TaskDto {
+  if (!text.trim()) throw new CliError('INVALID_ARGUMENT', 'The note text is empty');
+  const task = taskAt(ws, ref, expected);
+  const abs = absOf(ws, ref.path);
+  rewriteAround(abs, ref.line, task.originalMarkdown, (lines) => addNoteLines(lines, ref.line, text).lines);
+  return afterWrite(ws, abs, ref.line);
+}
+
+/** `set --notes`: replace all notes (existing lines rewritten in place; [] removes them; sub-tasks untouched). */
+export function setNotes(ws: Workspace, ref: { path: string; line: number }, notes: readonly string[], expected?: string): TaskDto {
+  const task = taskAt(ws, ref, expected);
+  const abs = absOf(ws, ref.path);
+  rewriteAround(abs, ref.line, task.originalMarkdown, (lines) => setNoteLines(lines, ref.line, notes));
+  return afterWrite(ws, abs, ref.line);
 }
 
 export function removeTask(ws: Workspace, ref: { path: string; line: number }, expected?: string): void {

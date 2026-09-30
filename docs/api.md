@@ -1,6 +1,16 @@
 # Tasks for Markdown 공개 API (v1)
 
-다른 확장·키바인딩·매크로에서 태스크를 읽고 쓰는 방법입니다. 설계 배경은 [api-plan.md](api-plan.md), 타입 정의는 확장에 동봉된 `dist/api-types/api/types.d.ts`(소스: [src/api/types.ts](../src/api/types.ts))입니다.
+다른 확장·키바인딩·매크로에서 태스크를 읽고 쓰는 방법입니다. 설계 배경은 [api-plan.md](api-plan.md)입니다.
+
+외부에서 들어오는 길은 세 가지이고, 같은 기능을 세 곳에 함께 제공합니다.
+
+| 길 | 누가 | 조건 | 이 문서 |
+|---|---|---|---|
+| 확장 API `getAPI(1)` | 에디터 안의 다른 확장 | VS Code/Cursor와 이 확장이 켜져 있음 | §1~§5 |
+| CLI `tasksmd` | 터미널·스크립트·다른 프로그램 | 에디터 없이 파일을 직접 읽고 씀 | §7 |
+| MCP `tasksmd mcp` | Claude Desktop, Cursor 에이전트 같은 AI | 에디터 없이 파일을 직접 읽고 씀 | §8 |
+
+**타입 정의(한 파일).** [src/api/types.ts](../src/api/types.ts)는 import가 없는 독립 파일입니다(1.13.0부터). 이 파일 하나를 프로젝트에 `tasks-api.ts`(또는 `.d.ts`)로 복사하면 자동완성과 타입 검사가 됩니다. 확장 안에도 `dist/api-types/api/types.d.ts`로 들어 있습니다. npm 타입 패키지 `@hastycapybara/tasks-api`는 마켓플레이스 공개 때 올릴 예정입니다.
 
 ## 1. 시작하기 (다른 확장에서)
 
@@ -20,6 +30,26 @@ for (const t of r.tasks) console.log(t.path, t.line + 1, t.description, t.due);
 - 모든 메서드는 `Promise`를 돌려주고, 실패하면 `{ code, message, details? }` 모양의 `TasksApiError`로 거부됩니다(§5).
 - 값은 전부 JSON입니다. 날짜는 `YYYY-MM-DD`, 태스크 위치는 `{ path, line }`(워크스페이스 상대 경로, 0부터 세는 줄).
 
+### 기능 확인 (1.13.0)
+
+API 버전은 기능을 **추가만** 하는 동안 `1`로 유지됩니다. 설치된 확장이 어떤 기능을 지원하는지는 버전 번호 대신 **기능 이름**으로 확인하세요.
+
+```ts
+if (tasks.features?.includes('notes.add')) await tasks.edit.addNote(ref, '회신 받음');
+const info = await tasks.info();   // { extensionVersion, apiVersion: 1, features, settings: { requireDueDate, taskFormat, globalFilter } }
+if (info.settings.requireDueDate) { /* 만들기 화면에서 마감일을 필수로 */ }
+```
+(`features`·`info`가 없는 1.12 이하 확장에서는 `tasks.features`가 `undefined`입니다.)
+
+| 기능 이름 | 추가된 버전 | 내용 |
+|---|---|---|
+| `tree` | 1.6.0 | `GroupDto.tree`, `TaskDto.parentLine`·`depth` |
+| `notes` | 1.8.0 | `TaskDto.notes`, `create`·`update`의 `notes`(전체 교체) |
+| `notes.add` | 1.13.0 | `edit.addNote`, batch `addNote` |
+| `info` | 1.13.0 | `extensionVersion`, `features`, `info()` |
+| `events.status` | 1.13.0 | `events.onDidChangeStatus` |
+| `isBlocking` | 1.13.0 | `TaskDto.isBlocking` |
+
 ## 2. 메서드
 
 ### query — 읽기 (확인 없음)
@@ -36,19 +66,22 @@ for (const t of r.tasks) console.log(t.path, t.line + 1, t.description, t.due);
 
 | 메서드 | 설명 |
 |---|---|
-| `create(input, target?)` | 새 태스크. `input`: `description`(필수), `tags`, `priority`('0'~'5'), 날짜들, `recurrence`, `onCompletion`, `id`, `dependsOn`, `status`. `target.path`(없으면 `tasksmd.calendar.newTaskFile`), `target.line`(없으면 파일 끝). 파일이 없으면 만듭니다 |
+| `create(input, target?)` | 새 태스크. `input`: `description`(필수), `tags`, `priority`('0'~'5'), 날짜들, `recurrence`, `onCompletion`, `id`, `dependsOn`, `status`, `notes`. `target.path`(없으면 `tasksmd.calendar.newTaskFile`), `target.line`(없으면 파일 끝). 파일이 없으면 만듭니다. **마감일 필수:** 설정 `tasksmd.requireDueDate`가 켜져 있으면(기본값) `due`가 없을 때 `INVALID_ARGUMENT`. 현재 값은 `info().settings.requireDueDate` |
 | `update(ref, changes)` | 필드 변경. `null`은 그 필드 제거. `status`가 있으면 마지막에 상태 변경으로 적용 |
 | `setStatus(ref, symbol)` | 상태 기호(`x`, `/`, `-` …). 완료·취소 날짜와 반복 다음 회차는 UI에서 클릭한 것과 똑같이 처리 |
 | `toggle(ref)` | 상태의 다음 기호로 |
 | `postpone(ref, to)` | 마감일(없으면 예정일)을 `YYYY-MM-DD` 또는 자연어(`tomorrow`, `next monday`, `in 2 weeks`, `3일 후`)로 |
 | `remove(ref)` | 줄 삭제 |
-| `batch(ops)` | 순서대로 실행. 첫 실패에서 멈추고 `details.completed`에 성공 개수, `details.results`에 그때까지의 결과. 상한 `tasksmd.api.batchLimit`(200). **원자적이지 않습니다**(앞선 작업은 되돌리지 않음) |
+| `addNote(ref, text)` | 메모 한 줄 추가: 태스크 아래 들여쓴 글머리표를 기존 메모 뒤(없으면 태스크 바로 아래)에 넣습니다. 렌더 보기 💬와 같은 동작. 메모가 포함된 태스크를 돌려줍니다 (1.13.0) |
+| `batch(ops)` | `create`·`update`·`setStatus`·`toggle`·`postpone`·`remove`·`addNote`를 순서대로 실행. 첫 실패에서 멈추고 `details.completed`에 성공 개수, `details.results`에 그때까지의 결과. 상한 `tasksmd.api.batchLimit`(200). **원자적이지 않습니다**(앞선 작업은 되돌리지 않음) |
 
 `ref.expectedText`에 줄 원문(`TaskDto.originalMarkdown`)을 넣으면 그사이 줄이 바뀐 경우 `STALE_LINE`으로 거부합니다. 오래된 정보로 덮어쓰는 사고를 막으려면 항상 넣는 것을 권합니다.
 
 **트리(1.6.0에 추가, v1 호환).** `query.run`의 결과에서 트리 표시가 켜져 있으면(`tasksmd.query.showTree` 또는 `show tree`) `groups`가 항상 채워지고, 말단 그룹에 `tree: { task, matched, children }[]`가 붙습니다. `matched: false`는 필터에 안 맞지만 부모와 함께 보여 주는 맥락 행입니다. `tasks`(평평한 목록)는 예전처럼 필터에 맞은 것만 담습니다. `TaskDto`에는 `parentLine`(부모 목록 항목의 줄, 없으면 null)과 `depth`가 추가되었습니다.
 
-**메모(1.8.0에 추가, v1 호환).** `TaskDto.notes: { line, text }[]` — 태스크 바로 아래 단계의 체크박스 없는 글머리표. `edit.create`와 `edit.update`의 `changes.notes: string[]`로 메모 전체를 바꿉니다(`[]`면 삭제). 기존 메모 줄은 제자리에서 고쳐 쓰고, 늘어난 만큼 추가, 줄어든 만큼 삭제하며 하위 태스크는 건드리지 않습니다.
+**메모(1.8.0에 추가, v1 호환).** `TaskDto.notes: { line, text }[]` — 태스크 바로 아래 단계의 체크박스 없는 글머리표. `edit.create`와 `edit.update`의 `changes.notes: string[]`로 메모 전체를 바꿉니다(`[]`면 삭제). 기존 메모 줄은 제자리에서 고쳐 쓰고, 늘어난 만큼 추가, 줄어든 만큼 삭제하며 하위 태스크는 건드리지 않습니다. 한 줄만 덧붙일 때는 `addNote`를 쓰세요(읽고-고치고-다시 쓰는 사이에 사용자가 바꾼 메모를 덮어쓰지 않음).
+
+**의존 관계(🆔/⛔).** `isBlocked` = 이 태스크가 끝나지 않은 다른 태스크를 기다리는 중(⛔). `isBlocking` = 끝나지 않은 다른 태스크가 이 태스크를 기다리는 중 — 이걸 끝내면 풀리는 일이 있다는 뜻(1.13.0). 둘 다 미완료 태스크에서만 `true`입니다.
 
 ### events — 구독
 
@@ -56,8 +89,9 @@ for (const t of r.tasks) console.log(t.path, t.line + 1, t.description, t.due);
 |---|---|
 | `onDidChangeTasks(listener)` | 태스크가 바뀌거나 지워진 파일 경로 목록. 디바운스된 인덱스 이벤트 |
 | `onDidCompleteTask(listener)` | 미완료 → 완료로 바뀔 때. 반복 태스크면 `next`에 새 회차 |
+| `onDidChangeStatus(listener)` | 모든 상태 변경(완료·취소·진행 중·다시 열기·사용자 정의 상태). `{ before, after, next?, deleted }`. 에디터·사이드바·보드·API 어디서 바꿔도 옵니다. 기호가 그대로면 오지 않습니다 (1.13.0) |
 
-둘 다 `{ dispose() }`를 돌려줍니다.
+모두 `{ dispose() }`를 돌려줍니다.
 
 ### ui — 화면 열기
 
@@ -96,6 +130,8 @@ keybindings.json:
 | `tasksmd.api.edit.toggle` / `remove` | `{ ref }` |
 | `tasksmd.api.edit.postpone` | `{ ref, to }` |
 | `tasksmd.api.edit.batch` | `{ ops }` |
+| `tasksmd.api.edit.addNote` | `{ ref, text }` |
+| `tasksmd.api.info` | 없음 |
 | `tasksmd.api.ui.openEdit` / `reveal` | `{ ref? }` |
 | `tasksmd.api.ui.openKanban` | `{ savedQueryId?, mode? }` |
 | `tasksmd.api.ui.openCalendar` | `{ fullScreen? }` |
@@ -163,12 +199,16 @@ tasksmd postpone notes/todo.md:12 "next monday"
 tasksmd remove notes/todo.md:12
 tasksmd list --file notes/todo.md --json
 tasksmd explain "priority is above none"
+tasksmd note notes/todo.md:12 "법무팀 회신 받음"        # 메모 한 줄 추가
+tasksmd add "계약서 검토 📅 2026-10-01" --file notes/todo.md --note "3조 확인"
+tasksmd set notes/todo.md:12 --notes "첫 메모\n둘째 메모"  # 메모 전체 교체(--notes none 이면 삭제)
+tasksmd info                                        # 버전, 기능 목록, requireDueDate 등 설정
 ```
 
 - 대상 폴더는 `--root`(기본 현재 폴더). `.gitignore`, `tasksmd.exclude`, `node_modules`, `.git`을 건너뜁니다.
-- 설정은 `<root>/.vscode/settings.json`의 `tasksmd.*`를 읽습니다: `globalFilter`, `taskFormat`, `setDoneDate`, `setCancelledDate`, `setCreatedDate`, `recurrence.*`, `statuses`, `include`, `exclude`, `query.allowFunctions`. 주석과 뒤따르는 쉼표가 있어도 됩니다.
+- 설정은 `<root>/.vscode/settings.json`의 `tasksmd.*`를 읽습니다: `globalFilter`, `taskFormat`, `setDoneDate`, `setCancelledDate`, `setCreatedDate`, `requireDueDate`(기본 켜짐 — `add`에 📅가 없으면 거부), `recurrence.*`, `statuses`, `include`, `exclude`, `query.allowFunctions`, `query.showTree`. 주석과 뒤따르는 쉼표가 있어도 됩니다.
 - 줄 번호는 1부터. `--today YYYY-MM-DD`로 기준일을 바꿀 수 있습니다(테스트·리포트용).
-- 출력: 터미널이면 마크다운(`원문 줄  (경로:줄)`), 파이프면 JSON. `--json`/`--md`로 고정. 오류는 JSON 모드에서 `{ "error": { code, message } }`, 종료 코드 1(실행 오류)·2(인자 오류).
+- 출력: 터미널이면 마크다운(`원문 줄  (경로:줄)`, 메모는 그 아래 들여쓴 `- …`), 파이프면 JSON(`notes`, `isBlocking` 포함). `--json`/`--md`로 고정. 오류는 JSON 모드에서 `{ "error": { code, message } }`, 종료 코드 1(실행 오류)·2(인자 오류).
 - 파일을 직접 고칩니다. 편집기에 저장 안 된 변경이 있는 파일은 저장 후 쓰세요. `--expect`에 줄 원문을 주면 그사이 바뀐 줄은 `STALE_LINE`으로 거부합니다. 완료 처리는 확장과 같은 코드라 완료일·반복 다음 회차·필드 순서가 동일합니다.
 
 ## 8. AI 에이전트용 MCP 서버 (`tasksmd mcp`)
@@ -196,12 +236,14 @@ Cursor는 `.cursor/mcp.json`, VS Code는 `.vscode/mcp.json`에 같은 명령을 
 | `tasks_explain_query { query }` | 쿼리 해석과 문법 오류(실행 안 함) |
 | `tasks_get { path, line }` | 태스크 하나 |
 | `tasks_list_saved_queries` | 저장된 쿼리 목록 |
-| `tasks_create { file, description, afterLine?, due?, priority?, … }` | 생성(파일 끝 또는 지정 줄 뒤) |
-| `tasks_update { path, line, expectedText?, …fields }` | 필드 변경(`null`은 제거), `status`는 마지막에 |
+| `tasks_create { file, description, afterLine?, due?, priority?, tags?, notes?, created?, … }` | 생성(파일 끝 또는 지정 줄 뒤). `tags`는 설명 끝에 붙이고, `notes`는 태스크 아래 메모로. 마감일 필수 설정이 켜져 있으면 `due` 필요 |
+| `tasks_update { path, line, expectedText?, …fields, notes? }` | 필드 변경(`null`은 제거), `notes`는 메모 전체 교체, `status`는 마지막에. 날짜 필드는 `due`·`scheduled`·`start`·`created`·`done`·`cancelled` |
+| `tasks_add_note { path, line, expectedText?, text }` | 메모 한 줄 추가 (1.13.0) |
+| `tasks_info` | 버전, 기능 목록, `requireDueDate` 등 쓰기에 영향을 주는 설정 (1.13.0) |
 | `tasks_set_status { path, line, expectedText?, symbol }` | 상태 변경. `x`면 완료일과 반복 다음 회차 |
 | `tasks_postpone { path, line, expectedText?, to }` | 마감(없으면 예정) 연기, 자연어 가능 |
 | `tasks_remove { path, line, expectedText? }` | 줄 삭제 |
-| `tasks_syntax_reference` / 리소스 `tasks://syntax` | 태스크 줄 형식과 쿼리 문법 요약. 에이전트가 먼저 읽도록 서버 안내문에 적혀 있음 |
+| `tasks_syntax_reference` / 리소스 `tasks://syntax` | 태스크 줄 형식, 메모 형식, 쿼리 문법, 마감일 필수 같은 규칙 요약. 에이전트가 먼저 읽도록 서버 안내문에 적혀 있음 |
 
 - 쓰기 도구는 `expectedText`(그 줄의 `originalMarkdown`)를 받으면 그사이 바뀐 줄을 `STALE_LINE`으로 거부합니다. 서버 안내문이 에이전트에게 항상 넣으라고 권합니다.
 - 호출마다 폴더를 다시 훑어 파일이 그사이 바뀌어도 최신 상태를 봅니다. 설정은 CLI와 같이 `.vscode/settings.json`을 읽습니다.
@@ -210,6 +252,6 @@ Cursor는 `.cursor/mcp.json`, VS Code는 `.vscode/mcp.json`에 같은 명령을 
 
 ## 9. 호환 정책
 
-- `version: 1`. 필드·메서드 **추가**는 1을 유지합니다. 제거·의미 변경은 `getAPI(2)`를 추가하고 1을 최소 한 릴리스 동안 병행합니다.
+- `version: 1`. 필드·메서드 **추가**는 1을 유지하고, 추가된 것은 위 "기능 확인" 표의 기능 이름으로 알립니다. 제거·의미 변경은 `getAPI(2)`를 추가하고 1을 최소 한 릴리스 동안 병행합니다.
 - 변경은 CHANGELOG의 "API" 절에 적습니다.
 - `__internal`(테스트용 내부 객체)과 `extendMarkdownIt`(마크다운 확장용)는 공개 API가 아닙니다.

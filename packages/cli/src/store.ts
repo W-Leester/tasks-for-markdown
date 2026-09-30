@@ -30,6 +30,14 @@ function check(abs: string, doc: Doc, line: number, expected: string): void {
   if (strip(actual) !== strip(expected)) throw new StaleLineError(abs, line, expected, actual);
 }
 
+/** Rewrite the file's lines with `fn` after checking that `line` still has the expected text (notes under a task). */
+export function rewriteAround(abs: string, line: number, expected: string, fn: (lines: string[]) => string[]): void {
+  const doc = read(abs);
+  check(abs, doc, line, expected);
+  doc.lines = fn(doc.lines);
+  write(abs, doc);
+}
+
 /** Replace a line (after checking its current text), optionally inserting lines above/below or deleting it. */
 export function replaceLine(abs: string, line: number, expected: string, newText: string, insert?: { position: 'above' | 'below'; lines: string[] }, deleteOriginal = false): number {
   const doc = read(abs);

@@ -11,6 +11,17 @@ Tags are #words inside the description. Example:
   - [ ] Write report #work ⏫ 🔁 every week 📅 2026-10-01
 Recurrence text examples: every day · every week · every 2 weeks on friday · every month on the 1st · every year · every week when done.
 
+## Notes
+Notes are plain bullets (no checkbox) indented one level directly under the task. They are not a field: never put them on the task line.
+  - [ ] Review contract #work 📅 2026-09-26
+    - Clause 3 penalty: check with legal      ← note
+    - [ ] Email legal                         ← sub-task, not a note
+Use tasks_add_note (one note) or the \`notes\` argument of tasks_create/tasks_update (replace all). Returned tasks carry \`notes: [{ line, text }]\`.
+
+## Rules the workspace may enforce
+- A due date is required by default (setting tasksmd.requireDueDate): tasks_create without \`due\` fails with INVALID_ARGUMENT. Call tasks_info to see the current settings.
+- Tasks that depend on others: \`isBlocked\` = waits for an unfinished task (⛔); \`isBlocking\` = an unfinished task waits for this one (finishing it unblocks something).
+
 ## Query language (one instruction per line, all lines ANDed)
 Status: done · not done · status.type is TODO|IN_PROGRESS|DONE|CANCELLED|NON_TASK · status.name includes X · status.symbol includes X
 Dates (due|scheduled|start|created|done|cancelled|happens): \`due today\`, \`due before tomorrow\`, \`due after 2026-10-01\`, \`due on or before next friday\`, \`due this week\`, \`due 2026-10\`, \`due 2026-Q4\`, \`due 2026-W40\`, \`has due date\`, \`no due date\`, \`due date is invalid\`. Natural dates: today, tomorrow, yesterday, next monday, last week, in 3 days, 2 weeks ago.

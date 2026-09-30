@@ -1,5 +1,5 @@
 import * as path from 'node:path';
-import { CliError, addTask, explainQuery, openWorkspace, parseRef, postpone, removeTask, runQuery, setFields, setStatus, type QueryOutput, type Workspace } from './commands';
+import { CliError, addNote, addTask, explainQuery, info, openWorkspace, parseRef, postpone, removeTask, runQuery, setFields, setNotes, setStatus, type QueryOutput, type Workspace } from './commands';
 import { loadConfig } from './config';
 import { StaleLineError } from './store';
 import { startMcpServer } from './mcp';
@@ -17,15 +17,19 @@ const HELP = `tasksmd — Tasks for Markdown from the command line
 Usage:
   tasksmd query <query text> [--source <file>]       run a query (same language as \`\`\`tasks blocks)
   tasksmd explain <query text>                        show how the query is understood
-  tasksmd add <task line> --file <path> [--line N]    append (or insert after line N) a task
+  tasksmd add <task line> --file <path> [--line N] [--note <text>]
+                                                      append (or insert after line N) a task, optionally with a note
   tasksmd done <path:line> [--expect <text>]          mark done (dates + recurrence like the editor)
   tasksmd status <path:line> <symbol> [--expect]      set the status symbol (x, /, -, space…)
   tasksmd set <path:line> [--due D] [--scheduled D] [--start D] [--priority 0-5]
               [--description T] [--recurrence R] [--status S] [--expect <text>]
+              [--notes "first\\nsecond"]              replace all notes (--notes none removes them)
+  tasksmd note <path:line> <text> [--expect <text>]   add a note under the task (indented bullet)
   tasksmd postpone <path:line> <date|tomorrow|next monday|in 2 weeks> [--expect]
   tasksmd remove <path:line> [--expect <text>]
   tasksmd list [--file <path>]                        every task (optionally one file)
   tasksmd saved                                       saved queries (settings + .tasks/queries)
+  tasksmd info                                        version, features and settings (e.g. requireDueDate)
   tasksmd mcp                                         start the MCP server (stdio) for AI agents
 
 Options:
@@ -75,16 +79,21 @@ function fmtTask(t: TaskDto): string {
 function renderQuery(r: QueryOutput, json: boolean): string[] {
   if (json) return [JSON.stringify(r, null, 2)];
   const lines: string[] = [];
+  // Notes print as indented bullets under their task, the way they sit in the file.
+  const push = (t: TaskDto, level: number, suffix = '') => {
+    lines.push(`${'  '.repeat(level)}${fmtTask(t)}${suffix}`);
+    for (const n of t.notes) lines.push(`${'  '.repeat(level + 1)}- ${n.text}`);
+  };
   const group = (g: GroupDto, depth: number) => {
     if (depth > 0) lines.push(`${'#'.repeat(Math.min(6, depth + 1))} ${g.name} (${g.count})`);
     if (g.tree) {
-      const rows = (nodes: TreeDto[], level: number) => { for (const n of nodes) { lines.push(`${'  '.repeat(level)}${fmtTask(n.task)}${n.matched ? '' : '  [context]'}`); rows(n.children, level + 1); } };
+      const rows = (nodes: TreeDto[], level: number) => { for (const n of nodes) { push(n.task, level, n.matched ? '' : '  [context]'); rows(n.children, level + 1); } };
       rows(g.tree, 0);
-    } else for (const t of g.tasks) lines.push(fmtTask(t));
+    } else for (const t of g.tasks) push(t, 0);
     for (const c of g.children) group(c, depth + 1);
   };
   if (r.groups) group(r.groups, 0);
-  else for (const t of r.tasks) lines.push(fmtTask(t));
+  else for (const t of r.tasks) push(t, 0);
   lines.push('', `${r.shown} of ${r.matched} tasks`);
   for (const e of r.runtimeErrors) lines.push(`warning: ${e}`);
   return lines;
@@ -127,6 +136,11 @@ export async function run(argv: string[], io: Io, isTTY = false): Promise<number
         emit(r.tasks, () => r.tasks.map(fmtTask));
         return 0;
       }
+      case 'info': {
+        const i = info(ws, CLI_VERSION);
+        emit(i, () => [`tasksmd ${i.version}`, `features: ${i.features.join(', ')}`, `requireDueDate: ${i.settings.requireDueDate} · taskFormat: ${i.settings.taskFormat} · globalFilter: ${i.settings.globalFilter || '(none)'}`]);
+        return 0;
+      }
       case 'saved': {
         const list = listSavedQueries(ws.cfg);
         emit(list, () => list.map((q) => `${q.name} [${q.source}]\n${q.query.split('\n').map((l) => '  ' + l).join('\n')}`));
@@ -136,7 +150,8 @@ export async function run(argv: string[], io: Io, isTTY = false): Promise<number
         const file = str(flags, 'file');
         if (!file) throw new CliError('INVALID_ARGUMENT', '--file <path> is required');
         const lineFlag = str(flags, 'line');
-        const t = addTask(ws, rest.join(' '), file, lineFlag ? Number(lineFlag) - 1 : undefined);
+        const note = str(flags, 'note');
+        const t = addTask(ws, rest.join(' '), file, lineFlag ? Number(lineFlag) - 1 : undefined, note ? { notes: [note] } : {});
         emit(t, () => [`added ${fmtTask(t)}`]);
         return 0;
       }
@@ -161,10 +176,20 @@ export async function run(argv: string[], io: Io, isTTY = false): Promise<number
           const v = str(flags, k);
           if (v !== undefined) fields[k] = v === 'none' ? null : v;
         }
-        if (!Object.keys(fields).length) throw new CliError('INVALID_ARGUMENT', 'set needs at least one --field value (use "none" to clear a field)');
+        const notesFlag = str(flags, 'notes');
+        if (!Object.keys(fields).length && notesFlag === undefined) throw new CliError('INVALID_ARGUMENT', 'set needs at least one --field value (use "none" to clear a field)');
         const { status, ...values } = fields;
-        const t = setFields(ws, ref, { ...(values as Record<string, string | null>), ...(typeof status === 'string' ? { status } : {}) }, expected);
-        emit(t, () => [`set ${fmtTask(t)}`]);
+        let t = notesFlag === undefined ? null : setNotes(ws, ref, notesFlag === 'none' ? [] : notesFlag.replace(/\\n/g, '\n').split('\n'), expected);
+        if (Object.keys(fields).length) t = setFields(ws, ref, { ...(values as Record<string, string | null>), ...(typeof status === 'string' ? { status } : {}) }, t ? undefined : expected);
+        emit(t, () => [`set ${fmtTask(t!)}`]);
+        return 0;
+      }
+      case 'note': {
+        const ref = parseRef(rest[0] ?? '');
+        const text = rest.slice(1).join(' ');
+        if (!text.trim()) throw new CliError('INVALID_ARGUMENT', 'note needs <path:line> <text>');
+        const t = addNote(ws, ref, text, expected);
+        emit(t, () => [`note added ${fmtTask(t)}`]);
         return 0;
       }
       case 'postpone': {

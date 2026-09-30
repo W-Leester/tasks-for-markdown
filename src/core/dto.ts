@@ -1,5 +1,5 @@
 import { type Dayjs } from './dates';
-import { type TaskIndex, isBlocked } from './index';
+import { type TaskIndex, isBlocked, isBlocking } from './index';
 import type { GroupNode } from './query';
 import { PRIORITY_NAME, type Task, urgency } from './task';
 
@@ -34,7 +34,10 @@ export interface TaskDto {
   tags: string[];
   isCompleted: boolean;
   isDone: boolean;
+  /** Waiting for an unfinished task it depends on (⛔). */
   isBlocked: boolean;
+  /** Another unfinished task depends on this one (it waits for this, via ⛔ this task's 🆔). */
+  isBlocking: boolean;
   urgency: number;
   originalMarkdown: string;
 }
@@ -89,6 +92,7 @@ export function toTaskDto(task: Task, index: TaskIndex, today: Dayjs): TaskDto {
     isCompleted: task.isCompleted,
     isDone: task.isDone,
     isBlocked: !task.isCompleted && isBlocked(task, index),
+    isBlocking: isBlocking(task, index),
     urgency: Math.round(urgency(task, today) * 100) / 100,
     originalMarkdown: task.originalMarkdown,
   };

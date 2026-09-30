@@ -35,7 +35,7 @@ afterEach(async () => {
 describe('MCP server', () => {
   it('lists the tools and serves the syntax resource', async () => {
     const tools = (await client.listTools()).tools.map((t) => t.name).sort();
-    expect(tools).toEqual(['tasks_create', 'tasks_explain_query', 'tasks_get', 'tasks_list_saved_queries', 'tasks_postpone', 'tasks_query', 'tasks_remove', 'tasks_set_status', 'tasks_syntax_reference', 'tasks_update']);
+    expect(tools).toEqual(['tasks_add_note', 'tasks_create', 'tasks_explain_query', 'tasks_get', 'tasks_info', 'tasks_list_saved_queries', 'tasks_postpone', 'tasks_query', 'tasks_remove', 'tasks_set_status', 'tasks_syntax_reference', 'tasks_update']);
     const res = await client.readResource({ uri: 'tasks://syntax' });
     expect((res.contents[0] as { text: string }).text).toContain('Query language');
   });
@@ -83,5 +83,28 @@ describe('MCP server', () => {
     expect(read('notes/todo.md')).not.toContain('write report');
     const missing = await call('tasks_get', { path: 'notes/todo.md', line: 40 });
     expect(missing.data.error.code).toBe('NOT_FOUND');
+  });
+
+  it('notes (M17): create with notes and tags, add one, replace all; info reports settings; syntax mentions notes', async () => {
+    const created = await call('tasks_create', { file: 'notes/todo.md', description: 'contract review', tags: ['work', '#legal'], due: '2026-10-01', notes: ['clause 3'], created: '2026-09-20' });
+    expect(created.isError).toBe(false);
+    expect(created.data).toMatchObject({ line: 2, created: '2026-09-20', tags: ['#work', '#legal'], notes: [{ line: 3, text: 'clause 3' }] });
+    const added = await call('tasks_add_note', { path: 'notes/todo.md', line: 2, text: 'waiting for reply', expectedText: created.data.originalMarkdown });
+    expect(added.data.notes.map((n: { text: string }) => n.text)).toEqual(['clause 3', 'waiting for reply']);
+    expect(read('notes/todo.md').split('\n').slice(2, 5)).toEqual(['- [ ] contract review #work #legal ➕ 2026-09-20 📅 2026-10-01', '  - clause 3', '  - waiting for reply']);
+    const replaced = await call('tasks_update', { path: 'notes/todo.md', line: 2, notes: ['only this'], priority: '1', expectedText: created.data.originalMarkdown });
+    expect(replaced.data).toMatchObject({ priority: '1', notes: [{ line: 3, text: 'only this' }] });
+    const cleared = await call('tasks_update', { path: 'notes/todo.md', line: 2, notes: [] });
+    expect(cleared.data.notes).toEqual([]);
+    expect(read('notes/todo.md')).not.toContain('only this');
+
+    const info = await call('tasks_info');
+    expect(info.data).toMatchObject({ version: 'test', settings: { requireDueDate: true, taskFormat: 'emoji' } });
+    expect(info.data.features).toContain('notes.add');
+    const noDue = await call('tasks_create', { file: 'notes/todo.md', description: 'no date' });
+    expect(noDue.data.error.code).toBe('INVALID_ARGUMENT');
+    const syntax = await call('tasks_syntax_reference');
+    expect(syntax.data).toContain('## Notes');
+    expect(syntax.data).toContain('requireDueDate');
   });
 });

@@ -1,8 +1,8 @@
 {
   "name": "tasks-for-markdown",
   "displayName": "Tasks for Markdown",
-  "description": "VS Code와 Cursor에서 쓰는 Obsidian Tasks 호환 마크다운 할 일 관리. Obsidian Tasks-compatible task management for Markdown files.",
-  "version": "1.12.0",
+  "description": "Obsidian Tasks 플러그인에서 출발한, VS Code와 Cursor용 마크다운 할 일 관리. Task management for Markdown in VS Code and Cursor, inspired by and compatible with the Obsidian Tasks plugin.",
+  "version": "1.13.0",
   "publisher": "hastycapybara",
   "license": "MIT",
   "repository": {
@@ -365,6 +365,18 @@
       {
         "command": "tasksmd.api.edit.remove",
         "title": "Tasks API: edit.remove",
+        "category": "Tasks",
+        "enablement": "false"
+      },
+      {
+        "command": "tasksmd.api.edit.addNote",
+        "title": "Tasks API: edit.addNote",
+        "category": "Tasks",
+        "enablement": "false"
+      },
+      {
+        "command": "tasksmd.api.info",
+        "title": "Tasks API: info",
         "category": "Tasks",
         "enablement": "false"
       },
@@ -997,6 +1009,14 @@
         },
         {
           "command": "tasksmd.api.edit.remove",
+          "when": "false"
+        },
+        {
+          "command": "tasksmd.api.edit.addNote",
+          "when": "false"
+        },
+        {
+          "command": "tasksmd.api.info",
           "when": "false"
         },
         {

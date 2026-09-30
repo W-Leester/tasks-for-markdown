@@ -126,7 +126,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<Extens
 
   void indexService.start();
   const internal: ExtensionApi = { index, indexService, editService, queries, savedQueries, settings, archive, preview, extendMarkdownIt: (md) => preview.extendMarkdownIt(md), webviews };
-  const apiDeps = { index, indexService, editService, queries, savedQueries, settings, getStatusRegistry, log, ui: { openEdit: webviews.openEdit, openKanban: webviews.openKanban, openCalendar: webviews.openCalendar, openQueryResults: webviews.openQueryResults } };
+  const apiDeps = { index, indexService, editService, queries, savedQueries, settings, getStatusRegistry, log, extensionVersion: String((context.extension.packageJSON as { version?: string }).version ?? '0.0.0'), ui: { openEdit: webviews.openEdit, openKanban: webviews.openKanban, openCalendar: webviews.openCalendar, openQueryResults: webviews.openQueryResults } };
   registerApiCommands(context, createTasksApi(apiDeps, { extensionId: 'command' }));
   return {
     getAPI: (version, caller) => {

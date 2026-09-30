@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { dayjs, type Dayjs } from '../core/dates/dayjs';
 import { StatusType, type StatusRegistry, type Status, type Task, type TaskFields, applyStatusChange, generateTaskId, serializeTask } from '../core/task';
 import type { TaskIndex } from '../core/index';
-import { noteBlock } from '../core/file';
+import { cleanNoteTexts, noteBlock } from '../core/file';
 import { t } from '../l10n';
 import type { IndexService } from '../index/IndexService';
 import type { Settings } from '../settings/Settings';
@@ -262,7 +262,5 @@ function docLines(doc: vscode.TextDocument): string[] {
   return doc.getText().split('\n');
 }
 
-/** One note per non-empty line, trimmed. */
-export function cleanNotes(notes: readonly string[]): string[] {
-  return notes.flatMap((n) => n.split('\n')).map((n) => n.trim()).filter((n) => n.length > 0);
-}
+/** One note per non-empty line, trimmed (shared with the CLI/MCP). */
+export const cleanNotes = cleanNoteTexts;

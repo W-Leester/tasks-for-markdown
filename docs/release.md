@@ -49,7 +49,7 @@ git tag v<ver> && git push origin v<ver>
 
 ### B. 릴리스할 때
 
-- [ ] **버전 번호 한곳에 맞추기.** `package.json`(확장). npm 패키지를 낼 때는 `packages/core`·`packages/cli`의 `version`도 같은 번호로(지금은 1.3.0으로 뒤처져 있음 — npm 첫 발행 전에 맞출 것). CLI의 `--version`은 빌드 시 확장 버전을 넣는다.
+- [ ] **버전 번호 한곳에 맞추기.** `package.json`(확장). npm 패키지를 낼 때는 `packages/core`·`packages/cli`의 `version`도 같은 번호로(지금은 1.3.0으로 뒤처져 있음 — npm 첫 발행 전에 맞출 것). CLI의 `tasksmd info`·MCP `tasks_info`가 보여 주는 버전은 `packages/cli/package.json`의 값이라, 맞추지 않으면 AI·스크립트에 옛 번호가 나간다.
 - [ ] **CHANGELOG.md**에 버전·날짜·추가/변경/수정, 외부 연동 변경은 "API" 항목으로.
 - [ ] **검증.** `pnpm typecheck && pnpm lint && pnpm test && pnpm test:webviews && pnpm test:integration`.
 - [ ] **패키징.** `pnpm package` → `.vsix`와 `dist/latest.json`, 타입 파일 `dist/api-types/api/types.d.ts` 포함 확인(`unzip -l`).

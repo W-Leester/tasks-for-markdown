@@ -57,3 +57,45 @@ export function noteBlock(lines: readonly string[], taskLine: number): NoteBlock
   const childIndent = children[0]?.indent ?? taskWs + ' '.repeat(task ? task[0].length - taskWs.length : 2);
   return { notes, children, childIndent, marker: bullet };
 }
+
+/** One note per non-empty line, trimmed (newlines inside an entry split it). */
+export function cleanNoteTexts(notes: readonly string[]): string[] {
+  return notes.flatMap((n) => n.split('\n')).map((n) => n.trim()).filter((n) => n.length > 0);
+}
+
+/**
+ * Add one note under the task on `taskLine` — after its existing notes (and their sub-items), else
+ * right below the task — in a copy of `lines`. Same rule as the editor (TaskEditService.addNote).
+ */
+export function addNoteLines(lines: readonly string[], taskLine: number, text: string): { lines: string[]; line: number } {
+  const note = text.replace(/\s*\n\s*/gu, ' ').trim();
+  if (!note) throw new Error('Empty note');
+  const block = noteBlock(lines, taskLine);
+  const after = block.notes.length ? block.notes[block.notes.length - 1]!.end : taskLine;
+  const out = [...lines];
+  out.splice(after + 1, 0, block.childIndent + block.marker + ' ' + note);
+  return { lines: out, line: after + 1 };
+}
+
+/**
+ * Replace the task's notes in a copy of `lines`: existing note lines are rewritten in place, extra
+ * ones added after the last note (or below the task), surplus ones removed with their sub-items.
+ * Sub-tasks are never touched. Same rule as the editor (TaskEditService.setNotes).
+ */
+export function setNoteLines(lines: readonly string[], taskLine: number, notes: readonly string[]): string[] {
+  const wanted = cleanNoteTexts(notes);
+  const block = noteBlock(lines, taskLine);
+  const existing = block.notes;
+  const out = [...lines];
+  for (let i = 0; i < Math.min(existing.length, wanted.length); i++) {
+    const n = existing[i]!;
+    out[n.line] = `${n.indent}${n.marker} ${wanted[i]}`;
+  }
+  // Removals first, bottom-up, so earlier line numbers stay valid.
+  for (const n of existing.slice(wanted.length).reverse()) out.splice(n.line, n.end - n.line + 1);
+  if (wanted.length > existing.length) {
+    const after = existing.length ? existing[existing.length - 1]!.end : taskLine;
+    out.splice(after + 1, 0, ...wanted.slice(existing.length).map((n) => `${block.childIndent}${block.marker} ${n}`));
+  }
+  return out;
+}

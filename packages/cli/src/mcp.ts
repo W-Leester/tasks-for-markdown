@@ -1,7 +1,7 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { z } from 'zod';
-import { CliError, addTask, explainQuery, openWorkspace, postpone, removeTask, runQuery, setFields, setStatus, taskAt, type Workspace } from './commands';
+import { CliError, addNote, addTask, explainQuery, info, openWorkspace, postpone, removeTask, runQuery, setFields, setNotes, setStatus, taskAt, type Workspace } from './commands';
 import { loadConfig } from './config';
 import { listSavedQueries } from './savedQueries';
 import { StaleLineError } from './store';
@@ -27,11 +27,15 @@ const fields = {
   due: z.string().nullable().optional().describe(dateDesc),
   scheduled: z.string().nullable().optional().describe(dateDesc),
   start: z.string().nullable().optional().describe(dateDesc),
+  created: z.string().nullable().optional().describe(dateDesc),
+  done: z.string().nullable().optional().describe(`${dateDesc} (normally set by status "x")`),
+  cancelled: z.string().nullable().optional().describe(`${dateDesc} (normally set by status "-")`),
   recurrence: z.string().nullable().optional().describe('e.g. "every week on monday", or null to remove'),
   onCompletion: z.enum(['keep', 'delete']).nullable().optional(),
   id: z.string().nullable().optional(),
   dependsOn: z.array(z.string()).optional().describe('ids of tasks that must be done first'),
   status: z.string().length(1).optional().describe('status symbol, applied last (x done, / in progress, - cancelled, " " todo)'),
+  notes: z.array(z.string()).optional().describe('Replace ALL notes (indented bullets under the task), one entry per note; [] removes them. To add one note use tasks_add_note.'),
 };
 
 const text = (value: unknown) => ({ content: [{ type: 'text' as const, text: typeof value === 'string' ? value : JSON.stringify(value, null, 2) }] });
@@ -81,14 +85,15 @@ export function createMcpServer(opts: McpOptions): McpServer {
   server.registerTool('tasks_create', {
     title: 'Create a task',
     description: 'Append a task to a file (or insert after a 0-based line). Give the description without field emojis and use the typed fields; the line is written in canonical field order. The file is created if missing.',
-    inputSchema: { ...fields, description: z.string().describe('Task text, may contain #tags'), file: z.string().describe('Workspace-relative Markdown file'), afterLine: z.number().int().min(0).optional() },
-  }, async ({ file, afterLine, description, priority, due, scheduled, start, recurrence, onCompletion, id, dependsOn, status }) => guard(() => {
+    inputSchema: { ...fields, description: z.string().describe('Task text, may contain #tags'), tags: z.array(z.string()).optional().describe('Tags to append to the description, with or without #'), file: z.string().describe('Workspace-relative Markdown file'), afterLine: z.number().int().min(0).optional() },
+  }, async ({ file, afterLine, description, tags, notes, status, ...rest }) => guard(() => {
     const w = ws();
-    if (w.cfg.requireDueDate && !due) throw new CliError('INVALID_ARGUMENT', 'A due date is required (tasksmd.requireDueDate): pass "due"');
+    if (w.cfg.requireDueDate && !rest.due) throw new CliError('INVALID_ARGUMENT', 'A due date is required (tasksmd.requireDueDate): pass "due"');
+    const tagText = (tags ?? []).map((x) => (x.startsWith('#') ? x : `#${x}`)).filter((x) => !description.includes(x));
     // The due date arrives as a typed field and is applied right after; it was checked above.
-    const created = addTask(w, description, file, afterLine, { dueChecked: true });
+    const created = addTask(w, [description.trim(), ...tagText].join(' '), file, afterLine, { dueChecked: true, notes });
     const values: Record<string, string | string[] | null> = {};
-    for (const [k, v] of Object.entries({ priority, due, scheduled, start, recurrence, onCompletion, id, dependsOn })) if (v !== undefined) values[k] = v as string | string[] | null;
+    for (const [k, v] of Object.entries(rest)) if (v !== undefined) values[k] = v as string | string[] | null;
     if (!Object.keys(values).length && status === undefined) return created;
     return setFields(w, { path: created.path, line: created.line }, { ...values, ...(status !== undefined ? { status } : {}) });
   }));
@@ -97,13 +102,28 @@ export function createMcpServer(opts: McpOptions): McpServer {
     title: 'Update task fields',
     description: 'Change fields of an existing task; null removes a date/recurrence. Status (if given) is applied last with done/cancelled dates and recurrence handling.',
     inputSchema: { ...ref, ...fields },
-  }, async ({ path, line, expectedText, ...changes }) => guard(() => {
+  }, async ({ path, line, expectedText, notes, ...changes }) => guard(() => {
     const values: Record<string, string | string[] | null> = {};
     let status: string | undefined;
     for (const [k, v] of Object.entries(changes)) { if (v === undefined) continue; if (k === 'status') status = v as string; else values[k] = v as string | string[] | null; }
-    if (!Object.keys(values).length && status === undefined) throw new CliError('INVALID_ARGUMENT', 'Nothing to change');
-    return setFields(ws(), { path, line }, { ...values, ...(status !== undefined ? { status } : {}) }, expectedText);
+    if (!Object.keys(values).length && status === undefined && notes === undefined) throw new CliError('INVALID_ARGUMENT', 'Nothing to change');
+    const w = ws();
+    // Notes first: they leave the task line as it is, so expectedText stays valid for the field edit.
+    let result = notes === undefined ? null : setNotes(w, { path, line }, notes, expectedText);
+    if (Object.keys(values).length || status !== undefined) result = setFields(w, { path, line }, { ...values, ...(status !== undefined ? { status } : {}) }, result ? undefined : expectedText);
+    return result;
   }));
+
+  server.registerTool('tasks_add_note', {
+    title: 'Add a note to a task',
+    description: 'Add one note under the task: an indented plain bullet after its existing notes (or right below the task). Notes are never written on the task line itself.',
+    inputSchema: { ...ref, text: z.string().min(1).describe('The note text (one line)') },
+  }, async ({ path, line, expectedText, text: note }) => guard(() => addNote(ws(), { path, line }, note, expectedText)));
+
+  server.registerTool('tasks_info', {
+    title: 'Version, features and settings',
+    description: 'Server version, supported features (e.g. "notes") and the workspace settings that change what edits are accepted — notably requireDueDate (tasks_create needs "due" when true).',
+  }, async () => guard(() => info(ws(), opts.version ?? '0.0.0')));
 
   server.registerTool('tasks_set_status', {
     title: 'Set task status',

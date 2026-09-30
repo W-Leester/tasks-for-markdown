@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { noteBlock, parseFile } from '../../../src/core/file';
+import { addNoteLines, noteBlock, parseFile, setNoteLines } from '../../../src/core/file';
 import { toTaskDto } from '../../../src/core/dto';
 import { dayjs } from '../../../src/core/dates/dayjs';
 import { TaskIndex } from '../../../src/core/index';
@@ -61,5 +61,16 @@ describe('task notes (M13)', () => {
     const block = noteBlock(lines, 0);
     expect(block.notes.map((n) => n.text)).toEqual(['메모']);
     expect(block.marker).toBe('*');
+  });
+
+  it('addNoteLines / setNoteLines follow the editor rules (after sub-items of the last note; sub-tasks untouched)', () => {
+    const lines = ['- [ ] a', '  * one', '    - deeper', '  - [ ] sub', '  * two', '    - under two', '- [ ] b'];
+    expect(addNoteLines(lines, 0, 'three')).toEqual({ lines: ['- [ ] a', '  * one', '    - deeper', '  - [ ] sub', '  * two', '    - under two', '  * three', '- [ ] b'], line: 6 });
+    expect(addNoteLines(['- [ ] b'], 0, ' x\ny ').lines).toEqual(['- [ ] b', '  - x y']);
+    expect(() => addNoteLines(lines, 0, '  ')).toThrow();
+    expect(setNoteLines(lines, 0, ['ONE'])).toEqual(['- [ ] a', '  * ONE', '    - deeper', '  - [ ] sub', '- [ ] b']);
+    expect(setNoteLines(lines, 0, ['one', 'two', 'three', ''])).toEqual(['- [ ] a', '  * one', '    - deeper', '  - [ ] sub', '  * two', '    - under two', '  * three', '- [ ] b']);
+    expect(setNoteLines(lines, 0, [])).toEqual(['- [ ] a', '  - [ ] sub', '- [ ] b']);
+    expect(setNoteLines(['- [ ] b'], 0, ['n1', 'n2'])).toEqual(['- [ ] b', '  - n1', '  - n2']);
   });
 });

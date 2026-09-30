@@ -2,6 +2,8 @@
 
 **VS Code**와 **Cursor**에서 쓰는 Obsidian Tasks 호환 할 일 관리 확장입니다. (English: [docs/README.en.md](docs/README.en.md))
 
+> 이 확장은 Obsidian의 [Tasks 플러그인](https://github.com/obsidian-tasks-group/obsidian-tasks)에서 출발했습니다. 태스크 문법과 쿼리 언어, 그리고 그 프로젝트가 오랫동안 다듬어 온 설계 위에 VS Code·Cursor용으로 다시 만든 것입니다. 좋은 도구를 공개해 준 원작자와 기여자들께 감사드립니다. 아래 [감사의 말](#감사의-말)을 참고하세요.
+
 할 일은 노트 안의 체크리스트 줄 그대로 남습니다 — 별도 데이터베이스도, 종속도 없습니다:
 
 ```markdown
@@ -91,7 +93,7 @@ group by filename
 
 | 어디서 | 방법 |
 |---|---|
-| 다른 VS Code/Cursor 확장 | `getExtension('hastycapybara.tasks-for-markdown').exports.getAPI(1, { extensionId })` → `query.run(...)`, `edit.setStatus(...)` 등. 타입은 확장에 동봉된 `dist/api-types/api/types.d.ts` |
+| 다른 VS Code/Cursor 확장 | `getExtension('hastycapybara.tasks-for-markdown').exports.getAPI(1, { extensionId })` → `query.run(...)`, `edit.setStatus(...)`, `edit.addNote(...)` 등. 타입 정의는 import 없는 한 파일 [src/api/types.ts](src/api/types.ts)를 복사해 쓰면 됩니다 |
 | 키바인딩·매크로 | 명령 `tasksmd.api.<ns>.<method>` (예: `tasksmd.api.query.run` + `{ "query": "due today" }`) |
 | 터미널·스크립트·CI | `npx @hastycapybara/tasks-cli query "not done\ndue before today" --root ~/notes` — 편집기 없이 동작 |
 | AI 에이전트 (Claude Code 등) | `claude mcp add tasks -- npx -y @hastycapybara/tasks-cli mcp --root "$PWD"` 후 말로 지시 |
@@ -103,7 +105,7 @@ const r = await tasks.query.run('not done\nhappens on or before today');   // �
 await tasks.edit.setStatus({ path: r.tasks[0].path, line: r.tasks[0].line, expectedText: r.tasks[0].originalMarkdown }, 'x');
 ```
 
-쓰기는 기본 설정에서 호출자마다 한 번 확인창이 뜹니다(`tasksmd.api.writePolicy`). 값은 전부 JSON이고 오류는 `{ code, message }`입니다. Node 라이브러리만 필요하면 `@hastycapybara/tasks-core`.
+쓰기는 기본 설정에서 호출자마다 한 번 확인창이 뜹니다(`tasksmd.api.writePolicy`). 값은 전부 JSON이고 오류는 `{ code, message }`입니다. 메모 읽기·쓰기, 의존 관계(`isBlocked`/`isBlocking`)는 확장 API·CLI·MCP 모두 됩니다. 기본 설정에서는 새 태스크에 마감일이 필수이고, 설치된 버전이 지원하는 기능과 설정은 `info()`(CLI `tasksmd info`, MCP `tasks_info`)로 확인합니다. Node 라이브러리만 필요하면 `@hastycapybara/tasks-core`.
 
 ## 마크다운 미리보기에 관해
 
@@ -128,7 +130,13 @@ VS Code/Cursor에서 `F5`를 누르면 확장이 로드된 개발용 창이 열�
 
 ## 감사의 말
 
-태스크 문법, 쿼리 언어, 핵심 로직 일부(파서, 반복, 긴급도)는 [Obsidian Tasks](https://github.com/obsidian-tasks-group/obsidian-tasks)(MIT)에서 이식했습니다. [NOTICE.md](NOTICE.md)를 참고하세요. 이 프로젝트는 Obsidian과 관련이 없습니다.
+이 확장은 [Obsidian Tasks](https://github.com/obsidian-tasks-group/obsidian-tasks)가 없었다면 존재하지 않았습니다. 태스크 문법, 쿼리 언어, 핵심 로직 일부(파서, 반복, 긴급도)를 그 프로젝트에서 이식했고(MIT 라이선스), 기능 하나하나의 동작도 그 문서를 기준으로 맞췄습니다. 플러그인을 처음 만든 Martin Schenck, 오랫동안 이끌어 온 Clare Macrae, 그리고 모든 기여자께 깊이 감사드립니다.
+
+- Obsidian을 쓰신다면 원본 플러그인을 써 보세요: [Tasks 문서](https://publish.obsidian.md/tasks/) · [저장소](https://github.com/obsidian-tasks-group/obsidian-tasks)
+- 원본 프로젝트를 후원할 수 있습니다: [GitHub Sponsors (Clare Macrae)](https://github.com/sponsors/claremacrae)
+- 이식한 코드와 라이선스 고지는 [NOTICE.md](NOTICE.md)에 있습니다.
+
+이 프로젝트는 Obsidian Tasks 프로젝트나 Obsidian(Dynalist Inc.)과 관련이 없으며, 그들의 보증을 받지 않았습니다.
 
 ## 라이선스
 

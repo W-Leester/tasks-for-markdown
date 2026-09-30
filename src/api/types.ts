@@ -6,11 +6,86 @@
  *
  * Everything here is plain JSON: dates are `YYYY-MM-DD` strings, a task is addressed by its
  * workspace-relative path and 0-based line. No `vscode` types leak through this file, so it can
- * be copied into another project as a `.d.ts`.
+ * be copied into another project as a `.d.ts`. Keep it that way: **no imports** in this file (a test
+ * checks), and the data shapes below must match the internal DTOs exactly (a type test checks).
  */
-import type { GroupDto, SavedQueryDto, TaskDto, TreeDto } from '../core/dto';
 
-export type { GroupDto, SavedQueryDto, TaskDto, TreeDto };
+// ---- data -----------------------------------------------------------------------------------
+
+/** A task as JSON — what queries return and edits resolve to. Dates are `YYYY-MM-DD` or null. */
+export interface TaskDto {
+  /** Index key of the file (a URI string in the extension; the path in the CLI/MCP). With `line`, identifies the task for edits. */
+  key: string;
+  /** Workspace-relative path. */
+  path: string;
+  /** 0-based line number. */
+  line: number;
+  /** Nearest heading above the task (without `#`), or null. */
+  heading: string | null;
+  /** Line of the parent list item (task or bullet) in the same file, or null; see depth. (1.6.0) */
+  parentLine: number | null;
+  /** Nesting depth: 0 = top-level list item. (1.6.0) */
+  depth: number;
+  /** Notes: the task's direct child bullets without a checkbox, with their lines. (1.8.0) */
+  notes: { line: number; text: string }[];
+  /** Task text without the field emojis (tags included). */
+  description: string;
+  /** `type` is TODO, IN_PROGRESS, ON_HOLD, DONE, CANCELLED or NON_TASK. */
+  status: { symbol: string; name: string; type: string };
+  /** '0' (highest) … '3' (none) … '5' (lowest). */
+  priority: string;
+  priorityName: string;
+  created: string | null;
+  start: string | null;
+  scheduled: string | null;
+  due: string | null;
+  done: string | null;
+  cancelled: string | null;
+  /** Recurrence rule text such as `every week`, or null. */
+  recurrence: string | null;
+  onCompletion: string | null;
+  /** 🆔 of this task, or null. */
+  id: string | null;
+  /** ⛔ ids this task waits for. */
+  dependsOn: string[];
+  tags: string[];
+  /** Done or cancelled. */
+  isCompleted: boolean;
+  /** Done (not cancelled). */
+  isDone: boolean;
+  /** Waiting for an unfinished task it depends on (⛔). */
+  isBlocked: boolean;
+  /** Another unfinished task depends on this one — finishing it unblocks something. (1.13.0) */
+  isBlocking: boolean;
+  /** Obsidian Tasks' urgency score. */
+  urgency: number;
+  /** The whole line as it is in the file — pass it back as `expectedText` to guard edits. */
+  originalMarkdown: string;
+}
+
+/** A group of query results (`group by`). */
+export interface GroupDto {
+  name: string;
+  count: number;
+  children: GroupDto[];
+  tasks: TaskDto[];
+  /** Tree display (leaf groups only): `tasks` nested by parent task, with context children (`matched: false`). (1.6.0) */
+  tree?: TreeDto[];
+}
+
+export interface TreeDto {
+  task: TaskDto;
+  /** False for a context row: shown with its parent although it did not match the query. */
+  matched: boolean;
+  children: TreeDto[];
+}
+
+export interface SavedQueryDto {
+  id: string;
+  name: string;
+  query: string;
+  source: 'settings' | 'file';
+}
 
 export type ApiErrorCode =
   | 'STALE_LINE' // the line changed since it was read (expectedText / index mismatch)
@@ -116,6 +191,7 @@ export type EditOp =
   | { op: 'setStatus'; ref: TaskRef; symbol: string }
   | { op: 'toggle'; ref: TaskRef }
   | { op: 'postpone'; ref: TaskRef; to: string }
+  | { op: 'addNote'; ref: TaskRef; text: string }
   | { op: 'remove'; ref: TaskRef };
 
 export interface BatchResult {
@@ -134,12 +210,51 @@ export interface TaskCompletedEvent {
   next?: TaskDto;
 }
 
+export interface TaskStatusChangeEvent {
+  /** The task before the change. */
+  before: TaskDto;
+  /** The task after the change (its line as written; for 🏁 delete this is the removed task). */
+  after: TaskDto;
+  /** The next occurrence written for a recurring task, if any. */
+  next?: TaskDto;
+  /** True when the task line was deleted (🏁 delete on completion). */
+  deleted: boolean;
+}
+
+/**
+ * Names of optional capabilities, so a caller can check what the installed extension supports
+ * (all within API version 1). See docs/api.md "Feature list" for the version each was added in.
+ */
+export type ApiFeature = 'tree' | 'notes' | 'notes.add' | 'info' | 'events.status' | 'isBlocking';
+
+export interface ApiInfo {
+  /** Version of the installed extension, e.g. `1.13.0`. */
+  extensionVersion: string;
+  apiVersion: 1;
+  features: ApiFeature[];
+  /** Settings that change what edits are accepted or how lines are written. */
+  settings: {
+    /** `tasksmd.requireDueDate` (default true): `edit.create` rejects a task without `due`. */
+    requireDueDate: boolean;
+    /** `tasksmd.taskFormat`: how fields are written. */
+    taskFormat: 'emoji' | 'dataview';
+    /** `tasksmd.globalFilter`: only lines containing it are tasks ('' = off). */
+    globalFilter: string;
+  };
+}
+
 export interface ApiDisposable {
   dispose(): void;
 }
 
 export interface TasksApi {
   readonly version: 1;
+  /** Version of the installed extension, e.g. `1.13.0`. (1.13.0) */
+  readonly extensionVersion: string;
+  /** Optional capabilities this build supports — check before using a newer field or method. (1.13.0) */
+  readonly features: readonly ApiFeature[];
+  /** Version, features and the settings that affect edits (e.g. whether a due date is required). (1.13.0) */
+  info(): Promise<ApiInfo>;
 
   query: {
     /** Run query text (the same language as ```tasks blocks). Rejects with INVALID_QUERY on parse errors. */
@@ -165,6 +280,8 @@ export interface TasksApi {
     postpone(ref: TaskRef, to: string): Promise<TaskDto>;
     /** Delete the task line. */
     remove(ref: TaskRef): Promise<void>;
+    /** Add one note (an indented bullet) under the task, after its existing notes. Returns the task with its notes. (1.13.0) */
+    addNote(ref: TaskRef, text: string): Promise<TaskDto>;
     /** Run several edits in order. Stops at the first failure; the error's `details` says how many completed. */
     batch(ops: EditOp[]): Promise<BatchResult>;
   };
@@ -172,6 +289,8 @@ export interface TasksApi {
   events: {
     onDidChangeTasks(listener: (e: TasksChangeEvent) => void): ApiDisposable;
     onDidCompleteTask(listener: (e: TaskCompletedEvent) => void): ApiDisposable;
+    /** Every status change (done, cancelled, in progress, reopened…) from the editor, sidebar, views or the API. (1.13.0) */
+    onDidChangeStatus(listener: (e: TaskStatusChangeEvent) => void): ApiDisposable;
   };
 
   ui: {

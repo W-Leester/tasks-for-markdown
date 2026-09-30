@@ -11,7 +11,7 @@ import { applyFieldValues, type FieldValues } from '../services/taskFields';
 import type { Settings } from '../settings/Settings';
 import type { WebviewHost } from '../webviewHost/WebviewHost';
 import { t } from '../l10n';
-import type { ApiCaller, ApiError, ApiErrorCode, BatchResult, CreateTarget, EditOp, NewTask, TaskDto, TaskFieldChanges, TaskRef, TasksApi } from './types';
+import type { ApiCaller, ApiError, ApiErrorCode, ApiFeature, ApiInfo, BatchResult, CreateTarget, EditOp, NewTask, TaskDto, TaskFieldChanges, TaskRef, TasksApi } from './types';
 
 export class TasksApiError extends Error implements ApiError {
   constructor(
@@ -44,6 +44,8 @@ export interface TasksApiDeps {
   getStatusRegistry(): StatusRegistry;
   log(message: string): void;
   clock?: Clock;
+  /** Version of the installed extension (package.json). */
+  extensionVersion?: string;
   ui: {
     openEdit(target: { key: string | null; line: number | null }): WebviewHost;
     openKanban(): WebviewHost;
@@ -53,6 +55,9 @@ export interface TasksApiDeps {
 }
 
 const MAX_LINE = Number.MAX_SAFE_INTEGER;
+
+/** Optional capabilities of this build (docs/api.md "Feature list"). Add a name whenever an additive API feature ships. */
+export const API_FEATURES: readonly ApiFeature[] = ['tree', 'notes', 'notes.add', 'info', 'events.status', 'isBlocking'];
 
 /**
  * The public API (docs/api-plan.md §4). One instance per caller so the write-confirmation
@@ -228,8 +233,25 @@ export function createTasksApi(deps: TasksApiDeps, caller: ApiCaller = {}): Task
     await deps.editService.deleteTaskLine(task);
   };
 
+  const addNote = async (ref: TaskRef, text: string): Promise<TaskDto> => {
+    if (typeof text !== 'string' || !text.trim()) fail('INVALID_ARGUMENT', 'text must be a non-empty string');
+    const task = await requireTask(ref);
+    logWrite('edit.addNote', `${ref.path}:${ref.line + 1}`);
+    await deps.editService.addNote(task, text);
+    return dto(fresh(task));
+  };
+  const info = (): ApiInfo => ({
+    extensionVersion: deps.extensionVersion ?? '0.0.0',
+    apiVersion: 1,
+    features: [...API_FEATURES],
+    settings: { requireDueDate: deps.settings.get('requireDueDate'), taskFormat: deps.settings.get('taskFormat'), globalFilter: deps.settings.get('globalFilter') ?? '' },
+  });
+
   const api: TasksApi = {
     version: 1,
+    extensionVersion: deps.extensionVersion ?? '0.0.0',
+    features: API_FEATURES,
+    info: () => wrap(async () => info()),
     query: {
       run: (query, options) => wrap(async () => {
         if (typeof query !== 'string') fail('INVALID_ARGUMENT', 'query must be a string');
@@ -265,6 +287,7 @@ export function createTasksApi(deps: TasksApiDeps, caller: ApiCaller = {}): Task
       toggle: (ref) => wrap(async () => { await ensureWrite('toggle'); return toggle(ref); }),
       postpone: (ref, to) => wrap(async () => { await ensureWrite('postpone'); return postpone(ref, to); }),
       remove: (ref) => wrap(async () => { await ensureWrite('remove'); return remove(ref); }),
+      addNote: (ref, text) => wrap(async () => { await ensureWrite('addNote'); return addNote(ref, text); }),
       batch: (ops) => wrap(async () => {
         if (!Array.isArray(ops)) fail('INVALID_ARGUMENT', 'ops must be an array');
         const limit = deps.settings.get('api.batchLimit');
@@ -281,6 +304,7 @@ export function createTasksApi(deps: TasksApiDeps, caller: ApiCaller = {}): Task
               case 'toggle': results.push(await toggle(op.ref)); break;
               case 'postpone': results.push(await postpone(op.ref, op.to)); break;
               case 'remove': await remove(op.ref); results.push(null); break;
+              case 'addNote': results.push(await addNote(op.ref, op.text)); break;
               default: fail('INVALID_ARGUMENT', `Unknown op "${String((op as EditOp).op)}" at index ${i}`);
             }
           } catch (err) {
@@ -302,6 +326,11 @@ export function createTasksApi(deps: TasksApiDeps, caller: ApiCaller = {}): Task
       onDidCompleteTask: (listener) =>
         deps.editService.onDidSetStatus((e) => {
           if (e.after.isCompleted && !e.before.isCompleted) listener({ task: dto(e.after), ...(e.created[0] ? { next: dto(e.created[0]) } : {}) });
+        }),
+      onDidChangeStatus: (listener) =>
+        deps.editService.onDidSetStatus((e) => {
+          if (e.before.status.symbol === e.after.status.symbol) return;
+          listener({ before: dto(e.before), after: dto(e.deleted ? e.after : fresh(e.after)), ...(e.created[0] ? { next: dto(e.created[0]) } : {}), deleted: e.deleted });
         }),
     },
     ui: {

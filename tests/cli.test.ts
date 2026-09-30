@@ -114,6 +114,25 @@ describe('tasksmd CLI', () => {
     expect(out[1]).toMatch(/^- \[ \] child/);
   });
 
+  it('notes (M17): add --note, note, set --notes (replace / none), notes in --md output; info', async () => {
+    expect(await cli('add', 'contract review 📅 2026-10-01', '--file', 'notes/todo.md', '--line', '3', '--note', 'clause 3', '--json')).toBe(0);
+    expect(read('notes/todo.md').split('\n').slice(2, 6)).toEqual(['- [ ] write report #work ⏫ 📅 2026-09-25', '- [ ] contract review 📅 2026-10-01', '  - clause 3', '- [ ] weekly sync 🔁 every week 📅 2026-09-26']);
+    out = [];
+    expect(await cli('note', 'notes/todo.md:4', 'waiting', 'for', 'reply', '--expect', '- [ ] contract review 📅 2026-10-01', '--json')).toBe(0);
+    expect(JSON.parse(out.join('\n')).notes.map((n: { text: string }) => n.text)).toEqual(['clause 3', 'waiting for reply']);
+    out = [];
+    expect(await cli('query', 'description includes contract', '--md')).toBe(0);
+    expect(out).toContain('  - clause 3');
+    expect(await cli('set', 'notes/todo.md:4', '--notes', 'one\\ntwo', '--priority', '1', '--json')).toBe(0);
+    expect(read('notes/todo.md').split('\n').slice(3, 6)).toEqual(['- [ ] contract review ⏫ 📅 2026-10-01', '  - one', '  - two']);
+    expect(await cli('set', 'notes/todo.md:4', '--notes', 'none')).toBe(0);
+    expect(read('notes/todo.md')).not.toContain('  - one');
+    expect(await cli('note', 'notes/todo.md:4', '--expect', 'stale line', 'x')).toBe(1);
+    out = [];
+    expect(await cli('info', '--json')).toBe(0);
+    expect(JSON.parse(out.join('\n'))).toMatchObject({ features: expect.arrayContaining(['notes', 'notes.add', 'isBlocking']), settings: { requireDueDate: true } });
+  });
+
   it('help and unknown command', async () => {
     expect(await cli('--help')).toBe(2);
     expect(out[0]).toContain('Usage');

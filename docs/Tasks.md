@@ -42,7 +42,7 @@
 | M14 | 렌더 보기 열 숨기기(툴바 `열 ▾`) | ✅ 완료(1.9.0) | 이 문서 M14, design.md 7.13 |
 | M15 | 열 제목 줄(쿼리 결과·본문), 툴바와 같은 전역 열 숨기기 | ✅ 완료(1.11.0; 1.10.0은 블록별) | 이 문서 M15, design.md 7.14 |
 | M16 | 렌더 보기 열 너비 조절(제목 줄 경계 끌기) | ✅ 완료(1.12.0) | 이 문서 M16, design.md 7.15 |
-| M17 | 외부 연동 보강(독립 타입, 메모·기능 확인·상태 알림·isBlocking, CLI·MCP), 출처 표시 | 🟡 계획 확정(2026-09-30) | 이 문서 M17, release.md |
+| M17 | 외부 연동 보강(독립 타입, 메모·기능 확인·상태 알림·isBlocking, CLI·MCP), 출처 표시 | ✅ 완료(1.13.0) | 이 문서 M17, release.md |
 
 ---
 
@@ -815,13 +815,13 @@
 **문서.** 버전 관리와 배포 때 빠뜨리면 안 되는 항목을 [release.md](release.md) "빠뜨리지 말 것" 체크리스트로 정리(세 곳 동시 반영, 기능 목록·버전 표, 타입 파일, 1.0.0 공개 시 버전 번호 문제 등).
 
 ### 할 일
-- [ ] release.md 체크리스트 (먼저)
-- [ ] 독립 타입 파일 + 내부 DTO와 양방향 검사 + import 없음 검사
-- [ ] core: 메모 삽입/교체 순수 함수, `TaskDto.isBlocking`
-- [ ] 확장 API: `addNote`, batch·명령, `extensionVersion`·`features`·`info()`, `onDidChangeStatus`
-- [ ] CLI: `note`, `add --note`, `set --notes`
-- [ ] MCP: `tasks_add_note`, create/update의 notes·created·done·cancelled·tags, 문법 설명서
-- [ ] 테스트(단위·CLI·MCP·통합), 문서(api.md·api.en.md, README 한·영, CHANGELOG, NOTICE 점검)
+- [x] release.md 체크리스트 (먼저)
+- [x] 독립 타입 파일 + 내부 DTO와 양방향 검사 + import 없음 검사
+- [x] core: 메모 삽입/교체 순수 함수, `TaskDto.isBlocking`
+- [x] 확장 API: `addNote`, batch·명령, `extensionVersion`·`features`·`info()`, `onDidChangeStatus`
+- [x] CLI: `note`, `add --note`, `set --notes`
+- [x] MCP: `tasks_add_note`, create/update의 notes·created·done·cancelled·tags, 문법 설명서
+- [x] 테스트(단위·CLI·MCP·통합), 문서(api.md·api.en.md, README 한·영, CHANGELOG, NOTICE 점검)
 
 ## 향후 후보 (미착수)
 

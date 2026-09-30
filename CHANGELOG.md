@@ -1,5 +1,19 @@
 # 변경 이력
 
+## 1.13.0 — 2026-09-30
+
+### API (외부 연동, 모두 추가만 — API 버전 1 유지)
+- **기능 확인**: `api.extensionVersion`, `api.features`(기능 이름 목록), `api.info()`(버전·기능·`requireDueDate` 등 설정). CLI `tasksmd info`, MCP `tasks_info`.
+- **메모 쓰기를 세 곳 모두에**: 확장 API `edit.addNote`(한 줄 추가, batch·명령 포함), CLI `tasksmd note`, `add --note`, `set --notes`, MCP `tasks_add_note`와 `tasks_create`·`tasks_update`의 `notes`. CLI 마크다운 출력에 메모 표시.
+- **상태 변경 알림**: `events.onDidChangeStatus({ before, after, next?, deleted })` — 완료뿐 아니라 진행 중·취소·다시 열기 등 모든 상태 변경.
+- **`TaskDto.isBlocking`**: 다른 미완료 태스크가 이 태스크를 기다리는지(확장·CLI·MCP 공통).
+- **MCP**: `tasks_create`·`tasks_update`에 `created`·`done`·`cancelled` 날짜, `tasks_create`에 `tags`. AI용 문법 설명서에 메모 형식과 마감일 필수 규칙.
+- **타입 정의 한 파일**: `src/api/types.ts`가 import 없는 독립 파일이 되어 그대로 복사해 쓸 수 있습니다(내부 데이터 모양과 일치하는지 테스트로 확인).
+- 문서: API 문서에 마감일 필수, 기능 목록 표, 세 가지 연동 경로 정리. 배포 체크리스트(docs/release.md "빠뜨리지 말 것").
+
+### 변경
+- README와 마켓플레이스 소개에 Obsidian Tasks 플러그인에서 출발했음을 밝히고, 감사의 말을 보강했습니다(원작자·기여자, 원본 문서·저장소, 후원 링크).
+
 ## 1.12.0 — 2026-09-30
 
 ### 추가

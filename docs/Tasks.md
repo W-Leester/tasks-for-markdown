@@ -43,6 +43,7 @@
 | M15 | 열 제목 줄(쿼리 결과·본문), 툴바와 같은 전역 열 숨기기 | ✅ 완료(1.11.0; 1.10.0은 블록별) | 이 문서 M15, design.md 7.14 |
 | M16 | 렌더 보기 열 너비 조절(제목 줄 경계 끌기) | ✅ 완료(1.12.0) | 이 문서 M16, design.md 7.15 |
 | M17 | 외부 연동 보강(독립 타입, 메모·기능 확인·상태 알림·isBlocking, CLI·MCP), 출처 표시 | ✅ 완료(1.13.0) | 이 문서 M17, release.md |
+| M18 | 마켓플레이스 정식 공개 준비(1.0.0 재시작, 저장소 공개, 영어 README, npm) | 🟡 진행 중(2026-09-30) | 이 문서 M18, release.md |
 
 ---
 
@@ -822,6 +823,40 @@
 - [x] CLI: `note`, `add --note`, `set --notes`
 - [x] MCP: `tasks_add_note`, create/update의 notes·created·done·cancelled·tags, 문법 설명서
 - [x] 테스트(단위·CLI·MCP·통합), 문서(api.md·api.en.md, README 한·영, CHANGELOG, NOTICE 점검)
+
+## M18. 마켓플레이스 정식 공개 준비 (계획 확정 2026-09-30)
+
+**사용자 결정(2026-09-30).**
+1. 버전은 **1.0.0으로 다시 시작**한다(내부 개발 버전은 1.13.0까지). 확장·`packages/core`·`packages/cli`·새 타입 패키지 모두 1.0.0.
+2. GitHub 저장소를 **공개**한다.
+3. 마켓 페이지(README.md)는 **영어 기본**, 한국어 README(README.ko.md)로 연결.
+4. CLI·MCP(`@hastycapybara/tasks-cli`), 라이브러리(`@hastycapybara/tasks-core`), 타입(`@hastycapybara/tasks-api`)을 npm에 **함께 배포**.
+5. 아이콘: 사용자가 준 `media/icon_v1.png`에서 배경을 빼고 타일만 잘라 `media/icon.png`(256×256, 투명 모서리).
+
+**할 일 (제가)**
+- 패키지 정보: `icon`, `version 1.0.0`, 영어 우선 소개문, 분류·검색어 보강, `galleryBanner`. `.vscodeignore`에 `examples/**`, `media/icon_v1.png`(설치 파일에서 제외; 확장이 쓰지 않음).
+- README: 영어를 `README.md`로, 한국어를 `README.ko.md`로. 서로 연결. 문서 안 링크 정리(공개 저장소 기준 상대 경로). **README 이미지는 PNG/GIF만**(마켓이 SVG를 거부) — 렌더 보기·쿼리 결과 스크린샷을 PNG로.
+- 버전 기준 정리: 공개 사용자에게는 1.0.0이 처음이므로 API 문서·타입 주석의 "1.6.0/1.8.0/1.13.0에 추가" 표기를 **1.0.0 기준**으로 바꾼다(기능 목록 표는 전부 1.0.0).
+- CHANGELOG: `1.0.0 — 첫 공개` 항목(영어·한국어 요약)만 남기고, 내부 개발 이력(0.x~1.13.0)과 docs/post-release-changes.md는 `docs/history-internal.md`로 옮긴다.
+- npm: `packages/api`(타입 패키지) 신설, 세 패키지 메타데이터 점검, Release 워크플로에 npm 게시 단계(`NPM_TOKEN` 있을 때만).
+- 전체 테스트, `vsce ls`로 설치 파일 확인, 수동 테스트 목록 정리.
+
+**할 일 (사용자)**
+- 계정·토큰: VS Code Marketplace 퍼블리셔 `hastycapybara` + PAT, Open VSX 네임스페이스 + 토큰(Cursor는 Open VSX 사용), npm 조직 `hastycapybara` + 토큰 → GitHub Secrets `VSCE_PAT`·`OVSX_PAT`·`NPM_TOKEN`.
+- 저장소 공개 전환(Settings › Danger Zone 또는 `gh repo edit --visibility public --accept-visibility-change-consequences`). 공개되면 커밋 작성자 이메일(lwy502@gmail.com)이 보인다(이력을 다시 쓰지 않는 한 되돌릴 수 없음).
+- 설치 파일로 수동 테스트 한 바퀴(Cursor), 가능하면 칸반·캘린더 실제 화면 스크린샷.
+- 태그 `v1.0.0` 푸시 → 자동 게시.
+
+**알려 둘 영향.** 사내에서 `.vsix`로 1.13.0을 쓰던 사용자는 1.0.0이 더 낮은 번호라 업데이트 알림을 받지 못한다 → 마켓(자동 업데이트)으로 옮기거나 1.0.0을 직접 설치하도록 안내.
+
+### 할 일
+- [ ] 아이콘 `media/icon.png` (완료: 2026-09-30)
+- [ ] 패키지 정보·제외 목록
+- [ ] README 영어 기본 + README.ko.md, 링크 정리, PNG 스크린샷
+- [ ] 버전 표기 1.0.0 기준 정리(API 문서·타입 주석), 버전 번호 1.0.0
+- [ ] CHANGELOG 1.0.0 + docs/history-internal.md
+- [ ] npm 타입 패키지 `packages/api`, 워크플로 npm 게시
+- [ ] 전체 검증, 설치 파일 확인, release.md 절차 갱신
 
 ## 향후 후보 (미착수)
 

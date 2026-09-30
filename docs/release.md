@@ -59,10 +59,13 @@ git tag v<ver> && git push origin v<ver>
 
 ### C. 마켓플레이스 첫 공개(1.0.0) 때 한 번
 
-- [ ] **버전 번호 결정.** 내부 버전이 이미 1.x(현재 1.13 근처)라 1.0.0으로 내리면 **번호가 뒤로 간다.** 영향:
-  - 사내 `.vsix` 사용자의 업데이트 알림(`latest.json` 비교)이 1.0.0을 "새 버전"으로 보지 않는다 → 사내 사용자에게 수동 설치 안내, 또는 `latest.json` 교체.
-  - Marketplace·Open VSX에는 아직 올린 적이 없으니 1.0.0으로 시작해도 문제없다.
-  - 대안: 공개 버전을 지금 번호 다음(예 1.14.0)으로 이어 가기. 결정 후 이 줄을 갱신.
+- [x] **버전 번호 결정 (2026-09-30): 1.0.0으로 다시 시작.** 내부 개발 버전은 1.13.0까지였다. 영향:
+  - 사내 `.vsix` 사용자의 업데이트 알림(`latest.json` 비교)이 1.0.0을 "새 버전"으로 보지 않는다 → 마켓 설치(자동 업데이트)로 옮기거나 1.0.0을 직접 설치하도록 안내.
+  - Marketplace·Open VSX·npm에는 처음 올리는 것이라 문제없다.
+  - API 문서의 "추가된 버전"은 공개 기준(1.0.0)으로 적는다. 내부 버전 번호는 docs/history-internal.md에만.
+- [x] **저장소 공개 (결정 2026-09-30).** 공개 전 비밀 값 검사(2026-09-30: 파일·140개 커밋 이력에서 토큰·키 없음). 커밋 작성자 이메일이 공개된다.
+- [x] **마켓 페이지 언어 (결정 2026-09-30):** README.md 영어 기본, README.ko.md로 연결. README 이미지는 PNG/GIF만(마켓이 SVG 거부).
+- [x] **npm 동시 배포 (결정 2026-09-30):** tasks-core, tasks-cli, tasks-api.
 - [ ] **CHANGELOG 정리.** 내부 이력을 "1.0.0 — 첫 공개" 요약으로 묶을지 결정(사용자 결정: 1.0.0 때 정리). docs/post-release-changes.md(1.4.0 이후 갱신 안 됨)도 이때 정리.
 - [ ] **npm 패키지 발행**: `@hastycapybara/tasks-core`, `@hastycapybara/tasks-cli`, 그리고 타입 패키지 `@hastycapybara/tasks-api`(src/api/types.ts로 만든 `.d.ts`만 담은 패키지; 폴더 `packages/api` 신설). npm 계정·스코프 `hastycapybara` 필요.
 - [ ] 계정: Marketplace 퍼블리셔 `hastycapybara`, Open VSX 네임스페이스, npm 스코프(위 "한 번만" 절).

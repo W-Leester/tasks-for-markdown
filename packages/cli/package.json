@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Command line for Tasks for Markdown: query, add, complete and edit Obsidian Tasks-style task lines in a folder of Markdown notes — no editor required.",
   "license": "MIT",
-  "author": "hastyCapybara (W.Leester)",
+  "author": "HastyCapybara (W.Leester)",
   "homepage": "https://github.com/W-Leester/tasks-for-markdown",
   "repository": {
     "type": "git",

@@ -1,4 +1,5 @@
 {
+  "tasksmd.description": "Obsidian Tasks-style task management for Markdown in VS Code and Cursor: queries, rendered view, kanban, calendar, recurrence and notes. Inspired by and compatible with the Obsidian Tasks plugin.",
   "tasksmd.reindex.title": "Reindex all tasks",
   "tasksmd.config.taskFormat": "Format used when writing task fields. Both formats are always read.",
   "tasksmd.config.taskFormat.emoji": "Emoji: 📅 2026-01-01 ⏫ 🔁 every week",

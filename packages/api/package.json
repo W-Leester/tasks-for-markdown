@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "TypeScript types for the public API of the Tasks for Markdown VS Code/Cursor extension (getAPI(1)): queries, edits, notes, events. Types only — no runtime code.",
   "license": "MIT",
-  "author": "hastyCapybara (W.Leester)",
+  "author": "HastyCapybara (W.Leester)",
   "homepage": "https://github.com/W-Leester/tasks-for-markdown/blob/main/docs/api.en.md",
   "repository": {
     "type": "git",

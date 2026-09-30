@@ -1,4 +1,5 @@
 {
+  "tasksmd.description": "Obsidian Tasks 플러그인에서 출발한 VS Code·Cursor용 마크다운 할 일 관리: 쿼리, 렌더 보기, 칸반, 캘린더, 반복, 메모. Obsidian Tasks 문법과 호환됩니다.",
   "tasksmd.reindex.title": "모든 태스크 다시 인덱싱",
   "tasksmd.config.taskFormat": "태스크 필드를 쓸 때 사용할 포맷. 읽기는 항상 두 포맷 모두 지원합니다.",
   "tasksmd.config.taskFormat.emoji": "이모지: 📅 2026-01-01 ⏫ 🔁 every week",

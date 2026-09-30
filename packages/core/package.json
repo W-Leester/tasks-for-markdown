@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Obsidian Tasks-compatible task lines, dates, recurrence and query engine for Markdown — the core of Tasks for Markdown, usable from any Node program.",
   "license": "MIT",
-  "author": "hastyCapybara (W.Leester)",
+  "author": "HastyCapybara (W.Leester)",
   "homepage": "https://github.com/W-Leester/tasks-for-markdown",
   "repository": {
     "type": "git",

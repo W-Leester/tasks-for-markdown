@@ -1,7 +1,7 @@
 {
   "name": "tasks-for-markdown",
   "displayName": "Tasks for Markdown",
-  "description": "Obsidian Tasks-style task management for Markdown in VS Code and Cursor: queries, rendered view, kanban, calendar, recurrence and notes. Inspired by and compatible with the Obsidian Tasks plugin.",
+  "description": "%tasksmd.description%",
   "icon": "media/icon.png",
   "galleryBanner": {
     "color": "#171d35",

@@ -6,12 +6,12 @@
 
 1. **수동 점검.** Cursor에 설치된 1.0.0으로 [manual-checklist.md](manual-checklist.md)를 한 바퀴. 문제가 있으면 고친 뒤 다시 패키징.
 2. **VS Code Marketplace 퍼블리셔와 토큰.**
-   - https://marketplace.visualstudio.com/manage → Microsoft 계정으로 로그인 → *Create publisher*: ID `hastycapybara`(package.json의 `publisher`와 정확히 같아야 함), 표시 이름은 자유.
+   - https://marketplace.visualstudio.com/manage → Microsoft 계정으로 로그인 → *Create publisher*: ID `hastycapybara`(package.json의 `publisher`와 정확히 같아야 함), **표시 이름(Display name)은 `HastyCapybara`**. 마켓 페이지와 마켓에서 설치한 확장에는 이 표시 이름이 보인다(`.vsix`로 설치하면 ID가 보임).
    - https://dev.azure.com 에서 같은 계정으로 조직을 하나 만든 뒤 *User settings › Personal access tokens › New token*: Organization **All accessible organizations**, Scopes **Marketplace › Manage**. 만료일은 길게.
 3. **Open VSX 네임스페이스와 토큰** (Cursor가 이 마켓을 쓴다).
    - https://open-vsx.org → GitHub로 로그인 → 프로필에서 **Eclipse 계정 연결과 Publisher Agreement 서명**(안 하면 게시가 거부됨).
    - *Settings › Access Tokens*에서 토큰 발급.
-   - 네임스페이스 만들기(한 번): `npx ovsx create-namespace hastycapybara -p <토큰>`.
+   - 네임스페이스 만들기(한 번): `npx ovsx create-namespace hastycapybara -p <토큰>`. 만든 뒤 open-vsx.org의 네임스페이스 설정에서 표시 이름을 `HastyCapybara`로 적을 수 있으면 적는다.
 4. **npm 조직과 토큰.**
    - https://www.npmjs.com 가입 → *Add Organization*: 이름 `hastycapybara`(무료, 공개 패키지).
    - *Access Tokens › Generate New Token › Granular*: 패키지·스코프 `@hastycapybara` **Read and write**. (계정에 2단계 인증이 켜져 있으면 "Bypass 2FA"가 가능한 토큰이어야 자동 게시가 된다.)
@@ -67,6 +67,14 @@ code --install-extension tasks-for-markdown-<ver>.vsix   # 또는 cursor --insta
 # 4. 태그 푸시 → GitHub Actions가 빌드·테스트·Release 첨부·(토큰 있으면) 게시
 git tag v<ver> && git push origin v<ver>
 ```
+
+## 이름 표기 규칙
+
+| 쓰는 곳 | 표기 | 이유 |
+|---|---|---|
+| 사람이 읽는 이름: 마켓 퍼블리셔 표시 이름, LICENSE, npm 패키지 `author`, 문서 본문의 만든 사람 | **HastyCapybara** | 결정 2026-10-01 |
+| 퍼블리셔 ID(`package.json` `publisher`), 확장 ID `hastycapybara.tasks-for-markdown`, Open VSX 네임스페이스 | `hastycapybara` | 기술 식별자. 게시 후에는 바꿀 수 없고, 확장 ID는 대소문자를 구분하지 않는다 |
+| npm 조직·패키지 `@hastycapybara/tasks-core` 등 | `hastycapybara` | npm은 패키지 이름에 대문자를 허용하지 않는다 |
 
 ## 빠뜨리지 말 것 (버전 관리·배포 체크리스트)
 

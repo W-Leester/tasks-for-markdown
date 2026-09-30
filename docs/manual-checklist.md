@@ -8,13 +8,15 @@ docs/Tasks.md에 남아 있는 미체크 항목 중 자동 테스트로 대신�
 
 ## 2. 수동 테스트 (7개)
 
+> **Cursor에서 `Cmd+K`로 시작하는 단축키는 쓰지 마세요.** Cursor는 `Cmd+K`를 AI 인라인 편집(입력 상자가 뜨는 것)에 쓰기 때문에, VS Code의 `Cmd+K Cmd+T`(색 테마), `Cmd+K V`(미리보기를 옆에 열기) 같은 두 단계 단축키가 동작하지 않습니다. 아래에서는 **명령 팔레트**(`Cmd/Ctrl+Shift+P`)로 같은 명령을 부릅니다. VS Code에서는 단축키도 그대로 됩니다.
+
 ### 2-1. 하이 컨트라스트 테마 점검
 
-1. `Cmd/Ctrl+K` 다음 `Cmd/Ctrl+T` → **Dark High Contrast** 선택. 나중에 **Light High Contrast**도 한 번.
+1. 명령 팔레트(`Cmd/Ctrl+Shift+P`) → `Preferences: Color Theme` → **Dark High Contrast** 선택. 나중에 **Light High Contrast**도 한 번. (VS Code에서는 `Cmd/Ctrl+K` 다음 `Cmd/Ctrl+T`도 됩니다.)
 2. `examples/샘플-태스크.md`를 텍스트 편집기로 엽니다.
 3. 볼 것:
    - 줄 끝 상대 날짜 장식("4일 지남" 등)과 기한 초과 줄 배경이 **읽히는지** (글자가 배경에 묻히지 않아야 함).
-   - `Cmd/Ctrl+K V`로 미리보기를 옆에 열어 뱃지·체크박스·쿼리 결과 카드가 보이는지.
+   - 명령 팔레트 → `Markdown: Open Preview to the Side`로 미리보기를 옆에 열어 뱃지·체크박스·쿼리 결과 카드가 보이는지.
    - `Ctrl+Shift+R` 렌더 보기, `Tasks: 칸반 보드 열기`, `Tasks: 캘린더 열기`, `Ctrl+Shift+C` 편집 대화상자 순서로 열어 테두리·포커스 링·버튼이 보이는지. 하이 컨트라스트에서는 테두리가 두껍고 뚜렷해야 정상입니다.
 4. 문제가 보이면 어느 화면의 어떤 요소인지 스크린샷을 남겨 주세요. 색은 모두 `--vscode-*` 변수라 `package.json`의 `contributes.colors` hc 기본값만 고치면 됩니다.
 
@@ -32,7 +34,7 @@ docs/Tasks.md에 남아 있는 미체크 항목 중 자동 테스트로 대신�
 2. 에디터: 태스크 줄에서 `Cmd/Ctrl+Enter` 완료 → `✅ 날짜`가 붙는지 → **`Cmd/Ctrl+Z`를 한 번** 눌러 원래 줄로 **한 번에** 돌아오는지(두 번 눌러야 하면 버그). 반복 태스크(`운동 #건강 🔁 every day when done`)에서도 완료 → 새 줄이 위에 생기고 `Cmd/Ctrl+Z` 한 번에 둘 다 사라지는지.
 3. CodeLens: 커서 줄 위에 `✔ 완료 · 우선순위 ▾ · 📅 …` 렌즈가 뜨고 클릭이 되는지.
 4. 자동완성: 새 줄에 `- [ ] 테스트 ` 입력 후 스페이스 → 제안 상자에 📅/⏫/🔁 항목, `due tom` 입력 시 내일 날짜 제안.
-5. 미리보기(`Cmd/Ctrl+K V`)에 뱃지와 쿼리 결과가 보이는지, 링크 클릭이 파일을 여는지.
+5. 미리보기(명령 팔레트 → `Markdown: Open Preview to the Side`)에 뱃지와 쿼리 결과가 보이는지, 링크 클릭이 파일을 여는지.
 6. 칸반: 카드를 다른 컬럼으로 드래그 → 파일의 상태 기호가 바뀌는지. `Alt+←/→`도.
 7. 캘린더: 항목을 다른 날로 드래그 → 📅 날짜가 바뀌는지. `⤢ 전체 화면`과 `Esc`.
 8. 알림: 설정 `tasksmd.notifications.dailyTime`을 현재 시각 +1분으로 바꾸고 기다렸다가 토스트와 OS 알림이 오는지. Windows/Linux에서는 OS 알림(PowerShell 토스트 / `notify-send`)이 특히 확인 대상입니다.
@@ -45,12 +47,12 @@ Windows에서는 키 표기가 `Ctrl+Shift+C`, `Ctrl+Shift+R`로 같고, 경로 
 VS Code와 다른 부분만 봅니다.
 1. `Ctrl+Shift+C`, `Ctrl+Shift+R`, `Cmd/Ctrl+Enter`가 **Cursor의 기본 키와 충돌하지 않는지**: 텍스트 편집기, 렌더 보기, Cursor Preview 모드, 채팅 패널에 포커스가 있을 때 각각 눌러 엉뚱한 동작(다른 편집기 닫힘 등)이 없는지.
 2. Cursor Preview 토글은 결과가 안 나오는 것이 정상입니다(설계상 불가). 대신 `Ctrl+Shift+R` 렌더 보기와 CodeLens `▷ 결과 보기`가 되는지.
-3. `Cmd/Ctrl+K V` 표준 미리보기가 **빈 화면이 아닌지**. 예전에 비어 보이던 증상이 1.0.1 이후 사라졌는지 확인이 필요한 항목입니다. 비어 있으면 `Help: Toggle Developer Tools` 콘솔의 빨간 줄을 붙여 주세요.
+3. 명령 팔레트 → `Markdown: Open Preview to the Side`로 연 표준 미리보기가 **빈 화면이 아닌지**. 예전에 비어 보이던 증상이 1.0.1 이후 사라졌는지 확인이 필요한 항목입니다. 비어 있으면 `Help: Toggle Developer Tools` 콘솔의 빨간 줄을 붙여 주세요.
 4. Markdown All in One을 켠 상태와 끈 상태 모두에서 미리보기 뱃지가 보이는지.
 
 ### 2-5. 라이트 / 다크 / 하이 컨트라스트
 
-2-1과 같은 화면을 **Light Modern**, **Dark Modern**에서도 한 번씩 봅니다. 특히 렌더 보기의 지난 마감(붉은색), 완료(흐린색), 배지 배경이 두 테마 모두에서 읽히는지. 캘린더 항목 색(파랑 마감 / 노랑 예정 / 초록 시작 / 빨강 초과)이 구분되는지.
+2-1과 같은 화면을 **Light Modern**, **Dark Modern**에서도 한 번씩 봅니다(테마 바꾸기: 명령 팔레트 → `Preferences: Color Theme`). 특히 렌더 보기의 지난 마감(붉은색), 완료(흐린색), 배지 배경이 두 테마 모두에서 읽히는지. 캘린더 항목 색(파랑 마감 / 노랑 예정 / 초록 시작 / 빨강 초과)이 구분되는지.
 
 ### 2-6. 멀티 루트 워크스페이스, 신뢰되지 않은 워크스페이스
 
@@ -60,7 +62,7 @@ VS Code와 다른 부분만 봅니다.
 ### 2-7. Obsidian 볼트 샘플과 파싱 대조
 
 1. 실제로 쓰는 Obsidian 볼트가 있으면 그 폴더를 VS Code로 엽니다(없으면 `examples/`로 대신).
-2. Obsidian에서 ```tasks 블록이 있는 노트를 하나 골라, 같은 노트를 여기서 `Cmd/Ctrl+K V`나 `Ctrl+Shift+R`로 봅니다.
+2. Obsidian에서 ```tasks 블록이 있는 노트를 하나 골라, 같은 노트를 여기서 `Markdown: Open Preview to the Side`(명령 팔레트)나 `Ctrl+Shift+R`로 봅니다.
 3. 대조할 것: 블록의 **일치 개수**("N of M tasks")와 **순서**가 Obsidian과 같은지, 각 태스크의 날짜·우선순위·반복 배지가 같은지, 여기서 완료 토글한 줄을 Obsidian에서 열었을 때 필드 순서(`🆔 ⛔ 우선순위 🔁 🏁 ➕ 🛫 ⏳ 📅 ❌ ✅`)가 Obsidian이 쓴 것과 같은지.
 4. 다르면 그 태스크 줄 원문과 쿼리 텍스트를 그대로 붙여 주세요. `tests/core/query/obsidian-compat.test.ts`에 케이스로 추가해 고칩니다.
 

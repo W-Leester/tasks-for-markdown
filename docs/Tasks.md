@@ -857,6 +857,8 @@
 - [x] CHANGELOG 1.0.0 + docs/history-internal.md
 - [x] npm 타입 패키지 `packages/api`, 워크플로 npm 게시
 - [x] 전체 검증, 설치 파일 확인, release.md 절차 갱신
+- [x] 명령 이름: 영어 화면에는 영어만, 한국어 화면에는 한국어만(package.nls.json에서 한국어 제거, 테스트로 고정) — 사용자 결정 2026-09-30
+- [x] 수동 점검 문서: Cursor는 `Cmd+K`가 AI 인라인 편집이라 `Cmd+K` 두 단계 단축키 대신 명령 팔레트 안내
 
 ## 향후 후보 (미착수)
 

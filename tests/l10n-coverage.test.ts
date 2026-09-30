@@ -43,3 +43,17 @@ describe('l10n coverage', () => {
     expect(bad).toEqual([]);
   });
 });
+
+describe('package.nls (command titles, settings)', () => {
+  const en = JSON.parse(readFileSync(join(__dirname, '..', 'package.nls.json'), 'utf8')) as Record<string, string>;
+  const ko = JSON.parse(readFileSync(join(__dirname, '..', 'package.nls.ko.json'), 'utf8')) as Record<string, string>;
+  it('the default (English) file has no Korean — Korean belongs in package.nls.ko.json', () => {
+    expect(Object.entries(en).filter(([, v]) => /[가-힣]/.test(v)).map(([k]) => k)).toEqual([]);
+  });
+  it('every key has a Korean entry, and every %key% used in package.json exists', () => {
+    expect(Object.keys(en).filter((k) => !(k in ko))).toEqual([]);
+    const pkg = readFileSync(join(__dirname, '..', 'package.json'), 'utf8');
+    const used = [...pkg.matchAll(/"%([^%"]+)%"/g)].map((m) => m[1]!);
+    expect(used.filter((k) => !(k in en))).toEqual([]);
+  });
+});

@@ -6,3 +6,4 @@ node_modules/
 packages/*/LICENSE
 packages/*/NOTICE.md
 packages/api/index.d.ts
+*.vsix.zip

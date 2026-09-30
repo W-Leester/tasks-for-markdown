@@ -57,6 +57,11 @@
         "icon": "$(check)"
       },
       {
+        "command": "tasksmd.enterKey",
+        "title": "%tasksmd.enterKey.title%",
+        "category": "Tasks"
+      },
+      {
         "command": "tasksmd.openTask",
         "title": "%tasksmd.openTask.title%",
         "category": "Tasks",
@@ -926,6 +931,12 @@
         "when": "editorTextFocus && editorLangId == markdown && tasksmd.onTaskLine"
       },
       {
+        "command": "tasksmd.enterKey",
+        "key": "ctrl+enter",
+        "mac": "cmd+enter",
+        "when": "editorTextFocus && editorLangId == markdown && !editorReadonly && !suggestWidgetVisible && !inlineSuggestionVisible"
+      },
+      {
         "command": "tasksmd.createOrEdit",
         "key": "ctrl+shift+c",
         "mac": "ctrl+shift+c",
@@ -945,6 +956,10 @@
     ],
     "menus": {
       "commandPalette": [
+        {
+          "command": "tasksmd.enterKey",
+          "when": "false"
+        },
         {
           "command": "tasksmd.openTask",
           "when": "false"

@@ -47,7 +47,7 @@ group by filename
 
 | Command | Default key |
 |---|---|
-| Toggle task done | `Cmd/Ctrl+Enter` (on a task line) |
+| Toggle task done | `Cmd/Ctrl+Enter` (on a task line; on other lines the key keeps its usual action — Markdown All in One's, if installed) |
 | Create or edit task | `Ctrl+Shift+C` |
 | Quick search tasks | `Cmd/Ctrl+Shift+;` |
 | Set status / priority / due / scheduled / start / recurrence / dependencies, Postpone | — |

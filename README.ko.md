@@ -47,7 +47,7 @@ group by filename
 
 | 명령 | 기본 키 |
 |---|---|
-| 태스크 완료 토글 | `Cmd/Ctrl+Enter` (태스크 줄에서) |
+| 태스크 완료 토글 | `Cmd/Ctrl+Enter` (태스크 줄에서. 다른 줄에서는 원래 동작 — Markdown All in One이 있으면 그 기능) |
 | 태스크 만들기 / 편집 | `Ctrl+Shift+C` |
 | 렌더 보기로 열기 / 마크다운 소스 편집 (전환) | `Ctrl+Shift+R` |
 | 렌더 보기를 기본 편집기로 (설정/해제) | — |

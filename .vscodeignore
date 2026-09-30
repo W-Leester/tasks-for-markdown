@@ -24,3 +24,4 @@ packages/**
 .tasks/**
 examples/**
 media/icon_v1.png
+*.zip

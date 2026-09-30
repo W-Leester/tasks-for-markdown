@@ -43,6 +43,28 @@ suite('toggle', () => {
     assert.equal(doc.lineAt(14).text, '- [ ] Cancelled thing');
   });
 
+  test('Cmd/Ctrl+Enter command: toggles on a task line, inserts a line below elsewhere (no Markdown All in One here)', async () => {
+    await getApi();
+    guard.protect('notes/week-38.md');
+    const doc = await vscode.workspace.openTextDocument(fixtureUri('notes/week-38.md'));
+    const editor = await vscode.window.showTextDocument(doc);
+    editor.selection = new vscode.Selection(6, 3, 6, 3); // - [ ] Write report #work ⏫ 📅 2026-09-25
+    await sleep(50);
+    await vscode.commands.executeCommand('tasksmd.enterKey');
+    assert.equal(doc.lineAt(6).text, `- [x] Write report #work ⏫ 📅 2026-09-25 ✅ ${today()}`);
+
+    const plain = 3; // '# Week 38' — not a task line
+    assert.ok(!/\[.\]/.test(doc.lineAt(plain).text), doc.lineAt(plain).text);
+    const before = doc.lineCount;
+    const heading = doc.lineAt(plain).text;
+    editor.selection = new vscode.Selection(plain, 1, plain, 1);
+    await sleep(50);
+    await vscode.commands.executeCommand('tasksmd.enterKey');
+    assert.equal(doc.lineCount, before + 1, 'a line was inserted below');
+    assert.equal(doc.lineAt(plain).text, heading, 'the line itself is unchanged');
+    assert.equal(doc.lineAt(plain + 1).text.trim(), '');
+  });
+
   test('toggles every task line in a multi-line selection', async () => {
     await getApi();
     guard.protect('notes/project-a.md');

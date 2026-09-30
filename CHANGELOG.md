@@ -14,7 +14,7 @@ First public release on the VS Code Marketplace, Open VSX and npm. (한국어 �
 **Views**
 - Sidebar smart views (Today, Upcoming, Overdue, In progress, Blocked, Open, Done) and saved queries.
 - Rendered view: an interactive preview with live ` ```tasks ` results, column layout (hide and resize columns), view-only sort and scope; can be the default Markdown editor (replaces Cursor's Preview toggle).
-- Query results panel, query builder, kanban board, calendar (month/week, full screen), weekly statistics, archive, notifications.
+- Query results panel, query builder, kanban board (columns in a balanced grid, e.g. 2×2), calendar (month/week, full screen), weekly statistics, archive, notifications.
 - Query language compatible with Obsidian Tasks, including tree display, `explain` and optional `by function`.
 
 **Integration**

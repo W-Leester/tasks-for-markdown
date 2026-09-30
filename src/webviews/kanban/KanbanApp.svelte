@@ -5,6 +5,7 @@
   import { setBundle, t } from '../shared/l10n';
   import type { InitState, StatusDto, TaskDto, TaskFieldName } from '../shared/protocol';
   import { nextRequestId, onMessage, post } from '../shared/vscode.svelte';
+  import { COLUMN_GAP, columnsPerRow } from './layout';
 
   type Mode = 'status' | 'due' | 'priority' | 'file';
   interface Column { id: string; label: string; tasks: TaskDto[]; drop: ((task: TaskDto) => { field: TaskFieldName; value: string | null } | null) | null }
@@ -20,6 +21,7 @@
   let dragOver: string | null = $state(null);
   let live = $state(''); // screen-reader announcements (keyboard moves)
   let boardHeight = $state(0);
+  let boardWidth = $state(0);
   let scrollTops: Record<string, number> = $state({});
   let request = 0;
 
@@ -30,7 +32,8 @@
   function windowFor(col: Column): { start: number; end: number; top: number; bottom: number } {
     const n = col.tasks.length;
     if (n < VIRTUAL_FROM) return { start: 0, end: n, top: 0, bottom: 0 };
-    const viewport = Math.max(boardHeight - 40, 200);
+    // Rows share the board height (M19 grid), so a column sees one row's worth.
+    const viewport = Math.max((boardHeight - (rows - 1) * COLUMN_GAP) / rows - 40, 200);
     const top = scrollTops[col.id] ?? 0;
     const start = Math.max(0, Math.floor(top / CARD_ESTIMATE) - OVERSCAN);
     const end = Math.min(n, Math.ceil((top + viewport) / CARD_ESTIMATE) + OVERSCAN);
@@ -125,6 +128,10 @@
     return files.map((f) => ({ id: f, label: f.split('/').pop()!.replace(/\.md$/, ''), tasks: list.filter((x) => x.path === f), drop: null }));
   });
 
+  // Balanced grid (M19): 4 columns → 2×2 at normal widths, one row when the window is wide enough.
+  const perRow = $derived(columnsPerRow(columns.length, boardWidth));
+  const rows = $derived(Math.max(1, Math.ceil(columns.length / perRow)));
+
   function onDrop(e: DragEvent, col: Column) {
     e.preventDefault(); dragOver = null;
     const raw = e.dataTransfer?.getData('application/x-tfm-task');
@@ -184,7 +191,8 @@
     </div>
   {/if}
 
-  <div class="board" class:tabs-mode={narrow} bind:clientHeight={boardHeight}>
+  <div class="board" class:tabs-mode={narrow} bind:clientHeight={boardHeight} bind:clientWidth={boardWidth}
+    style:--per-row={perRow} style:--rows={rows}>
     {#each columns as col, i (col.id)}
       {#if !narrow || i === activeTab}
         {@const w = windowFor(col)}
@@ -215,9 +223,10 @@
   .search { min-width: 140px; flex: 1; }
   .count { font-size: 0.9em; }
   .error { color: var(--tfm-error); font-size: 0.9em; }
-  .board { display: flex; gap: 10px; flex: 1; min-height: 0; overflow-x: auto; }
-  .board.tabs-mode { overflow-x: hidden; }
-  .column { flex: 0 0 240px; display: flex; flex-direction: column; background: var(--tfm-panel); border: 1px solid var(--tfm-border); border-radius: var(--tfm-radius); min-height: 0; }
+  /* Balanced grid (M19): columns share the width, rows share the height; cards scroll inside a column. */
+  .board { display: grid; grid-template-columns: repeat(var(--per-row, 1), minmax(0, 1fr)); grid-auto-rows: minmax(0, 1fr); gap: 10px; flex: 1; min-height: 0; }
+  .board.tabs-mode { display: flex; overflow-x: hidden; }
+  .column { display: flex; flex-direction: column; background: var(--tfm-panel); border: 1px solid var(--tfm-border); border-radius: var(--tfm-radius); min-height: 0; min-width: 0; }
   .tabs-mode .column { flex: 1; }
   .column.over { border-color: var(--tfm-accent); box-shadow: inset 0 0 0 1px var(--tfm-accent); }
   .column.readonly { opacity: 0.9; }

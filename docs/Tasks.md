@@ -161,7 +161,7 @@
 ### M1.5 명령어 (`src/commands/`)
 - [x] `tasksmd.toggleDone` — 활성 에디터 커서 줄 또는 트리 항목 인자 (FR-8 표)
 - [x] 컨텍스트 키 `tasksmd.onTaskLine` — 커서가 태스크 줄일 때 true (`setContext`), 키바인딩 `when` 조건
-- [x] 키바인딩 `Cmd/Ctrl+Enter` — `editorTextFocus && editorLangId == markdown && tasksmd.onTaskLine` (Q-13)
+- [x] 키바인딩 `Cmd/Ctrl+Enter` — `editorTextFocus && editorLangId == markdown && tasksmd.onTaskLine` (Q-13) (→ 2026-10-01 `Ctrl+Shift+Enter`로 변경: Markdown All in One이 `Cmd/Ctrl+Enter`를 먼저 가져감)
 - [x] `tasksmd.reindex`, `tasksmd.openSidebar`
 - [x] 모든 명령 `category: "Tasks"` + 제목 nls 키 (FR-8.1)
 

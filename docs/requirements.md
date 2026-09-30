@@ -23,7 +23,7 @@
 | 저장된 쿼리 | settings.json + 워크스페이스 파일 둘 다 |
 | 미리보기 | VS Code 기본 미리보기에 플러그인 주입 |
 | 칸반 | 사이드바 WebviewView + 에디터 패널 둘 다 |
-| 키 | 토글 `Cmd/Ctrl+Enter`, 편집 모달 `Cmd/Ctrl+Shift+T`, 빠른 검색 `Cmd/Ctrl+Shift+;` |
+| 키 | 토글 `Ctrl+Shift+Enter`(macOS에서도 Ctrl; 처음에는 `Cmd/Ctrl+Enter`였으나 Markdown All in One과 충돌해 2026-10-01 변경), 편집 모달 `Ctrl+Shift+C`(모든 OS; 처음 계획은 `Cmd/Ctrl+Shift+T`), 빠른 검색 `Cmd/Ctrl+Shift+;` |
 | 추가 기능(v1) | 알림(토스트+OS), 수동 아카이브 명령, 주 단위 통계, 캘린더(월간+주간) |
 | AI 연동(MCP) | **v1.x로 연기** |
 | 언어·날짜 | UI 영어+한국어, 상대 날짜("3일 남음"), 주 시작 월요일 |
@@ -285,7 +285,7 @@ Obsidian Tasks 쿼리 문법과 호환되는 텍스트 기반 엔진. 한 줄 = 
 
 | 명령 ID | 기본 키 | 동작 |
 |---|---|---|
-| `tasksmd.toggleDone` | `Ctrl/Cmd+Enter` (마크다운 파일에서, 태스크 줄일 때) | 상태 순환(FR-1.18) |
+| `tasksmd.toggleDone` | `Ctrl+Shift+Enter` (마크다운 파일에서, 태스크 줄일 때; macOS에서도 Ctrl. 2026-10-01 `Ctrl/Cmd+Enter`에서 변경) | 상태 순환(FR-1.18) |
 | `tasksmd.setStatus` | — | 상태 선택 QuickPick |
 | `tasksmd.createOrEdit` | `Ctrl+Shift+C` (모든 OS 동일; macOS는 미할당, Windows/Linux의 "외부 터미널 열기"를 덮음. `when: !terminalFocus && !inputFocus`라 터미널 복사는 유지) | 편집 모달 |
 | `tasksmd.setPriority` / `setDueDate` / `setScheduledDate` / `setStartDate` / `setRecurrence` / `setDependencies` | — | 개별 QuickPick |
@@ -504,7 +504,7 @@ Obsidian Tasks처럼 `#task` 같은 글로벌 필터를 지원하되 기본은 �
 답변: c
 
 **Q-13. 기본 키바인딩**
-토글: `Cmd/Ctrl+Enter`(마크다운 태스크 줄에서만) 괜찮은지? 편집 모달, 빠른 검색의 키 조합 희망 사항. Cursor는 `Cmd+K`, `Cmd+L`, `Cmd+I`를 이미 쓰므로 피해야 함.
+토글: `Cmd/Ctrl+Enter`(마크다운 태스크 줄에서만) 괜찮은지? (→ 2026-10-01 `Ctrl+Shift+Enter`로 변경: Markdown All in One이 `Cmd/Ctrl+Enter`를 먼저 가져감) 편집 모달, 빠른 검색의 키 조합 희망 사항. Cursor는 `Cmd+K`, `Cmd+L`, `Cmd+I`를 이미 쓰므로 피해야 함.
 답변: 그래 좋아.
 
 **Q-14. 범위 밖 후보 기능 — 포함 여부**
@@ -570,7 +570,7 @@ Marketplace에 올리지 않아도 `package.json`의 `publisher` 필드는 필�
 - Q-2 패키지 매니저: pnpm
 - Q-4 대상 확장자: `.md`, `.markdown` (설정으로 추가 가능)
 - Q-6 쓰기 기본값: 이모지, Dataview 쓰기도 v1 포함
-- Q-13 키: 토글 `Cmd/Ctrl+Enter`, 편집 모달 `Cmd/Ctrl+Shift+T`, 빠른 검색 `Cmd/Ctrl+Shift+;` (Cursor 예약 키 회피)
+- Q-13 키: 토글 `Cmd/Ctrl+Enter` (→ 2026-10-01 `Ctrl+Shift+Enter`로 변경: Markdown All in One이 `Cmd/Ctrl+Enter`를 먼저 가져감), 편집 모달 `Cmd/Ctrl+Shift+T`, 빠른 검색 `Cmd/Ctrl+Shift+;` (Cursor 예약 키 회피)
 답변:
 
 ---

@@ -118,7 +118,7 @@ VS Code 1.138에 들어온 내장 Markdown Editor(WYSIWYG)와 `markdown.codeBloc
 | 항목 | 환경 | 날짜 | 결과 | 메모 |
 |---|---|---|---|---|
 | 2-1 하이 컨트라스트 | | | | |
-| 2-2 원격 | | | | |
+| 2-2 원격 | Cursor macOS → Remote SSH(localhost) | 2026-10-01 | ✅ 통과 | 원격 쪽 설치, 인덱싱·사이드바, 렌더 보기, 칸반 정상. 바깥 수정 반영은 저장 안 된 편집기 때문에 한 번 헷갈렸으나 원격 문제 아님 |
 | 2-3 VS Code macOS | | | | |
 | 2-3 VS Code Windows | | | | |
 | 2-3 VS Code Linux | | | | |

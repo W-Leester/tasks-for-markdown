@@ -27,12 +27,12 @@ Obsidian Tasks 플러그인과 같은 문법으로 VS Code / Cursor 안에서 �
 
 | 동작 | 방법 |
 |---|---|
-| 완료/다시 열기 | 태스크 줄에서 `Cmd/Ctrl+Enter`, 사이드바 체크박스, CodeLens `✔ Done`, 호버 카드 |
+| 완료/다시 열기 | 태스크 줄에서 `Cmd+Alt+X`(Windows/Linux `Ctrl+Alt+X`), 사이드바 체크박스, CodeLens `✔ Done`, 호버 카드 |
 | 상태 순환 | 토글은 상태의 "다음 심볼"로 이동합니다 (`[ ]`→`[x]`→`[ ]`, `[/]`→`[x]`). 완료 타입이 되면 ✅ 날짜가 붙고, 벗어나면 제거됩니다 |
 | 편집 대화상자 | `Ctrl+Shift+C` — 위에서부터 상태·설명·우선순위·마감일·태그·반복. 예정일·시작일·의존·생성일·완료 시 동작은 **더보기**에 접혀 있고(값이 있으면 자동으로 펼침), 완료일·취소일은 편집할 때만 더보기에 나옵니다. 태그 칸은 설명 끝의 태그를 따로 보여 주고 적용할 때 다시 붙입니다. 아래에 결과 줄 미리보기 |
 | 개별 필드 | 우클릭 › Tasks › 우선순위/마감일/예정일/시작일/반복/의존성/미루기, 또는 CodeLens 클릭 |
-| 여러 줄 | 여러 줄을 선택하고 `Cmd/Ctrl+Enter` |
-| 다른 확장과 함께 | `Cmd/Ctrl+Enter`는 **태스크 줄에서만** 완료 토글이고, 다른 줄에서는 원래 동작을 그대로 합니다. Markdown All in One이 설치되어 있으면 그 확장의 `Ctrl+Enter` 기능(아래에 줄/목록 항목 추가), 없으면 편집기 기본 동작(아래에 줄 삽입) |
+| 여러 줄 | 여러 줄을 선택하고 `Cmd+Alt+X` |
+| 단축키가 안 먹을 때 | 다른 확장이 같은 키를 쓰면 그쪽이 먼저 잡을 수 있습니다. `Keyboard Shortcuts`에서 `Tasks: Toggle task done`(한국어 화면: `태스크 완료 토글`)을 찾아 원하는 키로 바꾸세요. 기본 키를 `Cmd/Ctrl+Enter`에서 `Cmd/Ctrl+Alt+X`로 바꾼 것도 Markdown All in One이 `Cmd/Ctrl+Enter`를 먼저 가져가서입니다 |
 
 반복 태스크를 완료하면 다음 회차가 **위 줄**에 생깁니다 (`tasksmd.recurrence.insertPosition`). 마감일 → 예정일 → 시작일 순으로 기준을 잡고 나머지 날짜는 간격을 유지합니다. `when done`이면 완료한 날짜 기준입니다.
 
@@ -122,7 +122,7 @@ short mode
 
 | 화면 | 키 |
 |---|---|
-| 에디터 | `Cmd/Ctrl+Enter` 완료 토글 · `Ctrl+Shift+C` 만들기/편집 · `Ctrl+Shift+R` 렌더 보기 ↔ 소스 |
+| 에디터 | `Cmd/Ctrl+Alt+X` 완료 토글 · `Ctrl+Shift+C` 만들기/편집 · `Ctrl+Shift+R` 렌더 보기 ↔ 소스 |
 | 편집 대화상자 | `Tab`으로 이동, 액세스 키(설정 `editModal.accessKeys`), `Esc` 닫기 |
 | 칸반 | 카드에 포커스: `Enter` 편집 · `Space` 완료 전환 · **`Alt+←/→` 옆 컬럼으로 이동**(드래그 대신). 이동 결과는 스크린 리더에 안내 |
 | 캘린더 | 날짜 칸: `←/→` 하루, `↑/↓` 한 주(가장자리를 넘으면 월/주 전환) · `Enter` 그 날짜에 새 태스크 · 항목: `Enter` 편집 · `Esc` 전체 화면 해제 |
@@ -132,7 +132,7 @@ short mode
 ## 7. 자주 묻는 질문
 
 - **Obsidian과 같은 폴더를 써도 되나요?** 문법이 같고 필드 순서도 동일하게 쓰므로 호환됩니다. 다만 이 확장의 공식 지원 범위는 전용 폴더입니다.
-- **미리보기에서 체크가 안 돼요.** 의도된 제한입니다(4장). 에디터에서 `Cmd/Ctrl+Enter`를 쓰거나 쿼리 결과 패널의 체크박스를 쓰세요.
+- **미리보기에서 체크가 안 돼요.** 의도된 제한입니다(4장). 에디터에서 `Cmd/Ctrl+Alt+X`를 쓰거나 쿼리 결과 패널의 체크박스를 쓰세요.
 - **Cursor에서 쿼리 블록이 그냥 코드로 보여요.** 오른쪽 위 "Preview | Markdown" 토글의 Preview는 Cursor 자체 WYSIWYG 편집기라 확장이 개입할 수 없고, `Cmd+Shift+V`도 이 토글에 묶여 있습니다. "Markdown"으로 전환한 뒤 블록 위 `▶ 결과 보기` CodeLens로 결과 패널을 열거나, 명령 팔레트에서 `Markdown: Open Preview to the Side`로 VS Code 미리보기를 여세요(Cursor에서는 `Cmd+K`가 AI 인라인 편집이라 `Cmd+K V`가 안 됩니다).
 - **`.vsix`로 설치했는데 업데이트는?** `tasksmd.updateCheckUrl`에 사내 `latest.json` 경로를 넣으면 하루 1회 새 버전을 알려줍니다.
 - **로그는 어디에?** `Tasks: 로그 보기` (출력 채널 "Tasks for Markdown").

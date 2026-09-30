@@ -6,7 +6,7 @@ First public release on the VS Code Marketplace, Open VSX and npm. (한국어 �
 
 **Tasks**
 - Obsidian Tasks syntax: emoji fields (📅 ⏳ 🛫 ➕ ✅ ❌ 🔁 🏁 🆔 ⛔, priorities 🔺⏫🔼🔽⏬) and Dataview inline fields, written in Obsidian's field order.
-- Toggle with `Cmd/Ctrl+Enter`, create/edit dialog (`Ctrl+Shift+C`), auto-suggest with natural-language dates, CodeLens, hover cards, diagnostics with quick fixes.
+- Toggle with `Cmd+Alt+X` (`Ctrl+Alt+X` on Windows/Linux), create/edit dialog (`Ctrl+Shift+C`), auto-suggest with natural-language dates, CodeLens, hover cards, diagnostics with quick fixes.
 - Recurrence (`every month on the last`, `when done`), custom statuses with presets, dependencies (🆔/⛔) with blocked/blocking detection, urgency.
 - Notes: indented plain bullets under a task; add from the rendered view (💬), shown on query rows and cards, edited in the dialog.
 - Due date required for new tasks by default (`tasksmd.requireDueDate`).

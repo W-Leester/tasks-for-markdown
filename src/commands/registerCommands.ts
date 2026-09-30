@@ -104,20 +104,6 @@ export function registerCommands(context: vscode.ExtensionContext, deps: Command
     }),
   );
 
-  // Cmd/Ctrl+Enter: toggle on task lines; anywhere else give the key back — Markdown All in One's
-  // Ctrl+Enter action when it is installed (it binds the same key), else the editor default (insert
-  // line below). Decided from the editor at key-press time, not from the tasksmd.onTaskLine context
-  // key, which lost to Markdown All in One in Cursor.
-  register('tasksmd.enterKey', async () => {
-    const editor = vscode.window.activeTextEditor;
-    if (editor && editor.document.languageId === 'markdown' && tasksAtCursors(editor, deps).length) {
-      await vscode.commands.executeCommand('tasksmd.toggleDone');
-      return;
-    }
-    const markdownAllInOne = vscode.extensions.getExtension('yzhang.markdown-all-in-one');
-    await vscode.commands.executeCommand(markdownAllInOne ? 'markdown.extension.onCtrlEnterKey' : 'editor.action.insertLineAfter');
-  });
-
   const setStatusOfType = (type: StatusType) => (arg: unknown) =>
     runEdit(deps, async () => {
       const status = deps.getStatusRegistry().firstOfType(type);

@@ -29,12 +29,12 @@
 
 | 표면 | 소비자 | 장점 | 단점 | 추천 |
 |---|---|---|---|---|
-| **A. 확장 API** (`vscode.extensions.getExtension('hastycapybara.tasks-for-markdown').exports`) | 다른 확장 | 타입 있는 직접 호출, 이벤트 구독 가능, VS Code 표준 방식 | 같은 확장 호스트 안에서만 | **1차** |
+| **A. 확장 API** (`vscode.extensions.getExtension('HastyCapybara.tasks-for-markdown').exports`) | 다른 확장 | 타입 있는 직접 호출, 이벤트 구독 가능, VS Code 표준 방식 | 같은 확장 호스트 안에서만 | **1차** |
 | **B. 인자 있는 명령** (`vscode.commands.executeCommand('tasksmd.api.query', {...})`) | 다른 확장, 키바인딩, 매크로 확장 | 가장 낮은 진입 장벽, 언어 무관 | 타입 없음, 반환값 JSON만 | **1차** (A의 얇은 래퍼) |
 | **C. MCP 서버** (Model Context Protocol) | Cursor Agent, Claude Code, Claude Desktop 등 AI | AI가 도구로 바로 사용. Cursor는 `.cursor/mcp.json`으로 등록 | 별도 프로세스, 편집기와 상태 공유 방법 필요 | **2차** (가장 큰 효용) |
 | **D. npm 라이브러리 + CLI** (`@hastycapybara/tasks-core`, `tasksmd` 명령) | 스크립트, CI, C의 기반 | core가 이미 분리되어 있어 비용 낮음 | 배포 채널 하나 더 | **2차** (C와 함께) |
 | E. 로컬 HTTP 서버 | 외부 앱 | 언어 무관 | 포트·인증·보안 부담, 위 넷으로 충분 | 보류 |
-| F. URI 핸들러 (`vscode://hastycapybara.tasks-for-markdown/open?…`) | 외부 링크, 다른 앱 | 딥링크 | 읽기 전용 수준 | 3차 (작음) |
+| F. URI 핸들러 (`vscode://HastyCapybara.tasks-for-markdown/open?…`) | 외부 링크, 다른 앱 | 딥링크 | 읽기 전용 수준 | 3차 (작음) |
 
 **구조 제안**: 하나의 **API 코어**(`src/api/`)를 만들고, A·B·C·D는 모두 그 코어의 어댑터로 둡니다. 데이터 계약(JSON DTO)을 한 곳에 두어 네 표면이 같은 모양을 반환하게 합니다.
 
@@ -372,7 +372,7 @@ editor.replaceSelection(line);
 **우리 확장 API (A)** — 다른 확장에서. `dist/api.d.ts`를 복사하거나 npm 타입을 씁니다.
 ```ts
 import type { TasksApi } from '@hastycapybara/tasks-core/api';   // 또는 확장에 동봉된 api.d.ts
-const ext = vscode.extensions.getExtension<{ getAPI(v: 1): TasksApi }>('hastycapybara.tasks-for-markdown');
+const ext = vscode.extensions.getExtension<{ getAPI(v: 1): TasksApi }>('HastyCapybara.tasks-for-markdown');
 const tasks = (await ext!.activate()).getAPI(1);
 
 // 조회: 앱과 같은 쿼리 문법

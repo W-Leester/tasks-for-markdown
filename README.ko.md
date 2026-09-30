@@ -95,7 +95,7 @@ group by filename
 
 | 어디서 | 방법 |
 |---|---|
-| 다른 VS Code/Cursor 확장 | `getExtension('hastycapybara.tasks-for-markdown').exports.getAPI(1, { extensionId })` → `query.run(...)`, `edit.setStatus(...)`, `edit.addNote(...)` 등. 타입 정의는 import 없는 한 파일 [src/api/types.ts](src/api/types.ts)를 복사해 쓰면 됩니다 |
+| 다른 VS Code/Cursor 확장 | `getExtension('HastyCapybara.tasks-for-markdown').exports.getAPI(1, { extensionId })` → `query.run(...)`, `edit.setStatus(...)`, `edit.addNote(...)` 등. 타입 정의는 import 없는 한 파일 [src/api/types.ts](src/api/types.ts)를 복사해 쓰면 됩니다 |
 | 키바인딩·매크로 | 명령 `tasksmd.api.<ns>.<method>` (예: `tasksmd.api.query.run` + `{ "query": "due today" }`) |
 | 터미널·스크립트·CI | `npx @hastycapybara/tasks-cli query "not done\ndue before today" --root ~/notes` — 편집기 없이 동작 |
 | AI 에이전트 (Claude Code 등) | `claude mcp add tasks -- npx -y @hastycapybara/tasks-cli mcp --root "$PWD"` 후 말로 지시 |

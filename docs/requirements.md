@@ -11,7 +11,7 @@
 
 | 항목 | 결정 |
 |---|---|
-| 확장 이름 / ID | **Tasks for Markdown** / `hastycapybara.tasks-for-markdown` |
+| 확장 이름 / ID | **Tasks for Markdown** / `HastyCapybara.tasks-for-markdown` |
 | 언어·UI·도구 | TypeScript, Svelte(웹뷰), esbuild, pnpm, Vitest |
 | 원본 코드 | Obsidian Tasks 순수 로직(파서·반복·쿼리·긴급도) MIT 이식 + 저작권 고지 |
 | 스캔 범위 | 워크스페이스 전체 `.md`/`.markdown`, `.gitignore`·`files.exclude` 존중 |

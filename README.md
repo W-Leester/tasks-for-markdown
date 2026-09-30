@@ -95,7 +95,7 @@ Four ways for other programs to read and write tasks. Details in [docs/api.en.md
 
 | From | How |
 |---|---|
-| Another VS Code/Cursor extension | `getExtension('hastycapybara.tasks-for-markdown').exports.getAPI(1, { extensionId })` → `query.run(...)`, `edit.setStatus(...)`, `edit.addNote(...)`. For types, copy the self-contained file [src/api/types.ts](src/api/types.ts) |
+| Another VS Code/Cursor extension | `getExtension('HastyCapybara.tasks-for-markdown').exports.getAPI(1, { extensionId })` → `query.run(...)`, `edit.setStatus(...)`, `edit.addNote(...)`. For types, copy the self-contained file [src/api/types.ts](src/api/types.ts) |
 | Keybindings, macros | Commands `tasksmd.api.<ns>.<method>` (e.g. `tasksmd.api.query.run` with `{ "query": "due today" }`) |
 | Terminal, scripts, CI | `npx @hastycapybara/tasks-cli query "not done\ndue before today" --root ~/notes` — no editor needed |
 | AI agents (Claude Code, Cursor, …) | `claude mcp add tasks -- npx -y @hastycapybara/tasks-cli mcp --root "$PWD"`, then ask in plain language |

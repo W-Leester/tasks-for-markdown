@@ -18,7 +18,7 @@
 import * as vscode from 'vscode';
 import type { TasksExtensionExports, TasksApi } from '@hastycapybara/tasks-api';   // 또는 src/api/types.ts를 복사한 파일
 
-const ext = vscode.extensions.getExtension<TasksExtensionExports>('hastycapybara.tasks-for-markdown');
+const ext = vscode.extensions.getExtension<TasksExtensionExports>('HastyCapybara.tasks-for-markdown');
 if (!ext) throw new Error('Tasks for Markdown is not installed');
 const tasks: TasksApi = (await ext.activate()).getAPI(1, { extensionId: 'my-publisher.my-extension' });
 

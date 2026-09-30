@@ -18,7 +18,7 @@ There are three ways in, and each feature is offered through all three:
 import * as vscode from 'vscode';
 import type { TasksExtensionExports, TasksApi } from '@hastycapybara/tasks-api';   // or a copy of src/api/types.ts
 
-const ext = vscode.extensions.getExtension<TasksExtensionExports>('hastycapybara.tasks-for-markdown');
+const ext = vscode.extensions.getExtension<TasksExtensionExports>('HastyCapybara.tasks-for-markdown');
 if (!ext) throw new Error('Tasks for Markdown is not installed');
 const tasks: TasksApi = (await ext.activate()).getAPI(1, { extensionId: 'my-publisher.my-extension' });
 

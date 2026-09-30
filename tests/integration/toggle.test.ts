@@ -7,7 +7,7 @@ const today = () => localToday();
 
 suite('toggle', () => {
   test('Ctrl+Shift+Enter is bound to toggleDone in Markdown editors (not Cmd+Enter, which Markdown All in One takes)', () => {
-    const pkg = vscode.extensions.getExtension('hastycapybara.tasks-for-markdown')!.packageJSON as { contributes: { keybindings: { command: string; key: string; mac?: string; when?: string }[] } };
+    const pkg = vscode.extensions.getExtension('HastyCapybara.tasks-for-markdown')!.packageJSON as { contributes: { keybindings: { command: string; key: string; mac?: string; when?: string }[] } };
     const kb = pkg.contributes.keybindings.filter((k) => k.command === 'tasksmd.toggleDone');
     assert.deepEqual(kb.map((k) => [k.key, k.mac]), [['ctrl+shift+enter', 'ctrl+shift+enter']]);
     assert.ok(!pkg.contributes.keybindings.some((k) => /^(cmd|ctrl)\+enter$/.test(k.mac ?? k.key) && k.command.startsWith('tasksmd.')), 'no tasksmd binding on Cmd/Ctrl+Enter');

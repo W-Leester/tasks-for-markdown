@@ -1,7 +1,7 @@
 /**
  * Public API of Tasks for Markdown (v1). Other extensions get it with
  *
- *   const ext = vscode.extensions.getExtension('hastycapybara.tasks-for-markdown');
+ *   const ext = vscode.extensions.getExtension('HastyCapybara.tasks-for-markdown');
  *   const api = (await ext.activate()).getAPI(1, { extensionId: 'my.extension' });
  *
  * Everything here is plain JSON: dates are `YYYY-MM-DD` strings, a task is addressed by its

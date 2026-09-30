@@ -6,12 +6,12 @@
 
 1. **수동 점검.** Cursor에 설치된 1.0.0으로 [manual-checklist.md](manual-checklist.md)를 한 바퀴. 문제가 있으면 고친 뒤 다시 패키징.
 2. **VS Code Marketplace 퍼블리셔와 토큰.**
-   - https://marketplace.visualstudio.com/manage → Microsoft 계정으로 로그인 → *Create publisher*: ID `hastycapybara`(package.json의 `publisher`와 정확히 같아야 함), **표시 이름(Display name)은 `HastyCapybara`**. 마켓 페이지와 마켓에서 설치한 확장에는 이 표시 이름이 보인다(`.vsix`로 설치하면 ID가 보임).
+   - https://marketplace.visualstudio.com/manage → Microsoft 계정으로 로그인 → *Create publisher*: **ID `HastyCapybara`**(package.json의 `publisher`와 대소문자까지 똑같이), 표시 이름(Display name)도 `HastyCapybara`.
    - https://dev.azure.com 에서 같은 계정으로 조직을 하나 만든 뒤 *User settings › Personal access tokens › New token*: Organization **All accessible organizations**, Scopes **Marketplace › Manage**. 만료일은 길게.
 3. **Open VSX 네임스페이스와 토큰** (Cursor가 이 마켓을 쓴다).
    - https://open-vsx.org → GitHub로 로그인 → 프로필에서 **Eclipse 계정 연결과 Publisher Agreement 서명**(안 하면 게시가 거부됨).
    - *Settings › Access Tokens*에서 토큰 발급.
-   - 네임스페이스 만들기(한 번): `npx ovsx create-namespace hastycapybara -p <토큰>`. 만든 뒤 open-vsx.org의 네임스페이스 설정에서 표시 이름을 `HastyCapybara`로 적을 수 있으면 적는다.
+   - 네임스페이스 만들기(한 번): `npx ovsx create-namespace HastyCapybara -p <토큰>`(package.json의 `publisher`와 같은 표기).
 4. **npm 조직과 토큰.**
    - https://www.npmjs.com 가입 → *Add Organization*: 이름 `hastycapybara`(무료, 공개 패키지).
    - *Access Tokens › Generate New Token › Granular*: 패키지·스코프 `@hastycapybara` **Read and write**. (계정에 2단계 인증이 켜져 있으면 "Bypass 2FA"가 가능한 토큰이어야 자동 게시가 된다.)
@@ -38,8 +38,8 @@ for p in tasks-core tasks-cli tasks-api; do pnpm --filter @hastycapybara/$p publ
 
 ## 한 번만 (계정·토큰)
 
-1. **VS Code Marketplace**: https://marketplace.visualstudio.com/manage 에서 퍼블리셔 `hastycapybara` 생성 → Azure DevOps에서 PAT(Marketplace › Manage 권한) 발급 → GitHub 저장소 Secrets에 `VSCE_PAT`.
-2. **Open VSX** (Cursor용): https://open-vsx.org 에서 로그인 → 네임스페이스 `hastycapybara` 생성(`ovsx create-namespace hastycapybara -p <token>`) → Secrets에 `OVSX_PAT`.
+1. **VS Code Marketplace**: https://marketplace.visualstudio.com/manage 에서 퍼블리셔 `HastyCapybara` 생성 → Azure DevOps에서 PAT(Marketplace › Manage 권한) 발급 → GitHub 저장소 Secrets에 `VSCE_PAT`.
+2. **Open VSX** (Cursor용): https://open-vsx.org 에서 로그인 → 네임스페이스 `HastyCapybara` 생성(`ovsx create-namespace HastyCapybara -p <token>`) → Secrets에 `OVSX_PAT`.
 3. 두 토큰이 없으면 워크플로는 게시 단계를 건너뛰고 `.vsix`만 Release에 첨부한다.
 
 ## npm 패키지 (`@hastycapybara/tasks-core`, `@hastycapybara/tasks-cli`)
@@ -72,8 +72,7 @@ git tag v<ver> && git push origin v<ver>
 
 | 쓰는 곳 | 표기 | 이유 |
 |---|---|---|
-| 사람이 읽는 이름: 마켓 퍼블리셔 표시 이름, LICENSE, npm 패키지 `author`, 문서 본문의 만든 사람 | **HastyCapybara** | 결정 2026-10-01 |
-| 퍼블리셔 ID(`package.json` `publisher`), 확장 ID `hastycapybara.tasks-for-markdown`, Open VSX 네임스페이스 | `hastycapybara` | 기술 식별자. 게시 후에는 바꿀 수 없고, 확장 ID는 대소문자를 구분하지 않는다 |
+| 사람이 읽는 이름(마켓 표시 이름, LICENSE, npm `author`), **퍼블리셔 ID**(`package.json` `publisher`), 확장 ID `HastyCapybara.tasks-for-markdown`, Open VSX 네임스페이스 | **HastyCapybara** | 결정 2026-10-01. `.vsix`로 설치하면 확장 화면에 퍼블리셔 ID가 그대로 보이므로 ID도 이 표기로 함. 게시 후에는 ID를 바꿀 수 없다. 확장 ID는 대소문자를 구분하지 않아 `hastycapybara.tasks-for-markdown`으로 찾아도 된다 |
 | npm 조직·패키지 `@hastycapybara/tasks-core` 등 | `hastycapybara` | npm은 패키지 이름에 대문자를 허용하지 않는다 |
 
 ## 빠뜨리지 말 것 (버전 관리·배포 체크리스트)
@@ -112,7 +111,7 @@ git tag v<ver> && git push origin v<ver>
 - [x] **npm 동시 배포 (결정 2026-09-30):** tasks-core, tasks-cli, tasks-api.
 - [x] **CHANGELOG 정리 (2026-09-30).** CHANGELOG.md는 "1.0.0 — 첫 공개"(영어·한국어 요약)부터 시작. 내부 이력(내부 1.0.0~1.13.0)과 옛 post-release-changes.md는 docs/history-internal.md로 옮김.
 - [ ] **npm 패키지 발행**: `@hastycapybara/tasks-core`, `@hastycapybara/tasks-cli`, 그리고 타입 패키지 `@hastycapybara/tasks-api`(src/api/types.ts로 만든 `.d.ts`만 담은 패키지; 폴더 `packages/api` 신설). npm 계정·스코프 `hastycapybara` 필요.
-- [ ] 계정: Marketplace 퍼블리셔 `hastycapybara`, Open VSX 네임스페이스, npm 스코프(위 "한 번만" 절).
+- [ ] 계정: Marketplace 퍼블리셔 `HastyCapybara`, Open VSX 네임스페이스, npm 스코프(위 "한 번만" 절).
 - [ ] 마켓플레이스 소개문(package.json `description`, README 첫머리)과 Obsidian Tasks 출처 문구 최종 확인. 로고·이름을 우리 것처럼 쓰지 않았는지.
 - [ ] docs/manual-checklist.md 수동 테스트 한 바퀴.
 

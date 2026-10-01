@@ -22,4 +22,5 @@ jobs:
       - run: pnpm build
       - run: pnpm build:packages
       - name: Integration tests (VS Code)
-        run: xvfb-run -a pnpm test:integration
+        # One retry: the headless VS Code window occasionally hangs at startup on the runner ("CodeWindow: detected unresponsive").
+        run: xvfb-run -a pnpm test:integration || (echo 'Integration tests failed; retrying once' && xvfb-run -a pnpm test:integration)

@@ -119,14 +119,15 @@ VS Code 1.138에 들어온 내장 Markdown Editor(WYSIWYG)와 `markdown.codeBloc
 |---|---|---|---|---|
 | 2-1 하이 컨트라스트 | | | | |
 | 2-2 원격 | Cursor macOS → Remote SSH(localhost) | 2026-10-01 | ✅ 통과 | 원격 쪽 설치, 인덱싱·사이드바, 렌더 보기, 칸반 정상. 바깥 수정 반영은 저장 안 된 편집기 때문에 한 번 헷갈렸으나 원격 문제 아님 |
-| 2-3 VS Code macOS | | | | |
+| 2-3 VS Code macOS | VS Code macOS, `.vsix` 설치 | 2026-10-01 | ✅ 통과 | 사이드바, `Ctrl+Shift+Enter` 토글·되돌리기, 반복, 편집 대화상자, 렌더 보기(버튼·메모·열), 미리보기 쿼리, 칸반·캘린더. 칸반 열이 좁다는 의견 → 격자 배치로 개선(M19) |
 | 2-3 VS Code Windows | | | | |
 | 2-3 VS Code Linux | | | | |
 | 2-4 Cursor macOS | | | | |
 | 2-4 Cursor Windows | | | | |
-| 2-5 라이트/다크 | | | | |
+| 2-5 라이트/다크 | Cursor macOS | 2026-10-01 | ✅ 통과 | 하이 컨트라스트 포함 |
 | 2-6 멀티 루트 / 비신뢰 | | | | |
 | 2-7 Obsidian 대조 | | | | |
+| 2-8 MCP (Claude Code) | macOS, 저장소 빌드 CLI | 2026-10-01 | ✅ 통과 | 조회·완료 처리·메모 추가·마감일 필수 거절. 처음에 옛 Claude Code 버전 오류가 났으나 재실행으로 해결(확장 문제 아님) |
 | 3-1 VSCE_PAT | | | | |
 | 3-2 OVSX_PAT | | | | |
 | 3-3 공개 여부 | | | | |

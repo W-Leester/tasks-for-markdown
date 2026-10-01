@@ -116,7 +116,7 @@ await tasks.edit.setStatus({ path: r.tasks[0].path, line: r.tasks[0].line, expec
 ## 문서
 
 - [사용자 가이드](docs/user-guide.md) · [의존성(🆔/⛔) 이해하기](docs/dependencies-guide.md) · 편집기 밖에서는 [npm 라이브러리 `@hastycapybara/tasks-core`](packages/core/README.md)와 [CLI `tasksmd`](packages/cli/README.md)(MCP 서버 포함, Claude Code 연동은 docs/api.md 8절)
-- [요구사항](docs/requirements.md) · [설계](docs/design.md) · [개발 체크리스트](docs/Tasks.md) · [성능](docs/perf.md) · [릴리스 절차](docs/release.md) · [공개 전 내부 개발 이력](docs/history-internal.md) · [수동 점검·사용자 작업 안내](docs/manual-checklist.md) · [공개 API](docs/api.md) · [API 계획](docs/api-plan.md)
+- [요구사항](docs/requirements.md) · [설계](docs/design.md) · [개발 체크리스트](docs/Tasks.md) · [성능](docs/perf.md) · [릴리스 절차](docs/release.md) · [배포 가이드라인](docs/publishing-guide.md) · [실패 기록(포스트모템)](docs/postmortems/README.md) · [공개 전 내부 개발 이력](docs/history-internal.md) · [수동 점검·사용자 작업 안내](docs/manual-checklist.md) · [공개 API](docs/api.md) · [API 계획](docs/api-plan.md)
 
 ## 개발
 

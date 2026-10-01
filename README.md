@@ -116,6 +116,7 @@ The built-in preview renders task lines with checkboxes and badges and ` ```task
 ## Documentation
 
 - [Public API (extension API, commands, library, CLI, MCP server)](docs/api.en.md)
+- [Publishing guide (Korean)](docs/publishing-guide.md) · [Postmortems and incident log (Korean)](docs/postmortems/README.md)
 
 - [User guide (Korean)](docs/user-guide.md)
 - [Requirements](docs/requirements.md) · [Design](docs/design.md) · [Development checklist](docs/Tasks.md) · [Performance](docs/perf.md)

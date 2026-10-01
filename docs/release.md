@@ -7,7 +7,7 @@
 1. **수동 점검.** Cursor에 설치된 1.0.0으로 [manual-checklist.md](manual-checklist.md)를 한 바퀴. 문제가 있으면 고친 뒤 다시 패키징.
 2. **VS Code Marketplace 퍼블리셔와 토큰.**
    - https://marketplace.visualstudio.com/manage → Microsoft 계정으로 로그인 → *Create publisher*: **ID `HastyCapybara`**(package.json의 `publisher`와 대소문자까지 똑같이), 표시 이름(Display name)도 `HastyCapybara`.
-   - https://dev.azure.com 에서 같은 계정으로 조직을 하나 만든 뒤 *User settings › Personal access tokens › New token*: Organization **All accessible organizations**, Scopes **Marketplace › Manage**. 만료일은 길게.
+   - **토큰(PAT) 대신 웹 업로드를 쓴다 (2026-10-01).** PAT를 받으려면 Azure DevOps 조직이 필요한데, 조직을 만들 때 **Azure 구독(결제 계정) 연결을 요구**한다. 그래서 VS Code Marketplace는 토큰 없이 **웹에서 `.vsix`를 업로드**한다: https://marketplace.visualstudio.com/manage → 퍼블리셔 `HastyCapybara` → *+ New extension* → *Visual Studio Code* → `.vsix` 끌어다 놓기 → *Upload*(몇 분간 자동 검사 후 공개). 새 버전도 같은 페이지에서 확장의 *…* → *Update*로 올린다. `VSCE_PAT`가 없으면 Release 워크플로는 Marketplace 단계만 건너뛴다. 나중에 Azure 구독이 생기면 PAT(Organization: All accessible organizations, Scope: Marketplace › Manage)를 만들어 `VSCE_PAT`로 등록하면 자동 게시로 바뀐다.
 3. **Open VSX 네임스페이스와 토큰** (Cursor가 이 마켓을 쓴다).
    - https://open-vsx.org → GitHub로 로그인 → 프로필에서 **Eclipse 계정 연결과 Publisher Agreement 서명**(안 하면 게시가 거부됨).
    - *Settings › Access Tokens*에서 토큰 발급.
@@ -16,12 +16,12 @@
    - https://www.npmjs.com 가입 → *Add Organization*: 이름 `hastycapybara`(무료, 공개 패키지).
    - *Access Tokens › Generate New Token › Granular*: 패키지·스코프 `@hastycapybara` **Read and write**. (계정에 2단계 인증이 켜져 있으면 "Bypass 2FA"가 가능한 토큰이어야 자동 게시가 된다.)
 5. **저장소 공개.** GitHub 저장소 *Settings › General › Danger Zone › Change visibility › Public* (또는 `gh repo edit W-Leester/tasks-for-markdown --visibility public --accept-visibility-change-consequences`). 공개해야 마켓 README의 이미지·링크가 보인다. 커밋 작성자 이메일이 공개된다.
-6. **Secrets 등록.** 저장소 *Settings › Secrets and variables › Actions › New repository secret*: `VSCE_PAT`, `OVSX_PAT`, `NPM_TOKEN`.
+6. **Secrets 등록.** 저장소 *Settings › Secrets and variables › Actions › New repository secret*: `OVSX_PAT`, `NPM_TOKEN` (`VSCE_PAT`는 Azure 구독이 생긴 뒤에).
 7. **태그 푸시.**
    ```bash
    git tag v1.0.0 && git push origin v1.0.0
    ```
-   GitHub Actions의 *Release* 워크플로가 테스트 → `.vsix`·npm `.tgz` 만들기 → GitHub Release 첨부 → VS Code Marketplace·Open VSX·npm 게시까지 한다. 진행 상황은 저장소 *Actions* 탭.
+   GitHub Actions의 *Release* 워크플로가 테스트 → `.vsix`·npm `.tgz` 만들기 → GitHub Release 첨부 → Open VSX·npm 게시까지 한다. **그다음 VS Code Marketplace에는 같은 `.vsix`를 웹에서 업로드**한다(2번). 진행 상황은 저장소 *Actions* 탭.
 8. **확인.** 몇 분 뒤 VS Code 확장 검색 "Tasks for Markdown", Cursor 확장 검색(Open VSX), https://www.npmjs.com/org/hastycapybara 에서 세 패키지. 사내 `.vsix` 사용자에게는 마켓에서 설치하라고 안내(1.13.0 → 1.0.0은 번호가 낮아 업데이트 알림이 안 뜸).
 
 **손으로 게시하고 싶다면**(워크플로 대신, 토큰은 위와 같음):

@@ -37,8 +37,9 @@ docs/Tasks.md에 남아 있는 미체크 항목 중 자동 테스트로 대신�
 5. 미리보기(명령 팔레트 → `Markdown: Open Preview to the Side`)에 뱃지와 쿼리 결과가 보이는지, 링크 클릭이 파일을 여는지.
 6. 칸반: 카드를 다른 컬럼으로 드래그 → 파일의 상태 기호가 바뀌는지. `Alt+←/→`도.
 7. 캘린더: 항목을 다른 날로 드래그 → 📅 날짜가 바뀌는지. `⤢ 전체 화면`과 `Esc`.
-8. 알림: 설정 `tasksmd.notifications.dailyTime`을 현재 시각 +1분으로 바꾸고 기다렸다가 에디터 알림(오른쪽 아래)이 오는지.
+8. 알림: 설정 `tasksmd.notifications.dailyTime`을 현재 시각 +1분으로 바꾸고 기다렸다가 토스트와 OS 알림이 오는지. Windows/Linux에서는 OS 알림(PowerShell 토스트 / `notify-send`)이 특히 확인 대상입니다.
 9. 아카이브: `Tasks: 완료 태스크 아카이브…` → 미리보기 → 확인 → `Archive.md` 생성.
+10. 업데이트 확인: `tasksmd.updateCheckUrl`에 `dist/latest.json`을 로컬 HTTP나 파일 경로로 주고 `Tasks: 업데이트 확인` 실행.
 Windows에서는 키 표기가 `Ctrl+Shift+C`, `Ctrl+Shift+R`로 같고, 경로 구분자가 `\`라도 쿼리의 `path includes`가 `/`로 동작해야 합니다(내부에서 변환).
 
 ### 2-4. Cursor macOS / Windows
@@ -56,7 +57,7 @@ VS Code와 다른 부분만 봅니다.
 ### 2-6. 멀티 루트 워크스페이스, 신뢰되지 않은 워크스페이스
 
 - 멀티 루트: `File › Add Folder to Workspace…`로 마크다운이 있는 폴더를 하나 더 추가. 사이드바에 두 폴더의 태스크가 모두 뜨고, 백링크·`path` 표시가 `폴더이름/파일.md`처럼 **폴더 이름이 앞에 붙어** 구분되는지. 쿼리 `folder includes <두 번째 폴더 이름>`이 그 폴더만 거르는지.
-- 신뢰되지 않은 워크스페이스: `Workspaces: Manage Workspace Trust`에서 신뢰를 해제. 인덱싱·토글·미리보기는 그대로 되고, **JS 함수 쿼리(`filter by function`)만 꺼지는지**. `filter by function` 블록을 미리보기로 보면 "신뢰되지 않은 워크스페이스" 안내가 떠야 합니다.
+- 신뢰되지 않은 워크스페이스: `Workspaces: Manage Workspace Trust`에서 신뢰를 해제. 인덱싱·토글·미리보기는 그대로 되고, **JS 함수 쿼리(`filter by function`)·OS 알림·업데이트 확인만 꺼지는지**. `filter by function` 블록을 미리보기로 보면 "신뢰되지 않은 워크스페이스" 안내가 떠야 합니다.
 
 ### 2-7. Obsidian 볼트 샘플과 파싱 대조
 

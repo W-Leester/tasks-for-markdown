@@ -43,6 +43,7 @@ export interface SettingsSchema {
   'editModal.accessKeys': boolean;
   'editModal.hiddenFields': string[];
   'notifications.enabled': boolean;
+  'notifications.os': boolean;
   'notifications.dailyTime': string;
   'notifications.dueWithinDays': number;
   'archive.file': string;
@@ -62,6 +63,7 @@ export interface SettingsSchema {
   'rendered.sourceWhenNoTasks': boolean;
   /** Max width of the rendered column in px; 0 = use the full editor width. */
   'rendered.maxWidth': number;
+  updateCheckUrl: string;
   language: 'auto' | 'en' | 'ko';
 }
 
@@ -102,6 +104,7 @@ export const SETTINGS_DEFAULTS: Readonly<SettingsSchema> = {
   'editModal.accessKeys': true,
   'editModal.hiddenFields': [],
   'notifications.enabled': true,
+  'notifications.os': true,
   'notifications.dailyTime': '09:00',
   'notifications.dueWithinDays': 1,
   'archive.file': 'Archive.md',
@@ -119,6 +122,7 @@ export const SETTINGS_DEFAULTS: Readonly<SettingsSchema> = {
   'rendered.fieldsAlign': 'columns',
   'rendered.sourceWhenNoTasks': true,
   'rendered.maxWidth': 0,
+  updateCheckUrl: '',
   language: 'auto',
 };
 

@@ -69,7 +69,7 @@ for p in tasks-core tasks-cli tasks-api; do pnpm --filter @hastycapybara/$p publ
 # 2. 검증
 pnpm typecheck && pnpm lint && pnpm test && pnpm test:integration
 # 3. 로컬 패키징 확인
-pnpm package            # tasks-for-markdown-<ver>.vsix
+pnpm package            # tasks-for-markdown-<ver>.vsix, dist/latest.json
 code --install-extension tasks-for-markdown-<ver>.vsix   # 또는 cursor --install-extension
 # 4. 태그 푸시 → GitHub Actions가 빌드·테스트·Release 첨부·(토큰 있으면) 게시
 git tag v<ver> && git push origin v<ver>
@@ -102,7 +102,7 @@ git tag v<ver> && git push origin v<ver>
 - [ ] **버전 번호 한곳에 맞추기.** `package.json`(확장). npm 패키지를 낼 때는 `packages/core`·`packages/cli`의 `version`도 같은 번호로(지금은 1.3.0으로 뒤처져 있음 — npm 첫 발행 전에 맞출 것). CLI의 `tasksmd info`·MCP `tasks_info`가 보여 주는 버전은 `packages/cli/package.json`의 값이라, 맞추지 않으면 AI·스크립트에 옛 번호가 나간다.
 - [ ] **CHANGELOG.md**에 버전·날짜·추가/변경/수정, 외부 연동 변경은 "API" 항목으로.
 - [ ] **검증.** `pnpm typecheck && pnpm lint && pnpm test && pnpm test:webviews && pnpm test:integration`.
-- [ ] **패키징.** `pnpm package` → `.vsix`, 타입 파일 `dist/api-types/api/types.d.ts` 포함 확인(`unzip -l`). 설치 파일에 외부 프로그램 실행(`child_process`)이나 자체 업데이트 코드가 들어가지 않게 한다 — Marketplace가 "suspicious content"로 거절한다(M20).
+- [ ] **패키징.** `pnpm package` → `.vsix`와 `dist/latest.json`, 타입 파일 `dist/api-types/api/types.d.ts` 포함 확인(`unzip -l`).
 - [ ] **이전 `.vsix` 삭제**, 새 파일로 설치 확인.
 - [ ] **출처 고지.** 새로 이식한 코드가 있으면 파일 상단 주석과 NOTICE.md 목록에 추가. 새 런타임 의존성은 NOTICE.md 표에 라이선스와 함께.
 - [ ] 태그 `v<버전>` 푸시(Actions가 게시).
@@ -110,7 +110,7 @@ git tag v<ver> && git push origin v<ver>
 ### C. 마켓플레이스 첫 공개(1.0.0) 때 한 번
 
 - [x] **버전 번호 결정 (2026-09-30): 1.0.0으로 다시 시작.** 내부 개발 버전은 1.13.0까지였다. 영향:
-  - 사내 `.vsix` 사용자는 마켓 설치(자동 업데이트)로 옮기도록 안내한다. `.vsix` 업데이트 확인 기능은 M20에서 제거했다.
+  - 사내 `.vsix` 사용자의 업데이트 알림(`latest.json` 비교)이 1.0.0을 "새 버전"으로 보지 않는다 → 마켓 설치(자동 업데이트)로 옮기거나 1.0.0을 직접 설치하도록 안내.
   - Marketplace·Open VSX·npm에는 처음 올리는 것이라 문제없다.
   - API 문서의 "추가된 버전"은 공개 기준(1.0.0)으로 적는다. 내부 버전 번호는 docs/history-internal.md에만.
 - [x] **저장소 공개 (결정 2026-09-30).** 공개 전 비밀 값 검사(2026-09-30: 파일·140개 커밋 이력에서 토큰·키 없음). 커밋 작성자 이메일이 공개된다.
@@ -124,7 +124,9 @@ git tag v<ver> && git push origin v<ver>
 
 ## 사내 `.vsix` 배포 (보조 경로)
 
-Release에 첨부된 `tasks-for-markdown-<ver>.vsix`를 공유 경로에 올리고, 사용자는 확장 뷰 `…` › *Install from VSIX…*로 설치한다. 자동 업데이트는 없으므로(M20에서 `.vsix` 업데이트 확인 제거) 가능하면 마켓 설치를 안내한다.
+1. Release에 첨부된 `tasks-for-markdown-<ver>.vsix`와 `latest.json`을 사내 공유 경로(파일 서버 또는 HTTP)에 올린다.
+2. `latest.json`의 `vsix`를 실제 경로/URL로 고친다 (`node scripts/make-latest.mjs "<경로>" "<릴리스 노트>"`로 생성 가능).
+3. 사용자는 `tasksmd.updateCheckUrl`에 `latest.json` 위치를 설정하면 하루 1회 새 버전 알림을 받는다. Marketplace 설치본은 자동 업데이트되므로 알림이 뜨지 않는다.
 
 ## 설치 방법 (사용자)
 

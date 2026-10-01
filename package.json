@@ -307,6 +307,11 @@
         "icon": "$(screen-full)"
       },
       {
+        "command": "tasksmd.checkForUpdates",
+        "title": "%tasksmd.checkForUpdates.title%",
+        "category": "Tasks"
+      },
+      {
         "command": "tasksmd.convertFormat",
         "title": "%tasksmd.convertFormat.title%",
         "category": "Tasks"
@@ -744,6 +749,11 @@
           "default": true,
           "description": "%tasksmd.config.notifications.enabled%"
         },
+        "tasksmd.notifications.os": {
+          "type": "boolean",
+          "default": true,
+          "description": "%tasksmd.config.notifications.os%"
+        },
         "tasksmd.notifications.dailyTime": {
           "type": "string",
           "default": "09:00",
@@ -855,6 +865,11 @@
           "maximum": 24,
           "default": 13,
           "description": "%tasksmd.config.calendar.fontSize%"
+        },
+        "tasksmd.updateCheckUrl": {
+          "type": "string",
+          "default": "",
+          "description": "%tasksmd.config.updateCheckUrl%"
         },
         "tasksmd.language": {
           "type": "string",
@@ -1386,7 +1401,7 @@
     "test:watch": "vitest",
     "lint": "eslint src tests packages/cli/src",
     "format": "prettier --write .",
-    "package": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\" && pnpm build:prod && pnpm build:api-types && vsce package --no-dependencies",
+    "package": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\" && pnpm build:prod && pnpm build:api-types && vsce package --no-dependencies && node scripts/make-latest.mjs",
     "publish:vsce": "vsce publish --no-dependencies",
     "publish:ovsx": "ovsx publish --no-dependencies",
     "vscode:prepublish": "pnpm build",
@@ -1433,7 +1448,9 @@
       "supported": "limited",
       "description": "%tasksmd.capabilities.untrusted%",
       "restrictedConfigurations": [
-        "tasksmd.query.allowFunctions"
+        "tasksmd.query.allowFunctions",
+        "tasksmd.notifications.os",
+        "tasksmd.updateCheckUrl"
       ]
     },
     "virtualWorkspaces": {

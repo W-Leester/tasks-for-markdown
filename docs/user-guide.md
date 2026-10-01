@@ -112,7 +112,7 @@ short mode
   - **전체 화면**: 툴바 오른쪽의 `⤢ 전체 화면` 버튼(또는 `Tasks: 캘린더 열기(전체 화면)`, `Tasks: 캘린더: 전체 화면 전환` 명령)을 누르면 사이드바·하단 패널이 숨고 캘린더의 에디터 그룹이 최대화됩니다. 셀이 커지는 만큼 하루에 더 많은 태스크가 보입니다. `Esc` 또는 같은 버튼으로 되돌립니다(사이드바는 다시 열립니다). `tasksmd.calendar.fullScreen`을 `window`로 두면 창 자체도 전체 화면으로 전환됩니다.
 - **통계** (`Tasks: 통계 열기`): 최근 N주 완료/생성/기한 초과/잔량, 태그·폴더 필터.
 - **아카이브** (`Tasks: 완료 태스크 아카이브…`): N일 이상 지난 완료 태스크를 미리보기에서 고른 뒤 `Archive.md`로 이동(원본 링크 포함).
-- **알림**: 시작 시·지정 시각에 오늘/초과 요약, 마감 임박 묶음 알림(스누즈). 에디터 오른쪽 아래 알림으로 뜹니다.
+- **알림**: 시작 시·지정 시각에 오늘/초과 요약, 마감 임박 묶음 알림(스누즈), OS 알림.
 - **빠른 검색** `Cmd/Ctrl+Shift+;`.
 - **커스텀 상태**: `tasksmd.statuses` 또는 `Tasks: 상태 프리셋 불러오기…`(Minimal / ITS / Things). 동작은 심볼이 아니라 타입(TODO / IN_PROGRESS / ON_HOLD / DONE / CANCELLED / NON_TASK)을 따릅니다.
 - **진단**: 잘못된 날짜, 없는 ID, 순환 의존성, 잘못된 반복 규칙, 날짜 없는 반복 → Problems 패널 + Quick Fix.
@@ -134,5 +134,5 @@ short mode
 - **Obsidian과 같은 폴더를 써도 되나요?** 문법이 같고 필드 순서도 동일하게 쓰므로 호환됩니다. 다만 이 확장의 공식 지원 범위는 전용 폴더입니다.
 - **미리보기에서 체크가 안 돼요.** 의도된 제한입니다(4장). 에디터에서 `Ctrl+Shift+Enter`를 쓰거나 쿼리 결과 패널의 체크박스를 쓰세요.
 - **Cursor에서 쿼리 블록이 그냥 코드로 보여요.** 오른쪽 위 "Preview | Markdown" 토글의 Preview는 Cursor 자체 WYSIWYG 편집기라 확장이 개입할 수 없고, `Cmd+Shift+V`도 이 토글에 묶여 있습니다. "Markdown"으로 전환한 뒤 블록 위 `▶ 결과 보기` CodeLens로 결과 패널을 열거나, 명령 팔레트에서 `Markdown: Open Preview to the Side`로 VS Code 미리보기를 여세요(Cursor에서는 `Cmd+K`가 AI 인라인 편집이라 `Cmd+K V`가 안 됩니다).
-- **업데이트는 어떻게 받나요?** VS Code Marketplace나 Open VSX에서 설치하면 에디터가 자동으로 업데이트합니다. `.vsix` 파일로 직접 설치했다면 새 버전도 같은 방법으로 설치하세요.
+- **`.vsix`로 설치했는데 업데이트는?** `tasksmd.updateCheckUrl`에 사내 `latest.json` 경로를 넣으면 하루 1회 새 버전을 알려줍니다.
 - **로그는 어디에?** `Tasks: 로그 보기` (출력 채널 "Tasks for Markdown").

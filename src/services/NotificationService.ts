@@ -1,4 +1,3 @@
-import { execFile } from 'node:child_process';
 import * as vscode from 'vscode';
 import { systemClock, type Clock } from '../core/dates';
 import type { TaskIndex } from '../core/index';
@@ -19,7 +18,6 @@ export interface NotificationDeps {
   clock?: Clock;
   log(m: string): void;
   /** Injectable for tests. */
-  osNotify?: (title: string, body: string) => Promise<void>;
 }
 
 /**
@@ -107,15 +105,8 @@ export class NotificationService implements vscode.Disposable {
     }
   }
 
-  /** Toast (with "Show today" button) and, if enabled, an OS notification. Returns the chosen extra action. */
+  /** Editor notification with a "Show today" button. Returns the chosen extra action. */
   private async notify(title: string, body: string, detail = '', actions: string[] = []): Promise<string | undefined> {
-    if (this.deps.settings.get('notifications.os') && vscode.workspace.isTrusted) {
-      try {
-        await (this.deps.osNotify ?? osNotify)(title, body);
-      } catch (err) {
-        this.deps.log(`OS notification failed: ${err instanceof Error ? err.message : String(err)}`);
-      }
-    }
     const show = t('Show today');
     const choice = await vscode.window.showInformationMessage(`${title}: ${body}${detail ? `\n${detail}` : ''}`, show, ...actions);
     if (choice === show) void vscode.commands.executeCommand('tasksmd.openSidebar');
@@ -130,26 +121,4 @@ export class NotificationService implements vscode.Disposable {
 
 function snoozeKey(t: Task): string {
   return `${t.location.key}#${t.description}`;
-}
-
-/** Native notification via the platform's own tool; arguments are passed as arrays, never through a shell (D§10). */
-export function osNotify(title: string, body: string): Promise<void> {
-  const run = (cmd: string, args: string[]) =>
-    new Promise<void>((resolve, reject) => {
-      execFile(cmd, args, { timeout: 5000, windowsHide: true }, (err) => (err ? reject(err) : resolve()));
-    });
-  const safe = (s: string) => s.replace(/["\\]/g, '');
-  switch (process.platform) {
-    case 'darwin':
-      return run('osascript', ['-e', `display notification "${safe(body)}" with title "${safe(title)}"`]);
-    case 'win32': {
-      const ps = `[Windows.UI.Notifications.ToastNotificationManager, Windows.UI.Notifications, ContentType = WindowsRuntime] | Out-Null;
-$t = [Windows.UI.Notifications.ToastNotificationManager]::GetTemplateContent([Windows.UI.Notifications.ToastTemplateType]::ToastText02);
-$n = $t.GetElementsByTagName('text'); $n.Item(0).AppendChild($t.CreateTextNode('${safe(title).replace(/'/g, "''")}')) | Out-Null; $n.Item(1).AppendChild($t.CreateTextNode('${safe(body).replace(/'/g, "''")}')) | Out-Null;
-[Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier('Visual Studio Code').Show([Windows.UI.Notifications.ToastNotification]::new($t))`;
-      return run('powershell', ['-NoProfile', '-NonInteractive', '-Command', ps]);
-    }
-    default:
-      return run('notify-send', [title, body]);
-  }
 }

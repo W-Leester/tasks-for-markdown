@@ -45,7 +45,7 @@
 | M17 | 외부 연동 보강(독립 타입, 메모·기능 확인·상태 알림·isBlocking, CLI·MCP), 출처 표시 | ✅ 완료(1.13.0) | 이 문서 M17, release.md |
 | M18 | 마켓플레이스 정식 공개 준비(1.0.0 재시작, 저장소 공개, 영어 README, npm) | ✅ 준비 완료(1.0.0) — 계정·공개·태그는 사용자(release.md "첫 공개 순서") | 이 문서 M18, release.md |
 | M19 | 칸반 격자 배치(창 폭에 맞춰 2×2 등으로 균형 배치) | ✅ 완료(1.0.0에 포함) | 이 문서 M19 |
-| M20 | 마켓 업로드 거절 대응: OS 알림·`.vsix` 업데이트 확인 제거 | 🟡 계획 확정(2026-10-01) | 이 문서 M20 |
+| M20 | 마켓 업로드 거절 대응: OS 알림·`.vsix` 업데이트 확인 제거 | ✅ 완료(1.0.0에 포함) — 재업로드 결과 대기 | 이 문서 M20 |
 
 ---
 
@@ -887,10 +887,10 @@
 **결정(사용자).** 둘 다 제거한다. 마켓 설치본은 마켓이 자동 업데이트하고, 알림은 VS Code·Cursor 자체 알림 팝업(아침 요약, 마감 임박, 스누즈)으로 그대로 남는다. 빠지는 것은 OS 알림 센터 알림뿐.
 
 ### 할 일
-- [ ] 코드: `osNotify`와 `tasksmd.notifications.os`, `UpdateCheckService`·`tasksmd.checkForUpdates`·`tasksmd.updateCheckUrl` 제거(설정·명령·번역·신뢰 안 된 워크스페이스 제한 목록 포함), `scripts/make-latest.mjs`와 `dist/latest.json`
-- [ ] 워크플로·패키지 스크립트에서 `latest.json` 제거, 관련 테스트 정리
-- [ ] 문서: README(영·한) 설정 표, user-guide, release.md(사내 `.vsix` 배포 절 정리), CHANGELOG
-- [ ] 설치 파일에 `child_process`·자체 업데이트 코드가 없는지 확인 후 재패키징
+- [x] 코드: `osNotify`와 `tasksmd.notifications.os`, `UpdateCheckService`·`tasksmd.checkForUpdates`·`tasksmd.updateCheckUrl` 제거(설정·명령·번역·신뢰 안 된 워크스페이스 제한 목록 포함), `scripts/make-latest.mjs`와 `dist/latest.json`
+- [x] 워크플로·패키지 스크립트에서 `latest.json` 제거, 관련 테스트 정리
+- [x] 문서: README(영·한) 설정 표, user-guide, release.md(사내 `.vsix` 배포 절 정리), CHANGELOG
+- [x] 설치 파일에 `child_process`·자체 업데이트 코드가 없는지 확인 후 재패키징
 
 ## 향후 후보 (미착수)
 

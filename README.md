@@ -73,7 +73,7 @@ group by filename
 | `savedQueries` | `[]` | Saved queries (also `.tasks/queries/*.md`) |
 | `query.allowFunctions` | `false` | Allow `by function` JavaScript in queries (trusted workspaces only) |
 | `editModal.accessKeys` / `editModal.hiddenFields` | `true` / `[]` | Edit dialog |
-| `notifications.*` | on, `09:00`, 1 day | Daily summary and due-soon digest, OS notifications |
+| `notifications.*` | on, `09:00`, 1 day | Daily summary and due-soon digest (editor notifications) |
 | `archive.file` / `afterDays` / `linkStyle` | `Archive.md` / 30 / `wiki` | Archive command |
 | `calendar.newTaskFile` | `""` | File that receives tasks created from the calendar |
 | `query.showTree` | `true` | Query results as a tree (sub-tasks under their parent); per block `show tree` / `hide tree` |
@@ -87,7 +87,6 @@ group by filename
 | `rendered.fieldStyle` | `plain` | Task-line fields in the rendered view: as in the source (`plain`) or pill badges (`badges`) |
 | `calendar.fontSize` | `13` | Font size (px) of tasks in calendar cells |
 | `calendar.fullScreen` | `maximize` | Full screen button: maximize the editor group only, or `window` for the whole window |
-| `updateCheckUrl` | `""` | `latest.json` location for `.vsix` installs |
 
 ## API and automation
 
@@ -127,7 +126,7 @@ pnpm install
 pnpm build              # extension + webview bundles
 pnpm test               # unit tests (vitest)
 pnpm test:integration   # runs a VS Code instance
-pnpm package            # production build + .vsix + latest.json
+pnpm package            # production build + .vsix
 ```
 
 Press `F5` in VS Code to launch an Extension Development Host.

@@ -26,7 +26,7 @@ jobs:
       - run: pnpm typecheck && pnpm lint && pnpm test
       - name: Integration tests (VS Code)
         run: xvfb-run -a pnpm test:integration
-      - name: Package .vsix + latest.json
+      - name: Package .vsix
         run: pnpm package
       - name: Build and pack npm packages (.tgz attached to the release)
         run: |
@@ -40,7 +40,6 @@ jobs:
           files: |
             *.vsix
             *.tgz
-            dist/latest.json
           generate_release_notes: true
       # Publishing runs only when the tokens are configured as repository secrets.
       - name: Publish to VS Code Marketplace

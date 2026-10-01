@@ -73,7 +73,7 @@ group by filename
 | `savedQueries` | `[]` | 저장된 쿼리 (`.tasks/queries/*.md`도 함께 읽음) |
 | `query.allowFunctions` | `false` | 쿼리의 `by function` JavaScript 허용 (신뢰된 워크스페이스만) |
 | `editModal.accessKeys` / `editModal.hiddenFields` | `true` / `[]` | 편집 대화상자 |
-| `notifications.*` | 켜짐, `09:00`, 1일 | 일일 요약·마감 임박 알림, OS 알림 |
+| `notifications.*` | 켜짐, `09:00`, 1일 | 일일 요약·마감 임박 알림(에디터 알림) |
 | `archive.file` / `afterDays` / `linkStyle` | `Archive.md` / 30 / `wiki` | 아카이브 명령 |
 | `calendar.newTaskFile` | `""` | 캘린더에서 만든 태스크를 넣을 파일 |
 | `query.showTree` | `true` | 쿼리 결과를 트리로(하위 태스크를 부모 밑에). 블록별 `show tree` / `hide tree` |
@@ -87,7 +87,6 @@ group by filename
 | `rendered.fieldStyle` | `plain` | 렌더 보기 태스크 줄의 필드 표시: 원문처럼(`plain`) / 배지(`badges`) |
 | `calendar.fontSize` | `13` | 캘린더 칸의 태스크 글자 크기(px) |
 | `calendar.fullScreen` | `maximize` | 전체 화면 버튼: 에디터 그룹 최대화만(`maximize`) / 창도 전체 화면(`window`) |
-| `updateCheckUrl` | `""` | `.vsix` 설치본용 `latest.json` 위치 |
 
 ## API와 자동화
 
@@ -125,7 +124,7 @@ pnpm install
 pnpm build              # 확장 + 웹뷰 번들
 pnpm test               # 단위 테스트 (vitest)
 pnpm test:integration   # VS Code를 띄워 통합 테스트
-pnpm package            # production 빌드 + .vsix + latest.json
+pnpm package            # production 빌드 + .vsix
 ```
 
 VS Code/Cursor에서 `F5`를 누르면 확장이 로드된 개발용 창이 열립니다.

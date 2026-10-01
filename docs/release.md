@@ -36,6 +36,13 @@ for p in tasks-core tasks-cli tasks-api; do pnpm --filter @hastycapybara/$p publ
 
 **문제가 생기면.** Marketplace는 같은 버전을 다시 올릴 수 없다(내리기는 가능: `vsce unpublish`). 고칠 게 있으면 1.0.1로 올린다. npm은 게시 후 72시간 안에만 `npm unpublish` 가능.
 
+## 공개 직후 할 일 (토큰 정리)
+
+- [ ] **npm Trusted Publishing으로 전환.** 첫 게시는 2FA 우회 토큰(`NPM_TOKEN`, 2026-10-01 발급, **90일 만료 → 2026-12-30 전후**)으로 한다. npm의 Trusted Publishing은 이미 있는 패키지에만 설정할 수 있으므로, 첫 게시 뒤 세 패키지(`@hastycapybara/tasks-core`, `tasks-cli`, `tasks-api`) 각각의 *Settings › Trusted Publisher*에 GitHub(`W-Leester/tasks-for-markdown`, 워크플로 `release.yml`)를 등록하고, 워크플로에 `permissions: id-token: write`와 npm CLI 11.5 이상을 맞춘 뒤 `NPM_TOKEN`을 삭제한다.
+- [ ] **Open VSX Trusted Publishers로 전환**(네임스페이스 `HastyCapybara` 소유권 승인 뒤). 등록 후 `OVSX_PAT` 삭제.
+- [ ] 전환 전까지는 토큰 만료일을 달력에 적어 두고, 만료되면 새로 발급해 GitHub Secret만 바꾼다.
+- [ ] **Open VSX 네임스페이스 소유권 신청**: VS Code Marketplace 업로드와 저장소 공개가 끝난 뒤 GitHub 이슈(Option 1 — 같은 이름의 Marketplace 퍼블리셔, 저장소는 신청자 소유)로 제출.
+
 ## 한 번만 (계정·토큰)
 
 1. **VS Code Marketplace**: https://marketplace.visualstudio.com/manage 에서 퍼블리셔 `HastyCapybara` 생성 → Azure DevOps에서 PAT(Marketplace › Manage 권한) 발급 → GitHub 저장소 Secrets에 `VSCE_PAT`.

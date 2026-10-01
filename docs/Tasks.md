@@ -45,7 +45,7 @@
 | M17 | 외부 연동 보강(독립 타입, 메모·기능 확인·상태 알림·isBlocking, CLI·MCP), 출처 표시 | ✅ 완료(1.13.0) | 이 문서 M17, release.md |
 | M18 | 마켓플레이스 정식 공개 준비(1.0.0 재시작, 저장소 공개, 영어 README, npm) | ✅ 준비 완료(1.0.0) — 계정·공개·태그는 사용자(release.md "첫 공개 순서") | 이 문서 M18, release.md |
 | M19 | 칸반 격자 배치(창 폭에 맞춰 2×2 등으로 균형 배치) | ✅ 완료(1.0.0에 포함) | 이 문서 M19 |
-| M20 | 마켓 업로드 거절 대응: OS 알림·`.vsix` 업데이트 확인 제거 | 🟡 계획 확정(2026-10-01) | 이 문서 M20 |
+| M20 | 마켓 업로드 거절 대응: 원인은 검색어 — 통과한 검색어로 교체 | 🟡 재업로드 대기(2026-10-01) | 이 문서 M20 |
 
 ---
 
@@ -878,19 +878,36 @@
 - [x] 균형 격자 계산(순수 함수) + 칸반 보드 CSS grid, 행 높이 기준 윈도잉
 - [x] 테스트(계산, 웹뷰), 스크린샷, 문서(user-guide)
 
-## M20. 마켓 업로드 거절 대응 — OS 알림·.vsix 업데이트 확인 제거 (결정 2026-10-01)
+## M20. 마켓 업로드 거절 대응 (2026-10-01)
 
-**상황.** VS Code Marketplace 웹 업로드가 "Your extension has suspicious content"로 거절됨(어느 항목인지는 알려 주지 않음). 설치 파일 점검 결과 비밀 값은 없었고, 의심받을 만한 코드는 두 가지였다.
-1. **OS 알림**(`NotificationService.osNotify`): `child_process.execFile`로 macOS `osascript`, Windows `powershell -Command <스크립트>`를 실행 — 악성 확장의 전형적인 패턴과 같다.
-2. **`.vsix` 업데이트 확인**(`UpdateCheckService`, `Tasks: 업데이트 확인`): 지정 주소에서 `latest.json`을 받아 `.vsix` 위치를 연다 — 마켓 밖 자체 업데이트 경로.
+**상황.** VS Code Marketplace 웹 업로드가 "Your extension has suspicious content. Please fix your extension metadata"로 거절됨. 어느 항목인지는 알려 주지 않는다.
 
-**결정(사용자).** 둘 다 제거한다. 마켓 설치본은 마켓이 자동 업데이트하고, 알림은 VS Code·Cursor 자체 알림 팝업(아침 요약, 마감 임박, 스누즈)으로 그대로 남는다. 빠지는 것은 OS 알림 센터 알림뿐.
+**1차 가설(틀림).** 외부 프로그램 실행(OS 알림의 `osascript`/PowerShell)과 `.vsix` 업데이트 확인 코드를 의심해 제거(41814e7) → 같은 오류 → **되돌림**(e345098). 기능은 그대로 남아 있다.
+
+**시험 업로드로 원인 좁히기**(시험용 이름으로 각각 업로드):
+
+| 시험 | 내용 | 결과 |
+|---|---|---|
+| ① 전체 코드 + 최소 정보 | 짧은 소개·검색어 3개·짧은 README | 통과 → 코드 문제 아님 |
+| ② 최소 확장(hello) | — | 통과 → 계정 문제 아님 |
+| ③ 실제 문서(README·README.ko·CHANGELOG·NOTICE) | | 통과 |
+| ④ 실제 소개문 + 검색어 13개 + 배너 | | 실패 |
+| ⑤ 실제 소개문(Obsidian·VS Code·Cursor 포함) | | 통과 |
+| ⑦ 소개문에서 Obsidian 뺀 것 | | 통과 |
+| ⑥ 검색어 13개 + 배너 / ⑧ obsidian 2개 뺀 검색어 + 배너 | | 둘 다 실패 |
+| ⑨ 배너만 | | 통과 |
+| ⑫ 검색어 + `productivity`·`recurring`·`dataview`·`mcp` | | 통과 |
+| ⑩ 검색어 8개 / ⑪ + `checklist`·`kanban`·`calendar`·`gtd` | | 둘 다 실패 |
+| ⑬~⑯ 위 4단어를 하나씩 | | 넷 다 실패 |
+
+**결론.** 원인은 **검색어(keywords)**. `checklist`·`kanban`·`calendar`·`gtd`(그리고 `obsidian`·`obsidian-tasks`는 미확인)가 들어가면 거절된다. 다른 확장 이름과 같은 단어를 검색어로 넣는 것을 끼워 넣기로 보는 규칙이거나, 짧은 시간에 비슷한 시험 확장을 많이 올려 생긴 판정일 수 있다.
+
+**조치.** 검색어를 통과가 확인된 `markdown, tasks, todo, productivity, recurring, dataview, mcp`로 교체. 소개문·문서·배너는 그대로.
 
 ### 할 일
-- [ ] 코드: `osNotify`와 `tasksmd.notifications.os`, `UpdateCheckService`·`tasksmd.checkForUpdates`·`tasksmd.updateCheckUrl` 제거(설정·명령·번역·신뢰 안 된 워크스페이스 제한 목록 포함), `scripts/make-latest.mjs`와 `dist/latest.json`
-- [ ] 워크플로·패키지 스크립트에서 `latest.json` 제거, 관련 테스트 정리
-- [ ] 문서: README(영·한) 설정 표, user-guide, release.md(사내 `.vsix` 배포 절 정리), CHANGELOG
-- [ ] 설치 파일에 `child_process`·자체 업데이트 코드가 없는지 확인 후 재패키징
+- [x] 원인 좁히기(시험 업로드 16개)
+- [x] 검색어 교체, 재패키징
+- [ ] 실제 업로드 결과 확인, 시험 확장 모두 삭제(Remove)
 
 ## 향후 후보 (미착수)
 

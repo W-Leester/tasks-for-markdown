@@ -93,6 +93,7 @@ git tag v<ver> && git push origin v<ver>
 - [ ] **기능 목록.** 확장 API의 `features`에 이름 추가, api.md "기능 목록" 표에 이름·추가 버전 기록.
 - [ ] **공개 타입.** `src/api/types.ts`에 추가(import 없는 한 파일 유지). 내부 DTO와의 양방향 검사가 통과해야 한다.
 - [ ] **API 호환.** 추가만이면 버전 1 유지. 제거·의미 변경은 `getAPI(2)`를 새로 만들고 1을 최소 한 릴리스 병행.
+- [ ] **검색어(keywords).** 바꿀 때는 마켓 업로드로 확인한다. `checklist`·`kanban`·`calendar`·`gtd`가 들어가면 "suspicious content"로 거절됐다(M20, 2026-10-01). 통과 확인된 것: `markdown, tasks, todo, productivity, recurring, dataview, mcp`.
 - [ ] **설정.** `package.json` contributes, `package.nls.json`·`package.nls.ko.json` 설명, README 설정 표(한·영).
 - [ ] **화면 문구.** `l10n/bundle.l10n.ko.json`에 한국어(누락은 `l10n-coverage` 테스트가 잡는다).
 - [ ] **문서.** user-guide, README(한·영), api.md·api.en.md, docs/Tasks.md 진행 표, design.md 변경 이력.

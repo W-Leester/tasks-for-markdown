@@ -4,7 +4,7 @@
 
 | 문서 | 내용 |
 |---|---|
-| [2026-10-01-marketplace-upload-rejected.md](2026-10-01-marketplace-upload-rejected.md) | VS Code Marketplace 첫 업로드 거절("suspicious content") — 원인은 검색어 |
+| [2026-10-01-marketplace-upload-rejected.md](2026-10-01-marketplace-upload-rejected.md) | VS Code Marketplace 첫 업로드 거절("suspicious content") — 원인은 검색어, 2026-10-02 해결 |
 | [incidents.md](incidents.md) | 개발 중 실패 사례 모음(19건): 증상 → 원인 → 해결 → 재발 방지 |
 
 ## 쓰는 법

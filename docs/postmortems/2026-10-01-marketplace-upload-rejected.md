@@ -5,7 +5,7 @@
 | 날짜 | 2026-10-01 (KST) |
 | 대상 | Tasks for Markdown 1.0.0 (`HastyCapybara.tasks-for-markdown`) 첫 공개 |
 | 영향 | 공개가 하루 이상 늦어짐. 사용자 영향 없음(아직 공개 전) |
-| 상태 | 원인 좁힘 완료, 검색어 교체(a20c931). **12시간 생성 한도 해제 후 재업로드 대기** |
+| 상태 | **해결.** 검색어 교체(a20c931) 후 2026-10-02 재업로드 성공, 1.0.0 공개 |
 | 관련 | [Tasks.md M20](../Tasks.md), [배포 가이드라인 5.3](../publishing-guide.md#53-marketplace가-거절할-때) |
 
 이 문서는 누구의 잘못을 따지려는 것이 아니라, 같은 일이 다시 생겼을 때 더 빨리 끝내기 위한 기록이다.
@@ -93,9 +93,10 @@ VS Code Marketplace 웹 업로드가 **"Your extension has suspicious content. P
 | 배포 체크리스트에 "검색어는 업로드로 확인, 금지 사례" 추가 | ✅ [release.md](../release.md) |
 | 배포 가이드라인에 거절 대응 절차(반씩 나누기, 시험용 이름, 생성 한도) 정리 | ✅ [publishing-guide.md 5.3](../publishing-guide.md) |
 | CI 통합 테스트 한 번 재시도 | ✅ 27d50bc |
-| 12시간 뒤 재업로드, 결과를 이 문서 "결과"에 기록 | ⏳ |
+| 12시간 뒤 재업로드, 결과를 이 문서 "결과"에 기록 | ✅ 2026-10-02 |
 | 남은 시험 확장 모두 Remove | ⏳ 사용자 |
 | 재업로드도 실패하면 Microsoft 지원 문의(시험 결과 표 첨부) | 조건부 |
 
 ## 8. 결과
-- (재업로드 후 기록)
+- **2026-10-02:** 검색어만 바꾼 같은 `tasks-for-markdown-1.0.0.vsix`(코드·소개문·문서·배너는 처음 거절된 것과 동일)를 다시 올리자 **통과**. Marketplace에 `HastyCapybara.tasks-for-markdown` 1.0.0 공개 확인.
+- 따라서 원인은 검색어로 확정. 다만 `checklist`·`kanban`·`calendar`·`gtd` 넷 중 어느 것이 결정적이었는지(또는 넷 다인지)는 단어별 시험이 생성 한도 근처에서 진행돼 확정하지 못했다. 이 단어들은 검색어에 넣지 않는다.

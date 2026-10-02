@@ -19,7 +19,7 @@
 
 ### 남은 일 (순서대로)
 1. [ ] **시험 확장 삭제** — 관리 페이지에서 `TFM …` 이름의 시험 확장들을 *… → Remove*.
-2. [ ] **Open VSX 네임스페이스 소유권 신청** — open-vsx.org › 네임스페이스 `HastyCapybara` › *Claim Ownership* → GitHub 이슈: Ownership ☑, Account Age ☑, **Option 1** ☑, Claim evidence에 Marketplace 링크·퍼블리셔 링크·저장소 링크(신청자 W-Leester 소유). 승인까지 며칠.
+2. [x] **Open VSX 네임스페이스 소유권 신청** — 2026-10-03 제출: https://github.com/eclipse/openvsx/issues/13675 (승인 대기). — open-vsx.org › 네임스페이스 `HastyCapybara` › *Claim Ownership* → GitHub 이슈: Ownership ☑, Account Age ☑, **Option 1** ☑, Claim evidence에 Marketplace 링크·퍼블리셔 링크·저장소 링크(신청자 W-Leester 소유). 승인까지 며칠.
 3. [ ] **태그 푸시** → Release 워크플로가 Open VSX·npm 게시, GitHub Release에 `.vsix`·`.tgz` 첨부.
    ```bash
    git tag v1.0.0 && git push origin v1.0.0

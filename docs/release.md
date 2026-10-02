@@ -43,7 +43,8 @@ for p in tasks-core tasks-cli tasks-api; do pnpm --filter @hastycapybara/$p publ
 
 ## 공개 직후 할 일 (토큰 정리)
 
-- [ ] **npm Trusted Publishing으로 전환.** 첫 게시는 2FA 우회 토큰(`NPM_TOKEN`, 2026-10-01 발급, **90일 만료 → 2026-12-30 전후**)으로 한다. npm의 Trusted Publishing은 이미 있는 패키지에만 설정할 수 있으므로, 첫 게시 뒤 세 패키지(`@hastycapybara/tasks-core`, `tasks-cli`, `tasks-api`) 각각의 *Settings › Trusted Publisher*에 GitHub(`W-Leester/tasks-for-markdown`, 워크플로 `release.yml`)를 등록하고, 워크플로에 `permissions: id-token: write`와 npm CLI 11.5 이상을 맞춘 뒤 `NPM_TOKEN`을 삭제한다.
+- [ ] **npm Trusted Publishing으로 전환 (진행 중, 2026-10-03).** 세 패키지가 게시되어 조건 충족.
+  - 계획: (1) 워크플로에 `permissions: id-token: write` 추가 — 첫 게시 로그의 `Skipped OIDC: ERR_PNPM_ID_TOKEN_GITHUB_WORKFLOW_INCORRECT_PERMISSIONS`가 이것 때문. pnpm이 OIDC 토큰을 받으면 토큰 없이 게시하고 출처 증명(provenance)도 붙는다. (2) npm 게시 단계를 토큰 유무와 상관없이 실행하고, `NPM_TOKEN`이 있을 때만 `.npmrc`에 쓴다(전환 확인 전까지 대비책). (3) 사용자가 npmjs.com에서 세 패키지 각각 *Settings › Trusted Publisher › GitHub Actions*: Organization or user `W-Leester`, Repository `tasks-for-markdown`, Workflow filename `release.yml`, Environment 비움. (4) 다음 게시(1.1.0)에서 로그에 OIDC 사용이 확인되면 GitHub Secret `NPM_TOKEN` 삭제 + npm에서 토큰 폐기, 각 패키지 *Publishing access*를 "Require two-factor authentication and disallow tokens"로.
 - [ ] **Open VSX Trusted Publishers로 전환**(네임스페이스 `HastyCapybara` 소유권 승인 뒤). 등록 후 `OVSX_PAT` 삭제.
 - [ ] 전환 전까지는 토큰 만료일을 달력에 적어 두고, 만료되면 새로 발급해 GitHub Secret만 바꾼다.
 - [ ] **Open VSX 네임스페이스 소유권 신청**: VS Code Marketplace 업로드와 저장소 공개가 끝난 뒤 GitHub 이슈(Option 1 — 같은 이름의 Marketplace 퍼블리셔, 저장소는 신청자 소유)로 제출.

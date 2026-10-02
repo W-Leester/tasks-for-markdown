@@ -1,28 +1,31 @@
 # @hastycapybara/tasks-cli
 
-Tasks for Markdown의 명령줄 도구입니다. 편집기를 띄우지 않고 마크다운 폴더의 태스크를 조회하고 만들고 완료합니다. 확장과 같은 코드(`@hastycapybara/tasks-core`)를 쓰므로 완료일·반복 다음 회차·필드 순서가 편집기에서 한 것과 똑같습니다.
+Command line for **[Tasks for Markdown](https://github.com/W-Leester/tasks-for-markdown)**: query, add, complete and edit Obsidian Tasks-style task lines in a folder of Markdown notes — no editor required. It uses the same code as the extension (`@hastycapybara/tasks-core`), so done dates, the next occurrence of recurring tasks and field order come out exactly as they do in the editor. (한국어: [docs/api.md §7–8](https://github.com/W-Leester/tasks-for-markdown/blob/main/docs/api.md))
 
 ```bash
 npx @hastycapybara/tasks-cli query "not done
 due before today" --root ~/notes --md
 
-tasksmd add "월간 결산 #업무 ⏫ 📅 2026-10-05" --file notes/inbox.md
-tasksmd done notes/todo.md:12 --expect "- [ ] 원문 줄"      # 줄이 바뀌었으면 거부(STALE_LINE)
+tasksmd add "Monthly close #work ⏫ 📅 2026-10-05" --file notes/inbox.md
+tasksmd done notes/todo.md:12 --expect "- [ ] the exact line"   # refused if the line changed (STALE_LINE)
 tasksmd set notes/todo.md:12 --due 2026-10-20 --priority 1
 tasksmd postpone notes/todo.md:12 "next monday"
+tasksmd note notes/todo.md:12 "Reply received"                  # add a note under the task
+tasksmd info                                                    # version, features, settings
 tasksmd query "not done" --json | jq '.tasks[] | select(.priority == "0") | .description'
 ```
 
-- `--root`(기본 현재 폴더) 아래의 `.md`/`.markdown`을 `.gitignore`와 `tasksmd.exclude`를 존중해 훑습니다. 설정은 `<root>/.vscode/settings.json`의 `tasksmd.*`를 읽습니다(전역 필터, 완료일 기록, 반복 삽입 위치, 사용자 정의 상태 등).
-- 줄 번호는 사람이 읽는 1부터 시작하는 번호입니다. 출력은 터미널이면 마크다운, 파이프면 JSON이 기본이고 `--json`/`--md`로 고정합니다.
-- 파일을 직접 고칩니다. 편집기에 저장하지 않은 변경이 있는 파일을 고치면 편집기가 "덮어쓸까요?"를 물을 수 있으니 저장한 뒤 쓰세요. `--expect`로 줄 원문을 함께 주면 그사이 바뀐 줄을 덮어쓰지 않습니다.
-- 종료 코드: 0 성공, 1 실행 오류(`NOT_FOUND`, `STALE_LINE`, `INVALID_QUERY`, `IO`), 2 인자 오류.
+- Scans `.md`/`.markdown` under `--root` (default: current folder), honouring `.gitignore` and `tasksmd.exclude`. Settings come from `<root>/.vscode/settings.json` (`tasksmd.*`: global filter, done dates, recurrence insert position, custom statuses, due-date requirement…).
+- Line numbers are 1-based. Output is Markdown in a terminal and JSON in a pipe; force either with `--json` / `--md`.
+- It edits files directly. Save files that have unsaved changes in an editor first. Pass the line text with `--expect` to avoid overwriting a line that changed meanwhile.
+- Exit codes: 0 success, 1 runtime error (`NOT_FOUND`, `STALE_LINE`, `INVALID_QUERY`, `IO`), 2 bad arguments.
 
-## MCP 서버 (AI 에이전트)
+## MCP server (AI agents)
 
 ```bash
 claude mcp add tasks -- npx -y @hastycapybara/tasks-cli mcp --root "$PWD"
 ```
-등록 후 Claude Code에 "이번 주 마감인 업무 태스크 중 안 끝난 거 보여주고 계약서 검토는 완료 처리해 줘"처럼 말하면 `tasks_query`, `tasks_set_status` 도구가 호출됩니다. 도구 목록과 인자는 저장소의 docs/api.md 8절에 있습니다.
 
-라이선스 MIT. 태스크 문법과 핵심 로직 일부는 [Obsidian Tasks](https://github.com/obsidian-tasks-group/obsidian-tasks)(MIT)에서 이식했습니다(동봉된 NOTICE.md). Obsidian과 관련이 없습니다.
+Then ask in plain language, e.g. "show my unfinished work tasks due this week and mark the contract review done" — the agent calls tools such as `tasks_query`, `tasks_set_status` and `tasks_add_note`. Cursor (`.cursor/mcp.json`) and VS Code (`.vscode/mcp.json`) take the same command. Tools and arguments: [docs/api.en.md §8](https://github.com/W-Leester/tasks-for-markdown/blob/main/docs/api.en.md).
+
+MIT. The task syntax and parts of the core logic are ported from [Obsidian Tasks](https://github.com/obsidian-tasks-group/obsidian-tasks) (MIT); see the bundled NOTICE.md. Not affiliated with Obsidian.

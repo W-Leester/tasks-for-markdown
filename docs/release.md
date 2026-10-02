@@ -102,6 +102,7 @@ git tag v<ver> && git push origin v<ver>
 - [ ] **검색어(keywords).** 바꿀 때는 마켓 업로드로 확인한다. `checklist`·`kanban`·`calendar`·`gtd`가 들어가면 "suspicious content"로 거절됐다(M20, 2026-10-01). 통과 확인된 것: `markdown, tasks, todo, productivity, recurring, dataview, mcp`.
 - [ ] **설정.** `package.json` contributes, `package.nls.json`·`package.nls.ko.json` 설명, README 설정 표(한·영).
 - [ ] **화면 문구.** `l10n/bundle.l10n.ko.json`에 한국어(누락은 `l10n-coverage` 테스트가 잡는다).
+- [ ] **npm 패키지 README**(`packages/*/README.md`)는 영어 기본(한국어 문서로 링크). npm 페이지의 README는 **새 버전을 게시해야** 바뀐다.
 - [ ] **문서.** user-guide, README(한·영), api.md·api.en.md, docs/Tasks.md 진행 표, design.md 변경 이력.
 
 ### B. 릴리스할 때

@@ -1,13 +1,13 @@
 # @hastycapybara/tasks-core
 
-Tasks for Markdown 확장의 핵심 라이브러리입니다. VS Code 없이 Node에서 Obsidian Tasks 호환 태스크 줄을 파싱·직렬화하고, 날짜·반복 규칙을 계산하고, 같은 쿼리 언어로 검색합니다. 확장이 실제로 쓰는 코드 그대로입니다.
+The core library of **[Tasks for Markdown](https://github.com/W-Leester/tasks-for-markdown)**: parse and write Obsidian Tasks-compatible task lines, compute dates and recurrence, and search with the same query language — in plain Node, without VS Code. It is exactly the code the extension runs. (한국어: [docs/api.md §6](https://github.com/W-Leester/tasks-for-markdown/blob/main/docs/api.md))
 
 ```ts
 import { TaskIndex, parseFile, Query, StatusRegistry, dayjs, serializeTask, toTaskDto } from '@hastycapybara/tasks-core';
 
 const registry = StatusRegistry.default();
 const index = new TaskIndex();
-const text = '- [ ] 보고서 작성 #업무 ⏫ 📅 2026-10-01\n- [x] 회의록 정리 ✅ 2026-09-20\n';
+const text = '- [ ] Write the report #work ⏫ 📅 2026-10-01\n- [x] Tidy meeting notes ✅ 2026-09-20\n';
 const parsed = parseFile(text, { path: 'notes/todo.md', statusRegistry: registry });
 index.setFile({ key: 'notes/todo.md', path: 'notes/todo.md', tasks: parsed.tasks, headings: parsed.headings, frontmatterTags: parsed.frontmatterTags });
 
@@ -16,6 +16,6 @@ const result = Query.parse('not done\ndue before 2026-10-15\nsort by urgency').r
 for (const task of result.root.tasks) console.log(serializeTask(task), toTaskDto(task, index, today).due);
 ```
 
-주요 export: `parseTaskLine`, `parseFile`, `serializeTask`, `Task`, `DateField`, `StatusRegistry`, `applyStatusChange`(완료·반복 처리), `Recurrence`, `parseNaturalDate`, `Query`, `TaskIndex`, `toTaskDto`, `renderQueryResult`, `computeWeeklyStats`. 쿼리 문법과 필드 이모지는 확장 문서(docs/user-guide.md)와 같습니다.
+Main exports: `parseTaskLine`, `parseFile`, `serializeTask`, `Task`, `DateField`, `StatusRegistry`, `applyStatusChange` (done dates and recurrence), `Recurrence`, `parseNaturalDate`, `Query`, `TaskIndex`, `toTaskDto`, `renderQueryResult`, `computeWeeklyStats`, plus note helpers (`noteBlock`, `addNoteLines`, `setNoteLines`). The query syntax and field emojis match the extension ([user guide, Korean](https://github.com/W-Leester/tasks-for-markdown/blob/main/docs/user-guide.md); [Obsidian Tasks docs](https://publish.obsidian.md/tasks/)).
 
-CommonJS로 배포되며 Node 18 이상에서 동작합니다. 라이선스 MIT. 일부 코드는 Obsidian Tasks(MIT)에서 이식했습니다(저장소의 NOTICE.md).
+It does not write files — use [`@hastycapybara/tasks-cli`](https://www.npmjs.com/package/@hastycapybara/tasks-cli) for that. CommonJS, Node 18+. MIT; parts are ported from [Obsidian Tasks](https://github.com/obsidian-tasks-group/obsidian-tasks) (MIT), see NOTICE.md.

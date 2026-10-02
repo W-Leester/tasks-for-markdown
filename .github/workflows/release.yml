@@ -6,6 +6,8 @@ on:
 
 permissions:
   contents: write
+  # npm trusted publishing: GitHub issues a short-lived OIDC token that npm accepts instead of NPM_TOKEN.
+  id-token: write
 
 jobs:
   release:
@@ -50,10 +52,10 @@ jobs:
       - name: Publish to Open VSX
         if: ${{ env.OVSX_PAT != '' }}
         run: pnpm exec ovsx publish *.vsix -p "$OVSX_PAT"
+      # Trusted publishing (OIDC) first; NPM_TOKEN is only a fallback until the switch is confirmed.
       - name: Publish npm packages
-        if: ${{ env.NPM_TOKEN != '' }}
         run: |
-          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+          if [ -n "${NPM_TOKEN}" ]; then echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc; fi
           for pkg in tasks-core tasks-cli tasks-api; do
             pnpm --filter "@hastycapybara/${pkg}" publish --access public --no-git-checks
           done

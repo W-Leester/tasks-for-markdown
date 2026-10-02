@@ -18,6 +18,16 @@ VS Code 확장을 **VS Code Marketplace**, **Open VSX**(Cursor·VSCodium 등이 
 | 5. 공개 | 저장소 공개 → Marketplace 업로드 → Open VSX 소유권 신청 → 태그로 Open VSX·npm 게시 | 1시간 + 승인 대기(며칠) | **같은 버전 번호는 다시 올릴 수 없음** |
 | 6. 공개 후 | 설치 확인, 토큰을 Trusted Publishing으로 전환, 시험 확장 삭제 | 30분 | — |
 
+### 편집기마다 확장을 받아 오는 마켓이 다르다
+
+| 편집기 | 확장 마켓 | 게시 방법 |
+|---|---|---|
+| **VS Code** (Microsoft) | **VS Code Marketplace** | 웹 업로드 또는 `vsce publish` |
+| **Cursor**, VSCodium 등 VS Code 계열 | **Open VSX** | `ovsx publish` (네임스페이스 소유권 승인 필요) |
+| (선택) npm | npm 레지스트리 | 라이브러리·CLI·타입 패키지가 있을 때 |
+
+Cursor는 VS Code를 바탕으로 만들었지만 **Microsoft 제품이 아니라서 VS Code Marketplace를 쓸 수 없다**(Marketplace 이용 약관이 Microsoft 제품으로 한정). 그래서 VS Code Marketplace에 올려도 Cursor에는 나오지 않는다. **두 마켓에 따로 올려야 한다.**
+
 **가장 중요한 원칙 두 가지.**
 1. **한 번 게시한 버전 번호는 다시 쓸 수 없다.** 그래서 여러 마켓에 같은 번호를 올릴 때는 **가장 까다로운 곳(VS Code Marketplace)부터** 통과시키고, 나머지는 그다음에 올린다.
 2. **이름과 ID는 게시하면 바꿀 수 없다.** 퍼블리셔 ID, 확장 이름, npm 이름은 1단계에서 확정한다.
@@ -143,8 +153,10 @@ VS Code 확장을 **VS Code Marketplace**, **Open VSX**(Cursor·VSCodium 등이 
 ### 5.1 순서
 1. **저장소 공개** (README 이미지·링크, Open VSX 소유권 근거).
 2. **VS Code Marketplace 업로드** — 가장 엄격한 검사. 여기서 고칠 게 생기면 아직 다른 마켓에 같은 번호를 올리지 않았으니 고쳐서 다시 올리면 된다.
-3. **Open VSX 소유권 신청** (Marketplace 페이지가 열리는 것 확인 후).
-4. **태그 푸시** (`git tag vX.Y.Z && git push origin vX.Y.Z`) → 워크플로가 테스트, `.vsix`·npm `.tgz` 만들기, GitHub Release 첨부, Open VSX·npm 게시.
+3. **Marketplace 반영 확인** — 업로드 직후에는 "public"으로 등록돼도 **자동 검사가 끝날 때까지 확장 페이지가 404**이고 검색에도 안 나온다. 이 프로젝트는 **약 8분** 뒤 페이지와 검색이 함께 열렸다(5.4의 확인 명령).
+4. **Open VSX 소유권 신청** (Marketplace 페이지가 열린 뒤). 승인에 며칠 걸리므로 **태그보다 먼저** 낸다.
+5. **태그 푸시** (`git tag vX.Y.Z && git push origin vX.Y.Z`) → 워크플로가 테스트, `.vsix`·npm `.tgz` 만들기, GitHub Release 첨부, Open VSX·npm 게시.
+6. **Open VSX 승인 → Cursor 반영.** 네임스페이스가 검증되기 전에는 Open VSX에 올린 확장이 비활성으로 보일 수 있다. 승인된 뒤에도 Cursor가 Open VSX 목록을 가져오기까지 시간이 조금 더 걸릴 수 있다.
 
 ### 5.2 배포 워크플로(GitHub Actions)에서 실제로 틀렸던 것
 - **토큰은 job 수준 `env`에 둔다.** 단계(step)의 `if: env.TOKEN != ''`는 **같은 단계에 적은 `env`를 보지 못한다** → 토큰을 넣어도 게시 단계가 항상 건너뛰어진다.
@@ -162,6 +174,22 @@ VS Code 확장을 **VS Code Marketplace**, **Open VSX**(Cursor·VSCodium 등이 
 - **"maximum number of extensions … in 12 hour(s)"**: 기다린다. 그 사이 재시도하지 않는다.
 
 ---
+
+### 5.4 반영 확인 명령
+사람이 검색해 보기 전에, 마켓 API로 상태를 확인할 수 있다(`<publisher>.<name>`만 바꿔 쓴다).
+
+```bash
+# VS Code Marketplace: 등록 상태와 버전 검증 여부(flags가 validated가 되면 페이지가 열린다)
+curl -s -X POST "https://marketplace.visualstudio.com/_apis/public/gallery/extensionquery" \
+  -H "Content-Type: application/json" -H "Accept: application/json;api-version=7.1-preview.1" \
+  -d '{"filters":[{"criteria":[{"filterType":7,"value":"HastyCapybara.tasks-for-markdown"}]}],"flags":914}' \
+  | python3 -c "import json,sys; e=json.load(sys.stdin)['results'][0]['extensions']; print(e[0]['flags'], e[0]['versions'][0]['version'], e[0]['versions'][0]['flags']) if e else print('없음')"
+# 확장 페이지(200이면 열림)
+curl -s -o /dev/null -w "%{http_code}\n" "https://marketplace.visualstudio.com/items?itemName=HastyCapybara.tasks-for-markdown"
+# Open VSX
+curl -s https://open-vsx.org/api/HastyCapybara/tasks-for-markdown | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('version'), d.get('verified'), d.get('error'))"
+```
+- VS Code 안의 확장 검색은 결과를 잠시 저장해 두므로, 마켓에 나온 뒤에도 바로 안 보이면 VS Code를 재시작한다.
 
 ## 6. 공개 후
 - 각 마켓에서 검색·설치해 본다(아이콘, 퍼블리셔 이름, README 이미지, 링크).

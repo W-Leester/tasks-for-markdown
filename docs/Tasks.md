@@ -46,6 +46,7 @@
 | M18 | 마켓플레이스 정식 공개 준비(1.0.0 재시작, 저장소 공개, 영어 README, npm) | ✅ 준비 완료(1.0.0) — 계정·공개·태그는 사용자(release.md "첫 공개 순서") | 이 문서 M18, release.md |
 | M19 | 칸반 격자 배치(창 폭에 맞춰 2×2 등으로 균형 배치) | ✅ 완료(1.0.0에 포함) | 이 문서 M19 |
 | M20 | 마켓 업로드 거절 대응: 원인은 검색어 — 통과한 검색어로 교체 | ✅ 해결(2026-10-02 재업로드 성공) | 이 문서 M20 |
+| M21 | 확장 안에서 AI 연결 제공(VS Code MCP 등록, Cursor 설정 등록, 터미널 명령) | 📝 계획만(1.1.0 후보, 2026-10-02) | 이 문서 M21 |
 
 ---
 
@@ -909,6 +910,26 @@
 - [x] 검색어 교체, 재패키징
 - [x] 실제 업로드 결과 확인(2026-10-02 통과)
 - [ ] 시험 확장 모두 삭제(Remove) — 사용자
+
+## M21. 확장 안에서 AI 연결 제공 — 1.1.0 후보 (계획만, 2026-10-02)
+
+**배경.** 지금 AI 에이전트 연결(MCP)은 npm 패키지 `@hastycapybara/tasks-cli`를 `npx`로 실행하는 방식이라, 사용자가 설정 파일을 직접 고치고 Node.js가 있어야 한다. 사용자 질문: "마켓에서 확장을 설치할 때 함께 되게 할 수 없나?" → npm 패키지를 같이 설치하게 할 수는 없지만, **확장 안에서 같은 효과**를 낼 수 있다. 1.0.0 공개(세 마켓 동일 버전)를 먼저 끝낸 뒤 1.1.0으로 진행하기로 결정(사용자, 2026-10-02).
+
+**하려는 것.**
+1. **VS Code: 확장이 MCP 서버를 직접 등록.** VS Code의 MCP 서버 제공 API(`vscode.lm.registerMcpServerDefinitionProvider` + `contributes.mcpServerDefinitionProviders`)로 확장을 설치하기만 하면 VS Code의 AI 에이전트(Copilot 에이전트 모드 등)가 우리 태스크 도구를 쓰게 한다. 서버는 확장에 함께 넣은 `tasksmd.cjs`를 **VS Code 자체의 Node 런타임**(`process.execPath` + `ELECTRON_RUN_AS_NODE=1`)으로 실행 → npm·Node.js 설치 불필요. 워크스페이스 폴더를 `--root`로.
+2. **Cursor: 명령 하나로 등록.** `Tasks: Connect AI agents (MCP)` 같은 명령이 Cursor의 MCP 설정(`.cursor/mcp.json`, 프로젝트 또는 사용자 범위 선택)에 항목을 추가/제거. 기존 설정은 보존하고, 바꾸기 전에 무엇을 쓸지 보여 주고 확인받는다.
+3. (선택) **`tasksmd` 터미널 명령 설치.** VS Code의 "Install 'code' command in PATH"처럼 명령 팔레트에서 등록/해제.
+
+**확인할 것(개발 전).**
+- MCP 제공 API가 필요한 최소 VS Code 버전 → `engines.vscode`를 올려야 하는지, 아니면 API가 있을 때만 쓰도록 할지.
+- Cursor가 VS Code의 MCP 제공 API를 지원하는지(지원하면 2번이 필요 없을 수 있음). Cursor GUI는 자동으로 띄우지 않고 번들 코드 확인 → 사용자 확인 순서.
+- 설치 파일에 CLI 번들을 넣으면 크기·마켓 검사(외부 프로그램 실행으로 오해받지 않는지) — 업로드 전에 시험 이름으로 확인할지 결정. 12시간 생성 한도 주의.
+- 신뢰되지 않은 워크스페이스, 쓰기 정책(`tasksmd.api.writePolicy`)과의 관계(AI가 파일을 쓰는 경로이므로).
+
+### 할 일 (착수 시 확정)
+- [ ] 위 "확인할 것" 조사 → 설계(design.md) → 계획 확정
+- [ ] VS Code MCP 등록, Cursor 설정 등록 명령, (선택) 터미널 명령
+- [ ] 테스트, 문서(README·api.md·user-guide), 1.1.0 게시(Marketplace Update + 태그)
 
 ## 향후 후보 (미착수)
 

@@ -139,7 +139,8 @@ Cursor는 VS Code를 바탕으로 만들었지만 **Microsoft 제품이 아니�
 1. 가입. **사용자 이름 = 스코프**다. 사용자 이름을 원하는 스코프(예 `hastycapybara`)로 하면 조직을 따로 만들 필요가 없다. 조직 만들기·계정을 조직으로 바꾸기(Convert)는 하지 않는다.
 2. **2단계 인증**: 패스키는 iCloud 키체인(Apple 기기) 또는 Google 비밀번호 관리자(여러 OS)에 저장. **복구 코드는 비밀번호 관리자에 보관**(노출됐다면 재발급).
 3. 토큰: *Access Tokens → Granular Access Token* — 권한 *Read and write (publish and stage)*, 대상 *All packages*(첫 게시 전엔 고를 패키지가 없음), *Bypass 2FA*(자동 게시용), 만료는 쓰기 토큰 최대(90일).
-4. **Trusted Publishing은 이미 있는 패키지에만** 설정할 수 있다. 첫 게시는 토큰으로 하고, 직후 전환한 뒤 토큰을 지운다.
+4. **첫 게시 때 npm이 `0.0.0-stage`라는 자리표시 버전을 먼저 만들 수 있다**(단계적 게시 기능, 설명 "Temporary package placeholder for staged publishing"). 실제 버전은 몇 분 안에 `latest`로 올라온다. 게시 직후 `0.0.0-stage`만 보여도 놀라지 말고 몇 분 뒤 `npm view <pkg> dist-tags`로 다시 확인한다. 2단계 인증 승인이 필요한 경우에만 *Staged Packages*에 나타난다.
+5. **Trusted Publishing은 이미 있는 패키지에만** 설정할 수 있다. 첫 게시는 토큰으로 하고, 직후 전환한 뒤 토큰을 지운다.
 
 ### 4.4 GitHub
 - 저장소 *Settings › Secrets and variables › Actions*에 토큰 등록(이름은 워크플로와 정확히 같게).

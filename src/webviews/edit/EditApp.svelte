@@ -204,7 +204,7 @@
 
       {#if !hidden('tags')}
         <label for="f-tags">{t('Tags')} <kbd>G</kbd></label>
-        <input id="f-tags" class="tfm-input wide" type="text" accesskey={ak('g')} placeholder="#업무 #프로젝트A" bind:value={tags} />
+        <input id="f-tags" class="tfm-input wide" type="text" accesskey={ak('g')} placeholder={t('#work #project-a')} bind:value={tags} />
       {/if}
 
       {#if !hidden('recurrence')}

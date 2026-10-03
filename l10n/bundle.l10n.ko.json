@@ -179,6 +179,7 @@
   "New task": "새 태스크",
   "Description": "설명",
   "e.g. 2026-09-25, tomorrow, next fri, in 3 days": "예: 2026-09-25, 내일, 다음 금, 3일 후",
+  "#work #project-a": "#업무 #프로젝트A",
   "{0} picker": "{0} 선택기",
   "Created / done / cancelled dates": "생성 / 완료 / 취소일",
   "Search tasks that must finish first…": "먼저 끝나야 하는 태스크 검색…",

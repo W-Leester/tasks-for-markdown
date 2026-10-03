@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+**Fixes**
+- Webviews (kanban, calendar, statistics, query builder, dialog) now show their first screen in the configured language; toolbars could stay in English with Korean selected.
+- The create/edit dialog's Tags placeholder was Korean in the English UI.
+
+**Docs**
+- README: why use it, using it with AI agents (MCP setup for Claude Code, Cursor, VS Code and Claude Desktop), building on the public API, animated examples, website link.
+- VS Code's `.vscode/mcp.json` example now uses the `servers` key.
+
 ## 1.0.0 — 2026-09-30
 
 First public release on the VS Code Marketplace, Open VSX and npm. (한국어 요약은 아래에 있습니다.)

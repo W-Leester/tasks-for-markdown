@@ -15,6 +15,7 @@ import { applyFieldValues } from '../services/taskFields';
 import type { Settings } from '../settings/Settings';
 import type { FromWebview, InitState, TaskFieldName, ToWebview } from '../webviews/shared/protocol';
 import { currentBundle, currentLanguage, t } from '../l10n';
+import { l10nBlock } from './l10nBlock';
 
 export interface WebviewHostDeps {
   context: vscode.ExtensionContext;
@@ -315,7 +316,7 @@ export class WebviewHost implements vscode.Disposable {
     const script = webview.asWebviewUri(vscode.Uri.joinPath(this.deps.context.extensionUri, 'dist', 'webviews', `${this.options.app}.js`));
     const css = webview.asWebviewUri(vscode.Uri.joinPath(this.deps.context.extensionUri, 'dist', 'webviews', `${this.options.app}.css`));
     return `<!DOCTYPE html>
-<html lang="${vscode.env.language}">
+<html lang="${currentLanguage()}">
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}'; img-src ${webview.cspSource} data:; font-src ${webview.cspSource};">
@@ -325,6 +326,7 @@ export class WebviewHost implements vscode.Disposable {
 </head>
 <body>
 <div id="app"></div>
+${l10nBlock(currentBundle())}
 <script nonce="${nonce}" src="${script}"></script>
 </body>
 </html>`;

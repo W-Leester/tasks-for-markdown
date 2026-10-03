@@ -47,6 +47,7 @@
 | M19 | 칸반 격자 배치(창 폭에 맞춰 2×2 등으로 균형 배치) | ✅ 완료(1.0.0에 포함) | 이 문서 M19 |
 | M20 | 마켓 업로드 거절 대응: 원인은 검색어 — 통과한 검색어로 교체 | ✅ 해결(2026-10-02 재업로드 성공) | 이 문서 M20 |
 | M21 | 확장 안에서 AI 연결 제공(VS Code MCP 등록, Cursor 설정 등록, 터미널 명령) | 📝 계획만(1.1.0 후보, 2026-10-02) | 이 문서 M21 |
+| M22 | README 개편: 강점(AI·API) 강조, 움직이는 예시 GIF, 사이트 연결 | 🟡 진행 중(2026-10-03) | 이 문서 M22 |
 
 ---
 
@@ -910,6 +911,22 @@
 - [x] 검색어 교체, 재패키징
 - [x] 실제 업로드 결과 확인(2026-10-02 통과)
 - [ ] 시험 확장 모두 삭제(Remove) — 사용자
+
+## M22. README 개편 — 강점 강조, 움직이는 예시, 사이트 연결 (계획 확정 2026-10-03)
+
+**사용자 결정.** 1~4를 먼저 하고, 사용자가 확인한 뒤 1.0.1 게시 여부를 정한다.
+
+1. **영어 README의 한국어 정리**: `(한국어: README.ko.md)` → 영어 표기로, `3일 후` 예시 → "English and Korean natural-language dates". README.md에 한글이 있으면 실패하는 테스트.
+2. **강점 강조**: 맨 위 "Why" 세 칸 — Obsidian Tasks 문법 / **AI 에이전트(MCP)** / **공개 API로 확장 가능**. "Use it with AI" 섹션(Claude Code·Claude Desktop·Cursor·VS Code 설정, 예시 요청과 결과). "Extend it" 섹션(다른 확장이 만들 수 있는 것 예시, 코드, 이벤트·기능 확인·명령 표면, 타입 패키지, CLI·라이브러리). 배지(Marketplace·Open VSX·npm). 아직 안 되는 것(확장만 설치하면 AI 자동 연결 — M21)은 쓰지 않는다.
+3. **움직이는 이미지(GIF)** ①~⑤ — 실제 VS Code를 `code serve-web`으로 브라우저에 띄우고 자동 조작해 프레임을 찍어 만든다(Cursor GUI는 띄우지 않음): ① 입력·자동완성·자연어 날짜 ② 완료 토글·반복 다음 회차 ③ **AI 에이전트(Claude Code를 실제 실행, MCP 연결)로 말로 시키기** ④ 렌더 보기 ⑤ 칸반·캘린더. `docs/images/`에 두고 README에서 링크(설치 파일에는 미포함).
+4. **사이트 연결**: README 맨 위 Website(https://hastycapybara.com/en/apps/tasksmd/)·Korean(https://hastycapybara.com/ko/apps/tasksmd/), README.ko.md에 사이트 한국어 링크, `package.json` homepage → 영어 사이트. 사이트의 README 동기화는 사용자가 별도 모듈로 관리.
+
+### 할 일
+- [ ] 1 한국어 정리 + 테스트
+- [ ] 2 README 구성 개편(영·한)
+- [ ] 3 GIF ①~⑤ (먼저 serve-web 시험)
+- [ ] 4 사이트 링크, homepage
+- [ ] 사용자 확인 → 1.0.1 게시 결정
 
 ## M21. 확장 안에서 AI 연결 제공 — 1.1.0 후보 (계획만, 2026-10-02)
 

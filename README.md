@@ -8,7 +8,7 @@
 
 Obsidian Tasks-compatible task management for Markdown files in **VS Code** and **Cursor**.
 
-[Website](https://hastycapybara.com/en/apps/tasksmd/) · [Korean website](https://hastycapybara.com/ko/apps/tasksmd/) · [Korean README](README.ko.md)
+[Website](https://hastycapybara.com/apps/tasksmd/) · [Korean README](README.ko.md)
 
 > This extension started from the [Tasks plugin](https://github.com/obsidian-tasks-group/obsidian-tasks) for Obsidian. It rebuilds that plugin's task syntax, query language and years of careful design for VS Code and Cursor. Thank you to its authors and contributors — see [Credits](#credits).
 

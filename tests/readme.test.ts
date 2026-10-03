@@ -21,8 +21,10 @@ describe('README', () => {
     }
   });
 
-  it('links the website in both languages', () => {
-    expect(en).toContain('https://hastycapybara.com/en/apps/tasksmd/');
-    expect(ko).toContain('https://hastycapybara.com/ko/apps/tasksmd/');
+  it('links the website (one address for all languages) and each other', () => {
+    for (const text of [en, ko]) expect(text).toContain('https://hastycapybara.com/apps/tasksmd/');
+    expect(`${en}${ko}`).not.toMatch(/hastycapybara\.com\/(?:en|ko)\//);
+    expect(en).toContain('(README.ko.md)');
+    expect(ko).toContain('(README.md)');
   });
 });

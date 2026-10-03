@@ -8,7 +8,7 @@
 
 **VS Code**와 **Cursor**에서 쓰는 Obsidian Tasks 호환 할 일 관리 확장입니다.
 
-[웹사이트](https://hastycapybara.com/ko/apps/tasksmd/) · [English website](https://hastycapybara.com/en/apps/tasksmd/) · [English README](README.md)
+[웹사이트](https://hastycapybara.com/apps/tasksmd/) · [English README](README.md)
 
 > 이 확장은 Obsidian의 [Tasks 플러그인](https://github.com/obsidian-tasks-group/obsidian-tasks)에서 출발했습니다. 태스크 문법과 쿼리 언어, 그리고 그 프로젝트가 오랫동안 다듬어 온 설계 위에 VS Code·Cursor용으로 다시 만든 것입니다. 좋은 도구를 공개해 준 원작자와 기여자들께 감사드립니다. 아래 [감사의 말](#감사의-말)을 참고하세요.
 
@@ -28,7 +28,7 @@
 
 확장은 워크스페이스의 모든 `- [ ]` 줄을 인덱싱합니다. 에디터, 사이드바, 칸반 보드, 캘린더, 마크다운 미리보기 어디서든 태스크를 보고, 검색하고, 완료할 수 있습니다. 완료하면 파일의 그 줄이 수정됩니다. 완료일이 붙고, 반복 태스크는 다음 회차가 생깁니다.
 
-## 움직이는 예시
+## 예시
 
 **도움을 받으며 입력.** 입력하는 동안 자동완성이 필드를 제안하고, `next fri` 같은 자연어 날짜가 실제 날짜로 바뀝니다.
 

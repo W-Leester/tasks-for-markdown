@@ -937,12 +937,14 @@
 9. **대화상자 GIF 추가(영·한)**: `Ctrl+Shift+C`로 대화상자를 열어 새 태스크 만들기 → 기존 태스크에서 다시 열어 수정. README의 예시 절에 추가.
 
 - [x] 5·6·7 README·homepage·테스트
-- [ ] 9 대화상자 GIF(영어)
+- [x] 9 대화상자 GIF(영어) — `docs/images/demo-dialog.gif`: 빈 줄에서 새 태스크(우선순위·`next mon`·태그) → 기존 태스크 수정(최고·`in 2 weeks`·`every 2 weeks`)
 - [x] 덤: 대화상자 태그 칸 안내 문구가 영어 화면에서도 한국어(`#업무 #프로젝트A`) → 번역 키로(영어 `#work #project-a`). 촬영 준비 중 발견, incidents #25
-- [ ] 8 한국어 GIF 6개(①~⑤ + 대화상자)
+- [x] 8 한국어 GIF 6개(①~⑤ + 대화상자) — `docs/images/demo-*-ko.gif`, README.ko.md에서 사용. AI 장면은 한국어 요청으로 Claude Code 실제 실행(답도 한국어, 메모 `법무팀이 3조 승인` 추가 확인)
 - [x] 덤: 웹뷰 첫 화면 일부가 한국어 설정에서도 영어(칸반 툴바 `Columns`·`Tasks`·`Filter…`, 아래 안내 줄 등) — 번역 묶음이 `state/init` 메시지로 늦게 오고 `t()`는 다시 그려지지 않아서. 한국어 GIF 준비 중 발견, incidents #26. **고칠 방법:** 웹뷰 HTML에 번역 묶음을 JSON 블록(`<script type="application/json" id="tfm-l10n">`, 실행 안 됨)으로 넣어 첫 렌더 전에 읽게 하고, `<html lang>`도 확장의 언어(`tasksmd.language`)를 따르게. 테스트: 웹뷰 `t()`가 문서의 JSON 블록에서 번역을 읽는지, 호스트 HTML에 묶음이 들어가는지(`</script>` 이스케이프 포함).
 
 **GIF 만드는 법(다시 찍을 때).** `code serve-web --connection-token-file … --server-data-dir …`로 실제 VS Code를 브라우저에 띄우고, 설치 파일을 `server/extensions/`에 풀어 둔 뒤 puppeteer-core(헤드리스 Chrome, `--lang=en-US`)로 조작. 화면은 CDP `Page.startScreencast` 프레임을 PIL로 GIF로 묶음. 요령: 명령은 팔레트로(웹뷰에 초점이 있으면 단축키·팔레트가 안 먹을 수 있음 → 패널은 닫기 버튼 클릭), 웹뷰 안 클릭은 `frame.evaluate(el => el.click())`, 드래그는 같은 `DataTransfer`로 `dragstart/dragover/drop`을 웹뷰 안에서 보냄, 매 회 시작 전에 예시 노트·열 상태를 초기화.
+
+**한국어 GIF.** 확장 화면은 `tasksmd.language: ko`로 모두 한국어, 예시 노트도 한국어(`work.ko.template.md`, 날짜를 하루 늦춰 영어판과 같은 상대 날짜). **VS Code 자체 메뉴는 영어로 둠:** 최신 한국어 언어 팩이 1.131용이라 브라우저 VS Code(1.140)에서 상태 표시줄 등 문자열이 엉뚱하게 나오고, 1.131로 고정한 서버(`--commit-id`)에서도 같은 현상. 영어 VS Code + 한국어 확장 화면은 실제로 많이 쓰는 조합이라 그대로 씀. 촬영 요령 추가: 팔레트 명령이 비슷한 다른 명령(예: 편집기 탭 숨기기)에 걸릴 수 있어 매 회 `View: Show Multiple Editor Tabs`로 탭을 되살림, 웹뷰 탭 제목은 언어에 따라 달라짐(`Tasks: 캘린더`).
 
 **발견한 문제(코드 미수정, 사용자 확인 대기).** [#23](postmortems/incidents.md) 브라우저 VS Code에서 칸반·캘린더 편집 후 "Could not edit" 알림(파일은 바뀜), [#24](postmortems/incidents.md) 열 제목 `+` 칩 겹침.
 

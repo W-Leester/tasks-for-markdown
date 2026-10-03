@@ -30,27 +30,31 @@
 
 ## 예시
 
-**도움을 받으며 입력.** 입력하는 동안 자동완성이 필드를 제안하고, `next fri` 같은 자연어 날짜가 실제 날짜로 바뀝니다.
+**도움을 받으며 입력.** 입력하는 동안 자동완성이 필드를 제안하고, `다음 금요일`·`next fri` 같은 자연어 날짜가 실제 날짜로 바뀝니다.
 
-![태스크 입력: 마감일 자동완성, "next fri"가 2026-10-09로](docs/images/demo-editing.gif)
+![태스크 입력: 마감일 자동완성, "다음 금요일"이 2026-10-09로](docs/images/demo-editing-ko.gif)
+
+**대화상자로 만들고 고치기.** 빈 줄에서 `Ctrl+Shift+C`를 누르면 새 태스크 입력 창이 열립니다. 기존 태스크 위에서 누르면 같은 창으로 그 태스크를 고칩니다. 우선순위, 말로 쓰는 날짜, 태그, 반복을 한 번에 정합니다.
+
+![Ctrl+Shift+C: 새 태스크를 입력해 만들고, 기존 태스크를 열어 수정](docs/images/demo-dialog-ko.gif)
 
 **키 하나로 완료.** `Ctrl+Shift+Enter`로 완료합니다. 반복 태스크는 다음 회차가 자동으로 생깁니다.
 
-![Ctrl+Shift+Enter로 매주 반복 태스크를 완료하자 다음 회차가 추가됨](docs/images/demo-recurring.gif)
+![Ctrl+Shift+Enter로 매주 반복 태스크를 완료하자 다음 회차가 추가됨](docs/images/demo-recurring-ko.gif)
 
 **렌더 보기에서 작업.** 체크박스를 누르고, 💬로 메모를 남기고, 열을 숨기거나 다시 보입니다. 쿼리 블록이 바로 갱신됩니다.
 
-![렌더 보기: 메모 추가, 태스크 완료, 열 숨기기와 복원](docs/images/demo-rendered.gif)
+![렌더 보기: 메모 추가, 태스크 완료, 열 숨기기와 복원](docs/images/demo-rendered-ko.gif)
 
 **보드와 달력으로 계획.** 카드를 상태 열 사이로 끌어 옮기고, 태스크를 다른 날로 끌어 일정을 바꿉니다.
 
-![칸반: 카드를 진행 중·완료로 이동, 캘린더: 태스크를 다른 날짜로 끌기](docs/images/demo-kanban-calendar.gif)
+![칸반: 카드를 진행 중·완료로 이동, 캘린더: 태스크를 다른 날짜로 끌기](docs/images/demo-kanban-calendar-ko.gif)
 
 ## AI와 함께 쓰기
 
 AI 에이전트를 한 번 연결하면 말로 시킬 수 있습니다. 아래 화면은 실제 Claude Code 실행 장면입니다. 에이전트가 일하는 동안 에디터의 노트가 바로 바뀝니다.
 
-![Claude Code가 "What is overdue?"에 답하고, 태스크를 완료하고 메모를 추가 — 파일이 실시간으로 바뀜](docs/images/demo-ai.gif)
+![Claude Code가 "기한 지난 거 뭐 있어?"에 답하고, 태스크를 완료하고 메모를 추가 — 파일이 실시간으로 바뀜](docs/images/demo-ai-ko.gif)
 
 **연결** (서버를 npm에서 `npx`로 실행하므로 Node.js 18 이상이 필요합니다):
 

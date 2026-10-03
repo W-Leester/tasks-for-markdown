@@ -34,6 +34,10 @@ The extension indexes every `- [ ]` line in the workspace. You can see, query an
 
 ![Typing a task: auto-suggest for the due date, "next fri" becomes 2026-10-09](docs/images/demo-editing.gif)
 
+**Create and edit in a dialog.** `Ctrl+Shift+C` on an empty line opens a form for a new task. On an existing task it opens the same form to edit it, with priority, dates in plain words, tags and repeat presets.
+
+![Ctrl+Shift+C: a new task is filled in and created, then an existing task is opened and changed](docs/images/demo-dialog.gif)
+
 **Complete with one key.** `Ctrl+Shift+Enter` marks a task done. A recurring task gets its next occurrence automatically.
 
 ![Ctrl+Shift+Enter completes a weekly task and inserts the next occurrence](docs/images/demo-recurring.gif)

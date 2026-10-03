@@ -224,9 +224,13 @@ claude mcp add tasks -- npx -y @hastycapybara/tasks-cli mcp --root "$PWD"
 # built from the repository instead of npm
 claude mcp add tasks -- node /path/to/packages/cli/dist/tasksmd.cjs mcp --root "$PWD"
 ```
-Cursor: `.cursor/mcp.json`; VS Code: `.vscode/mcp.json`:
+Cursor: `.cursor/mcp.json`:
 ```json
 { "mcpServers": { "tasks": { "command": "npx", "args": ["-y", "@hastycapybara/tasks-cli", "mcp", "--root", "${workspaceFolder}"] } } }
+```
+VS Code: `.vscode/mcp.json` (the top-level key is `servers`):
+```json
+{ "servers": { "tasks": { "type": "stdio", "command": "npx", "args": ["-y", "@hastycapybara/tasks-cli", "mcp", "--root", "${workspaceFolder}"] } } }
 ```
 
 **Tools**

@@ -17,7 +17,7 @@
   "bugs": {
     "url": "https://github.com/W-Leester/tasks-for-markdown/issues"
   },
-  "homepage": "https://github.com/W-Leester/tasks-for-markdown#readme",
+  "homepage": "https://hastycapybara.com/en/apps/tasksmd/",
   "private": true,
   "packageManager": "pnpm@12.5.1",
   "engines": {

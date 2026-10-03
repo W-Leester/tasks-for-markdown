@@ -922,11 +922,16 @@
 4. **사이트 연결**: README 맨 위 Website(https://hastycapybara.com/en/apps/tasksmd/)·Korean(https://hastycapybara.com/ko/apps/tasksmd/), README.ko.md에 사이트 한국어 링크, `package.json` homepage → 영어 사이트. 사이트의 README 동기화는 사용자가 별도 모듈로 관리.
 
 ### 할 일
-- [ ] 1 한국어 정리 + 테스트
-- [ ] 2 README 구성 개편(영·한)
-- [ ] 3 GIF ①~⑤ (먼저 serve-web 시험)
-- [ ] 4 사이트 링크, homepage
+- [x] 1 한국어 정리 + 테스트 — `tests/readme.test.ts`(README.md 한글 금지, 로컬 이미지 존재, 사이트 링크)
+- [x] 2 README 구성 개편(영·한) — Why 표, 움직이는 예시, Use it with AI(Claude Code·Cursor·VS Code·Claude Desktop 설정, 예시 요청), Extend it(만들 수 있는 것, 코드, 제공 방식 표), 배지. 기존 "API and automation" 절은 두 절로 흡수
+- [x] 3 GIF ①~⑤ — `docs/images/demo-{editing,recurring,ai,rendered,kanban-calendar}.gif`(각 0.2~0.4MB, 960px). ③은 실제 `claude -p` 실행(MCP `--strict-mcp-config`), 파일 변경 확인
+- [x] 4 사이트 링크(영·한), `package.json` homepage → 영어 사이트
+- [x] 덤: api.md·api.en.md의 VS Code `mcp.json` 예시 키 수정(`servers`) — [incidents #22](postmortems/incidents.md)
 - [ ] 사용자 확인 → 1.0.1 게시 결정
+
+**GIF 만드는 법(다시 찍을 때).** `code serve-web --connection-token-file … --server-data-dir …`로 실제 VS Code를 브라우저에 띄우고, 설치 파일을 `server/extensions/`에 풀어 둔 뒤 puppeteer-core(헤드리스 Chrome, `--lang=en-US`)로 조작. 화면은 CDP `Page.startScreencast` 프레임을 PIL로 GIF로 묶음. 요령: 명령은 팔레트로(웹뷰에 초점이 있으면 단축키·팔레트가 안 먹을 수 있음 → 패널은 닫기 버튼 클릭), 웹뷰 안 클릭은 `frame.evaluate(el => el.click())`, 드래그는 같은 `DataTransfer`로 `dragstart/dragover/drop`을 웹뷰 안에서 보냄, 매 회 시작 전에 예시 노트·열 상태를 초기화.
+
+**발견한 문제(코드 미수정, 사용자 확인 대기).** [#23](postmortems/incidents.md) 브라우저 VS Code에서 칸반·캘린더 편집 후 "Could not edit" 알림(파일은 바뀜), [#24](postmortems/incidents.md) 열 제목 `+` 칩 겹침.
 
 ## M21. 확장 안에서 AI 연결 제공 — 1.1.0 후보 (계획만, 2026-10-02)
 

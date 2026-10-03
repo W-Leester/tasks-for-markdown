@@ -222,9 +222,13 @@ claude mcp add tasks -- npx -y @hastycapybara/tasks-cli mcp --root "$PWD"
 # npm에 없을 때(저장소에서 빌드한 경우)
 claude mcp add tasks -- node /경로/packages/cli/dist/tasksmd.cjs mcp --root "$PWD"
 ```
-Cursor는 `.cursor/mcp.json`, VS Code는 `.vscode/mcp.json`에 같은 명령을 적습니다.
+Cursor는 `.cursor/mcp.json`:
 ```json
 { "mcpServers": { "tasks": { "command": "npx", "args": ["-y", "@hastycapybara/tasks-cli", "mcp", "--root", "${workspaceFolder}"] } } }
+```
+VS Code는 `.vscode/mcp.json`(맨 위 키가 `servers`):
+```json
+{ "servers": { "tasks": { "type": "stdio", "command": "npx", "args": ["-y", "@hastycapybara/tasks-cli", "mcp", "--root", "${workspaceFolder}"] } } }
 ```
 
 **도구**

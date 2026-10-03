@@ -1,19 +1,118 @@
 # Tasks for Markdown
 
-**VS Code**와 **Cursor**에서 쓰는 Obsidian Tasks 호환 할 일 관리 확장입니다. (English: [README.md](README.md))
+[![VS Code Marketplace](https://img.shields.io/badge/VS%20Code%20Marketplace-install-007ACC)](https://marketplace.visualstudio.com/items?itemName=HastyCapybara.tasks-for-markdown)
+[![Open VSX](https://img.shields.io/open-vsx/v/HastyCapybara/tasks-for-markdown?label=Open%20VSX)](https://open-vsx.org/extension/HastyCapybara/tasks-for-markdown)
+[![npm: tasks-cli](https://img.shields.io/npm/v/@hastycapybara/tasks-cli?label=npm%20tasks-cli)](https://www.npmjs.com/package/@hastycapybara/tasks-cli)
+[![npm: tasks-api](https://img.shields.io/npm/v/@hastycapybara/tasks-api?label=npm%20tasks-api)](https://www.npmjs.com/package/@hastycapybara/tasks-api)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+
+**VS Code**와 **Cursor**에서 쓰는 Obsidian Tasks 호환 할 일 관리 확장입니다.
+
+[웹사이트](https://hastycapybara.com/ko/apps/tasksmd/) · [English website](https://hastycapybara.com/en/apps/tasksmd/) · [English README](README.md)
 
 > 이 확장은 Obsidian의 [Tasks 플러그인](https://github.com/obsidian-tasks-group/obsidian-tasks)에서 출발했습니다. 태스크 문법과 쿼리 언어, 그리고 그 프로젝트가 오랫동안 다듬어 온 설계 위에 VS Code·Cursor용으로 다시 만든 것입니다. 좋은 도구를 공개해 준 원작자와 기여자들께 감사드립니다. 아래 [감사의 말](#감사의-말)을 참고하세요.
 
-할 일은 노트 안의 체크리스트 줄 그대로 남습니다 — 별도 데이터베이스도, 종속도 없습니다:
+## 왜 Tasks for Markdown인가
+
+| | |
+|---|---|
+| **노트는 그냥 마크다운으로 남습니다** | 할 일은 [Obsidian Tasks](https://publish.obsidian.md/tasks/) 문법의 평범한 체크리스트 줄입니다. 별도 데이터베이스도, 종속도 없습니다. 같은 파일을 Obsidian, GitHub, 어떤 편집기에서도 씁니다. |
+| **AI 에이전트가 관리해 줍니다** | 내장 [MCP](https://modelcontextprotocol.io) 서버로 Claude Code, Cursor 에이전트, Claude Desktop, VS Code 에이전트 모드가 말로 시킨 대로 태스크를 찾고, 만들고, 완료하고, 메모를 남깁니다. |
+| **공개 API로 무엇이든 덧붙일 수 있습니다** | 버전이 정해진 공개 API, 명령, 타입 npm 패키지, CLI, Node 라이브러리를 제공합니다. 다른 확장·스크립트·CI가 같은 태스크를 안전하게 읽고 씁니다. |
 
 ```markdown
 - [ ] 보고서 작성 #업무 ⏫ 🔁 every week 🛫 2026-09-20 ⏳ 2026-09-22 📅 2026-09-25
+  - 재무팀에 3분기 수치 요청
 - [x] 회의록 정리 ✅ 2026-09-21
 ```
 
-확장은 워크스페이스의 모든 `- [ ]` 줄을 인덱싱해서 에디터, 사이드바, 칸반 보드, 캘린더, 마크다운 미리보기 어디서든 보고·검색하고·완료할 수 있게 합니다. 완료하면 파일의 그 줄이 수정됩니다(완료일 추가, 반복 태스크는 다음 회차 생성).
+확장은 워크스페이스의 모든 `- [ ]` 줄을 인덱싱합니다. 에디터, 사이드바, 칸반 보드, 캘린더, 마크다운 미리보기 어디서든 태스크를 보고, 검색하고, 완료할 수 있습니다. 완료하면 파일의 그 줄이 수정됩니다. 완료일이 붙고, 반복 태스크는 다음 회차가 생깁니다.
 
-![렌더 보기: 열로 정렬된 태스크와 메모, 쿼리 결과, 줄 위 버튼](docs/images/rendered-view.png)
+## 움직이는 예시
+
+**도움을 받으며 입력.** 입력하는 동안 자동완성이 필드를 제안하고, `next fri` 같은 자연어 날짜가 실제 날짜로 바뀝니다.
+
+![태스크 입력: 마감일 자동완성, "next fri"가 2026-10-09로](docs/images/demo-editing.gif)
+
+**키 하나로 완료.** `Ctrl+Shift+Enter`로 완료합니다. 반복 태스크는 다음 회차가 자동으로 생깁니다.
+
+![Ctrl+Shift+Enter로 매주 반복 태스크를 완료하자 다음 회차가 추가됨](docs/images/demo-recurring.gif)
+
+**렌더 보기에서 작업.** 체크박스를 누르고, 💬로 메모를 남기고, 열을 숨기거나 다시 보입니다. 쿼리 블록이 바로 갱신됩니다.
+
+![렌더 보기: 메모 추가, 태스크 완료, 열 숨기기와 복원](docs/images/demo-rendered.gif)
+
+**보드와 달력으로 계획.** 카드를 상태 열 사이로 끌어 옮기고, 태스크를 다른 날로 끌어 일정을 바꿉니다.
+
+![칸반: 카드를 진행 중·완료로 이동, 캘린더: 태스크를 다른 날짜로 끌기](docs/images/demo-kanban-calendar.gif)
+
+## AI와 함께 쓰기
+
+AI 에이전트를 한 번 연결하면 말로 시킬 수 있습니다. 아래 화면은 실제 Claude Code 실행 장면입니다. 에이전트가 일하는 동안 에디터의 노트가 바로 바뀝니다.
+
+![Claude Code가 "What is overdue?"에 답하고, 태스크를 완료하고 메모를 추가 — 파일이 실시간으로 바뀜](docs/images/demo-ai.gif)
+
+**연결** (서버를 npm에서 `npx`로 실행하므로 Node.js 18 이상이 필요합니다):
+
+```bash
+# Claude Code, 노트 폴더에서
+claude mcp add tasks -- npx -y @hastycapybara/tasks-cli mcp --root "$PWD"
+```
+
+Cursor — `.cursor/mcp.json`:
+```json
+{ "mcpServers": { "tasks": { "command": "npx", "args": ["-y", "@hastycapybara/tasks-cli", "mcp", "--root", "${workspaceFolder}"] } } }
+```
+
+VS Code(에이전트 모드) — `.vscode/mcp.json`:
+```json
+{ "servers": { "tasks": { "type": "stdio", "command": "npx", "args": ["-y", "@hastycapybara/tasks-cli", "mcp", "--root", "${workspaceFolder}"] } } }
+```
+
+Claude Desktop — `claude_desktop_config.json`, 노트 폴더의 절대 경로로:
+```json
+{ "mcpServers": { "tasks": { "command": "npx", "args": ["-y", "@hastycapybara/tasks-cli", "mcp", "--root", "/path/to/notes"] } } }
+```
+
+**이렇게 말해 보세요:**
+- "기한 지난 거 뭐 있어? 거래처 계약 검토는 완료로 하고 '법무팀이 3조 승인'이라고 메모 남겨 줘."
+- "이번 주 계획 세워 줘. 일요일 전에 마감인 것을 긴급한 순서로."
+- "오늘 마감인 #home 태스크를 전부 토요일로 미뤄 줘."
+- "여권 갱신 태스크 만들어 줘. 우선순위 높음, 마감 다음 주 금요일."
+
+**에이전트가 할 수 있는 일:** 쿼리 언어 전체로 검색, 태스크 조회·생성, 필드 변경, 상태 변경, 미루기, 메모 추가, 삭제, 쿼리 설명. 에이전트는 먼저 문법 안내를 읽으므로 올바른 Obsidian Tasks 문법으로 씁니다. 모든 쓰기에는 읽어 간 줄의 내용이 함께 실리고, 그 사이 줄이 바뀌었으면 쓰기를 거절합니다. 그래서 옛 내용을 보고 일하는 에이전트가 사용자의 수정을 덮어쓰지 않습니다. 전체 도구 목록: [MCP 서버](docs/api.md).
+
+## 확장하기
+
+Tasks for Markdown은 그 위에 무언가를 만들 수 있게 설계했습니다. 다른 확장, 단축키, 스크립트, CI가 **버전이 정해진 안정적인 공개 API**로 같은 태스크를 다룹니다. 마크다운을 직접 파싱할 필요가 없습니다.
+
+**만들 수 있는 것:**
+- 태스크가 *진행 중*으로 바뀌면 타이머를 켜는 시간 기록기 (`events.onDidChangeStatus`)
+- 기한 지난 일을 보여 주는 상태 표시줄 카운터나 대시보드 (`query.run` + `events.onDidChangeTasks`)
+- 완료한 태스크를 팀 채팅에 올리거나 이슈를 닫는 연결 (`events.onDidCompleteTask`)
+- 출시 태스크가 기한을 넘기면 빌드를 실패시키는 CI 일일 보고 (CLI)
+- 같은 인덱스 위에 올린 나만의 화면: 타임라인, 집중 목록, 회고
+
+```ts
+import type { TasksExtensionExports } from '@hastycapybara/tasks-api';
+
+const ext = vscode.extensions.getExtension<TasksExtensionExports>('HastyCapybara.tasks-for-markdown');
+const tasks = (await ext!.activate()).getAPI(1, { extensionId: 'me.my-extension' });
+
+const r = await tasks.query.run('not done\ndue before tomorrow\nsort by urgency');
+tasks.events.onDidChangeStatus(({ before, after }) => console.log(after.description, before.status.name, '→', after.status.name));
+if (tasks.features?.includes('notes.add')) await tasks.edit.addNote(r.tasks[0], 'Started');
+```
+
+| 제공 방식 | 대상 | |
+|---|---|---|
+| 확장 API `getAPI(1)` | 다른 VS Code/Cursor 확장 | `query`, `edit`(create, update, setStatus, postpone, addNote, batch…), `events`, `ui`, `features` / `info()`로 기능 확인 |
+| 명령 `tasksmd.api.*` | 단축키, 매크로, 다른 언어로 만든 확장 | API의 모든 메서드를 JSON 인자를 받는 명령으로 |
+| [`@hastycapybara/tasks-api`](https://www.npmjs.com/package/@hastycapybara/tasks-api) | TypeScript | 타입 정의만(실행 코드 없음) |
+| [`@hastycapybara/tasks-cli`](https://www.npmjs.com/package/@hastycapybara/tasks-cli) | 터미널, 스크립트, CI, AI 에이전트 | `tasksmd query`, `add`, `done`, `note`, `info` … 와 MCP 서버 — 에디터 없이 |
+| [`@hastycapybara/tasks-core`](https://www.npmjs.com/package/@hastycapybara/tasks-core) | Node 프로그램 | 파서, 쿼리 엔진, 반복 계산을 라이브러리로 |
+
+기능은 추가만 되고 API 버전은 `1`로 유지되므로, 만든 확장은 업데이트 후에도 그대로 동작합니다. 쓰기는 기본적으로 호출자마다 한 번 확인받고(`tasksmd.api.writePolicy`), 오류는 `{ code, message }` 형태이며, 옛 내용으로 쓰려 하면 거절됩니다. [공개 API 문서](docs/api.md)를 참고하세요.
 
 ## 주요 기능
 
@@ -25,6 +124,7 @@
 - **렌더 보기** — 노트를 미리보기처럼 렌더링하면서 체크박스 클릭·더블클릭 편집·링크 이동이 되는 상호작용 뷰. ```tasks 블록 결과가 그 자리에 표시되고, 상단 툴바로 마감일·생성일·긴급도 정렬과 오늘·이번 주·다음 주까지 범위, 그리고 `열 ▾`로 보일 열(마감일·생성일·나머지 필드)을 화면에서만 바꿀 수 있습니다(`Ctrl+Shift+R`). `Tasks: 렌더 보기를 기본 편집기로`로 .md의 기본 편집기로 삼으면 Cursor의 Preview 토글 대신 이 화면이 열립니다.
 - **메모** — 태스크 아래 들여쓴 일반 글머리표가 메모입니다(Obsidian 호환). 렌더 보기에서 `💬`로 바로 남기고, 쿼리 결과·카드에는 `💬 2`로 표시되며, 편집 대화상자 더보기에서 고칠 수 있습니다.
 - **추가 뷰** — 만들기/편집 대화상자, 칸반(드래그앤드롭), 캘린더(월간/주간, 전체 화면, 드래그로 일정 변경), 주간 통계, 완료 태스크 아카이브, 일일 알림.
+- **AI와 자동화** — AI 에이전트용 MCP 서버, 공개 확장 API, 명령, CLI, 라이브러리([AI와 함께 쓰기](#ai와-함께-쓰기), [확장하기](#확장하기) 참고).
 - **Cursor에서도 동작** — 안정 VS Code API만 사용, Open VSX에도 게시.
 
 ## 시작하기
@@ -88,26 +188,6 @@ group by filename
 | `calendar.fontSize` | `13` | 캘린더 칸의 태스크 글자 크기(px) |
 | `calendar.fullScreen` | `maximize` | 전체 화면 버튼: 에디터 그룹 최대화만(`maximize`) / 창도 전체 화면(`window`) |
 | `updateCheckUrl` | `""` | `.vsix` 설치본용 `latest.json` 위치 |
-
-## API와 자동화
-
-다른 프로그램에서 태스크를 읽고 쓰는 통로가 네 가지 있습니다. 상세는 [docs/api.md](docs/api.md).
-
-| 어디서 | 방법 |
-|---|---|
-| 다른 VS Code/Cursor 확장 | `getExtension('HastyCapybara.tasks-for-markdown').exports.getAPI(1, { extensionId })` → `query.run(...)`, `edit.setStatus(...)`, `edit.addNote(...)` 등. 타입 정의는 import 없는 한 파일 [src/api/types.ts](src/api/types.ts)를 복사해 쓰면 됩니다 |
-| 키바인딩·매크로 | 명령 `tasksmd.api.<ns>.<method>` (예: `tasksmd.api.query.run` + `{ "query": "due today" }`) |
-| 터미널·스크립트·CI | `npx @hastycapybara/tasks-cli query "not done\ndue before today" --root ~/notes` — 편집기 없이 동작 |
-| AI 에이전트 (Claude Code 등) | `claude mcp add tasks -- npx -y @hastycapybara/tasks-cli mcp --root "$PWD"` 후 말로 지시 |
-
-```ts
-// 다른 확장에서
-const tasks = (await ext.activate()).getAPI(1, { extensionId: 'my.extension' });
-const r = await tasks.query.run('not done\nhappens on or before today');   // 사이드바 "오늘"과 같은 결과
-await tasks.edit.setStatus({ path: r.tasks[0].path, line: r.tasks[0].line, expectedText: r.tasks[0].originalMarkdown }, 'x');
-```
-
-쓰기는 기본 설정에서 호출자마다 한 번 확인창이 뜹니다(`tasksmd.api.writePolicy`). 값은 전부 JSON이고 오류는 `{ code, message }`입니다. 메모 읽기·쓰기, 의존 관계(`isBlocked`/`isBlocking`)는 확장 API·CLI·MCP 모두 됩니다. 기본 설정에서는 새 태스크에 마감일이 필수이고, 설치된 버전이 지원하는 기능과 설정은 `info()`(CLI `tasksmd info`, MCP `tasks_info`)로 확인합니다. Node 라이브러리만 필요하면 `@hastycapybara/tasks-core`.
 
 ## 마크다운 미리보기에 관해
 

@@ -122,6 +122,9 @@ VS Code 확장을 **VS Code Marketplace**, **Open VSX**(Cursor·VSCodium 등이 
 - 상대 경로 이미지·링크는 `vsce`가 저장소 주소로 바꿔 준다 → **저장소가 공개돼 있어야** 보인다.
 - 다른 프로젝트의 코드·설계를 가져왔다면 `NOTICE.md`(법적 고지)와 README의 감사의 말을 함께 둔다. 원작자·후원 링크, "원본도 써 보세요", **"관련 없음·보증받지 않음" 문구**. 원작 로고·이름을 자기 것처럼 쓰지 않는다. (원작 이름을 소개문·README에 쓰는 것은 마켓 검사를 통과했다.)
 - 단축키 안내에는 명령 팔레트 이름도 함께 적는다(Cursor처럼 키가 다른 편집기 대비).
+- **움직이는 예시(GIF)** 는 설치 파일에 넣지 않는 폴더(`docs/images/`)에 두고 상대 경로로 링크한다. 한 개 0.2~0.4MB, 폭 960px 정도면 마켓 페이지에서 무리 없다. 만드는 법: [Tasks.md M22](Tasks.md).
+- **도구마다 설정 형식이 다르면 따로 적는다.** 예: MCP 설정 키는 Cursor·Claude Desktop이 `mcpServers`, VS Code가 `servers`. 하나로 합쳐 적었다가 VS Code 안내가 틀렸다(→ [실패 사례 22](postmortems/incidents.md)). 각 도구에서 한 번씩 등록해 보고 쓴다.
+- README에 다른 언어 글자가 섞이지 않게 테스트로 막는다(이 프로젝트: `tests/readme.test.ts`).
 
 ### 2.4 설치 파일에 들어가는 것 (`.vscodeignore`)
 - **허용 목록처럼** 생각한다: 실행에 필요한 `dist/`, `media/`(아이콘·CSS), 번역 파일, README·CHANGELOG·LICENSE·NOTICE.

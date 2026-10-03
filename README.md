@@ -1,30 +1,130 @@
 # Tasks for Markdown
 
-Obsidian Tasks-compatible task management for Markdown files in **VS Code** and **Cursor**. (한국어: [README.ko.md](README.ko.md))
+[![VS Code Marketplace](https://img.shields.io/badge/VS%20Code%20Marketplace-install-007ACC)](https://marketplace.visualstudio.com/items?itemName=HastyCapybara.tasks-for-markdown)
+[![Open VSX](https://img.shields.io/open-vsx/v/HastyCapybara/tasks-for-markdown?label=Open%20VSX)](https://open-vsx.org/extension/HastyCapybara/tasks-for-markdown)
+[![npm: tasks-cli](https://img.shields.io/npm/v/@hastycapybara/tasks-cli?label=npm%20tasks-cli)](https://www.npmjs.com/package/@hastycapybara/tasks-cli)
+[![npm: tasks-api](https://img.shields.io/npm/v/@hastycapybara/tasks-api?label=npm%20tasks-api)](https://www.npmjs.com/package/@hastycapybara/tasks-api)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+
+Obsidian Tasks-compatible task management for Markdown files in **VS Code** and **Cursor**.
+
+[Website](https://hastycapybara.com/en/apps/tasksmd/) · [Korean website](https://hastycapybara.com/ko/apps/tasksmd/) · [Korean README](README.ko.md)
 
 > This extension started from the [Tasks plugin](https://github.com/obsidian-tasks-group/obsidian-tasks) for Obsidian. It rebuilds that plugin's task syntax, query language and years of careful design for VS Code and Cursor. Thank you to its authors and contributors — see [Credits](#credits).
 
-Your tasks stay in your notes as plain checklist lines — no database, no lock-in:
+## Why Tasks for Markdown
+
+| | |
+|---|---|
+| **Your notes stay plain Markdown** | Tasks are ordinary checklist lines in the [Obsidian Tasks](https://publish.obsidian.md/tasks/) syntax — no database, no lock-in. The same files work in Obsidian, on GitHub and in any editor. |
+| **Your AI agent can manage them** | A built-in [MCP](https://modelcontextprotocol.io) server lets Claude Code, Cursor's agent, Claude Desktop or VS Code's agent mode query, create, complete and annotate tasks when you ask in plain language. |
+| **Other tools can build on it** | A versioned public API, a command surface, a typed npm package, a CLI and a Node library. Other extensions, scripts and CI jobs read and write the same tasks safely. |
 
 ```markdown
 - [ ] Write the report #work ⏫ 🔁 every week 🛫 2026-09-20 ⏳ 2026-09-22 📅 2026-09-25
+  - Ask finance for the Q3 numbers
 - [x] Tidy meeting notes ✅ 2026-09-21
 ```
 
-The extension indexes every `- [ ]` line in the workspace and lets you see, query and complete tasks wherever you are: the editor, a sidebar, a kanban board, a calendar, the Markdown preview. Completing a task rewrites the line in the file (with a done date, and the next instance for recurring tasks).
+The extension indexes every `- [ ]` line in the workspace. You can see, query and complete tasks wherever you are: the editor, a sidebar, a kanban board, a calendar or the Markdown preview. Completing a task rewrites the line in the file. It adds a done date, and for a recurring task it adds the next instance.
 
-![Rendered view: tasks in columns with notes, a live query block and hover actions](docs/images/rendered-view.png)
+## See it in action
+
+**Write tasks with help.** Auto-suggest offers fields as you type, and natural-language dates like `next fri` become real dates.
+
+![Typing a task: auto-suggest for the due date, "next fri" becomes 2026-10-09](docs/images/demo-editing.gif)
+
+**Complete with one key.** `Ctrl+Shift+Enter` marks a task done. A recurring task gets its next occurrence automatically.
+
+![Ctrl+Shift+Enter completes a weekly task and inserts the next occurrence](docs/images/demo-recurring.gif)
+
+**Work in the rendered view.** Tick checkboxes, add notes with 💬, and show or hide columns. Query blocks update live.
+
+![Rendered view: adding a note, ticking a task, hiding and restoring a column](docs/images/demo-rendered.gif)
+
+**Plan on a board and a calendar.** Drag cards between status columns, or drag a task to another day to reschedule it.
+
+![Kanban: a card moves to In Progress and another to Done; calendar: a task is dragged to a new date](docs/images/demo-kanban-calendar.gif)
+
+## Use it with AI
+
+Connect your AI agent once, then ask in plain language. The recording below is a real Claude Code session. The note in the editor updates while the agent works.
+
+![Claude Code answers "What is overdue?", marks the task done and adds a note; the file updates live](docs/images/demo-ai.gif)
+
+**Connect** (Node.js 18+ is needed, because the server runs from npm with `npx`):
+
+```bash
+# Claude Code, in your notes folder
+claude mcp add tasks -- npx -y @hastycapybara/tasks-cli mcp --root "$PWD"
+```
+
+Cursor — `.cursor/mcp.json`:
+```json
+{ "mcpServers": { "tasks": { "command": "npx", "args": ["-y", "@hastycapybara/tasks-cli", "mcp", "--root", "${workspaceFolder}"] } } }
+```
+
+VS Code (agent mode) — `.vscode/mcp.json`:
+```json
+{ "servers": { "tasks": { "type": "stdio", "command": "npx", "args": ["-y", "@hastycapybara/tasks-cli", "mcp", "--root", "${workspaceFolder}"] } } }
+```
+
+Claude Desktop — `claude_desktop_config.json`, with the absolute path of your notes folder:
+```json
+{ "mcpServers": { "tasks": { "command": "npx", "args": ["-y", "@hastycapybara/tasks-cli", "mcp", "--root", "/path/to/notes"] } } }
+```
+
+**Ask things like:**
+- "What is overdue? Mark the vendor contract review done and add a note: Legal approved clause 3."
+- "Plan my week: list everything due before Sunday, sorted by urgency."
+- "Postpone all #home tasks due today to Saturday."
+- "Create a task to renew the passport, high priority, due next Friday."
+
+**What the agent can do:** query with the full query language, get and create tasks, update fields, set status, postpone, add notes, remove, and explain a query. The agent reads a syntax reference first, so the lines it writes are valid Obsidian Tasks syntax. Every write carries the exact text of the line it read, and the write is refused if the line changed meanwhile. Your edits are never overwritten by an agent working from an old copy. Full tool list: [MCP server](docs/api.en.md#8-mcp-server-for-ai-agents-tasksmd-mcp).
+
+## Extend it
+
+Tasks for Markdown is built to be built on. Another extension, a keybinding, a script or a CI job can use the same tasks through a **stable, versioned public API**. You don't need to parse Markdown yourself.
+
+**What you could build:**
+- a time tracker that starts a timer when a task moves to *In progress* (`events.onDidChangeStatus`)
+- a status bar counter or dashboard of overdue work (`query.run` + `events.onDidChangeTasks`)
+- a bridge that posts completed tasks to a team chat or closes an issue (`events.onDidCompleteTask`)
+- a daily report in CI that fails the build when release tasks are overdue (the CLI)
+- your own views on top of the same index: timelines, focus lists, reviews
+
+```ts
+import type { TasksExtensionExports } from '@hastycapybara/tasks-api';
+
+const ext = vscode.extensions.getExtension<TasksExtensionExports>('HastyCapybara.tasks-for-markdown');
+const tasks = (await ext!.activate()).getAPI(1, { extensionId: 'me.my-extension' });
+
+const r = await tasks.query.run('not done\ndue before tomorrow\nsort by urgency');
+tasks.events.onDidChangeStatus(({ before, after }) => console.log(after.description, before.status.name, '→', after.status.name));
+if (tasks.features?.includes('notes.add')) await tasks.edit.addNote(r.tasks[0], 'Started');
+```
+
+| Surface | For | |
+|---|---|---|
+| Extension API `getAPI(1)` | other VS Code/Cursor extensions | `query`, `edit` (create, update, setStatus, postpone, addNote, batch…), `events`, `ui`, feature detection with `features` / `info()` |
+| Commands `tasksmd.api.*` | keybindings, macros, extensions in any language | every API method as a command with JSON arguments |
+| [`@hastycapybara/tasks-api`](https://www.npmjs.com/package/@hastycapybara/tasks-api) | TypeScript | type definitions only (no runtime code) |
+| [`@hastycapybara/tasks-cli`](https://www.npmjs.com/package/@hastycapybara/tasks-cli) | terminal, scripts, CI, AI agents | `tasksmd query`, `add`, `done`, `note`, `info`, … and the MCP server — no editor needed |
+| [`@hastycapybara/tasks-core`](https://www.npmjs.com/package/@hastycapybara/tasks-core) | Node programs | the parser, query engine and recurrence as a library |
+
+The API version stays `1` while features are only added, so your extension keeps working across updates. Writes are confirmed once per caller by default (`tasksmd.api.writePolicy`), errors are plain `{ code, message }` objects, and stale writes are refused. Read the [public API reference](docs/api.en.md).
 
 ## Highlights
 
 - **Same syntax as [Obsidian Tasks](https://publish.obsidian.md/tasks/)** — emoji fields (📅 ⏳ 🛫 ➕ ✅ ❌ 🔁 🏁 🆔 ⛔, priorities 🔺⏫🔼🔽⏬) and Dataview inline fields (`[due:: 2026-09-25]`) are both read; you choose which one is written. Lines are written in Obsidian's exact field order, so files stay interchangeable.
-- **Editor assistance** — auto-suggest on task lines (`due`, `priority high`, `every week`, natural-language dates like `next fri` / `3일 후`), CodeLens actions above the current task, hover cards, relative-date hints, overdue highlighting, diagnostics with quick fixes.
+- **Editor assistance** — auto-suggest on task lines (`due`, `priority high`, `every week`, natural-language dates in English and Korean (`next fri`, `in 3 days`)), CodeLens actions above the current task, hover cards, relative-date hints, overdue highlighting, diagnostics with quick fixes.
 - **Sidebar** — Today / Next 7 days / Overdue / In progress / Blocked / All open / Done, grouping, filter, checkboxes; saved queries with grouped results.
 - **Query language** — the Obsidian Tasks query language in ` ```tasks ` blocks (rendered in the Markdown preview), in saved queries and in a visual query builder. Filters, boolean logic, sort by, group by, limits, layout options, `explain`, and optional `filter/sort/group by function`.
 - **Recurrence, statuses, dependencies** — `🔁 every month on the last`, `when done`, custom checkbox statuses with theme presets (Minimal, ITS, Things), `🆔`/`⛔` dependencies with blocked detection and cycle diagnostics, Obsidian's urgency score.
 - **Rendered view** — an interactive preview of the note: click checkboxes, double-click to edit, hover a task for ✎ edit · ⏩ postpone · 💬 note, follow links, and see ` ```tasks ` results in place. Tasks line up in columns (status · description · due · created · other fields); hide or resize columns from the column header or the `Columns ▾` menu, and sort or narrow the view (due, created, urgency; today, this week, next week) without touching the file (`Ctrl+Shift+R`). Make it the default editor for `.md` with the `Tasks: Rendered view as default editor` command — in Cursor it replaces the built-in Preview toggle.
 - **Notes** — indented plain bullets under a task are its notes (Obsidian-compatible). Add one from the rendered view with `💬`, see `💬 2` on query rows and cards, edit them in the dialog's More section.
-- **More views** — Create/edit dialog, kanban (drag & drop), calendar (month/week, full screen, drag to reschedule), weekly statistics, archive of completed tasks, daily notifications.
+- **More views** — create/edit dialog, kanban (drag & drop), calendar (month/week, full screen, drag to reschedule), weekly statistics, archive of completed tasks, daily notifications.
+- **AI and automation** — MCP server for AI agents, public extension API, commands, CLI and library (see [Use it with AI](#use-it-with-ai) and [Extend it](#extend-it)).
 - **Works in Cursor** — only stable VS Code APIs; also published to Open VSX.
 
 ## Getting started
@@ -88,26 +188,6 @@ group by filename
 | `calendar.fontSize` | `13` | Font size (px) of tasks in calendar cells |
 | `calendar.fullScreen` | `maximize` | Full screen button: maximize the editor group only, or `window` for the whole window |
 | `updateCheckUrl` | `""` | `latest.json` location for `.vsix` installs |
-
-## API and automation
-
-Four ways for other programs to read and write tasks. Details in [docs/api.en.md](docs/api.en.md).
-
-| From | How |
-|---|---|
-| Another VS Code/Cursor extension | `getExtension('HastyCapybara.tasks-for-markdown').exports.getAPI(1, { extensionId })` → `query.run(...)`, `edit.setStatus(...)`, `edit.addNote(...)`. For types, copy the self-contained file [src/api/types.ts](src/api/types.ts) |
-| Keybindings, macros | Commands `tasksmd.api.<ns>.<method>` (e.g. `tasksmd.api.query.run` with `{ "query": "due today" }`) |
-| Terminal, scripts, CI | `npx @hastycapybara/tasks-cli query "not done\ndue before today" --root ~/notes` — no editor needed |
-| AI agents (Claude Code, Cursor, …) | `claude mcp add tasks -- npx -y @hastycapybara/tasks-cli mcp --root "$PWD"`, then ask in plain language |
-
-```ts
-// from another extension
-const tasks = (await ext.activate()).getAPI(1, { extensionId: 'my.extension' });
-const r = await tasks.query.run('not done\nhappens on or before today');   // same as the sidebar's "Today"
-await tasks.edit.setStatus({ path: r.tasks[0].path, line: r.tasks[0].line, expectedText: r.tasks[0].originalMarkdown }, 'x');
-```
-
-Writes ask the user once per caller by default (`tasksmd.api.writePolicy`). Everything is plain JSON; errors are `{ code, message }`. Notes and dependencies (`isBlocked` / `isBlocking`) work through the extension API, the CLI and MCP alike. By default new tasks need a due date; check the installed version's features and settings with `info()` (CLI `tasksmd info`, MCP `tasks_info`). Need only the Node library? `@hastycapybara/tasks-core`.
 
 ## Notes on the Markdown preview
 

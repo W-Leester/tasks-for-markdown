@@ -237,7 +237,8 @@ VS Code 확장을 **VS Code Marketplace**, **Open VSX**(Cursor·VSCodium 등이 
 1. **저장소 공개**(4.4).
 2. **VS Code Marketplace 웹 업로드**(5.2) — 가장 엄격한 검사. 실패하면 아직 다른 마켓에 같은 번호를 올리지 않았으니 고쳐서 다시 올리면 된다.
 3. **Marketplace 반영 확인**(5.5) — 페이지가 열리고 검색에 나올 때까지(이번 약 8분).
-4. **Open VSX 소유권 신청**(5.3) — Marketplace 페이지가 열린 뒤. 승인에 며칠 걸리므로 **태그보다 먼저**.
+4. **Open VSX 소유권 신청**(5.3) — Marketplace 페이지가 열린 뒤.
+   - **가능하면 승인(`granted`)을 받은 뒤에 태그를 올린다.** 승인 전에 게시한 버전은 승인 후에도 **그 버전에 한해** Open VSX 페이지에 주황색 경고("published by … not a verified publisher of the namespace")가 남는다(버전마다 게시 시점의 검증 여부가 기록되고, 이미 게시한 버전은 다시 올릴 수 없다). 이번 1.0.0이 이 경우 → 다음 버전부터 경고가 사라진다. 승인이 며칠 걸리면 그동안 npm만 먼저 내고 싶어도 태그 하나로 함께 게시되므로, 태그 자체를 승인 뒤로 미루는 편이 간단하다.
 5. **태그 푸시**(5.4) → 자동 배포가 Open VSX·npm에 게시.
 6. **Open VSX 승인 → Cursor 반영**(6.1).
 

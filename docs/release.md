@@ -7,7 +7,7 @@
 | 마켓 | 쓰는 편집기 | 상태 |
 |---|---|---|
 | VS Code Marketplace | VS Code | ✅ **공개** (10-02 10:03 KST 업로드, 10:11 페이지·검색 반영) — https://marketplace.visualstudio.com/items?itemName=HastyCapybara.tasks-for-markdown |
-| Open VSX | **Cursor**, VSCodium 등 | ✅ **공개** — 10-03 태그로 게시, 같은 날 네임스페이스 승인(#13675 `granted`, 신청 약 9시간 뒤). https://open-vsx.org/extension/HastyCapybara/tasks-for-markdown |
+| Open VSX | **Cursor**, VSCodium 등 | ✅ **공개** — 10-03 태그로 게시, 같은 날 네임스페이스 승인(#13675 `granted`, 신청 약 9시간 뒤). https://open-vsx.org/extension/HastyCapybara/tasks-for-markdown — 1.0.0은 승인 전에 게시돼 페이지에 "검증되지 않은 게시자" 경고가 남음(다음 버전부터 사라짐, 실패 사례 21) |
 | npm | CLI·MCP·라이브러리 사용자 | ✅ 공개 — tasks-core·tasks-cli·tasks-api 1.0.0 (tasks-api는 npm이 첫 게시 때 만든 `0.0.0-stage` 자리표시 버전이 함께 보이며, 1.0.0은 2분 뒤 반영) |
 
 ### 완료

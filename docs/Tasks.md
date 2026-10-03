@@ -940,6 +940,7 @@
 - [ ] 9 대화상자 GIF(영어)
 - [x] 덤: 대화상자 태그 칸 안내 문구가 영어 화면에서도 한국어(`#업무 #프로젝트A`) → 번역 키로(영어 `#work #project-a`). 촬영 준비 중 발견, incidents #25
 - [ ] 8 한국어 GIF 6개(①~⑤ + 대화상자)
+- [ ] 덤: 웹뷰 첫 화면 일부가 한국어 설정에서도 영어(칸반 툴바 `Columns`·`Tasks`·`Filter…`, 아래 안내 줄 등) — 번역 묶음이 `state/init` 메시지로 늦게 오고 `t()`는 다시 그려지지 않아서. 한국어 GIF 준비 중 발견, incidents #26. **고칠 방법:** 웹뷰 HTML에 번역 묶음을 JSON 블록(`<script type="application/json" id="tfm-l10n">`, 실행 안 됨)으로 넣어 첫 렌더 전에 읽게 하고, `<html lang>`도 확장의 언어(`tasksmd.language`)를 따르게. 테스트: 웹뷰 `t()`가 문서의 JSON 블록에서 번역을 읽는지, 호스트 HTML에 묶음이 들어가는지(`</script>` 이스케이프 포함).
 
 **GIF 만드는 법(다시 찍을 때).** `code serve-web --connection-token-file … --server-data-dir …`로 실제 VS Code를 브라우저에 띄우고, 설치 파일을 `server/extensions/`에 풀어 둔 뒤 puppeteer-core(헤드리스 Chrome, `--lang=en-US`)로 조작. 화면은 CDP `Page.startScreencast` 프레임을 PIL로 GIF로 묶음. 요령: 명령은 팔레트로(웹뷰에 초점이 있으면 단축키·팔레트가 안 먹을 수 있음 → 패널은 닫기 버튼 클릭), 웹뷰 안 클릭은 `frame.evaluate(el => el.click())`, 드래그는 같은 `DataTransfer`로 `dragstart/dragover/drop`을 웹뷰 안에서 보냄, 매 회 시작 전에 예시 노트·열 상태를 초기화.
 

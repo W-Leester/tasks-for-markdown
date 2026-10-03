@@ -7,7 +7,7 @@
 | 마켓 | 쓰는 편집기 | 상태 |
 |---|---|---|
 | VS Code Marketplace | VS Code | ✅ **공개** (10-02 10:03 KST 업로드, 10:11 페이지·검색 반영) — https://marketplace.visualstudio.com/items?itemName=HastyCapybara.tasks-for-markdown |
-| Open VSX | **Cursor**, VSCodium 등 | ⏳ 게시됨(10-03 태그 v1.0.0), **네임스페이스 승인 전이라 비활성** — #13675 승인 대기 |
+| Open VSX | **Cursor**, VSCodium 등 | ✅ **공개** — 10-03 태그로 게시, 같은 날 네임스페이스 승인(#13675 `granted`, 신청 약 9시간 뒤). https://open-vsx.org/extension/HastyCapybara/tasks-for-markdown |
 | npm | CLI·MCP·라이브러리 사용자 | ✅ 공개 — tasks-core·tasks-cli·tasks-api 1.0.0 (tasks-api는 npm이 첫 게시 때 만든 `0.0.0-stage` 자리표시 버전이 함께 보이며, 1.0.0은 2분 뒤 반영) |
 
 ### 완료
@@ -19,7 +19,7 @@
 
 ### 남은 일 (순서대로)
 1. [ ] **시험 확장 삭제** — 관리 페이지에서 `TFM …` 이름의 시험 확장들을 *… → Remove*.
-2. [x] **Open VSX 네임스페이스 소유권 신청** — 2026-10-03 제출: https://github.com/eclipse/openvsx/issues/13675 (승인 대기). — open-vsx.org › 네임스페이스 `HastyCapybara` › *Claim Ownership* → GitHub 이슈: Ownership ☑, Account Age ☑, **Option 1** ☑, Claim evidence에 Marketplace 링크·퍼블리셔 링크·저장소 링크(신청자 W-Leester 소유). 승인까지 며칠.
+2. [x] **Open VSX 네임스페이스 소유권 신청** — 2026-10-03 제출: https://github.com/EclipseFdn/open-vsx.org/issues/13675 (**승인됨**, `granted` 라벨). 실수로 같은 신청을 두 번 내 #13674는 중복으로 닫힘(운영자 댓글의 "Dup of #1675"는 #13675의 오타). — open-vsx.org › 네임스페이스 `HastyCapybara` › *Claim Ownership* → GitHub 이슈: Ownership ☑, Account Age ☑, **Option 1** ☑, Claim evidence에 Marketplace 링크·퍼블리셔 링크·저장소 링크(신청자 W-Leester 소유). 승인까지 며칠.
 3. [x] **태그 푸시** (2026-10-03, Release 성공) → Release 워크플로가 Open VSX·npm 게시, GitHub Release에 `.vsix`·`.tgz` 첨부.
    ```bash
    git tag v1.0.0 && git push origin v1.0.0

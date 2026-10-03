@@ -255,7 +255,7 @@ VS Code 확장을 **VS Code Marketplace**, **Open VSX**(Cursor·VSCodium 등이 
    - **"maximum number of extensions … in 12 hour(s)"**: 기다린다. 그 사이 재시도하지 않는다.
 
 ### 5.3 Open VSX 네임스페이스 소유권 신청
-1. open-vsx.org → 아바타 → Settings → 네임스페이스 → **Claim Ownership** → Open VSX GitHub 저장소의 이슈 양식이 열린다.
+1. open-vsx.org → 아바타 → Settings → 네임스페이스 → **Claim Ownership** → GitHub 저장소 `EclipseFdn/open-vsx.org`의 이슈 양식이 열린다.
 2. 양식:
 
    | 항목 | 설정 |
@@ -276,7 +276,8 @@ VS Code 확장을 **VS Code Marketplace**, **Open VSX**(Cursor·VSCodium 등이 
    ```
 3. **Create** 전에 세 링크가 모두 열리는지 확인(Marketplace 업로드·저장소 공개 뒤). "potential duplicates" 안내는 다른 사람 신청이라 무시.
 4. 만든 이슈에서 오른쪽 **Subscribe**를 눌러야 답변 메일이 온다(기본은 꺼져 있다).
-5. 이번 신청: https://github.com/eclipse/openvsx/issues/13675 (2026-10-03).
+5. **한 번만 제출한다.** 실수로 두 번 내면 하나는 중복으로 닫힌다(이번에 #13674가 "Dup of …"로 닫혔고 #13675가 승인됨).
+6. 승인되면 이슈에 **`granted` 라벨**이 붙고 닫힌다(운영자 댓글이 없을 수도 있다). 이번 신청: https://github.com/EclipseFdn/open-vsx.org/issues/13675 — 제출 후 **약 9시간 만에 승인**.
 
 ### 5.4 태그로 자동 게시 (Open VSX·npm)
 1. **터미널**(Cursor·VS Code의 `Terminal › New Terminal` 또는 Mac 터미널 앱)에서:
@@ -320,7 +321,7 @@ gh release view v1.0.0 -R W-Leester/tasks-for-markdown --json assets --jq '.asse
 ## 6. 공개 후
 
 ### 6.1 Open VSX 승인 기다리기 → Cursor 반영
-- 확인 위치: 신청 이슈(답변이 달리고 **Closed**되면 승인), 또는 open-vsx.org › Settings › 네임스페이스 옆 **⚠가 사라지면** 승인.
+- 확인 위치: 신청 이슈(**`granted` 라벨**이 붙고 Closed되면 승인), API `curl -s https://open-vsx.org/api/<네임스페이스>`의 `"verified":true`, 또는 open-vsx.org › Settings › 네임스페이스 옆 **⚠가 사라지면** 승인.
 - 승인되면 태그로 이미 올린 버전이 **다시 올리지 않아도** 나타난다. Cursor 검색에는 조금 더 걸릴 수 있다.
 - 두 번째 버전부터는 Open VSX에 기다림 없이 바로 게시된다.
 
@@ -371,7 +372,7 @@ gh release view v1.0.0 -R W-Leester/tasks-for-markdown --json assets --jq '.asse
 | 10-01 낮 | 계정: Marketplace 퍼블리셔, Azure 구독 요구 → 웹 업로드로 결정, Open VSX(Eclipse 계정·동의서·네임스페이스·토큰), npm(가입·2FA·토큰), Secrets |
 | 10-01 밤 | Marketplace 업로드 거절 → 시험 업로드 16개로 원인(검색어) 확인 → 12시간 생성 한도 |
 | 10-02 10:03 | 재업로드 성공, **10:11 Marketplace 페이지·검색 반영**(약 8분) |
-| 10-03 | Open VSX 소유권 신청(#13675), 태그 `v1.0.0` → Release 성공: npm 3개 공개, Open VSX 게시(승인 대기), npm Trusted Publisher 등록 |
+| 10-03 | Open VSX 소유권 신청(#13675), 태그 `v1.0.0` → Release 성공: npm 3개 공개, Open VSX 게시(승인 대기), npm Trusted Publisher 등록. **같은 날 네임스페이스 승인(약 9시간) → Open VSX 공개·검색 반영** |
 
 ---
 

@@ -919,7 +919,7 @@
 1. **영어 README의 한국어 정리**: `(한국어: README.ko.md)` → 영어 표기로, `3일 후` 예시 → "English and Korean natural-language dates". README.md에 한글이 있으면 실패하는 테스트.
 2. **강점 강조**: 맨 위 "Why" 세 칸 — Obsidian Tasks 문법 / **AI 에이전트(MCP)** / **공개 API로 확장 가능**. "Use it with AI" 섹션(Claude Code·Claude Desktop·Cursor·VS Code 설정, 예시 요청과 결과). "Extend it" 섹션(다른 확장이 만들 수 있는 것 예시, 코드, 이벤트·기능 확인·명령 표면, 타입 패키지, CLI·라이브러리). 배지(Marketplace·Open VSX·npm). 아직 안 되는 것(확장만 설치하면 AI 자동 연결 — M21)은 쓰지 않는다.
 3. **움직이는 이미지(GIF)** ①~⑤ — 실제 VS Code를 `code serve-web`으로 브라우저에 띄우고 자동 조작해 프레임을 찍어 만든다(Cursor GUI는 띄우지 않음): ① 입력·자동완성·자연어 날짜 ② 완료 토글·반복 다음 회차 ③ **AI 에이전트(Claude Code를 실제 실행, MCP 연결)로 말로 시키기** ④ 렌더 보기 ⑤ 칸반·캘린더. `docs/images/`에 두고 README에서 링크(설치 파일에는 미포함).
-4. **사이트 연결**: README 맨 위 Website(https://hastycapybara.com/en/apps/tasksmd/)·Korean(https://hastycapybara.com/ko/apps/tasksmd/), README.ko.md에 사이트 한국어 링크, `package.json` homepage → 영어 사이트. 사이트의 README 동기화는 사용자가 별도 모듈로 관리.
+4. **사이트 연결**: README 맨 위 Website(처음 계획은 언어별 주소 두 개, 10-03 사이트 변경으로 `https://hastycapybara.com/apps/tasksmd/` 하나 — 아래 7번), README.ko.md에 사이트 한국어 링크, `package.json` homepage → 영어 사이트. 사이트의 README 동기화는 사용자가 별도 모듈로 관리.
 
 ### 할 일
 - [x] 1 한국어 정리 + 테스트 — `tests/readme.test.ts`(README.md 한글 금지, 로컬 이미지 존재, 사이트 링크)
@@ -928,6 +928,17 @@
 - [x] 4 사이트 링크(영·한), `package.json` homepage → 영어 사이트
 - [x] 덤: api.md·api.en.md의 VS Code `mcp.json` 예시 키 수정(`servers`) — [incidents #22](postmortems/incidents.md)
 - [ ] 사용자 확인 → 1.0.1 게시 결정
+
+### 추가 요청 (2026-10-03, 사용자 확인 후)
+5. **README.ko.md 제목**: "움직이는 예시" → "예시".
+6. **링크 줄 단순화**: README.md `Website · Korean README`, README.ko.md `웹사이트 · English README`(언어별 사이트 링크 두 개 → 하나).
+7. **사이트 주소 변경**: 언어 구분 없는 `https://hastycapybara.com/apps/tasksmd/` 하나로(README 영·한, `package.json` homepage, 테스트).
+8. **한국어 GIF**: 같은 장면을 한국어 화면(VS Code 한국어 언어 팩 + 확장의 한국어 번역)과 한국어 예시 노트로 다시 찍어 README.ko.md에서 사용. AI 장면은 한국어 요청으로 Claude Code를 실제 실행. 파일 이름 `*-ko.gif`.
+9. **대화상자 GIF 추가(영·한)**: `Ctrl+Shift+C`로 대화상자를 열어 새 태스크 만들기 → 기존 태스크에서 다시 열어 수정. README의 예시 절에 추가.
+
+- [ ] 5·6·7 README·homepage·테스트
+- [ ] 9 대화상자 GIF(영어)
+- [ ] 8 한국어 GIF 6개(①~⑤ + 대화상자)
 
 **GIF 만드는 법(다시 찍을 때).** `code serve-web --connection-token-file … --server-data-dir …`로 실제 VS Code를 브라우저에 띄우고, 설치 파일을 `server/extensions/`에 풀어 둔 뒤 puppeteer-core(헤드리스 Chrome, `--lang=en-US`)로 조작. 화면은 CDP `Page.startScreencast` 프레임을 PIL로 GIF로 묶음. 요령: 명령은 팔레트로(웹뷰에 초점이 있으면 단축키·팔레트가 안 먹을 수 있음 → 패널은 닫기 버튼 클릭), 웹뷰 안 클릭은 `frame.evaluate(el => el.click())`, 드래그는 같은 `DataTransfer`로 `dragstart/dragover/drop`을 웹뷰 안에서 보냄, 매 회 시작 전에 예시 노트·열 상태를 초기화.
 

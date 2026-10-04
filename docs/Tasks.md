@@ -956,6 +956,11 @@
 - [x] 13·14 (표 확인 테스트가 `api.allowedWriters`·`api.batchLimit`도 빠진 것을 찾아 함께 추가)
 - [x] 덤: 쿼리 설명(`explain`)의 날짜가 `Sunday 4o October 2026`처럼 나옴(dayjs `advancedFormat` 플러그인 누락, `Do`가 서수로 안 바뀜) → 플러그인 추가 + 테스트. 쿼리 표 확인 중 발견, incidents #27
 
+### 추가 요청 4 (2026-10-04) — README 전체 순서
+15. 세 덩어리로 재배치(영·한 동일): **소개**(Why, 주요 기능 — 한 줄씩으로 줄임) → **시작**(시작하기, 예시 GIF, AI, 확장하기) → **참고**(쿼리 문법, 명령, 설정, 문서·개발·감사·라이선스). "마크다운 미리보기에 관해" 절은 없애고 "시작하기" 3번 끝 한 구절로. "시작하기" 3번에 쿼리 문법 절 링크.
+
+- [ ] 15
+
 **GIF 만드는 법(다시 찍을 때).** `code serve-web --connection-token-file … --server-data-dir …`로 실제 VS Code를 브라우저에 띄우고, 설치 파일을 `server/extensions/`에 풀어 둔 뒤 puppeteer-core(헤드리스 Chrome, `--lang=en-US`)로 조작. 화면은 CDP `Page.startScreencast` 프레임을 PIL로 GIF로 묶음. 요령: 명령은 팔레트로(웹뷰에 초점이 있으면 단축키·팔레트가 안 먹을 수 있음 → 패널은 닫기 버튼 클릭), 웹뷰 안 클릭은 `frame.evaluate(el => el.click())`, 드래그는 같은 `DataTransfer`로 `dragstart/dragover/drop`을 웹뷰 안에서 보냄, 매 회 시작 전에 예시 노트·열 상태를 초기화.
 
 **한국어 GIF.** 확장 화면은 `tasksmd.language: ko`로 모두 한국어, 예시 노트도 한국어(`work.ko.template.md`, 날짜를 하루 늦춰 영어판과 같은 상대 날짜). **VS Code 자체 메뉴는 영어로 둠:** 최신 한국어 언어 팩이 1.131용이라 브라우저 VS Code(1.140)에서 상태 표시줄 등 문자열이 엉뚱하게 나오고, 1.131로 고정한 서버(`--commit-id`)에서도 같은 현상. 영어 VS Code + 한국어 확장 화면은 실제로 많이 쓰는 조합이라 그대로 씀. 촬영 요령 추가: 팔레트 명령이 비슷한 다른 명령(예: 편집기 탭 숨기기)에 걸릴 수 있어 매 회 `View: Show Multiple Editor Tabs`로 탭을 되살림, 웹뷰 탭 제목은 언어에 따라 달라짐(`Tasks: 캘린더`).

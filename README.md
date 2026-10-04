@@ -28,6 +28,72 @@ Obsidian Tasks-compatible task management for Markdown files in **VS Code** and 
 
 The extension indexes every `- [ ]` line in the workspace. You can see, query and complete tasks wherever you are: the editor, a sidebar, a kanban board, a calendar or the Markdown preview. Completing a task rewrites the line in the file. It adds a done date, and for a recurring task it adds the next instance.
 
+## Getting started
+
+1. Install the extension (Marketplace / Open VSX / `.vsix`).
+2. Open a folder with Markdown files. The **Tasks** icon appears in the Activity Bar.
+3. Put the cursor on a checklist line and press `Ctrl+Shift+Enter` (the Ctrl key on macOS too) to toggle it, or `Ctrl+Shift+C` to open the edit dialog.
+4. Type ` ```tasks ` in a note and open the Markdown preview:
+
+````markdown
+```tasks
+not done
+due before next week
+sort by urgency
+group by filename
+```
+````
+
+## Commands (Command Palette → "Tasks:")
+
+| Command | Shortcut |
+|---|---|
+| Toggle task done | `Ctrl+Shift+Enter` (on a task line; Ctrl on macOS too) |
+| Create or edit task | `Ctrl+Shift+C` |
+| Quick search tasks | `Cmd/Ctrl+Shift+;` |
+| Set status / priority / due / scheduled / start / recurrence / dependencies, Postpone | — |
+| Open rendered view / edit Markdown source (toggle) — interactive preview with live ```tasks results | `Ctrl+Shift+R` |
+| Rendered view as default editor (on/off) | — |
+| Open kanban board / calendar / statistics / query builder / query results (beside the editor, follows the cursor) | — |
+| Archive completed tasks… | — |
+| Insert query block, Explain query under cursor | — |
+| Load status preset…, Convert task format in this file… | — |
+
+## Settings (`tasksmd.*`)
+
+| Setting | Default | What it does |
+|---|---|---|
+| `taskFormat` | `emoji` | Format used when writing fields (`emoji` or `dataview`) |
+| `globalFilter` | `""` | Only lines containing this text (e.g. `#task`) are tasks |
+| `include` / `exclude` / `respectGitignore` / `maxFileSizeKB` | | What gets scanned |
+| `setDoneDate` / `setCancelledDate` / `setCreatedDate` | `true` / `true` / `false` | Automatic ✅ ❌ ➕ dates |
+| `statuses` | 4 core statuses | Custom checkbox symbols, names, next symbol and type |
+| `recurrence.insertPosition` / `idHandling` / `copyDependsOn` / `removeScheduledDate` | `above` / `keep` / `true` / `false` | Next-instance behaviour |
+| `decorations.*`, `codeLens.mode`, `autoSuggest.*` | | Editor assistance |
+| `preview.enabled` / `preview.renderBadges` | `true` | Markdown preview rendering |
+| `savedQueries` | `[]` | Saved queries (also `.tasks/queries/*.md`) |
+| `query.allowFunctions` | `false` | Allow `by function` JavaScript in queries (trusted workspaces only) |
+| `editModal.accessKeys` / `editModal.hiddenFields` | `true` / `[]` | Edit dialog |
+| `notifications.*` | on, `09:00`, 1 day | Daily summary and due-soon digest, OS notifications |
+| `archive.file` / `afterDays` / `linkStyle` | `Archive.md` / 30 / `wiki` | Archive command |
+| `calendar.newTaskFile` | `""` | File that receives tasks created from the calendar |
+| `query.showTree` | `true` | Query results as a tree (sub-tasks under their parent); per block `show tree` / `hide tree` |
+| `decorations.strikeCancelled` | `true` | Strike through cancelled tasks (`[-]`) in the editor; done tasks use `decorations.strikeDone` (off) |
+| `requireDueDate` | `true` | Refuse new tasks without a due date (dialog, API, CLI, MCP) and warn in the editor |
+| `api.writePolicy` | `confirm` | Writes through the public API: confirm once per caller / allow / deny |
+| `rendered.maxWidth` | `0` | Max width (px) of the rendered column; 0 = full editor width (default) |
+| `rendered.sourceWhenNoTasks` | `true` | With the rendered view as default editor, notes without tasks open in the text editor |
+| `rendered.fieldsAlign` | `columns` | Rendered view: fields in aligned columns (`columns`: status, description+priority+tags, due, created, everything else), at the right edge (`right`) or after the description (`inline`) |
+| `rendered.fontSize` / `rendered.lineHeight` | `14.5` / `1.6` | Rendered view body font size (px) and line height |
+| `rendered.fieldStyle` | `plain` | Task-line fields in the rendered view: as in the source (`plain`) or pill badges (`badges`) |
+| `calendar.fontSize` | `13` | Font size (px) of tasks in calendar cells |
+| `calendar.fullScreen` | `maximize` | Full screen button: maximize the editor group only, or `window` for the whole window |
+| `updateCheckUrl` | `""` | `latest.json` location for `.vsix` installs |
+
+## Notes on the Markdown preview
+
+The built-in preview renders task lines with checkboxes and badges and ` ```tasks ` blocks as live results, refreshed whenever tasks change. The classic preview cannot send clicks back to extensions, so checkboxes there are display-only — toggle tasks from the editor, the sidebar or the kanban board instead.
+
 ## See it in action
 
 **Write tasks with help.** Auto-suggest offers fields as you type, and natural-language dates like `next fri` become real dates.
@@ -130,72 +196,6 @@ The API version stays `1` while features are only added, so your extension keeps
 - **More views** — create/edit dialog, kanban (drag & drop), calendar (month/week, full screen, drag to reschedule), weekly statistics, archive of completed tasks, daily notifications.
 - **AI and automation** — MCP server for AI agents, public extension API, commands, CLI and library (see [Use it with AI](#use-it-with-ai) and [Extend it](#extend-it)).
 - **Works in Cursor** — only stable VS Code APIs; also published to Open VSX.
-
-## Getting started
-
-1. Install the extension (Marketplace / Open VSX / `.vsix`).
-2. Open a folder with Markdown files. The **Tasks** icon appears in the Activity Bar.
-3. Put the cursor on a checklist line and press `Ctrl+Shift+Enter` (the Ctrl key on macOS too) to toggle it, or `Ctrl+Shift+C` to open the edit dialog.
-4. Type ` ```tasks ` in a note and open the Markdown preview:
-
-````markdown
-```tasks
-not done
-due before next week
-sort by urgency
-group by filename
-```
-````
-
-## Commands (Command Palette → "Tasks:")
-
-| Command | Default key |
-|---|---|
-| Toggle task done | `Ctrl+Shift+Enter` (on a task line; Ctrl on macOS too) |
-| Create or edit task | `Ctrl+Shift+C` |
-| Quick search tasks | `Cmd/Ctrl+Shift+;` |
-| Set status / priority / due / scheduled / start / recurrence / dependencies, Postpone | — |
-| Open rendered view / edit Markdown source (toggle) — interactive preview with live ```tasks results | `Ctrl+Shift+R` |
-| Rendered view as default editor (on/off) | — |
-| Open kanban board / calendar / statistics / query builder / query results (beside the editor, follows the cursor) | — |
-| Archive completed tasks… | — |
-| Insert query block, Explain query under cursor | — |
-| Load status preset…, Convert task format in this file… | — |
-
-## Settings (`tasksmd.*`)
-
-| Setting | Default | What it does |
-|---|---|---|
-| `taskFormat` | `emoji` | Format used when writing fields (`emoji` or `dataview`) |
-| `globalFilter` | `""` | Only lines containing this text (e.g. `#task`) are tasks |
-| `include` / `exclude` / `respectGitignore` / `maxFileSizeKB` | | What gets scanned |
-| `setDoneDate` / `setCancelledDate` / `setCreatedDate` | `true` / `true` / `false` | Automatic ✅ ❌ ➕ dates |
-| `statuses` | 4 core statuses | Custom checkbox symbols, names, next symbol and type |
-| `recurrence.insertPosition` / `idHandling` / `copyDependsOn` / `removeScheduledDate` | `above` / `keep` / `true` / `false` | Next-instance behaviour |
-| `decorations.*`, `codeLens.mode`, `autoSuggest.*` | | Editor assistance |
-| `preview.enabled` / `preview.renderBadges` | `true` | Markdown preview rendering |
-| `savedQueries` | `[]` | Saved queries (also `.tasks/queries/*.md`) |
-| `query.allowFunctions` | `false` | Allow `by function` JavaScript in queries (trusted workspaces only) |
-| `editModal.accessKeys` / `editModal.hiddenFields` | `true` / `[]` | Edit dialog |
-| `notifications.*` | on, `09:00`, 1 day | Daily summary and due-soon digest, OS notifications |
-| `archive.file` / `afterDays` / `linkStyle` | `Archive.md` / 30 / `wiki` | Archive command |
-| `calendar.newTaskFile` | `""` | File that receives tasks created from the calendar |
-| `query.showTree` | `true` | Query results as a tree (sub-tasks under their parent); per block `show tree` / `hide tree` |
-| `decorations.strikeCancelled` | `true` | Strike through cancelled tasks (`[-]`) in the editor; done tasks use `decorations.strikeDone` (off) |
-| `requireDueDate` | `true` | Refuse new tasks without a due date (dialog, API, CLI, MCP) and warn in the editor |
-| `api.writePolicy` | `confirm` | Writes through the public API: confirm once per caller / allow / deny |
-| `rendered.maxWidth` | `0` | Max width (px) of the rendered column; 0 = full editor width (default) |
-| `rendered.sourceWhenNoTasks` | `true` | With the rendered view as default editor, notes without tasks open in the text editor |
-| `rendered.fieldsAlign` | `columns` | Rendered view: fields in aligned columns (`columns`: status, description+priority+tags, due, created, everything else), at the right edge (`right`) or after the description (`inline`) |
-| `rendered.fontSize` / `rendered.lineHeight` | `14.5` / `1.6` | Rendered view body font size (px) and line height |
-| `rendered.fieldStyle` | `plain` | Task-line fields in the rendered view: as in the source (`plain`) or pill badges (`badges`) |
-| `calendar.fontSize` | `13` | Font size (px) of tasks in calendar cells |
-| `calendar.fullScreen` | `maximize` | Full screen button: maximize the editor group only, or `window` for the whole window |
-| `updateCheckUrl` | `""` | `latest.json` location for `.vsix` installs |
-
-## Notes on the Markdown preview
-
-The built-in preview renders task lines with checkboxes and badges and ` ```tasks ` blocks as live results, refreshed whenever tasks change. The classic preview cannot send clicks back to extensions, so checkboxes there are display-only — toggle tasks from the editor, the sidebar or the kanban board instead.
 
 ## Documentation
 

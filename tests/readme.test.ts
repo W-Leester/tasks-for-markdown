@@ -24,7 +24,7 @@ describe('README', () => {
   it('links the website (one address for all languages) and each other', () => {
     for (const text of [en, ko]) expect(text).toContain('https://hastycapybara.com/apps/tasksmd/');
     expect(`${en}${ko}`).not.toMatch(/hastycapybara\.com\/(?:en|ko)\//);
-    expect(en).toContain('(README.ko.md)');
-    expect(ko).toContain('(README.md)');
+    expect(en).toContain('[Korean README](README.ko.md)');
+    expect(ko).toContain('[README](README.md)'); // README alone reads as the English one
   });
 });

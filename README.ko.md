@@ -8,7 +8,7 @@
 
 **VS Code**와 **Cursor**에서 쓰는 Obsidian Tasks 호환 할 일 관리 확장입니다.
 
-[웹사이트](https://hastycapybara.com/apps/tasksmd/) · [English README](README.md)
+[웹사이트](https://hastycapybara.com/apps/tasksmd/) · [README](README.md)
 
 > 이 확장은 Obsidian의 [Tasks 플러그인](https://github.com/obsidian-tasks-group/obsidian-tasks)에서 출발했습니다. 태스크 문법과 쿼리 언어, 그리고 그 프로젝트가 오랫동안 다듬어 온 설계 위에 VS Code·Cursor용으로 다시 만든 것입니다. 좋은 도구를 공개해 준 원작자와 기여자들께 감사드립니다. 아래 [감사의 말](#감사의-말)을 참고하세요.
 
@@ -27,6 +27,72 @@
 ```
 
 확장은 워크스페이스의 모든 `- [ ]` 줄을 인덱싱합니다. 에디터, 사이드바, 칸반 보드, 캘린더, 마크다운 미리보기 어디서든 태스크를 보고, 검색하고, 완료할 수 있습니다. 완료하면 파일의 그 줄이 수정됩니다. 완료일이 붙고, 반복 태스크는 다음 회차가 생깁니다.
+
+## 시작하기
+
+1. 확장을 설치합니다 (Marketplace / Open VSX / `.vsix`).
+2. 마크다운 파일이 있는 폴더를 엽니다. 액티비티 바에 **Tasks** 아이콘이 생깁니다.
+3. 체크리스트 줄에 커서를 두고 `Ctrl+Shift+Enter`(macOS에서도 Ctrl 키)로 토글하거나, `Ctrl+Shift+C`로 편집 대화상자를 엽니다.
+4. 노트에 ` ```tasks ` 블록을 쓰고 마크다운 미리보기를 엽니다:
+
+````markdown
+```tasks
+not done
+due before next week
+sort by urgency
+group by filename
+```
+````
+
+## 명령 (명령 팔레트 → "Tasks:")
+
+| 명령 | 단축키 |
+|---|---|
+| 태스크 완료 토글 | `Ctrl+Shift+Enter` (태스크 줄에서, macOS에서도 Ctrl) |
+| 태스크 만들기 / 편집 | `Ctrl+Shift+C` |
+| 렌더 보기로 열기 / 마크다운 소스 편집 (전환) | `Ctrl+Shift+R` |
+| 렌더 보기를 기본 편집기로 (설정/해제) | — |
+| 태스크 빠른 검색 | `Cmd/Ctrl+Shift+;` |
+| 상태 / 우선순위 / 마감일 / 예정일 / 시작일 / 반복 / 의존성 설정, 미루기 | — |
+| 칸반 보드 / 캘린더 / 통계 / 쿼리 빌더 열기 | — |
+| 완료 태스크 아카이브… | — |
+| 쿼리 블록 삽입, 커서 위치 쿼리 결과 보기(에디터 옆 패널, 커서 따라가기), 커서 위치 쿼리 설명 | — |
+| 상태 프리셋 불러오기…, 이 파일의 태스크 포맷 변환… | — |
+
+## 설정 (`tasksmd.*`)
+
+| 설정 | 기본값 | 설명 |
+|---|---|---|
+| `taskFormat` | `emoji` | 필드를 쓸 때 사용할 포맷 (`emoji` / `dataview`) |
+| `globalFilter` | `""` | 이 문자열(예: `#task`)이 있는 줄만 태스크로 취급 |
+| `include` / `exclude` / `respectGitignore` / `maxFileSizeKB` | | 스캔 범위 |
+| `setDoneDate` / `setCancelledDate` / `setCreatedDate` | `true` / `true` / `false` | ✅ ❌ ➕ 자동 날짜 |
+| `statuses` | 기본 4종 | 커스텀 체크박스 심볼·이름·다음 심볼·타입 |
+| `recurrence.insertPosition` / `idHandling` / `copyDependsOn` / `removeScheduledDate` | `above` / `keep` / `true` / `false` | 다음 회차 생성 규칙 |
+| `decorations.*`, `codeLens.mode`, `autoSuggest.*` | | 에디터 보조 |
+| `preview.enabled` / `preview.renderBadges` | `true` | 마크다운 미리보기 렌더링 |
+| `savedQueries` | `[]` | 저장된 쿼리 (`.tasks/queries/*.md`도 함께 읽음) |
+| `query.allowFunctions` | `false` | 쿼리의 `by function` JavaScript 허용 (신뢰된 워크스페이스만) |
+| `editModal.accessKeys` / `editModal.hiddenFields` | `true` / `[]` | 편집 대화상자 |
+| `notifications.*` | 켜짐, `09:00`, 1일 | 일일 요약·마감 임박 알림, OS 알림 |
+| `archive.file` / `afterDays` / `linkStyle` | `Archive.md` / 30 / `wiki` | 아카이브 명령 |
+| `calendar.newTaskFile` | `""` | 캘린더에서 만든 태스크를 넣을 파일 |
+| `query.showTree` | `true` | 쿼리 결과를 트리로(하위 태스크를 부모 밑에). 블록별 `show tree` / `hide tree` |
+| `decorations.strikeCancelled` | `true` | 취소된 태스크(`[-]`)에 에디터 취소선. 완료(`[x]`)는 `decorations.strikeDone`(기본 꺼짐) |
+| `requireDueDate` | `true` | 마감일 없는 새 태스크 거부(대화상자·API·CLI·MCP) + 에디터 경고 |
+| `api.writePolicy` | `confirm` | 다른 확장이 API로 쓸 때: 확인(`confirm`) / 허용 / 거부 |
+| `rendered.maxWidth` | `0` | 렌더 보기 본문 열 최대 폭(px). 0 = 창 전체 폭(기본). 800 등을 주면 가운데 열로 제한 |
+| `rendered.sourceWhenNoTasks` | `true` | 렌더 보기가 기본 편집기일 때 태스크 없는 노트는 텍스트 편집기로 |
+| `rendered.fieldsAlign` | `columns` | 렌더 보기 태스크 줄의 필드 배치: 열(`columns`: 상태·설명+우선순위+태그·마감·작성일·나머지) / 오른쪽 끝(`right`) / 설명 뒤(`inline`) |
+| `rendered.fontSize` / `rendered.lineHeight` | `14.5` / `1.6` | 렌더 보기 본문 글자 크기(px)와 줄 간격 |
+| `rendered.fieldStyle` | `plain` | 렌더 보기 태스크 줄의 필드 표시: 원문처럼(`plain`) / 배지(`badges`) |
+| `calendar.fontSize` | `13` | 캘린더 칸의 태스크 글자 크기(px) |
+| `calendar.fullScreen` | `maximize` | 전체 화면 버튼: 에디터 그룹 최대화만(`maximize`) / 창도 전체 화면(`window`) |
+| `updateCheckUrl` | `""` | `.vsix` 설치본용 `latest.json` 위치 |
+
+## 마크다운 미리보기에 관해
+
+내장 미리보기는 태스크 줄을 체크박스와 뱃지로, ` ```tasks ` 블록을 실시간 결과로 렌더링하고 태스크가 바뀌면 자동 갱신됩니다. 다만 클래식 미리보기는 클릭을 확장으로 전달할 수 없어서 체크박스는 표시 전용입니다 — 토글은 에디터, 사이드바, 칸반에서 하세요.
 
 ## 예시
 
@@ -130,72 +196,6 @@ if (tasks.features?.includes('notes.add')) await tasks.edit.addNote(r.tasks[0], 
 - **추가 뷰** — 만들기/편집 대화상자, 칸반(드래그앤드롭), 캘린더(월간/주간, 전체 화면, 드래그로 일정 변경), 주간 통계, 완료 태스크 아카이브, 일일 알림.
 - **AI와 자동화** — AI 에이전트용 MCP 서버, 공개 확장 API, 명령, CLI, 라이브러리([AI와 함께 쓰기](#ai와-함께-쓰기), [확장하기](#확장하기) 참고).
 - **Cursor에서도 동작** — 안정 VS Code API만 사용, Open VSX에도 게시.
-
-## 시작하기
-
-1. 확장을 설치합니다 (Marketplace / Open VSX / `.vsix`).
-2. 마크다운 파일이 있는 폴더를 엽니다. 액티비티 바에 **Tasks** 아이콘이 생깁니다.
-3. 체크리스트 줄에 커서를 두고 `Ctrl+Shift+Enter`(macOS에서도 Ctrl 키)로 토글하거나, `Ctrl+Shift+C`로 편집 대화상자를 엽니다.
-4. 노트에 ` ```tasks ` 블록을 쓰고 마크다운 미리보기를 엽니다:
-
-````markdown
-```tasks
-not done
-due before next week
-sort by urgency
-group by filename
-```
-````
-
-## 명령 (명령 팔레트 → "Tasks:")
-
-| 명령 | 기본 키 |
-|---|---|
-| 태스크 완료 토글 | `Ctrl+Shift+Enter` (태스크 줄에서, macOS에서도 Ctrl) |
-| 태스크 만들기 / 편집 | `Ctrl+Shift+C` |
-| 렌더 보기로 열기 / 마크다운 소스 편집 (전환) | `Ctrl+Shift+R` |
-| 렌더 보기를 기본 편집기로 (설정/해제) | — |
-| 태스크 빠른 검색 | `Cmd/Ctrl+Shift+;` |
-| 상태 / 우선순위 / 마감일 / 예정일 / 시작일 / 반복 / 의존성 설정, 미루기 | — |
-| 칸반 보드 / 캘린더 / 통계 / 쿼리 빌더 열기 | — |
-| 완료 태스크 아카이브… | — |
-| 쿼리 블록 삽입, 커서 위치 쿼리 결과 보기(에디터 옆 패널, 커서 따라가기), 커서 위치 쿼리 설명 | — |
-| 상태 프리셋 불러오기…, 이 파일의 태스크 포맷 변환… | — |
-
-## 설정 (`tasksmd.*`)
-
-| 설정 | 기본값 | 설명 |
-|---|---|---|
-| `taskFormat` | `emoji` | 필드를 쓸 때 사용할 포맷 (`emoji` / `dataview`) |
-| `globalFilter` | `""` | 이 문자열(예: `#task`)이 있는 줄만 태스크로 취급 |
-| `include` / `exclude` / `respectGitignore` / `maxFileSizeKB` | | 스캔 범위 |
-| `setDoneDate` / `setCancelledDate` / `setCreatedDate` | `true` / `true` / `false` | ✅ ❌ ➕ 자동 날짜 |
-| `statuses` | 기본 4종 | 커스텀 체크박스 심볼·이름·다음 심볼·타입 |
-| `recurrence.insertPosition` / `idHandling` / `copyDependsOn` / `removeScheduledDate` | `above` / `keep` / `true` / `false` | 다음 회차 생성 규칙 |
-| `decorations.*`, `codeLens.mode`, `autoSuggest.*` | | 에디터 보조 |
-| `preview.enabled` / `preview.renderBadges` | `true` | 마크다운 미리보기 렌더링 |
-| `savedQueries` | `[]` | 저장된 쿼리 (`.tasks/queries/*.md`도 함께 읽음) |
-| `query.allowFunctions` | `false` | 쿼리의 `by function` JavaScript 허용 (신뢰된 워크스페이스만) |
-| `editModal.accessKeys` / `editModal.hiddenFields` | `true` / `[]` | 편집 대화상자 |
-| `notifications.*` | 켜짐, `09:00`, 1일 | 일일 요약·마감 임박 알림, OS 알림 |
-| `archive.file` / `afterDays` / `linkStyle` | `Archive.md` / 30 / `wiki` | 아카이브 명령 |
-| `calendar.newTaskFile` | `""` | 캘린더에서 만든 태스크를 넣을 파일 |
-| `query.showTree` | `true` | 쿼리 결과를 트리로(하위 태스크를 부모 밑에). 블록별 `show tree` / `hide tree` |
-| `decorations.strikeCancelled` | `true` | 취소된 태스크(`[-]`)에 에디터 취소선. 완료(`[x]`)는 `decorations.strikeDone`(기본 꺼짐) |
-| `requireDueDate` | `true` | 마감일 없는 새 태스크 거부(대화상자·API·CLI·MCP) + 에디터 경고 |
-| `api.writePolicy` | `confirm` | 다른 확장이 API로 쓸 때: 확인(`confirm`) / 허용 / 거부 |
-| `rendered.maxWidth` | `0` | 렌더 보기 본문 열 최대 폭(px). 0 = 창 전체 폭(기본). 800 등을 주면 가운데 열로 제한 |
-| `rendered.sourceWhenNoTasks` | `true` | 렌더 보기가 기본 편집기일 때 태스크 없는 노트는 텍스트 편집기로 |
-| `rendered.fieldsAlign` | `columns` | 렌더 보기 태스크 줄의 필드 배치: 열(`columns`: 상태·설명+우선순위+태그·마감·작성일·나머지) / 오른쪽 끝(`right`) / 설명 뒤(`inline`) |
-| `rendered.fontSize` / `rendered.lineHeight` | `14.5` / `1.6` | 렌더 보기 본문 글자 크기(px)와 줄 간격 |
-| `rendered.fieldStyle` | `plain` | 렌더 보기 태스크 줄의 필드 표시: 원문처럼(`plain`) / 배지(`badges`) |
-| `calendar.fontSize` | `13` | 캘린더 칸의 태스크 글자 크기(px) |
-| `calendar.fullScreen` | `maximize` | 전체 화면 버튼: 에디터 그룹 최대화만(`maximize`) / 창도 전체 화면(`window`) |
-| `updateCheckUrl` | `""` | `.vsix` 설치본용 `latest.json` 위치 |
-
-## 마크다운 미리보기에 관해
-
-내장 미리보기는 태스크 줄을 체크박스와 뱃지로, ` ```tasks ` 블록을 실시간 결과로 렌더링하고 태스크가 바뀌면 자동 갱신됩니다. 다만 클래식 미리보기는 클릭을 확장으로 전달할 수 없어서 체크박스는 표시 전용입니다 — 토글은 에디터, 사이드바, 칸반에서 하세요.
 
 ## 문서
 

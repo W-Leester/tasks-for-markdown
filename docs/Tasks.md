@@ -954,6 +954,7 @@
 14. **설정 표 누락 2줄**: `language`, `removeGlobalFilterFromDescription`. 설정이 표에서 빠지면 실패하는 테스트.
 
 - [ ] 13·14
+- [ ] 덤: 쿼리 설명(`explain`)의 날짜가 `Sunday 4o October 2026`처럼 나옴(dayjs `advancedFormat` 플러그인 누락, `Do`가 서수로 안 바뀜) → 플러그인 추가 + 테스트. 쿼리 표 확인 중 발견, incidents #27
 
 **GIF 만드는 법(다시 찍을 때).** `code serve-web --connection-token-file … --server-data-dir …`로 실제 VS Code를 브라우저에 띄우고, 설치 파일을 `server/extensions/`에 풀어 둔 뒤 puppeteer-core(헤드리스 Chrome, `--lang=en-US`)로 조작. 화면은 CDP `Page.startScreencast` 프레임을 PIL로 GIF로 묶음. 요령: 명령은 팔레트로(웹뷰에 초점이 있으면 단축키·팔레트가 안 먹을 수 있음 → 패널은 닫기 버튼 클릭), 웹뷰 안 클릭은 `frame.evaluate(el => el.click())`, 드래그는 같은 `DataTransfer`로 `dragstart/dragover/drop`을 웹뷰 안에서 보냄, 매 회 시작 전에 예시 노트·열 상태를 초기화.
 

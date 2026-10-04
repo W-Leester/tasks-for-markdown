@@ -28,11 +28,24 @@ Obsidian Tasks-compatible task management for Markdown files in **VS Code** and 
 
 The extension indexes every `- [ ]` line in the workspace. You can see, query and complete tasks wherever you are: the editor, a sidebar, a kanban board, a calendar or the Markdown preview. Completing a task rewrites the line in the file. It adds a done date, and for a recurring task it adds the next instance.
 
+## Highlights
+
+- **Same syntax as [Obsidian Tasks](https://publish.obsidian.md/tasks/)** — emoji and Dataview fields, written in Obsidian's field order, so files stay interchangeable.
+- **Editor assistance** — auto-suggest with natural-language dates (English and Korean), CodeLens, hover cards, overdue highlighting, diagnostics with quick fixes.
+- **Sidebar** — Today, Next 7 days, Overdue, In progress, Blocked, All open, Done; saved queries with grouped results.
+- **Query language** — the Obsidian Tasks query language in ` ```tasks ` blocks, saved queries and a visual query builder.
+- **Recurrence, statuses, dependencies** — `🔁 every month on the last`, custom statuses with presets, `🆔`/`⛔` dependencies with blocked detection, urgency score.
+- **Rendered view** — an interactive preview: tick, edit, postpone, add notes, show or hide columns, live query results (`Ctrl+Shift+R`).
+- **Notes** — indented bullets under a task are its notes; add them from the rendered view with 💬.
+- **More views** — create/edit dialog, kanban, calendar, weekly statistics, archive, daily notifications.
+- **AI and automation** — MCP server for AI agents, public extension API, commands, CLI and library (see [Use it with AI](#use-it-with-ai) and [Extend it](#extend-it)).
+- **Works in Cursor** — only stable VS Code APIs; also published to Open VSX.
+
 ## Getting started
 
 1. **Open a folder with Markdown files.** Every `- [ ]` line in it becomes a task, and the **Tasks** icon appears in the Activity Bar.
 2. **Create tasks.** Write a checklist line such as `- [ ] Write the report 📅 2026-09-25`, or press `Ctrl+Shift+C` (the Ctrl key on macOS too) to open the create/edit dialog. `Ctrl+Shift+Enter` on a task line marks it done.
-3. **Filter with a query block, then view the note.** A ` ```tasks ` block lists the tasks that match its lines; `Ctrl+Shift+R` opens the note in the rendered view with the results in place.
+3. **Filter with a query block, then view the note.** A ` ```tasks ` block lists the tasks that match its lines; `Ctrl+Shift+R` opens the note in the rendered view with the results in place. (VS Code's own Markdown preview shows the results too, but its checkboxes are display-only.) Common query lines: [Query syntax](#query-syntax).
 
 ````markdown
 ```tasks
@@ -42,78 +55,6 @@ sort by urgency
 group by filename
 ```
 ````
-
-## Query syntax
-
-A ` ```tasks ` block holds one instruction per line. Every line in the result must pass all filter lines (they combine with AND). It is the [Obsidian Tasks query language](https://publish.obsidian.md/tasks/Queries/About+Queries), so the same block works in Obsidian.
-
-| Purpose | Lines you can write |
-|---|---|
-| Status | `not done` · `done` · `status.type is IN_PROGRESS` |
-| Dates | `due today` · `due before tomorrow` · `due this week` · `due next week` · `happens on or before today` · `done after last week` · `no due date` · `has due date` |
-| Priority | `priority is high` · `priority is above medium` |
-| Text, tags, files | `tags include #work` · `description includes report` · `path includes projects` · `heading includes Today` |
-| Recurrence and dependencies | `is recurring` · `is blocked` (waits for an open task) · `is blocking` (an open task waits for it) |
-| Combine | `(due today) OR (priority is high)` · `NOT (tags include #home)` · `AND`, `OR`, `NOT`, `XOR` with parentheses |
-| Order and grouping | `sort by urgency` · `sort by due reverse` · `group by filename` · `group by tags` · `limit 20` |
-| Display | `hide due date` · `short mode` · `show tree` / `hide tree` (sub-tasks under their parent; on by default) · `explain` |
-
-Dates accept words such as `today`, `next friday`, `in 2 weeks`, ranges such as `this month` and `2026-W40`, and exact dates. Full reference: [filters](https://publish.obsidian.md/tasks/Queries/Filters), [sorting](https://publish.obsidian.md/tasks/Queries/Sorting) and [grouping](https://publish.obsidian.md/tasks/Queries/Grouping) in the Obsidian Tasks docs.
-
-You don't have to write queries by hand. `Tasks: Open query builder` assembles one from drop-downs and shows the matching count as you go. The `Explain` CodeLens above a block shows how each line was understood.
-
-## Commands (Command Palette → "Tasks:")
-
-| Command | Shortcut |
-|---|---|
-| Toggle task done | `Ctrl+Shift+Enter` (on a task line; Ctrl on macOS too) |
-| Create or edit task | `Ctrl+Shift+C` |
-| Quick search tasks | `Cmd/Ctrl+Shift+;` |
-| Set status / priority / due / scheduled / start / recurrence / dependencies, Postpone | — |
-| Open rendered view / edit Markdown source (toggle) — interactive preview with live ```tasks results | `Ctrl+Shift+R` |
-| Rendered view as default editor (on/off) | — |
-| Open kanban board / calendar / statistics / query builder / query results (beside the editor, follows the cursor) | — |
-| Archive completed tasks… | — |
-| Insert query block, Explain query under cursor | — |
-| Load status preset…, Convert task format in this file… | — |
-
-## Settings (`tasksmd.*`)
-
-| Setting | Default | What it does |
-|---|---|---|
-| `taskFormat` | `emoji` | Format used when writing fields (`emoji` or `dataview`) |
-| `globalFilter` | `""` | Only lines containing this text (e.g. `#task`) are tasks |
-| `language` | `auto` | Language of the extension's UI (`auto`, `en`, `ko`), independent of the editor's display language |
-| `removeGlobalFilterFromDescription` | `true` | Hide the global filter text (e.g. `#task`) when showing descriptions; the file is not changed |
-| `include` / `exclude` / `respectGitignore` / `maxFileSizeKB` | | What gets scanned |
-| `setDoneDate` / `setCancelledDate` / `setCreatedDate` | `true` / `true` / `false` | Automatic ✅ ❌ ➕ dates |
-| `statuses` | 4 core statuses | Custom checkbox symbols, names, next symbol and type |
-| `recurrence.insertPosition` / `idHandling` / `copyDependsOn` / `removeScheduledDate` | `above` / `keep` / `true` / `false` | Next-instance behaviour |
-| `decorations.*`, `codeLens.mode`, `autoSuggest.*` | | Editor assistance |
-| `preview.enabled` / `preview.renderBadges` | `true` | Markdown preview rendering |
-| `savedQueries` | `[]` | Saved queries (also `.tasks/queries/*.md`) |
-| `query.allowFunctions` | `false` | Allow `by function` JavaScript in queries (trusted workspaces only) |
-| `editModal.accessKeys` / `editModal.hiddenFields` | `true` / `[]` | Edit dialog |
-| `notifications.*` | on, `09:00`, 1 day | Daily summary and due-soon digest, OS notifications |
-| `archive.file` / `afterDays` / `linkStyle` | `Archive.md` / 30 / `wiki` | Archive command |
-| `calendar.newTaskFile` | `""` | File that receives tasks created from the calendar |
-| `query.showTree` | `true` | Query results as a tree (sub-tasks under their parent); per block `show tree` / `hide tree` |
-| `decorations.strikeCancelled` | `true` | Strike through cancelled tasks (`[-]`) in the editor; done tasks use `decorations.strikeDone` (off) |
-| `requireDueDate` | `true` | Refuse new tasks without a due date (dialog, API, CLI, MCP) and warn in the editor |
-| `api.writePolicy` | `confirm` | Writes through the public API: confirm once per caller / allow / deny |
-| `api.allowedWriters` / `api.batchLimit` | `[]` / `200` | Extensions allowed to write without asking (filled in by the confirmation dialog); most operations in one API batch call |
-| `rendered.maxWidth` | `0` | Max width (px) of the rendered column; 0 = full editor width (default) |
-| `rendered.sourceWhenNoTasks` | `true` | With the rendered view as default editor, notes without tasks open in the text editor |
-| `rendered.fieldsAlign` | `columns` | Rendered view: fields in aligned columns (`columns`: status, description+priority+tags, due, created, everything else), at the right edge (`right`) or after the description (`inline`) |
-| `rendered.fontSize` / `rendered.lineHeight` | `14.5` / `1.6` | Rendered view body font size (px) and line height |
-| `rendered.fieldStyle` | `plain` | Task-line fields in the rendered view: as in the source (`plain`) or pill badges (`badges`) |
-| `calendar.fontSize` | `13` | Font size (px) of tasks in calendar cells |
-| `calendar.fullScreen` | `maximize` | Full screen button: maximize the editor group only, or `window` for the whole window |
-| `updateCheckUrl` | `""` | `latest.json` location for `.vsix` installs |
-
-## Notes on the Markdown preview
-
-The built-in preview renders task lines with checkboxes and badges and ` ```tasks ` blocks as live results, refreshed whenever tasks change. The classic preview cannot send clicks back to extensions, so checkboxes there are display-only — toggle tasks from the editor, the sidebar or the kanban board instead.
 
 ## See it in action
 
@@ -205,18 +146,73 @@ if (tasks.features?.includes('notes.add')) await tasks.edit.addNote(r.tasks[0], 
 
 The API version stays `1` while features are only added, so your extension keeps working across updates. Writes are confirmed once per caller by default (`tasksmd.api.writePolicy`), errors are plain `{ code, message }` objects, and stale writes are refused. Read the [public API reference](docs/api.en.md).
 
-## Highlights
+## Query syntax
 
-- **Same syntax as [Obsidian Tasks](https://publish.obsidian.md/tasks/)** — emoji fields (📅 ⏳ 🛫 ➕ ✅ ❌ 🔁 🏁 🆔 ⛔, priorities 🔺⏫🔼🔽⏬) and Dataview inline fields (`[due:: 2026-09-25]`) are both read; you choose which one is written. Lines are written in Obsidian's exact field order, so files stay interchangeable.
-- **Editor assistance** — auto-suggest on task lines (`due`, `priority high`, `every week`, natural-language dates in English and Korean (`next fri`, `in 3 days`)), CodeLens actions above the current task, hover cards, relative-date hints, overdue highlighting, diagnostics with quick fixes.
-- **Sidebar** — Today / Next 7 days / Overdue / In progress / Blocked / All open / Done, grouping, filter, checkboxes; saved queries with grouped results.
-- **Query language** — the Obsidian Tasks query language in ` ```tasks ` blocks (rendered in the Markdown preview), in saved queries and in a visual query builder. Filters, boolean logic, sort by, group by, limits, layout options, `explain`, and optional `filter/sort/group by function`.
-- **Recurrence, statuses, dependencies** — `🔁 every month on the last`, `when done`, custom checkbox statuses with theme presets (Minimal, ITS, Things), `🆔`/`⛔` dependencies with blocked detection and cycle diagnostics, Obsidian's urgency score.
-- **Rendered view** — an interactive preview of the note: click checkboxes, double-click to edit, hover a task for ✎ edit · ⏩ postpone · 💬 note, follow links, and see ` ```tasks ` results in place. Tasks line up in columns (status · description · due · created · other fields); hide or resize columns from the column header or the `Columns ▾` menu, and sort or narrow the view (due, created, urgency; today, this week, next week) without touching the file (`Ctrl+Shift+R`). Make it the default editor for `.md` with the `Tasks: Rendered view as default editor` command — in Cursor it replaces the built-in Preview toggle.
-- **Notes** — indented plain bullets under a task are its notes (Obsidian-compatible). Add one from the rendered view with `💬`, see `💬 2` on query rows and cards, edit them in the dialog's More section.
-- **More views** — create/edit dialog, kanban (drag & drop), calendar (month/week, full screen, drag to reschedule), weekly statistics, archive of completed tasks, daily notifications.
-- **AI and automation** — MCP server for AI agents, public extension API, commands, CLI and library (see [Use it with AI](#use-it-with-ai) and [Extend it](#extend-it)).
-- **Works in Cursor** — only stable VS Code APIs; also published to Open VSX.
+A ` ```tasks ` block holds one instruction per line. Every line in the result must pass all filter lines (they combine with AND). It is the [Obsidian Tasks query language](https://publish.obsidian.md/tasks/Queries/About+Queries), so the same block works in Obsidian.
+
+| Purpose | Lines you can write |
+|---|---|
+| Status | `not done` · `done` · `status.type is IN_PROGRESS` |
+| Dates | `due today` · `due before tomorrow` · `due this week` · `due next week` · `happens on or before today` · `done after last week` · `no due date` · `has due date` |
+| Priority | `priority is high` · `priority is above medium` |
+| Text, tags, files | `tags include #work` · `description includes report` · `path includes projects` · `heading includes Today` |
+| Recurrence and dependencies | `is recurring` · `is blocked` (waits for an open task) · `is blocking` (an open task waits for it) |
+| Combine | `(due today) OR (priority is high)` · `NOT (tags include #home)` · `AND`, `OR`, `NOT`, `XOR` with parentheses |
+| Order and grouping | `sort by urgency` · `sort by due reverse` · `group by filename` · `group by tags` · `limit 20` |
+| Display | `hide due date` · `short mode` · `show tree` / `hide tree` (sub-tasks under their parent; on by default) · `explain` |
+
+Dates accept words such as `today`, `next friday`, `in 2 weeks`, ranges such as `this month` and `2026-W40`, and exact dates. Full reference: [filters](https://publish.obsidian.md/tasks/Queries/Filters), [sorting](https://publish.obsidian.md/tasks/Queries/Sorting) and [grouping](https://publish.obsidian.md/tasks/Queries/Grouping) in the Obsidian Tasks docs.
+
+You don't have to write queries by hand. `Tasks: Open query builder` assembles one from drop-downs and shows the matching count as you go. The `Explain` CodeLens above a block shows how each line was understood.
+
+## Commands (Command Palette → "Tasks:")
+
+| Command | Shortcut |
+|---|---|
+| Toggle task done | `Ctrl+Shift+Enter` (on a task line; Ctrl on macOS too) |
+| Create or edit task | `Ctrl+Shift+C` |
+| Quick search tasks | `Cmd/Ctrl+Shift+;` |
+| Set status / priority / due / scheduled / start / recurrence / dependencies, Postpone | — |
+| Open rendered view / edit Markdown source (toggle) — interactive preview with live ```tasks results | `Ctrl+Shift+R` |
+| Rendered view as default editor (on/off) | — |
+| Open kanban board / calendar / statistics / query builder / query results (beside the editor, follows the cursor) | — |
+| Archive completed tasks… | — |
+| Insert query block, Explain query under cursor | — |
+| Load status preset…, Convert task format in this file… | — |
+
+## Settings (`tasksmd.*`)
+
+| Setting | Default | What it does |
+|---|---|---|
+| `taskFormat` | `emoji` | Format used when writing fields (`emoji` or `dataview`) |
+| `globalFilter` | `""` | Only lines containing this text (e.g. `#task`) are tasks |
+| `language` | `auto` | Language of the extension's UI (`auto`, `en`, `ko`), independent of the editor's display language |
+| `removeGlobalFilterFromDescription` | `true` | Hide the global filter text (e.g. `#task`) when showing descriptions; the file is not changed |
+| `include` / `exclude` / `respectGitignore` / `maxFileSizeKB` | | What gets scanned |
+| `setDoneDate` / `setCancelledDate` / `setCreatedDate` | `true` / `true` / `false` | Automatic ✅ ❌ ➕ dates |
+| `statuses` | 4 core statuses | Custom checkbox symbols, names, next symbol and type |
+| `recurrence.insertPosition` / `idHandling` / `copyDependsOn` / `removeScheduledDate` | `above` / `keep` / `true` / `false` | Next-instance behaviour |
+| `decorations.*`, `codeLens.mode`, `autoSuggest.*` | | Editor assistance |
+| `preview.enabled` / `preview.renderBadges` | `true` | Markdown preview rendering |
+| `savedQueries` | `[]` | Saved queries (also `.tasks/queries/*.md`) |
+| `query.allowFunctions` | `false` | Allow `by function` JavaScript in queries (trusted workspaces only) |
+| `editModal.accessKeys` / `editModal.hiddenFields` | `true` / `[]` | Edit dialog |
+| `notifications.*` | on, `09:00`, 1 day | Daily summary and due-soon digest, OS notifications |
+| `archive.file` / `afterDays` / `linkStyle` | `Archive.md` / 30 / `wiki` | Archive command |
+| `calendar.newTaskFile` | `""` | File that receives tasks created from the calendar |
+| `query.showTree` | `true` | Query results as a tree (sub-tasks under their parent); per block `show tree` / `hide tree` |
+| `decorations.strikeCancelled` | `true` | Strike through cancelled tasks (`[-]`) in the editor; done tasks use `decorations.strikeDone` (off) |
+| `requireDueDate` | `true` | Refuse new tasks without a due date (dialog, API, CLI, MCP) and warn in the editor |
+| `api.writePolicy` | `confirm` | Writes through the public API: confirm once per caller / allow / deny |
+| `api.allowedWriters` / `api.batchLimit` | `[]` / `200` | Extensions allowed to write without asking (filled in by the confirmation dialog); most operations in one API batch call |
+| `rendered.maxWidth` | `0` | Max width (px) of the rendered column; 0 = full editor width (default) |
+| `rendered.sourceWhenNoTasks` | `true` | With the rendered view as default editor, notes without tasks open in the text editor |
+| `rendered.fieldsAlign` | `columns` | Rendered view: fields in aligned columns (`columns`: status, description+priority+tags, due, created, everything else), at the right edge (`right`) or after the description (`inline`) |
+| `rendered.fontSize` / `rendered.lineHeight` | `14.5` / `1.6` | Rendered view body font size (px) and line height |
+| `rendered.fieldStyle` | `plain` | Task-line fields in the rendered view: as in the source (`plain`) or pill badges (`badges`) |
+| `calendar.fontSize` | `13` | Font size (px) of tasks in calendar cells |
+| `calendar.fullScreen` | `maximize` | Full screen button: maximize the editor group only, or `window` for the whole window |
+| `updateCheckUrl` | `""` | `latest.json` location for `.vsix` installs |
 
 ## Documentation
 

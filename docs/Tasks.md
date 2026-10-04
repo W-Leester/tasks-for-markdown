@@ -959,7 +959,7 @@
 ### 추가 요청 4 (2026-10-04) — README 전체 순서
 15. 세 덩어리로 재배치(영·한 동일): **소개**(Why, 주요 기능 — 한 줄씩으로 줄임) → **시작**(시작하기, 예시 GIF, AI, 확장하기) → **참고**(쿼리 문법, 명령, 설정, 문서·개발·감사·라이선스). "마크다운 미리보기에 관해" 절은 없애고 "시작하기" 3번 끝 한 구절로. "시작하기" 3번에 쿼리 문법 절 링크.
 
-- [ ] 15
+- [x] 15
 
 **GIF 만드는 법(다시 찍을 때).** `code serve-web --connection-token-file … --server-data-dir …`로 실제 VS Code를 브라우저에 띄우고, 설치 파일을 `server/extensions/`에 풀어 둔 뒤 puppeteer-core(헤드리스 Chrome, `--lang=en-US`)로 조작. 화면은 CDP `Page.startScreencast` 프레임을 PIL로 GIF로 묶음. 요령: 명령은 팔레트로(웹뷰에 초점이 있으면 단축키·팔레트가 안 먹을 수 있음 → 패널은 닫기 버튼 클릭), 웹뷰 안 클릭은 `frame.evaluate(el => el.click())`, 드래그는 같은 `DataTransfer`로 `dragstart/dragover/drop`을 웹뷰 안에서 보냄, 매 회 시작 전에 예시 노트·열 상태를 초기화.
 

@@ -30,10 +30,9 @@ The extension indexes every `- [ ]` line in the workspace. You can see, query an
 
 ## Getting started
 
-1. Install the extension (Marketplace / Open VSX / `.vsix`).
-2. Open a folder with Markdown files. The **Tasks** icon appears in the Activity Bar.
-3. Put the cursor on a checklist line and press `Ctrl+Shift+Enter` (the Ctrl key on macOS too) to toggle it, or `Ctrl+Shift+C` to open the edit dialog.
-4. Type ` ```tasks ` in a note and open the Markdown preview:
+1. **Open a folder with Markdown files.** Every `- [ ]` line in it becomes a task, and the **Tasks** icon appears in the Activity Bar.
+2. **Create tasks.** Write a checklist line such as `- [ ] Write the report 📅 2026-09-25`, or press `Ctrl+Shift+C` (the Ctrl key on macOS too) to open the create/edit dialog. `Ctrl+Shift+Enter` on a task line marks it done.
+3. **Filter with a query block, then view the note.** A ` ```tasks ` block lists the tasks that match its lines; `Ctrl+Shift+R` opens the note in the rendered view with the results in place.
 
 ````markdown
 ```tasks

@@ -983,6 +983,18 @@
 2. **Cursor: 명령 하나로 등록.** `Tasks: Connect AI agents (MCP)` 같은 명령이 Cursor의 MCP 설정(`.cursor/mcp.json`, 프로젝트 또는 사용자 범위 선택)에 항목을 추가/제거. 기존 설정은 보존하고, 바꾸기 전에 무엇을 쓸지 보여 주고 확인받는다.
 3. (선택) **`tasksmd` 터미널 명령 설치.** VS Code의 "Install 'code' command in PATH"처럼 명령 팔레트에서 등록/해제.
 
+**확인한 것(2026-10-05).**
+- **npm 설치 없이 된다.** `packages/cli/dist/tasksmd.cjs`(한 파일, 약 880KB)를 `node_modules` 없는 빈 폴더에 복사해도 `query`와 MCP 연결(initialize → `tasks_query`)이 동작. **VS Code·Cursor 앱 내장 Node**(`ELECTRON_RUN_AS_NODE=1 <앱 실행 파일> tasksmd.cjs …`)로도 동작 → 사용자 PC에 Node.js·npm이 없어도 됨. 이 파일을 vsix에 넣으면 된다.
+- **설치할 때 자동으로 깔리게는 못 한다.** 확장에는 설치 시 실행 단계(npm postinstall 같은 것)가 없고, 몰래 PATH·셸 설정을 바꾸면 안 된다 → 사용자가 명령으로 한 번 동의하는 방식.
+- **설치 폴더 경로에 버전이 들어간다**(`~/.vscode/extensions/hastycapybara.tasks-for-markdown-1.0.1/`) → 밖의 설정에 직접 적으면 업데이트마다 끊김. **바뀌지 않는 런처**(예: `~/.local/bin/tasksmd`, Windows는 `.cmd`)를 두고, 확장이 켜질 때마다 런처가 가리키는 위치를 현재 버전으로 갱신.
+
+**추가로 할 것(2026-10-05 결정).**
+4. **`Tasks: Install 'tasksmd' command in PATH`** — 런처 설치/해제(VS Code의 `code` 명령 설치와 같은 방식). 터미널·스크립트·Claude Code에서 `tasksmd` 사용.
+5. **`Tasks: Connect AI agents (MCP)`** — 대상(VS Code, Cursor, Claude Code, Claude Desktop)을 골라 런처 경로로 설정을 써 줌. 쓰기 전에 바꿀 내용을 보여 주고 확인, 기존 설정 보존. (1번 VS Code 자동 등록과 함께)
+6. **알리는 방법** — 시작 안내 페이지(`contributes.walkthroughs`: "AI 에이전트 연결하기", "터미널 명령 설치하기" 단계와 실행 버튼), 명령 팔레트, Tasks 사이드바의 빈 화면 안내 버튼. 처음 켤 때 알림은 띄우지 않음.
+- **한계:** 에디터가 설치된 같은 PC에서만. 에디터 없는 CI 서버는 지금처럼 npm 패키지. npm 패키지 세 개는 그대로 유지.
+- **최소 VS Code 버전·Cursor 등록 API**는 아래 "확인할 것" 그대로. VS Code는 `.vscode/mcp.json` 키가 `servers`, Cursor는 `mcpServers`(incidents #22).
+
 **확인할 것(개발 전).**
 - MCP 제공 API가 필요한 최소 VS Code 버전 → `engines.vscode`를 올려야 하는지, 아니면 API가 있을 때만 쓰도록 할지.
 - Cursor가 VS Code의 MCP 제공 API를 지원하는지(지원하면 2번이 필요 없을 수 있음). Cursor GUI는 자동으로 띄우지 않고 번들 코드 확인 → 사용자 확인 순서.
@@ -991,7 +1003,7 @@
 
 ### 할 일 (착수 시 확정)
 - [ ] 위 "확인할 것" 조사 → 설계(design.md) → 계획 확정
-- [ ] VS Code MCP 등록, Cursor 설정 등록 명령, (선택) 터미널 명령
+- [ ] VS Code MCP 등록, 런처 + 터미널 명령 설치, AI 연결 명령(VS Code·Cursor·Claude Code·Claude Desktop), 시작 안내 페이지
 - [ ] 테스트, 문서(README·api.md·user-guide), 1.1.0 게시(Marketplace Update + 태그)
 
 ## 향후 후보 (미착수)

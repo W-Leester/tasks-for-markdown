@@ -406,7 +406,8 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
   body.rv-resizing, body.rv-resizing * { cursor: col-resize !important; user-select: none; }
   .rv-colhead button { border: none; background: transparent; color: var(--rv-muted); font: inherit; padding: 0 4px; border-radius: 3px; cursor: pointer; line-height: 16px; }
   .rv-colhead button:hover, .rv-colhead button:focus-visible { background: var(--rv-bg-3); color: var(--rv-fg); }
-  .rv-colhead-chips { position: absolute; right: 0; top: 50%; transform: translateY(-50%); display: inline-flex; gap: 4px; background: var(--rv-bg-2); padding-left: 6px; }
+  .rv-colhead-desc { overflow: hidden; }
+  .rv-colhead-chips { margin-left: auto; flex: none; display: inline-flex; gap: 4px; padding: 0 .3em 0 6px; }
   .rv-colhead-chips button { border: 1px solid var(--rv-stroke); }
   .rv-select select { font: inherit; color: var(--rv-fg); background: var(--rv-bg-2); border: 1px solid var(--rv-stroke); border-radius: 4px; padding: 2px 6px; }
   .rv-hint { margin-left: auto; padding-right: 130px; }

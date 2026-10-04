@@ -44,15 +44,17 @@ function headerHtml(): string {
   const labels = document.body.dataset;
   const esc = (s: string) => s.replace(/[&<>"]/g, (ch) => `&#${ch.charCodeAt(0)};`);
   const hide = labels.lColHide ?? 'Hide column';
+  // Chips for hidden columns sit at the right end of the description cell (the flexible track), so they
+  // never cover another column's title (incident #24: absolutely positioned, they overlapped the last one).
+  const chips = hiddenColumns.length ? `<span class="rv-colhead-chips">${hiddenColumns.map((c) => `<button type="button" data-show="${c}" title="${esc(labels.lColShow ?? 'Show column')}">+ ${esc(colLabel(c))}</button>`).join('')}</span>` : '';
   return (
-    `<span></span><span class="rv-colhead-cell"><span class="rv-colhead-text">${esc(colLabel('desc'))}</span></span>` +
+    `<span></span><span class="rv-colhead-cell rv-colhead-desc"><span class="rv-colhead-text">${esc(colLabel('desc'))}</span>${chips}</span>` +
     HIDEABLE_COLUMNS.filter((c) => !hiddenColumns.includes(c))
       .map((c) =>
         `<span class="rv-colhead-cell">` +
         `<span class="rv-colgrip" role="separator" aria-orientation="vertical" tabindex="0" data-col="${c}" aria-valuenow="${widthOf(c, columnWidths)}" aria-valuemin="3" aria-valuemax="40" aria-label="${esc(`${labels.lColWidth ?? 'Column width'}: ${colLabel(c)}`)}" title="${esc(labels.lColWidthHint ?? 'Drag to resize, double-click to reset')}"></span>` +
         `<span class="rv-colhead-text">${esc(colLabel(c))}</span><button type="button" data-hide="${c}" title="${esc(hide)}" aria-label="${esc(`${hide}: ${colLabel(c)}`)}">✕</button></span>`)
-      .join('') +
-    (hiddenColumns.length ? `<span class="rv-colhead-chips">${hiddenColumns.map((c) => `<button type="button" data-show="${c}" title="${esc(labels.lColShow ?? 'Show column')}">+ ${esc(colLabel(c))}</button>`).join('')}</span>` : '')
+      .join('')
   );
 }
 /** Where headers go: result boxes with tasks, and top-level note lists whose own items include tasks. */

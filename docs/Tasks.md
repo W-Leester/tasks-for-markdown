@@ -965,14 +965,14 @@
 16. **#24 고치기**: 렌더 보기 열 제목 줄에서 숨긴 열을 되살리는 `+` 칩이 마지막 열 제목과 겹침 → 칩 폭만큼 제목 줄 오른쪽 여백을 두어 겹치지 않게. 테스트: 칩이 있을 때 제목 줄에 오른쪽 여백 규칙이 붙는지.
 17. **#23 확인**: 데스크톱 VS Code(통합 테스트)에서 칸반 카드 옮기기·캘린더 날짜 옮기기와 같은 메시지를 보내고, 파일 내용뿐 아니라 **오류 메시지가 나가지 않았는지**도 확인하는 단언 추가. 통과하면 브라우저 VS Code(serve-web) 전용으로 기록하고 코드는 그대로, 실패하면 원인을 찾아 고친다.
 
-- [ ] 16
-- [ ] 17
+- [x] 16 — 칩을 설명 칸 오른쪽 끝으로(incidents #24)
+- [x] 17 — 데스크톱 통합 테스트에 오류 없음 단언 추가, 통과 → 브라우저 VS Code 전용, 코드 그대로(incidents #23)
 
 **GIF 만드는 법(다시 찍을 때).** `code serve-web --connection-token-file … --server-data-dir …`로 실제 VS Code를 브라우저에 띄우고, 설치 파일을 `server/extensions/`에 풀어 둔 뒤 puppeteer-core(헤드리스 Chrome, `--lang=en-US`)로 조작. 화면은 CDP `Page.startScreencast` 프레임을 PIL로 GIF로 묶음. 요령: 명령은 팔레트로(웹뷰에 초점이 있으면 단축키·팔레트가 안 먹을 수 있음 → 패널은 닫기 버튼 클릭), 웹뷰 안 클릭은 `frame.evaluate(el => el.click())`, 드래그는 같은 `DataTransfer`로 `dragstart/dragover/drop`을 웹뷰 안에서 보냄, 매 회 시작 전에 예시 노트·열 상태를 초기화.
 
 **한국어 GIF.** 확장 화면은 `tasksmd.language: ko`로 모두 한국어, 예시 노트도 한국어(`work.ko.template.md`, 날짜를 하루 늦춰 영어판과 같은 상대 날짜). **VS Code 자체 메뉴는 영어로 둠:** 최신 한국어 언어 팩이 1.131용이라 브라우저 VS Code(1.140)에서 상태 표시줄 등 문자열이 엉뚱하게 나오고, 1.131로 고정한 서버(`--commit-id`)에서도 같은 현상. 영어 VS Code + 한국어 확장 화면은 실제로 많이 쓰는 조합이라 그대로 씀. 촬영 요령 추가: 팔레트 명령이 비슷한 다른 명령(예: 편집기 탭 숨기기)에 걸릴 수 있어 매 회 `View: Show Multiple Editor Tabs`로 탭을 되살림, 웹뷰 탭 제목은 언어에 따라 달라짐(`Tasks: 캘린더`).
 
-**발견한 문제(코드 미수정, 사용자 확인 대기).** [#23](postmortems/incidents.md) 브라우저 VS Code에서 칸반·캘린더 편집 후 "Could not edit" 알림(파일은 바뀜), [#24](postmortems/incidents.md) 열 제목 `+` 칩 겹침.
+**발견한 문제(처리 완료, 10-04).** [#23](postmortems/incidents.md) 브라우저 VS Code 전용으로 확인, [#24](postmortems/incidents.md) 수정.
 
 ## M21. 확장 안에서 AI 연결 제공 — 1.1.0 후보 (계획만, 2026-10-02)
 

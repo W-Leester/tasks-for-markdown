@@ -108,10 +108,14 @@ describe('column header (M15, revised: global setting)', () => {
     // First note list (has a task row) and the result box with tasks; not the nested list, the task-less list or the empty result.
     expect(heads().map((h) => h.tagName)).toEqual(['LI', 'DIV']);
     expect(heads()[0]!.parentElement!.firstElementChild).toBe(heads()[0]);
-    const titles = (h: HTMLElement) => Array.from(h.querySelectorAll('.rv-colhead-cell')).map((c) => c.textContent);
+    // Cell titles without the chips.
+    const titles = (h: HTMLElement) => Array.from(h.querySelectorAll('.rv-colhead-cell')).map((c) =>
+      Array.from(c.childNodes).filter((n) => !(n as Element).classList?.contains('rv-colhead-chips')).map((n) => n.textContent).join(''));
     for (const h of heads()) {
       expect(titles(h)).toEqual(['설명', '마감일✕', '생성일✕']);
       expect(h.querySelector('[data-show]')!.textContent).toBe('+ 나머지 필드');
+      // incident #24: chips live in the description cell (flexible track), not over the last column title.
+      expect(h.querySelector('.rv-colhead-chips')!.parentElement!.classList.contains('rv-colhead-desc')).toBe(true);
     }
     const box = (c: string) => document.querySelector<HTMLInputElement>(`#view-cols input[data-col="${c}"]`)!;
 

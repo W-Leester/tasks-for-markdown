@@ -328,6 +328,15 @@ suite('edit dialog', () => {
   });
 });
 
+/** Records what the host sends to its webview, so tests can assert that no error was reported. */
+function recordSent(host: unknown): { type: string; message?: string }[] {
+  const h = host as { send(m: unknown): void };
+  const sent: { type: string; message?: string }[] = [];
+  const orig = h.send.bind(h);
+  h.send = (m: unknown) => { sent.push(m as { type: string }); orig(m); };
+  return sent;
+}
+
 suite('kanban', () => {
   const guard = new FixtureGuard();
   teardown(() => guard.restore());
@@ -339,10 +348,13 @@ suite('kanban', () => {
     const host = api.webviews.openKanban();
     await waitFor(() => host.received.includes('query/run'), 8000, 'kanban query');
     const task = await findTask(api, 'notes/project-a.md', 'Numbered task');
+    const sent = recordSent(host);
     await (host as unknown as { handle(m: unknown): Promise<void> }).handle({ type: 'task/setField', key: task.location.key, line: task.location.line, field: 'status', value: '/' });
     await (host as unknown as { handle(m: unknown): Promise<void> }).handle({ type: 'task/setField', key: task.location.key, line: task.location.line, field: 'due', value: '2026-09-22' });
     const line = fs.readFileSync(uri.fsPath, 'utf8').split('\n')[task.location.line];
     assert.equal(line, '1. [/] Numbered task 📅 2026-09-22');
+    // incident #23: in browser VS Code the edit applied but a "Could not edit" error was reported too.
+    assert.deepEqual(sent.filter((m) => m.type === 'error'), []);
     await vscode.commands.executeCommand('workbench.action.closeAllEditors');
   });
 });
@@ -432,6 +444,15 @@ suite('calendar', () => {
       await waitFor(() => fs.existsSync(fixtureUri('Inbox.md').fsPath), 3000, 'inbox created');
       const text = fs.readFileSync(fixtureUri('Inbox.md').fsPath, 'utf8');
       assert.ok(text.includes('- [ ] from calendar 📅 2026-10-07'), text);
+      // Dragging a task to another day sends a due-date change (incident #23: no error may be reported).
+      const inboxKey = fixtureUri('Inbox.md').toString();
+      const createdTask = () => api.index.file(inboxKey)?.tasks.find((t) => t.description === 'from calendar');
+      await waitFor(() => !!createdTask(), 3000, 'inbox indexed');
+      const created = createdTask()!;
+      const sent = recordSent(host);
+      await (host as unknown as { handle(m: unknown): Promise<void> }).handle({ type: 'task/setField', key: created.location.key, line: created.location.line, field: 'due', value: '2026-10-09' });
+      assert.ok(fs.readFileSync(fixtureUri('Inbox.md').fsPath, 'utf8').includes('- [ ] from calendar 📅 2026-10-09'));
+      assert.deepEqual(sent.filter((m) => m.type === 'error'), []);
     } finally {
       await api.settings.update('calendar.newTaskFile', undefined, vscode.ConfigurationTarget.Workspace);
       await vscode.commands.executeCommand('workbench.action.closeAllEditors');

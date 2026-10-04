@@ -6,6 +6,7 @@
 - Webviews (kanban, calendar, statistics, query builder, dialog) now show their first screen in the configured language; toolbars could stay in English with Korean selected.
 - The create/edit dialog's Tags placeholder was Korean in the English UI.
 - Query explanations show ordinal dates (`Sunday 4th October 2026`, was `4o`).
+- Rendered view: the `+` chip that brings back a hidden column no longer covers the last column title.
 
 **Docs**
 - README: why use it, using it with AI agents (MCP setup for Claude Code, Cursor, VS Code and Claude Desktop), building on the public API, animated examples, website link.

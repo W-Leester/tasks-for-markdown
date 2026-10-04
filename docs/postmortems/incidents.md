@@ -31,6 +31,7 @@ Tasks for Markdown을 만들며(2026-09-21 ~) 겪은 실패를 모아 둔 문서
 | 24 | 10-03 | CSS | 렌더 보기 열 제목의 `+` 칩이 마지막 열 제목과 겹침 | 🔍 수정 전 |
 | 25 | 10-03 | 번역 | 영어 화면 대화상자의 태그 칸 안내 문구가 한국어 | 안내 문구도 번역 키로 |
 | 26 | 10-03 | 번역 | 한국어 설정에서도 칸반 툴바 등 웹뷰 첫 화면 일부가 영어 | 번역은 첫 렌더 전에 |
+| 27 | 10-04 | 날짜 | 쿼리 설명의 날짜가 `4o October`로 나옴 | 형식 문자는 플러그인 확인 |
 | 19 | 상시 | 작업 방식 | 실패를 숨기거나 파일을 망가뜨린 스크립트 | pipefail, assert |
 
 ---
@@ -188,4 +189,10 @@ Tasks for Markdown을 만들며(2026-09-21 ~) 겪은 실패를 모아 둔 문서
 - **원인:** 웹뷰는 번역 묶음을 `state/init` 메시지로 받는데, 그 전에 화면을 한 번 그린다. Svelte 마크업의 `t()`는 반응형이 아니라 묶음이 나중에 와도 다시 그려지지 않는다. 메시지 뒤에 생기는 부분(카드, 빈 열 안내)만 한국어로 나왔다.
 - **해결:** 호스트가 웹뷰 HTML에 묶음을 실행되지 않는 JSON 블록(`<script type="application/json" id="tfm-l10n">`, `<`는 이스케이프)으로 넣고, 웹뷰 `t()`가 처음 불러올 때 읽는다. `<html lang>`도 확장 언어를 따름. 테스트: `tests/webviewHost-l10nBlock.test.ts`, `tests/webviews/l10nEmbedded.test.ts`, `tests/webviews/kanbanL10n.test.ts`(고치기 전 코드에서는 실패 확인). 한국어 GIF 준비 중 발견.
 - **재발 방지:** 웹뷰 컴포넌트 테스트에 "메시지 전 첫 화면이 번역됐는지"를 둔다. 번역처럼 화면 전체에 쓰이는 값은 메시지가 아니라 페이지와 함께 보낸다.
+
+## 27. 쿼리 설명(`explain`)의 날짜가 `Sunday 4o October 2026`으로 나옴 (10-04)
+- **증상:** `explain`, CodeLens `? 설명`, CLI `tasksmd explain`, MCP `tasks_explain_query`에서 날짜 뒤 괄호가 `(Sunday 4o October 2026)`. Obsidian은 `(Sunday 4th October 2026)`.
+- **원인:** 형식 문자열 `dddd Do MMMM YYYY`의 `Do`(서수)는 dayjs `advancedFormat` 플러그인이 있어야 동작하는데, 플러그인을 등록하지 않아 `D` + 글자 `o`로 출력됐다. 테스트가 괄호 안 날짜를 확인하지 않아 지나침.
+- **해결:** `src/core/dates/dayjs.ts`에 `advancedFormat` 등록, `tests/core/query/filters.test.ts`에 `4th` 확인 테스트. README 쿼리 표를 CLI로 확인하다 발견.
+- **재발 방지:** dayjs 형식 문자를 새로 쓰면 필요한 플러그인을 같이 확인하고, 출력 문자열을 테스트로 고정한다.
 

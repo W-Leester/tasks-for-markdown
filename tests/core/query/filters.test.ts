@@ -154,6 +154,10 @@ describe('boolean combinations', () => {
     expect(run('((priority is high) OR (priority is low)) AND (has due date)')).toEqual(['write report #work', 'plan q4']);
     expect(run('(has due date) AND (is recurring) OR (priority is low)')).toEqual(['plan q4', 'buy milk']);
   });
+  it('explains dates with ordinal days, like Obsidian', () => {
+    const q = Query.parse('due on 2026-10-04');
+    expect(q.filters[0]!.explain).toContain('2026-10-04 (Sunday 4th October 2026)');
+  });
   it('explains boolean structure', () => {
     const q = Query.parse('(priority is high) OR NOT (has due date)');
     expect(q.filters[0]!.explain).toBe('(priority is high) OR (NOT (has due date))');

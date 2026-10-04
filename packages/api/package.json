@@ -1,6 +1,6 @@
 {
   "name": "@hastycapybara/tasks-api",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "TypeScript types for the public API of the Tasks for Markdown VS Code/Cursor extension (getAPI(1)): queries, edits, notes, events. Types only — no runtime code.",
   "license": "MIT",
   "author": "HastyCapybara (W.Leester)",

@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.0.1 — 2026-10-05
 
 **Fixes**
 - Webviews (kanban, calendar, statistics, query builder, dialog) now show their first screen in the configured language; toolbars could stay in English with Korean selected.
@@ -9,8 +9,12 @@
 - Rendered view: the `+` chip that brings back a hidden column no longer covers the last column title.
 
 **Docs**
-- README: why use it, using it with AI agents (MCP setup for Claude Code, Cursor, VS Code and Claude Desktop), building on the public API, animated examples, website link.
+- README rewritten: why use it, a three-step getting started, query syntax cheat sheet, using it with AI agents (MCP setup for Claude Code, Cursor, VS Code and Claude Desktop), building on the public API, animated examples (English and Korean), complete settings table, website link.
 - VS Code's `.vscode/mcp.json` example now uses the `servers` key.
+
+### 한국어 요약
+- **수정:** 한국어 설정에서 칸반 등 웹뷰 첫 화면 일부가 영어로 나오던 문제, 영어 화면 대화상자의 태그 안내 문구가 한국어이던 문제, 쿼리 설명 날짜가 `4o`로 나오던 문제(이제 `4th`), 렌더 보기 열 제목의 `+` 칩이 마지막 열 제목과 겹치던 문제.
+- **문서:** README 개편(왜 쓰는지, 3단계 시작하기, 쿼리 문법, AI 연결, 공개 API, 영·한 예시 GIF, 설정 표 전체, 웹사이트). VS Code용 MCP 설정 예시의 키를 `servers`로 바로잡음.
 
 ## 1.0.0 — 2026-09-30
 

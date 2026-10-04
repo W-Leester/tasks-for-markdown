@@ -44,6 +44,25 @@ group by filename
 ```
 ````
 
+## Query syntax
+
+A ` ```tasks ` block holds one instruction per line. Every line in the result must pass all filter lines (they combine with AND). It is the [Obsidian Tasks query language](https://publish.obsidian.md/tasks/Queries/About+Queries), so the same block works in Obsidian.
+
+| Purpose | Lines you can write |
+|---|---|
+| Status | `not done` · `done` · `status.type is IN_PROGRESS` |
+| Dates | `due today` · `due before tomorrow` · `due this week` · `due next week` · `happens on or before today` · `done after last week` · `no due date` · `has due date` |
+| Priority | `priority is high` · `priority is above medium` |
+| Text, tags, files | `tags include #work` · `description includes report` · `path includes projects` · `heading includes Today` |
+| Recurrence and dependencies | `is recurring` · `is blocked` (waits for an open task) · `is blocking` (an open task waits for it) |
+| Combine | `(due today) OR (priority is high)` · `NOT (tags include #home)` · `AND`, `OR`, `NOT`, `XOR` with parentheses |
+| Order and grouping | `sort by urgency` · `sort by due reverse` · `group by filename` · `group by tags` · `limit 20` |
+| Display | `hide due date` · `short mode` · `show tree` / `hide tree` (sub-tasks under their parent; on by default) · `explain` |
+
+Dates accept words such as `today`, `next friday`, `in 2 weeks`, ranges such as `this month` and `2026-W40`, and exact dates. Full reference: [filters](https://publish.obsidian.md/tasks/Queries/Filters), [sorting](https://publish.obsidian.md/tasks/Queries/Sorting) and [grouping](https://publish.obsidian.md/tasks/Queries/Grouping) in the Obsidian Tasks docs.
+
+You don't have to write queries by hand. `Tasks: Open query builder` assembles one from drop-downs and shows the matching count as you go. The `Explain` CodeLens above a block shows how each line was understood.
+
 ## Commands (Command Palette → "Tasks:")
 
 | Command | Shortcut |
@@ -65,6 +84,8 @@ group by filename
 |---|---|---|
 | `taskFormat` | `emoji` | Format used when writing fields (`emoji` or `dataview`) |
 | `globalFilter` | `""` | Only lines containing this text (e.g. `#task`) are tasks |
+| `language` | `auto` | Language of the extension's UI (`auto`, `en`, `ko`), independent of the editor's display language |
+| `removeGlobalFilterFromDescription` | `true` | Hide the global filter text (e.g. `#task`) when showing descriptions; the file is not changed |
 | `include` / `exclude` / `respectGitignore` / `maxFileSizeKB` | | What gets scanned |
 | `setDoneDate` / `setCancelledDate` / `setCreatedDate` | `true` / `true` / `false` | Automatic ✅ ❌ ➕ dates |
 | `statuses` | 4 core statuses | Custom checkbox symbols, names, next symbol and type |
@@ -81,6 +102,7 @@ group by filename
 | `decorations.strikeCancelled` | `true` | Strike through cancelled tasks (`[-]`) in the editor; done tasks use `decorations.strikeDone` (off) |
 | `requireDueDate` | `true` | Refuse new tasks without a due date (dialog, API, CLI, MCP) and warn in the editor |
 | `api.writePolicy` | `confirm` | Writes through the public API: confirm once per caller / allow / deny |
+| `api.allowedWriters` / `api.batchLimit` | `[]` / `200` | Extensions allowed to write without asking (filled in by the confirmation dialog); most operations in one API batch call |
 | `rendered.maxWidth` | `0` | Max width (px) of the rendered column; 0 = full editor width (default) |
 | `rendered.sourceWhenNoTasks` | `true` | With the rendered view as default editor, notes without tasks open in the text editor |
 | `rendered.fieldsAlign` | `columns` | Rendered view: fields in aligned columns (`columns`: status, description+priority+tags, due, created, everything else), at the right edge (`right`) or after the description (`inline`) |

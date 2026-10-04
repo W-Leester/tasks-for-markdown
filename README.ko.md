@@ -44,6 +44,25 @@ group by filename
 ```
 ````
 
+## 쿼리 문법
+
+` ```tasks ` 블록에는 한 줄에 하나씩 조건을 씁니다. 결과에 나오려면 모든 필터 줄을 만족해야 합니다(줄끼리는 AND). [Obsidian Tasks 쿼리 언어](https://publish.obsidian.md/tasks/Queries/About+Queries)와 같아서, 같은 블록이 Obsidian에서도 동작합니다.
+
+| 용도 | 쓸 수 있는 줄 |
+|---|---|
+| 상태 | `not done` · `done` · `status.type is IN_PROGRESS` |
+| 날짜 | `due today` · `due before tomorrow` · `due this week` · `due next week` · `happens on or before today` · `done after last week` · `no due date` · `has due date` |
+| 우선순위 | `priority is high` · `priority is above medium` |
+| 글·태그·파일 | `tags include #업무` · `description includes 보고서` · `path includes projects` · `heading includes 오늘` |
+| 반복·의존 | `is recurring` · `is blocked`(미완료 태스크를 기다리는 중) · `is blocking`(미완료 태스크가 이것을 기다림) |
+| 조합 | `(due today) OR (priority is high)` · `NOT (tags include #집)` · 괄호와 함께 `AND`, `OR`, `NOT`, `XOR` |
+| 정렬·그룹 | `sort by urgency` · `sort by due reverse` · `group by filename` · `group by tags` · `limit 20` |
+| 표시 | `hide due date` · `short mode` · `show tree` / `hide tree`(하위 태스크를 부모 밑에, 기본 켜짐) · `explain` |
+
+날짜에는 `today`, `next friday`, `in 2 weeks` 같은 말, `this month`, `2026-W40` 같은 기간, 정확한 날짜를 씁니다. 쿼리 줄은 영어로 씁니다. 전체 문법은 Obsidian Tasks 문서의 [필터](https://publish.obsidian.md/tasks/Queries/Filters), [정렬](https://publish.obsidian.md/tasks/Queries/Sorting), [그룹](https://publish.obsidian.md/tasks/Queries/Grouping)을, 이 확장만의 차이(트리 표시 등)는 [사용자 가이드 4장](docs/user-guide.md#4-쿼리)을 보세요.
+
+쿼리를 직접 쓰지 않아도 됩니다. `Tasks: 쿼리 빌더 열기`는 드롭다운으로 쿼리를 만들고 맞는 개수를 바로 보여 줍니다. 블록 위 CodeLens `설명`은 각 줄을 어떻게 이해했는지 보여 줍니다.
+
 ## 명령 (명령 팔레트 → "Tasks:")
 
 | 명령 | 단축키 |
@@ -65,6 +84,8 @@ group by filename
 |---|---|---|
 | `taskFormat` | `emoji` | 필드를 쓸 때 사용할 포맷 (`emoji` / `dataview`) |
 | `globalFilter` | `""` | 이 문자열(예: `#task`)이 있는 줄만 태스크로 취급 |
+| `language` | `auto` | 확장 화면 언어(`auto`, `en`, `ko`). 에디터 표시 언어와 따로 정할 수 있음 |
+| `removeGlobalFilterFromDescription` | `true` | 설명을 보여 줄 때 글로벌 필터 문자열(예: `#task`)을 숨김. 파일은 그대로 |
 | `include` / `exclude` / `respectGitignore` / `maxFileSizeKB` | | 스캔 범위 |
 | `setDoneDate` / `setCancelledDate` / `setCreatedDate` | `true` / `true` / `false` | ✅ ❌ ➕ 자동 날짜 |
 | `statuses` | 기본 4종 | 커스텀 체크박스 심볼·이름·다음 심볼·타입 |
@@ -81,6 +102,7 @@ group by filename
 | `decorations.strikeCancelled` | `true` | 취소된 태스크(`[-]`)에 에디터 취소선. 완료(`[x]`)는 `decorations.strikeDone`(기본 꺼짐) |
 | `requireDueDate` | `true` | 마감일 없는 새 태스크 거부(대화상자·API·CLI·MCP) + 에디터 경고 |
 | `api.writePolicy` | `confirm` | 다른 확장이 API로 쓸 때: 확인(`confirm`) / 허용 / 거부 |
+| `api.allowedWriters` / `api.batchLimit` | `[]` / `200` | 묻지 않고 API로 쓸 수 있는 확장 목록(확인 대화상자가 채움), API batch 한 번에 허용하는 최대 작업 수 |
 | `rendered.maxWidth` | `0` | 렌더 보기 본문 열 최대 폭(px). 0 = 창 전체 폭(기본). 800 등을 주면 가운데 열로 제한 |
 | `rendered.sourceWhenNoTasks` | `true` | 렌더 보기가 기본 편집기일 때 태스크 없는 노트는 텍스트 편집기로 |
 | `rendered.fieldsAlign` | `columns` | 렌더 보기 태스크 줄의 필드 배치: 열(`columns`: 상태·설명+우선순위+태그·마감·작성일·나머지) / 오른쪽 끝(`right`) / 설명 뒤(`inline`) |

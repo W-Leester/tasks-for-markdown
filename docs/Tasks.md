@@ -949,6 +949,12 @@
 
 - [x] 10·11·12
 
+### 추가 요청 3 (2026-10-04)
+13. **README "쿼리 문법" 절(영·한)**: "시작하기" 바로 아래에 자주 쓰는 쿼리 줄 표(필터·날짜·불리언·정렬·그룹·limit·숨기기·트리·explain), 전체 문법은 Obsidian Tasks 쿼리 문서로, 이 확장만의 차이(트리 기본, `is blocking` 등)는 사용자 가이드 4장으로 연결, 쿼리 빌더·`? 설명` 안내. 표의 모든 줄은 CLI `tasksmd explain`으로 확인한 뒤 싣는다.
+14. **설정 표 누락 2줄**: `language`, `removeGlobalFilterFromDescription`. 설정이 표에서 빠지면 실패하는 테스트.
+
+- [ ] 13·14
+
 **GIF 만드는 법(다시 찍을 때).** `code serve-web --connection-token-file … --server-data-dir …`로 실제 VS Code를 브라우저에 띄우고, 설치 파일을 `server/extensions/`에 풀어 둔 뒤 puppeteer-core(헤드리스 Chrome, `--lang=en-US`)로 조작. 화면은 CDP `Page.startScreencast` 프레임을 PIL로 GIF로 묶음. 요령: 명령은 팔레트로(웹뷰에 초점이 있으면 단축키·팔레트가 안 먹을 수 있음 → 패널은 닫기 버튼 클릭), 웹뷰 안 클릭은 `frame.evaluate(el => el.click())`, 드래그는 같은 `DataTransfer`로 `dragstart/dragover/drop`을 웹뷰 안에서 보냄, 매 회 시작 전에 예시 노트·열 상태를 초기화.
 
 **한국어 GIF.** 확장 화면은 `tasksmd.language: ko`로 모두 한국어, 예시 노트도 한국어(`work.ko.template.md`, 날짜를 하루 늦춰 영어판과 같은 상대 날짜). **VS Code 자체 메뉴는 영어로 둠:** 최신 한국어 언어 팩이 1.131용이라 브라우저 VS Code(1.140)에서 상태 표시줄 등 문자열이 엉뚱하게 나오고, 1.131로 고정한 서버(`--commit-id`)에서도 같은 현상. 영어 VS Code + 한국어 확장 화면은 실제로 많이 쓰는 조합이라 그대로 씀. 촬영 요령 추가: 팔레트 명령이 비슷한 다른 명령(예: 편집기 탭 숨기기)에 걸릴 수 있어 매 회 `View: Show Multiple Editor Tabs`로 탭을 되살림, 웹뷰 탭 제목은 언어에 따라 달라짐(`Tasks: 캘린더`).

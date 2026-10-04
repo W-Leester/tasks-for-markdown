@@ -39,7 +39,6 @@ The extension indexes every `- [ ]` line in the workspace. You can see, query an
 - **Notes** — indented bullets under a task are its notes; add them from the rendered view with 💬.
 - **More views** — create/edit dialog, kanban, calendar, weekly statistics, archive, daily notifications.
 - **AI and automation** — MCP server for AI agents, public extension API, commands, CLI and library (see [Use it with AI](#use-it-with-ai) and [Extend it](#extend-it)).
-- **Works in Cursor** — only stable VS Code APIs; also published to Open VSX.
 
 ## Getting started
 
@@ -80,7 +79,7 @@ group by filename
 
 ## Use it with AI
 
-Connect your AI agent once, then ask in plain language. The recording below is a real Claude Code session. The note in the editor updates while the agent works.
+Tasks for Markdown ships an [MCP](https://modelcontextprotocol.io) server, so any MCP-capable AI agent can read and change your tasks as tools: Claude Code, Cursor's agent, VS Code's agent mode, Claude Desktop. Connect it once, then ask in plain language. The recording below is a real Claude Code session. The note in the editor updates while the agent works.
 
 ![Claude Code answers "What is overdue?", marks the task done and adds a note; the file updates live](docs/images/demo-ai.gif)
 

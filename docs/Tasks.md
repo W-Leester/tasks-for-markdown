@@ -47,7 +47,7 @@
 | M19 | 칸반 격자 배치(창 폭에 맞춰 2×2 등으로 균형 배치) | ✅ 완료(1.0.0에 포함) | 이 문서 M19 |
 | M20 | 마켓 업로드 거절 대응: 원인은 검색어 — 통과한 검색어로 교체 | ✅ 해결(2026-10-02 재업로드 성공) | 이 문서 M20 |
 | M21 | 확장 안에서 AI 연결 제공(VS Code MCP 등록, Cursor 설정 등록, 터미널 명령) | 📝 계획만(1.1.0 후보, 2026-10-02) | 이 문서 M21 |
-| M22 | README 개편: 강점(AI·API) 강조, 움직이는 예시 GIF, 사이트 연결 | 🟡 진행 중(2026-10-03) | 이 문서 M22 |
+| M22 | README 개편: 강점(AI·API) 강조, 움직이는 예시 GIF, 사이트 연결 | ✅ 1.0.1(2026-10-05) | 이 문서 M22 |
 
 ---
 
@@ -927,7 +927,7 @@
 - [x] 3 GIF ①~⑤ — `docs/images/demo-{editing,recurring,ai,rendered,kanban-calendar}.gif`(각 0.2~0.4MB, 960px). ③은 실제 `claude -p` 실행(MCP `--strict-mcp-config`), 파일 변경 확인
 - [x] 4 사이트 링크(영·한), `package.json` homepage → 영어 사이트
 - [x] 덤: api.md·api.en.md의 VS Code `mcp.json` 예시 키 수정(`servers`) — [incidents #22](postmortems/incidents.md)
-- [ ] 사용자 확인 → 1.0.1 게시 결정
+- [x] 사용자 확인 → **1.0.1 게시(2026-10-05)**: Marketplace 웹 Update(약 1시간 걸려 08:03 반영) → 태그 `v1.0.1` → Release 성공: Open VSX 1.0.1(verified, 경고 없음), npm 3개 1.0.1(OIDC Trusted Publishing, provenance 붙음)
 
 ### 추가 요청 (2026-10-03, 사용자 확인 후)
 5. **README.ko.md 제목**: "움직이는 예시" → "예시".

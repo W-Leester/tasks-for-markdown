@@ -41,9 +41,15 @@ for p in tasks-core tasks-cli tasks-api; do pnpm --filter @hastycapybara/$p publ
 
 **문제가 생기면.** Marketplace는 같은 버전을 다시 올릴 수 없다(내리기는 가능: `vsce unpublish`). 고칠 게 있으면 1.0.1로 올린다. npm은 게시 후 72시간 안에만 `npm unpublish` 가능.
 
+## 1.0.1 게시 (2026-10-05)
+- Marketplace: 관리 페이지 *… → Update*로 `tasks-for-markdown-1.0.1.vsix` 업로드 → 검사 후 공개(`validated`). 목록의 Version 칸은 검사 중에 옛 번호 옆에 "▶ Verifying…"으로 보인다.
+- 태그 `v1.0.1` → Release 워크플로 성공(약 2분): Open VSX `Published v1.0.1`(이제 `verified=True`, 1.0.0의 경고 없음), npm `tasks-core`·`tasks-cli`·`tasks-api` 1.0.1.
+- **npm Trusted Publishing(OIDC) 확인:** 로그에 `Signed provenance statement`, 세 패키지 모두 provenance 기록 있음 → 토큰 없이 게시됨. 다음 단계: GitHub Secret `NPM_TOKEN` 삭제, npm 토큰 폐기, 각 패키지 Publishing access 강화(아래).
+- npm·Open VSX 반영은 게시 뒤 1~3분(캐시).
+
 ## 공개 직후 할 일 (토큰 정리)
 
-- [~] **npm Trusted Publishing으로 전환 (진행 중, 2026-10-03).** 워크플로 변경(208f40e)·세 패키지 Trusted Publisher 등록(Allow npm publish) 완료. 남은 것: 다음 게시에서 OIDC 확인 후 토큰 삭제·Publishing access 강화. 세 패키지가 게시되어 조건 충족.
+- [~] **npm Trusted Publishing으로 전환 (1.0.1에서 OIDC 게시 확인, 2026-10-05 — 토큰 삭제·접근 강화만 남음).** 워크플로 변경(208f40e)·세 패키지 Trusted Publisher 등록(Allow npm publish) 완료. 남은 것: 다음 게시에서 OIDC 확인 후 토큰 삭제·Publishing access 강화. 세 패키지가 게시되어 조건 충족.
   - 계획: (1) 워크플로에 `permissions: id-token: write` 추가 — 첫 게시 로그의 `Skipped OIDC: ERR_PNPM_ID_TOKEN_GITHUB_WORKFLOW_INCORRECT_PERMISSIONS`가 이것 때문. pnpm이 OIDC 토큰을 받으면 토큰 없이 게시하고 출처 증명(provenance)도 붙는다. (2) npm 게시 단계를 토큰 유무와 상관없이 실행하고, `NPM_TOKEN`이 있을 때만 `.npmrc`에 쓴다(전환 확인 전까지 대비책). (3) 사용자가 npmjs.com에서 세 패키지 각각 *Settings › Trusted Publisher › GitHub Actions*: Organization or user `W-Leester`, Repository `tasks-for-markdown`, Workflow filename `release.yml`, Environment 비움. (4) 다음 게시(1.1.0)에서 로그에 OIDC 사용이 확인되면 GitHub Secret `NPM_TOKEN` 삭제 + npm에서 토큰 폐기, 각 패키지 *Publishing access*를 "Require two-factor authentication and disallow tokens"로.
 - [ ] **Open VSX Trusted Publishers로 전환**(네임스페이스 `HastyCapybara` 소유권 승인 뒤). 등록 후 `OVSX_PAT` 삭제.
 - [ ] 전환 전까지는 토큰 만료일을 달력에 적어 두고, 만료되면 새로 발급해 GitHub Secret만 바꾼다.

@@ -377,6 +377,7 @@ gh release view v1.0.0 -R W-Leester/tasks-for-markdown --json assets --jq '.asse
 | 10-01 밤 | Marketplace 업로드 거절 → 시험 업로드 16개로 원인(검색어) 확인 → 12시간 생성 한도 |
 | 10-02 10:03 | 재업로드 성공, **10:11 Marketplace 페이지·검색 반영**(약 8분) |
 | 10-03 | Open VSX 소유권 신청(#13675), 태그 `v1.0.0` → Release 성공: npm 3개 공개, Open VSX 게시(승인 대기), npm Trusted Publisher 등록. **같은 날 네임스페이스 승인(약 9시간) → Open VSX 공개·검색 반영** |
+| 10-05 | **1.0.1**: Marketplace Update 업로드 → 공개, 태그 → Release 성공(약 2분). npm은 **OIDC로 게시**(provenance 첨부) — Trusted Publishing 동작 확인. Open VSX 1.0.1은 검증된 게시자로 표시 |
 
 ---
 

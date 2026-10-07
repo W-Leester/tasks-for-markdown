@@ -120,8 +120,10 @@ VS Code 1.138에 들어온 내장 Markdown Editor(WYSIWYG)와 `markdown.codeBloc
 1. [x] **Cursor 자동 등록** — Cursor에서 노트 폴더를 열고 *Cursor Settings → MCP*(또는 Tools & Integrations)에 확장이 등록한 `tasks` 서버가 보이는지, 에이전트 채팅에서 "오늘 마감인 태스크 알려 줘"가 도구를 쓰는지.
    - **결과(2026-10-07, Cursor, `examples` 폴더):** *Customize → MCPs*의 Connected에 `extension-tasks`(User, 12 tools, 1 resource, 초록). 설정 파일 수정·npm 없이 연결됨. 채팅 "미완료 태스크 중 마감일이 가장 가까운 것 3개" → 문법 안내 리소스를 먼저 읽고 `tasks_query`로 조회, "마감일 있는 미완료 15개 중" 3개를 정확히 답함. (MCP 목록 위치: 최근 Cursor는 *Cursor Settings* 왼쪽의 **Customize** → **MCPs** 탭)
 2. [ ] **VS Code 에이전트 모드** — Copilot 채팅 에이전트 모드의 도구(🔧) 목록에 "Tasks for Markdown"이 있고, 처음 실행 허용 후 질문에 답하는지.
-3. [ ] **Claude Code 연결** — `Tasks: AI 에이전트 연결 (MCP)` → (설치돼 있으면 미리 체크됨) → 알림 확인 → 그 폴더에서 `claude mcp list`에 `tasks`가 보이는지, 새 세션에서 동작하는지.
+3. [x] **Claude Code 연결** — `Tasks: AI 에이전트 연결 (MCP)` → (설치돼 있으면 미리 체크됨) → 알림 확인 → 그 폴더에서 `claude mcp list`에 `tasks`가 보이는지, 새 세션에서 동작하는지.
+   - **결과(10-08, Cursor, 저장소 폴더):** 첫 실행 AI 연결 알림의 Connect로 연결 → `claude mcp list`에 `tasks … mcp --root …/Tasks-like-plugin - ✔ Connected`(Cursor Helper (Plugin) + `~/.tasksmd/tasksmd.cjs`). Claude Code 세션에 `mcp__tasks__*` 도구가 나타나 `tasks_info`(1.1.0)·`tasks_query`(샘플 3개)가 정확히 동작.
 4. [ ] **Claude Desktop 연결**(설치된 경우) — 같은 명령 → Claude Desktop → 확인 창 → 설정 파일에 `tasks` 추가·`.bak` 생성·다른 서버 유지 → Claude Desktop 재시작 후 동작.
+   - **중간 결과(10-08):** 설정 파일에 `tasks`(root = 저장소 폴더) 추가, 다른 키(`coworkUserFilesPath`, `preferences`) 보존, `.bak` 생성 확인. **남은 것: Claude Desktop 재시작 후 질문에 답하는지.**
 5. [x] **터미널 명령** — `Tasks: 'tasksmd' 터미널 명령 설치` → 새 터미널에서 `tasksmd --help`, `tasksmd query "not done" --root <노트 폴더>`. PATH 안내가 나오면 그 줄을 넣고 다시. `제거` 명령으로 지워지는지.
    - **결과(10-07, Cursor, 시작 안내 버튼):** `~/.tasksmd/`(cjs·runtime.json)와 `~/.local/bin/tasksmd`(Cursor Helper (Plugin)로 실행하는 런처) 생성. `~/.local/bin`이 이미 PATH에 있어 안내 없이 바로 사용. `examples`에서 `tasksmd query` → Cursor 에이전트와 같은 3개. (제거 명령은 아직)
 6. [ ] **링크** — 태스크 줄에서 `Tasks: 태스크 링크 복사` → 브라우저 주소창이나 메모 앱에 붙여 넣고 누름 → 에디터가 그 줄로 이동. 쿼리 블록에서 `쿼리 링크 복사` → 결과 패널.
@@ -131,8 +133,10 @@ VS Code 1.138에 들어온 내장 Markdown Editor(WYSIWYG)와 `markdown.codeBloc
    - **결과(10-07, VS Code):** 첫째 날 시작 안내 자동 열림, 날짜를 하루 전으로 돌려 둘째 날 알림 확인, 설치 권유 알림 확인(사용자 "잘 됨"). 횟수는 창이 아니라 날짜 기준(점검 중 창 기준으로 14번 세어진 문제를 고침).
 9. [x] **AI 연결 선택 창** — 입력란 안내 문구가 "Cursor: 자동으로 연결됨 · 추가로 연결할 대상을 고르세요", 목록은 Claude Code·Claude Desktop만. `tasksmd.mcp.autoRegister`를 끄면 안내가 "Cursor: 꺼짐 …"이고 "Cursor" 제목 아래 "자동 연결 다시 켜기"가 고를 수 있게 나옴. (10-07: 첫 수정의 상태 줄이 안 보여 다시 고침, incidents #31)
    - **결과(10-08, Cursor):** 켜진 상태 — 입력란 "Cursor: 자동으로 연결됨 · …", 목록은 Claude Code·Claude Desktop. 끈 상태 — 입력란 "Cursor: 꺼짐 …", "Cursor" 제목 아래 "자동 연결 다시 켜기" → 선택하면 알림, 설정 다시 켜짐, MCPs의 `extension-tasks` Connected로 복귀.
-13. [ ] **AI 연결 알림** — Claude Code·Desktop이 설치돼 있고 연결 안 됐을 때 켜질 때마다 "연결 / 나중에 / 다시 묻지 않기". "연결" → 아직 안 된 것만 연결(Desktop 확인 창 없음, `.bak` 생성). 연결된 뒤에는 안 뜸.
-10. [ ] **제거** — `Tasks: 'tasksmd' 터미널 명령 제거` → `~/.local/bin/tasksmd` 삭제, 다른 프로그램이면 건드리지 않음.
+13. [x] **AI 연결 알림** — Claude Code·Desktop이 설치돼 있고 연결 안 됐을 때 켜질 때마다 "연결 / 나중에 / 다시 묻지 않기". "연결" → 아직 안 된 것만 연결(Desktop 확인 창 없음, `.bak` 생성). 연결된 뒤에는 안 뜸.
+   - **결과(10-08, Cursor):** 알림의 Connect 한 번으로 Claude Code·Claude Desktop 연결(아래 4번 참고).
+10. [x] **제거** — `Tasks: 'tasksmd' 터미널 명령 제거` → `~/.local/bin/tasksmd` 삭제, 다른 프로그램이면 건드리지 않음.
+   - **결과(10-08):** 제거 → `tasksmd` 없음 → 다시 설치 → `~/.local/bin/tasksmd`(새 이름 주석) 정상.
 11. [ ] **원격(SSH)** — 원격 폴더에서 Cursor 자동 연결(원격 쪽 서버), 원격 터미널에서 `tasksmd`.
 12. [ ] **Windows**(가능하면) — 런처 `tasksmd.cmd`, PATH 안내, Claude Desktop 경로(`%APPDATA%\Claude`). 확인 전까지 알려진 한계.
 

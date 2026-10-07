@@ -85,6 +85,8 @@ describe('M21 MCP config helpers', () => {
     expect(claudeDesktopRunningFrom('darwin', '81111 /Applications/Claude.app/Contents/MacOS/Claude\n')).toBe(true);
     expect(claudeDesktopRunningFrom('darwin', '1825 /Applications/Claude.app/Contents/Helpers/chrome-native-host chrome-extension://x/')).toBe(false);
     expect(claudeDesktopRunningFrom('darwin', '')).toBe(false);
+    // When nothing matches, pgrep fails with an error that repeats the pattern (the 10-08 bug).
+    expect(claudeDesktopRunningFrom('darwin', 'Command failed: pgrep -fl Claude.app/Contents/MacOS/Claude')).toBe(false);
     expect(claudeDesktopRunningFrom('win32', 'Claude.exe                   1234 Console    1    150,000 K')).toBe(true);
     expect(claudeDesktopRunningFrom('win32', 'INFO: No tasks are running which match the specified criteria.')).toBe(false);
     expect(claudeDesktopRunningFrom('linux', 'anything')).toBe(false);

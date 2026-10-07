@@ -144,7 +144,9 @@ export function claudeDesktopHasServer(config: string | undefined, name: string)
  * While it runs it may write its config back from memory and drop our server (10-08, incident #32).
  */
 export function claudeDesktopRunningFrom(platform: NodeJS.Platform, output: string): boolean {
-  if (platform === 'darwin') return /Claude\.app\/Contents\/MacOS\/Claude(\s|$)/m.test(output);
+  // Only real process lines ("<pid> <command>"): when nothing is found, pgrep fails and the error
+  // message repeats the pattern — that must not count as running (10-08).
+  if (platform === 'darwin') return /^\s*\d+\s+\S*Claude\.app\/Contents\/MacOS\/Claude(\s|$)/m.test(output);
   if (platform === 'win32') return /^\s*Claude\.exe\s/im.test(output);
   return false;
 }

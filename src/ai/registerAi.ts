@@ -223,7 +223,11 @@ export function registerAi(context: vscode.ExtensionContext, deps: AiDeps): AiIn
   };
 
   const claudeDesktopRunning = async () => {
-    if (process.platform === 'darwin') return claudeDesktopRunningFrom('darwin', (await run('pgrep', ['-fl', 'Claude.app/Contents/MacOS/Claude'], os.homedir())).out);
+    if (process.platform === 'darwin') {
+      // pgrep exits 1 when nothing matches; its error text must not be read as a process list.
+      const r = await run('pgrep', ['-fl', 'Claude.app/Contents/MacOS/Claude'], os.homedir());
+      return r.ok && claudeDesktopRunningFrom('darwin', r.out);
+    }
     if (process.platform === 'win32') return claudeDesktopRunningFrom('win32', (await run('tasklist', ['/FI', '"IMAGENAME eq Claude.exe"', '/NH'], os.homedir())).out);
     return false;
   };

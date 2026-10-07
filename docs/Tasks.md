@@ -1032,7 +1032,7 @@
 - [x] **`Tasks: Install 'tasksmd' command in PATH` / `Uninstall …`:** macOS·Linux는 PATH에 있는 사용자 폴더(`~/.local/bin`, `~/bin`) 중 첫 번째, 없으면 `~/.local/bin` + PATH 추가 안내(복사 버튼). Windows는 `%LOCALAPPDATA%\tasksmd\bin\tasksmd.cmd` + 안내. 우리 런처(표시 주석)만 덮어쓰기/삭제
 - [x] **`Tasks: Connect AI agents (MCP)`:** 대상 선택 — VS Code·Cursor(자동 등록 상태 표시), Claude Code(`claude mcp add --scope local` 실행, 없으면 명령 복사), Claude Desktop(설정 파일에 병합, 바꿀 내용 미리 보기 → 확인, 백업). 기존 항목 보존
 - [x] **시작 안내 페이지(walkthrough):** 첫 태스크, 렌더 보기, AI 연결, 터미널 명령. 사이드바 빈 화면 안내에 "AI 연결" 버튼
-- [ ] **시작 안내 여는 명령 `Tasks: Open Get Started guide`**(10-07 수동 점검에서 발견): Cursor에는 VS Code의 `Welcome: Open Walkthrough…`가 없어 안내 페이지를 열 길이 없음 → `workbench.action.openWalkthrough`에 `<확장 id>#tasksmd.start`를 넘기는 명령(Claude Code 확장과 같은 방식, Cursor에 이 내부 명령이 있음을 확인). 사이드바 빈 화면 안내에도 링크
+- [x] **시작 안내 여는 명령 `Tasks: Open Get Started guide`**(10-07 수동 점검에서 발견): Cursor에는 VS Code의 `Welcome: Open Walkthrough…`가 없어 안내 페이지를 열 길이 없음 → `workbench.action.openWalkthrough`에 `<확장 id>#tasksmd.start`를 넘기는 명령(Claude Code 확장과 같은 방식, Cursor에 이 내부 명령이 있음을 확인). 사이드바 빈 화면 안내에도 링크
 - [x] **테스트:** 런처 스크립트·설정 병합·명령 문자열(단위), 등록·실제 실행(handshake) (통합)
 - [x] **문서:** README(영·한, "AI와 함께 쓰기"가 자동 연결 중심으로), api.md·api.en.md 8절, user-guide, CHANGELOG, 마켓 검사 주의(외부 프로세스 실행 — 1.0.0 때 원인 아니었음)
 - [ ] 수동 점검(manual-checklist.md 5절: Cursor 자동 등록 등) → 1.1.0 게시(Marketplace Update + 태그)

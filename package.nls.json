@@ -18,7 +18,7 @@
   "tasksmd.openTask.title": "Go to task",
   "tasksmd.openSidebar.title": "Open Tasks sidebar",
   "tasksmd.view.tasks": "Tasks",
-  "tasksmd.view.tasks.welcome": "No tasks found yet.\n\nAdd checklist lines like `- [ ] Write report 📅 2026-09-25` to any Markdown file in this workspace.\n\n[Reindex](command:tasksmd.reindex)\n\n[Connect AI agents](command:tasksmd.connectAi)",
+  "tasksmd.view.tasks.welcome": "No tasks found yet.\n\nAdd checklist lines like `- [ ] Write report 📅 2026-09-25` to any Markdown file in this workspace.\n\n[Reindex](command:tasksmd.reindex)\n\n[Connect AI agents](command:tasksmd.connectAi)\n\n[Get started](command:tasksmd.openWalkthrough)",
   "tasksmd.markDone.title": "Mark as done",
   "tasksmd.markCancelled.title": "Mark as cancelled",
   "tasksmd.reopen.title": "Reopen task",
@@ -152,5 +152,6 @@
   "tasksmd.walkthrough.ai.title": "Connect AI agents",
   "tasksmd.walkthrough.ai.description": "This editor's AI agent is connected automatically. Connect Claude Code or Claude Desktop with one command — no npm needed.\n[Connect AI agents](command:tasksmd.connectAi)",
   "tasksmd.walkthrough.cli.title": "Use your tasks from the terminal",
-  "tasksmd.walkthrough.cli.description": "Install the `tasksmd` command to query and update tasks from a terminal or a script.\n[Install the tasksmd command](command:tasksmd.installCli)"
+  "tasksmd.walkthrough.cli.description": "Install the `tasksmd` command to query and update tasks from a terminal or a script.\n[Install the tasksmd command](command:tasksmd.installCli)",
+  "tasksmd.openWalkthrough.title": "Open Get Started guide"
 }

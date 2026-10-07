@@ -187,7 +187,7 @@ if (tasks.features?.includes('notes.add')) await tasks.edit.addNote(r.tasks[0], 
 | 칸반 보드 / 캘린더 / 통계 / 쿼리 빌더 열기 | — |
 | 완료 태스크 아카이브… | — |
 | 쿼리 블록 삽입, 커서 위치 쿼리 결과 보기(에디터 옆 패널, 커서 따라가기), 커서 위치 쿼리 설명 | — |
-| AI 에이전트 연결 (MCP), 'tasksmd' 터미널 명령 설치 / 제거 | — |
+| AI 에이전트 연결 (MCP), 'tasksmd' 터미널 명령 설치 / 제거, 시작 안내 열기 | — |
 | 태스크 링크 복사, 커서 위치 쿼리 링크 복사(링크를 누르면 어느 앱에서든 그 태스크가 열림: `vscode://hastycapybara.tasks-for-markdown/open?…`) | — |
 | 상태 프리셋 불러오기…, 이 파일의 태스크 포맷 변환… | — |
 

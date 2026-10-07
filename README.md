@@ -187,7 +187,7 @@ You don't have to write queries by hand. `Tasks: Open query builder` assembles o
 | Open kanban board / calendar / statistics / query builder / query results (beside the editor, follows the cursor) | — |
 | Archive completed tasks… | — |
 | Insert query block, Explain query under cursor | — |
-| Connect AI agents (MCP), Install / Uninstall 'tasksmd' command in PATH | — |
+| Connect AI agents (MCP), Install / Uninstall 'tasksmd' command in PATH, Open Get Started guide | — |
 | Copy link to task, Copy link to query under cursor (links open the task from any app: `vscode://hastycapybara.tasks-for-markdown/open?…`) | — |
 | Load status preset…, Convert task format in this file… | — |
 

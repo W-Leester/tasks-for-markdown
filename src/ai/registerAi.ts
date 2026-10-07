@@ -270,6 +270,8 @@ export function registerAi(context: vscode.ExtensionContext, deps: AiDeps): AiIn
     vscode.commands.registerCommand('tasksmd.connectAi', guard(connectAi)),
     vscode.commands.registerCommand('tasksmd.installCli', guard(installCli)),
     vscode.commands.registerCommand('tasksmd.uninstallCli', guard(uninstallCli)),
+    // Cursor has no "Welcome: Open Walkthrough…", so offer our own entry (as the Claude Code extension does).
+    vscode.commands.registerCommand('tasksmd.openWalkthrough', () => vscode.commands.executeCommand('workbench.action.openWalkthrough', `${context.extension.id}#tasksmd.start`, false)),
   );
   deps.log(`mcp registration: ${mode}`);
   return { mode, current: wanted };

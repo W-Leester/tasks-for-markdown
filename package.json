@@ -454,6 +454,11 @@
         "command": "tasksmd.uninstallCli",
         "title": "%tasksmd.uninstallCli.title%",
         "category": "Tasks"
+      },
+      {
+        "command": "tasksmd.openWalkthrough",
+        "title": "%tasksmd.openWalkthrough.title%",
+        "category": "Tasks"
       }
     ],
     "configuration": {

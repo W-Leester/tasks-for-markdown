@@ -301,15 +301,15 @@ export function registerAi(context: vscode.ExtensionContext, deps: AiDeps): AiIn
     if (launch === 1) await vscode.commands.executeCommand('tasksmd.openWalkthrough');
     if (launch > 3 || state.get<boolean>(DONE)) return;
     const offerInstall = !(await cliPresent());
-    const install = t("Install 'tasksmd' command"), why = t('What can it do?'), guide = t('Open the guide'), never = t("Don't show again");
-    const buttons = offerInstall ? [install, why, never] : launch > 1 ? [guide, never] : [];
-    if (!buttons.length) return; // nothing to offer
+    const install = t("Install 'tasksmd' command"), guide = t('Open the guide'), never = t("Don't show again");
+    // Day 1 already opened the guide; on days 2 and 3 offer it again next to the install button.
+    const buttons = [...(offerInstall ? [install] : []), ...(launch > 1 ? [guide] : []), never];
+    if (buttons.length === 1) return; // nothing to offer
     const message = offerInstall
-      ? t('Tasks for Markdown: install the "tasksmd" command to check, add and complete tasks from any terminal, in scripts and with terminal AI agents (no npm needed).')
+      ? t('Tasks for Markdown: install the "tasksmd" command to check, add and complete tasks from any terminal, in scripts and with terminal AI agents (no npm needed). The Get Started guide shows what it can do.')
       : t('Tasks for Markdown: open the Get Started guide to see what it can do.');
     const choice = await vscode.window.showInformationMessage(message, ...buttons);
     if (choice === install) { await state.update(DONE, true); await installCli(); }
-    else if (choice === why) await vscode.commands.executeCommand('tasksmd.openWalkthrough', 'cli');
     else if (choice === guide) await vscode.commands.executeCommand('tasksmd.openWalkthrough');
     else if (choice === never) await state.update(DONE, true);
   };

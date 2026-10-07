@@ -1039,6 +1039,7 @@
   - 설치 후 **첫 실행**: 시작 안내 페이지를 자동으로 연다(한 번만).
   - **처음 3번 실행까지**: 오른쪽 아래 알림 하나 — "`tasksmd` 터미널 명령 설치" / "시작 안내 열기" / "다시 보지 않기". 누르면(설치·다시 보지 않기) 더는 안 뜸. 이미 `tasksmd`가 PATH에 있거나 우리 런처가 설치돼 있으면 설치 버튼은 빼고, 둘 다 해당 없으면 알림 자체를 안 띄움. 실행 횟수는 전역 상태(globalState)에 기록. 테스트 모드에서는 안 함.
 - [x] **README에서 시작 안내 열기**: 링크 동작 `guide` 추가(`<scheme>://hastycapybara.tasks-for-markdown/guide` → 시작 안내). README에는 VS Code용으로 `https://vscode.dev/redirect?url=vscode://hastycapybara.tasks-for-markdown/guide`(GitHub·마켓이 `vscode://` 링크를 지우므로 https 우회 주소, 302 확인). Cursor는 이 우회 주소가 `cursor://`를 거부(400)하므로 명령 이름(`Tasks: Open Get Started guide`)으로 안내 — 웹사이트에 넘겨주기 페이지를 두면 링크도 가능(사용자 사이트 작업)
+- [ ] **`tasksmd`를 설치하면 무엇이 좋은지 자세히(10-07 사용자 요청)**: 시작 안내 4단계 설명(영·한)과 오른쪽 페이지(예시 포함), 설치 권유 알림에 "무엇을 할 수 있나요?" 버튼(시작 안내의 그 단계로 이동), README "Use it from the terminal" 절(영·한), 사용자 가이드 5-1. 장점: 에디터 없이 확인·완료·미루기·메모, 스크립트·자동화(매일 아침 요약, git hook, Raycast·Alfred·단축어), 터미널 AI(Claude Code, Codex 등)가 명령으로 사용, JSON 출력, 확장과 같은 규칙(Obsidian 호환·완료일·반복·`--expect`), npm 불필요·확장과 함께 업데이트. 예시 명령은 모두 실제로 실행해 확인
 - [x] **테스트:** 런처 스크립트·설정 병합·명령 문자열(단위), 등록·실제 실행(handshake) (통합)
 - [x] **문서:** README(영·한, "AI와 함께 쓰기"가 자동 연결 중심으로), api.md·api.en.md 8절, user-guide, CHANGELOG, 마켓 검사 주의(외부 프로세스 실행 — 1.0.0 때 원인 아니었음)
 - [ ] 수동 점검(manual-checklist.md 5절: Cursor 자동 등록 등) → 1.1.0 게시(Marketplace Update + 태그)

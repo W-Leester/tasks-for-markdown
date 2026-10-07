@@ -126,7 +126,7 @@ Claude Desktop — `claude_desktop_config.json`, with the absolute path of your 
 
 ## Use it from the terminal
 
-**Tasks: Install 'tasksmd' command in PATH** (or the button in the Get Started guide) adds a `tasksmd` command to every terminal — no Node.js or npm, it runs on the editor's own Node and updates with the extension.
+**Tasks: Install 'tasksmd' terminal command** (or the button in the Get Started guide) adds a `tasksmd` command to every terminal — no Node.js or npm, it runs on the editor's own Node and updates with the extension.
 
 - **Check without opening the editor:** what is due today, overdue, next.
 - **Quick changes:** add, complete, postpone, add a note.
@@ -171,7 +171,7 @@ if (tasks.features?.includes('notes.add')) await tasks.edit.addNote(r.tasks[0], 
 | Extension API `getAPI(1)` | other VS Code/Cursor extensions | `query`, `edit` (create, update, setStatus, postpone, addNote, batch…), `events`, `ui`, feature detection with `features` / `info()` |
 | Commands `tasksmd.api.*` | keybindings, macros, extensions in any language | every API method as a command with JSON arguments |
 | [`@hastycapybara/tasks-api`](https://www.npmjs.com/package/@hastycapybara/tasks-api) | TypeScript | type definitions only (no runtime code) |
-| `tasksmd` command | terminal, scripts, AI agents | `tasksmd query`, `add`, `done`, `note`, `info`, … and the MCP server. **Tasks: Install 'tasksmd' command in PATH** installs it from the extension (no npm); on machines without the editor use [`@hastycapybara/tasks-cli`](https://www.npmjs.com/package/@hastycapybara/tasks-cli) |
+| `tasksmd` command | terminal, scripts, AI agents | `tasksmd query`, `add`, `done`, `note`, `info`, … and the MCP server. **Tasks: Install 'tasksmd' terminal command** installs it from the extension (no npm); on machines without the editor use [`@hastycapybara/tasks-cli`](https://www.npmjs.com/package/@hastycapybara/tasks-cli) |
 | Task links | other apps, chat, AI answers | `<scheme>://hastycapybara.tasks-for-markdown/open?path=…&line=…` and `/query?text=…`; `ui.link(ref)` makes one |
 | [`@hastycapybara/tasks-core`](https://www.npmjs.com/package/@hastycapybara/tasks-core) | Node programs | the parser, query engine and recurrence as a library |
 
@@ -209,7 +209,7 @@ You don't have to write queries by hand. `Tasks: Open query builder` assembles o
 | Open kanban board / calendar / statistics / query builder / query results (beside the editor, follows the cursor) | — |
 | Archive completed tasks… | — |
 | Insert query block, Explain query under cursor | — |
-| Connect AI agents (MCP), Install / Uninstall 'tasksmd' command in PATH, Open Get Started guide | — |
+| Connect AI agents (MCP), Install / Uninstall 'tasksmd' terminal command in PATH, Open Get Started guide | — |
 | Copy link to task, Copy link to query under cursor (links open the task from any app: `vscode://hastycapybara.tasks-for-markdown/open?…`) | — |
 | Load status preset…, Convert task format in this file… | — |
 

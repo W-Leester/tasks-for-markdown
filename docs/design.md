@@ -893,7 +893,7 @@ vsix ── dist/extension.js
   - 런처(macOS·Linux, `sh`):
     ```sh
     #!/bin/sh
-    # tasksmd launcher — installed by Tasks for Markdown (HastyCapybara.tasks-for-markdown). Remove with "Tasks: Uninstall 'tasksmd' command".
+    # tasksmd launcher — installed by Tasks for Markdown (HastyCapybara.tasks-for-markdown). Remove with "Tasks: Uninstall 'tasksmd' terminal command".
     ELECTRON_RUN_AS_NODE=1 exec "<execPath>" "$HOME/.tasksmd/tasksmd.cjs" "$@"
     ```
     `<execPath>`는 설치 시점 값. 켜질 때 `runtime.json`과 함께, 우리 런처(첫 두 줄로 식별)가 있으면 다시 써서 에디터를 옮겨도 따라간다. Windows는 `tasksmd.cmd`(`set ELECTRON_RUN_AS_NODE=1` + `"<execPath>" "%USERPROFILE%\.tasksmd\tasksmd.cjs" %*`).

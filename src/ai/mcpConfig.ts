@@ -70,10 +70,10 @@ export function launcherFileName(platform: NodeJS.Platform): string {
 /** The `tasksmd` command: runs the stable copy of the CLI on the editor's Node. */
 export function launcherScript(platform: NodeJS.Platform, execPath: string, cliPath: string): string {
   if (platform === 'win32') {
-    return [`@echo off`, `rem ${LAUNCHER_MARK}`, `rem Remove with "Tasks: Uninstall 'tasksmd' command".`, `set ELECTRON_RUN_AS_NODE=1`, `"${execPath}" "${cliPath}" %*`, ''].join('\r\n');
+    return [`@echo off`, `rem ${LAUNCHER_MARK}`, `rem Remove with "Tasks: Uninstall 'tasksmd' terminal command".`, `set ELECTRON_RUN_AS_NODE=1`, `"${execPath}" "${cliPath}" %*`, ''].join('\r\n');
   }
   const q = (s: string) => `'${s.replace(/'/g, `'\\''`)}'`;
-  return [`#!/bin/sh`, `# ${LAUNCHER_MARK}`, `# Remove with "Tasks: Uninstall 'tasksmd' command".`, `ELECTRON_RUN_AS_NODE=1 exec ${q(execPath)} ${q(cliPath)} "$@"`, ''].join('\n');
+  return [`#!/bin/sh`, `# ${LAUNCHER_MARK}`, `# Remove with "Tasks: Uninstall 'tasksmd' terminal command".`, `ELECTRON_RUN_AS_NODE=1 exec ${q(execPath)} ${q(cliPath)} "$@"`, ''].join('\n');
 }
 
 export function isOurLauncher(text: string): boolean {

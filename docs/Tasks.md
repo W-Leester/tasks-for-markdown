@@ -1007,7 +1007,7 @@
 - **설치 폴더 경로에 버전이 들어간다**(`~/.vscode/extensions/hastycapybara.tasks-for-markdown-1.0.1/`) → 밖의 설정에 직접 적으면 업데이트마다 끊김. **바뀌지 않는 런처**(예: `~/.local/bin/tasksmd`, Windows는 `.cmd`)를 두고, 확장이 켜질 때마다 런처가 가리키는 위치를 현재 버전으로 갱신.
 
 **추가로 할 것(2026-10-05 결정).**
-4. **`Tasks: Install 'tasksmd' command in PATH`** — 런처 설치/해제(VS Code의 `code` 명령 설치와 같은 방식). 터미널·스크립트·Claude Code에서 `tasksmd` 사용.
+4. **`Tasks: Install 'tasksmd' terminal command`** — 런처 설치/해제(VS Code의 `code` 명령 설치와 같은 방식). 터미널·스크립트·Claude Code에서 `tasksmd` 사용.
 5. **`Tasks: Connect AI agents (MCP)`** — 대상(VS Code, Cursor, Claude Code, Claude Desktop)을 골라 런처 경로로 설정을 써 줌. 쓰기 전에 바꿀 내용을 보여 주고 확인, 기존 설정 보존. (1번 VS Code 자동 등록과 함께)
 6. **알리는 방법** — 시작 안내 페이지(`contributes.walkthroughs`: "AI 에이전트 연결하기", "터미널 명령 설치하기" 단계와 실행 버튼), 명령 팔레트, Tasks 사이드바의 빈 화면 안내 버튼. 처음 켤 때 알림은 띄우지 않음.
 - **한계:** 에디터가 설치된 같은 PC에서만. 에디터 없는 CI 서버는 지금처럼 npm 패키지. npm 패키지 세 개는 그대로 유지.
@@ -1029,7 +1029,7 @@
 - [x] **번들:** 확장 빌드(esbuild)가 `packages/cli/src/main.ts`를 `dist/tasksmd.cjs`로 직접 묶음(npm 패키지와 같은 옵션). vsix 607KB → 832KB(34개 파일)
 - [x] **자동 등록:** VS Code(provider) / Cursor(registerServer). 워크스페이스 폴더마다 하나, 폴더가 바뀌면 갱신. 설정 `tasksmd.mcp.autoRegister`(기본 켬). 신뢰되지 않은 워크스페이스에서는 등록 안 함
 - [x] **안정 경로 + 런처:** 켜질 때 `~/.tasksmd/tasksmd.cjs`로 복사(버전 바뀔 때만), 런처는 이 파일과 에디터 실행 파일을 가리킴 → 업데이트로 확장 폴더가 바뀌어도 밖의 설정이 안 끊김
-- [x] **`Tasks: Install 'tasksmd' command in PATH` / `Uninstall …`:** macOS·Linux는 PATH에 있는 사용자 폴더(`~/.local/bin`, `~/bin`) 중 첫 번째, 없으면 `~/.local/bin` + PATH 추가 안내(복사 버튼). Windows는 `%LOCALAPPDATA%\tasksmd\bin\tasksmd.cmd` + 안내. 우리 런처(표시 주석)만 덮어쓰기/삭제
+- [x] **`Tasks: Install 'tasksmd' terminal command` / `Uninstall …`:** macOS·Linux는 PATH에 있는 사용자 폴더(`~/.local/bin`, `~/bin`) 중 첫 번째, 없으면 `~/.local/bin` + PATH 추가 안내(복사 버튼). Windows는 `%LOCALAPPDATA%\tasksmd\bin\tasksmd.cmd` + 안내. 우리 런처(표시 주석)만 덮어쓰기/삭제
 - [x] **`Tasks: Connect AI agents (MCP)`:** 대상 선택 — VS Code·Cursor(자동 등록 상태 표시), Claude Code(`claude mcp add --scope local` 실행, 없으면 명령 복사), Claude Desktop(설정 파일에 병합, 바꿀 내용 미리 보기 → 확인, 백업). 기존 항목 보존
 - [x] **시작 안내 페이지(walkthrough):** 첫 태스크, 렌더 보기, AI 연결, 터미널 명령. 사이드바 빈 화면 안내에 "AI 연결" 버튼
 - [x] **시작 안내 여는 명령 `Tasks: Open Get Started guide`**(10-07 수동 점검에서 발견): Cursor에는 VS Code의 `Welcome: Open Walkthrough…`가 없어 안내 페이지를 열 길이 없음 → `workbench.action.openWalkthrough`에 `<확장 id>#tasksmd.start`를 넘기는 명령(Claude Code 확장과 같은 방식, Cursor에 이 내부 명령이 있음을 확인). 사이드바 빈 화면 안내에도 링크
@@ -1044,6 +1044,7 @@
 - [x] **README에서 시작 안내 열기**: 링크 동작 `guide` 추가(`<scheme>://hastycapybara.tasks-for-markdown/guide` → 시작 안내). README에는 VS Code용으로 `https://vscode.dev/redirect?url=vscode://hastycapybara.tasks-for-markdown/guide`(GitHub·마켓이 `vscode://` 링크를 지우므로 https 우회 주소, 302 확인). Cursor는 이 우회 주소가 `cursor://`를 거부(400)하므로 명령 이름(`Tasks: Open Get Started guide`)으로 안내 — 웹사이트에 넘겨주기 페이지를 두면 링크도 가능(사용자 사이트 작업)
 - [x] **`tasksmd`를 설치하면 무엇이 좋은지 자세히(10-07 사용자 요청)**: 시작 안내 4단계 설명(영·한)과 오른쪽 페이지(예시 포함), 설치 권유 알림에 "무엇을 할 수 있나요?" 버튼(시작 안내의 그 단계로 이동), README "Use it from the terminal" 절(영·한), 사용자 가이드 5-1. 장점: 에디터 없이 확인·완료·미루기·메모, 스크립트·자동화(매일 아침 요약, git hook, Raycast·Alfred·단축어), 터미널 AI(Claude Code, Codex 등)가 명령으로 사용, JSON 출력, 확장과 같은 규칙(Obsidian 호환·완료일·반복·`--expect`), npm 불필요·확장과 함께 업데이트. 예시 명령은 모두 실제로 실행해 확인
 - [x] **1.1.0 문서 점검(10-07)**: ① NOTICE에 번들 라이브러리(MCP SDK·zod·zod-to-json-schema·ajv·ajv-formats·fast-deep-equal·fast-uri·json-schema-traverse) — npm tasks-cli에도 같은 NOTICE가 복사됨 ② design 10장 보안 ③ incidents #29(Cursor에 Walkthrough 명령 없음) ④ 확장 삭제 후 남는 것·지우는 법 ⑤ release.md B 체크리스트 ⑥⑦ publishing-guide: VS Code·Cursor 차이, README 링크·URI 인코딩 ⑧ npm README 2개 ⑨ FAQ ⑩ 원격(SSH) ⑪ Windows 미확인 ⑫ 수동 점검표 ⑬ design 변경 이력
+- [x] **영어 명령 이름에 "terminal"(10-07 수동 점검):** `Install 'tasksmd' command in PATH` → `Install 'tasksmd' terminal command`, `Uninstall 'tasksmd' terminal command`(한국어 이름처럼 "terminal"로 검색되게)
 - [x] **테스트:** 런처 스크립트·설정 병합·명령 문자열(단위), 등록·실제 실행(handshake) (통합)
 - [x] **문서:** README(영·한, "AI와 함께 쓰기"가 자동 연결 중심으로), api.md·api.en.md 8절, user-guide, CHANGELOG, 마켓 검사 주의(외부 프로세스 실행 — 1.0.0 때 원인 아니었음)
 - [ ] 수동 점검(manual-checklist.md 5절: Cursor 자동 등록 등) → 1.1.0 게시(Marketplace Update + 태그)

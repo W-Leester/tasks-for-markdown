@@ -1,6 +1,6 @@
 # Use your tasks from the terminal
 
-**Tasks: Install 'tasksmd' command in PATH** adds a `tasksmd` command to every terminal. It reads and writes the same Markdown files, with the same rules as the editor.
+**Tasks: Install 'tasksmd' terminal command** adds a `tasksmd` command to every terminal. It reads and writes the same Markdown files, with the same rules as the editor.
 
 ## Why install it
 
@@ -33,4 +33,4 @@ tasksmd done inbox.md:1
 tasksmd query "due today" --json | jq '.matched'
 ```
 
-`tasksmd --help` lists every command. Remove it with **Tasks: Uninstall 'tasksmd' command**.
+`tasksmd --help` lists every command. Remove it with **Tasks: Uninstall 'tasksmd' terminal command**.

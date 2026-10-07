@@ -26,6 +26,8 @@ tasksmd query "not done" --json | jq '.tasks[] | select(.priority == "0") | .des
 claude mcp add tasks -- npx -y @hastycapybara/tasks-cli mcp --root "$PWD"
 ```
 
-Then ask in plain language, e.g. "show my unfinished work tasks due this week and mark the contract review done" — the agent calls tools such as `tasks_query`, `tasks_set_status` and `tasks_add_note`. Cursor (`.cursor/mcp.json`) and VS Code (`.vscode/mcp.json`) take the same command. Tools and arguments: [docs/api.en.md §8](https://github.com/W-Leester/tasks-for-markdown/blob/main/docs/api.en.md).
+Then ask in plain language, e.g. "show my unfinished work tasks due this week and mark the contract review done" — the agent calls tools such as `tasks_query`, `tasks_set_status` and `tasks_add_note`. Cursor (`.cursor/mcp.json`, key `mcpServers`) and VS Code (`.vscode/mcp.json`, key `servers`) take the same command.
+
+**Using the VS Code / Cursor extension?** You don't need this package: from version 1.1.0 the extension bundles the same server and command, connects VS Code's agent mode and Cursor automatically, and offers **Tasks: Install 'tasksmd' command in PATH** and **Tasks: Connect AI agents (MCP)** — no Node.js or npm. This package is for machines without the extension (CI, servers). Tools and arguments: [docs/api.en.md §8](https://github.com/W-Leester/tasks-for-markdown/blob/main/docs/api.en.md).
 
 MIT. The task syntax and parts of the core logic are ported from [Obsidian Tasks](https://github.com/obsidian-tasks-group/obsidian-tasks) (MIT); see the bundled NOTICE.md. Not affiliated with Obsidian.

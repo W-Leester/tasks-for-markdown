@@ -13,11 +13,8 @@ Copyright (c) 2021 Martin Schenck and Clare Macrae, MIT 라이선스.
 MIT 라이선스 전문은 `LICENSE`와 같습니다. 이 프로젝트는 Obsidian Tasks 프로젝트나 Obsidian(Dynalist Inc.)과
 관련이 없으며, 그들의 보증을 받지 않았습니다.
 
-## 런타임 의존성
+## 함께 배포하는 오픈소스 (Bundled open-source packages)
 
-| 패키지 | 라이선스 | 용도 |
-|---|---|---|
-| [dayjs](https://github.com/iamkun/dayjs) | MIT | 날짜 계산 |
-| [rrule](https://github.com/jkbrzt/rrule) | BSD-3-Clause | 반복 규칙 해석 |
-| [ignore](https://github.com/kaelzhang/node-ignore) | MIT | `.gitignore` 규칙 적용 |
-| [svelte](https://github.com/sveltejs/svelte) (웹뷰 번들에 포함) | MIT | 웹뷰 UI |
+확장(`dist/extension.js`), 웹뷰, `tasksmd` 명령·MCP 서버(`dist/tasksmd.cjs`, npm `@hastycapybara/tasks-cli`)에 함께 묶여 배포되는 패키지 목록과 **라이선스 전문**은 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)에 있습니다(빌드 때 자동 생성, 테스트가 최신인지 확인). 주요 패키지: dayjs, rrule, ignore, markdown-it, svelte, @modelcontextprotocol/sdk, zod, ajv — 모두 MIT·ISC·BSD 계열.
+
+The full list of bundled packages with their license texts is in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) (generated at build time).

@@ -33,6 +33,8 @@ Tasks for Markdown을 만들며(2026-09-21 ~) 겪은 실패를 모아 둔 문서
 | 26 | 10-03 | 번역 | 한국어 설정에서도 칸반 툴바 등 웹뷰 첫 화면 일부가 영어 | 번역은 첫 렌더 전에 |
 | 27 | 10-04 | 날짜 | 쿼리 설명의 날짜가 `4o October`로 나옴 | 형식 문자는 플러그인 확인 |
 | 28 | 10-07 | UX | 시작 안내 버튼이 "마크다운 파일을 여세요"로 실패 | 명령은 '앞에 있는 탭'이 아니라 '쓰던 노트'를 대상으로 |
+| 29 | 10-07 | 호환 | Cursor에는 `Welcome: Open Walkthrough`가 없어 시작 안내를 열 길이 없음 | 에디터마다 있는 명령 확인 |
+| 30 | 10-07 | 라이선스 | 번들에 들어간 오픈소스 여러 개가 고지에서 빠짐(1.0.0~1.0.1) | 고지 목록은 빌드에서 자동 생성 |
 | 19 | 상시 | 작업 방식 | 실패를 숨기거나 파일을 망가뜨린 스크립트 | pipefail, assert |
 
 ---
@@ -205,4 +207,16 @@ Tasks for Markdown을 만들며(2026-09-21 ~) 겪은 실패를 모아 둔 문서
 - **원인:** 두 명령은 **앞에 있는 편집기**(`activeTextEditor`)만 대상으로 봤다. 버튼을 누를 때 앞에 있는 것은 시작 안내 탭이라 항상 "없음". 쿼리 빌더의 "노트에 넣기"도 같은 구조(앞에 다른 파일이 있으면 실패).
 - **해결:** 공용 도우미 `recentMarkdown.ts` — 앞의 마크다운 편집기 → 보이는 마크다운 편집기 → 가장 최근에 쓴 마크다운 문서. 세 곳(쿼리 블록 삽입, 렌더 보기 열기, 쿼리 빌더 넣기)이 사용. 쿼리 블록 삽입은 마크다운이 하나도 없으면 예시 태스크가 든 새 노트를 연다. 통합 테스트 `recentMarkdown.test.ts`(마크다운을 연 뒤 다른 탭을 앞에 두고 실행).
 - **재발 방지:** 다른 화면(시작 안내, 웹뷰, 사이드바)에서도 부를 수 있는 명령은 `activeTextEditor`에만 기대지 않는다. 시작 안내처럼 사용자가 처음 보는 흐름은 실제 에디터에서 눌러 본다(이번엔 자동 테스트가 명령만 확인해 놓침).
+
+## 29. Cursor에서 시작 안내를 열 방법이 없었음 (10-07)
+- **증상:** 수동 점검에서 Cursor 명령 팔레트에 `Welcome: Open Walkthrough…`가 없었다(Claude Code·Cline의 자체 "Open Walkthrough" 명령만 보임). 사용자 가이드와 점검표가 이 명령을 안내하고 있었다.
+- **원인:** VS Code 기준으로만 설계·문서화했다. Cursor는 내부 명령 `workbench.action.openWalkthrough`는 있지만 사용자용 명령을 빼 두었다.
+- **해결:** `Tasks: 시작 안내 열기`(`tasksmd.openWalkthrough`) 추가 — 내부 명령에 `<확장 id>#tasksmd.start`를 넘김(Claude Code 확장과 같은 방식). 사이드바 빈 화면 안내에도 링크. 통합 테스트.
+- **재발 방지:** VS Code 기능에 기대는 안내는 Cursor에도 같은 명령·화면이 있는지 확인한다(설치된 Cursor의 코드 검색으로 확인 가능). VS Code와 Cursor 차이는 배포 가이드 2.6에 모은다.
+
+## 30. 번들에 들어간 오픈소스 여러 개가 고지에서 빠짐 (10-07 발견, 1.0.0~1.0.1)
+- **증상:** NOTICE.md의 "런타임 의존성" 표에는 dayjs·rrule·ignore·svelte만 있었다. 실제로는 확장에 markdown-it과 그 의존성(entities·linkify-it·mdurl·punycode.js·uc.micro), 웹뷰에 clsx·esm-env, npm `tasks-cli`에 @modelcontextprotocol/sdk·zod·zod-to-json-schema·ajv·ajv-formats·fast-deep-equal·fast-uri·json-schema-traverse가 묶여 배포됐다. MIT·BSD·ISC는 함께 배포할 때 저작권·허가 고지를 포함해야 한다.
+- **원인:** 표를 손으로 관리했다. esbuild 번들은 의존성의 의존성까지 파일 안에 넣는데, 무엇이 들어가는지 확인하는 단계가 없었다. 1.1.0 문서 점검(CLI를 vsix에 넣으면서 확인)에서 발견.
+- **해결:** `scripts/third-party-notices.mjs`가 세 번들(확장·웹뷰·CLI)의 esbuild 메타파일에서 실제 패키지를 뽑아 `THIRD_PARTY_NOTICES.md`(라이선스 전문 포함)를 만든다. `pnpm package`에 포함, npm `tasks-cli`에도 복사, `tests/thirdPartyNotices.test.ts`가 최신인지 확인. NOTICE.md는 이 파일을 가리킴. 1.1.0부터 바로잡힘(이미 게시한 1.0.x는 다시 올릴 수 없음).
+- **재발 방지:** 고지 목록은 사람이 아니라 빌드가 만든다. 배포 가이드 2.5에 반영.
 

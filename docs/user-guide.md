@@ -138,6 +138,15 @@ short mode
 - 같은 이름의 다른 프로그램이 있으면 덮어쓰지 않습니다. 지우려면 `Tasks: 'tasksmd' 터미널 명령 제거`.
 - 에디터 내장 Node로 실행되며, 에디터 위치가 바뀌거나 확장이 업데이트돼도 에디터를 한 번 켜면 따라갑니다.
 
+**원격(SSH)·컨테이너.** 확장이 원격 쪽에서 돌기 때문에 MCP 서버와 `tasksmd` 명령도 **원격 컴퓨터에** 생깁니다(원격의 노트 폴더를 다룸). 내 컴퓨터의 Claude Desktop에 원격 폴더를 연결할 수는 없습니다.
+
+**확장을 지운 뒤 남는 것.** 확장을 삭제해도 아래는 남으니, 필요하면 지우세요(확장이 있을 때 `Tasks: 'tasksmd' 터미널 명령 제거`를 먼저 실행하면 런처는 자동으로 지워집니다).
+- 터미널 명령: `~/.local/bin/tasksmd`(또는 `~/bin/tasksmd`, Windows `%LOCALAPPDATA%\tasksmd\bin\tasksmd.cmd`)
+- 서버 사본: `~/.tasksmd/` 폴더
+- Claude Code 연결: 그 폴더에서 `claude mcp remove tasks -s local`(폴더가 여럿이었다면 `tasks-<폴더>`)
+- Claude Desktop 연결: 설정 파일의 `mcpServers.tasks` 항목(같은 폴더의 `.bak`이 연결 전 원본)
+- VS Code·Cursor 자동 연결은 확장과 함께 사라집니다.
+
 **태스크 링크.** 링크를 누르면 어느 앱에서든(메신저, 다른 메모 앱, 웹 페이지, AI 답변) 에디터가 열리며 그 태스크로 이동합니다.
 - 태스크 줄에 커서를 두고 `Tasks: 태스크 링크 복사` → `vscode://hastycapybara.tasks-for-markdown/open?path=…&line=…`(Cursor에서는 `cursor://…`).
 - ```tasks 블록 안에서 `Tasks: 커서 위치 쿼리 링크 복사` → 누르면 그 쿼리 결과 패널이 열립니다.
@@ -165,3 +174,6 @@ short mode
 - **Cursor에서 쿼리 블록이 그냥 코드로 보여요.** 오른쪽 위 "Preview | Markdown" 토글의 Preview는 Cursor 자체 WYSIWYG 편집기라 확장이 개입할 수 없고, `Cmd+Shift+V`도 이 토글에 묶여 있습니다. "Markdown"으로 전환한 뒤 블록 위 `▶ 결과 보기` CodeLens로 결과 패널을 열거나, 명령 팔레트에서 `Markdown: Open Preview to the Side`로 VS Code 미리보기를 여세요(Cursor에서는 `Cmd+K`가 AI 인라인 편집이라 `Cmd+K V`가 안 됩니다).
 - **`.vsix`로 설치했는데 업데이트는?** `tasksmd.updateCheckUrl`에 사내 `latest.json` 경로를 넣으면 하루 1회 새 버전을 알려줍니다.
 - **로그는 어디에?** `Tasks: 로그 보기` (출력 채널 "Tasks for Markdown").
+- **AI 에이전트가 tasks 도구를 못 찾아요.** ① 설정 `tasksmd.mcp.autoRegister`가 켜져 있는지 ② 워크스페이스가 신뢰됨인지(제한 모드에서는 연결 안 함) ③ `Developer: Reload Window` ④ 위치 확인: Cursor는 *Cursor Settings → Customize → MCPs*에 `extension-tasks`, VS Code는 채팅 에이전트 모드의 도구(🔧) 목록 ⑤ `Tasks: 로그 보기`에서 `mcp registration:` 줄. Claude Code·Desktop은 `Tasks: AI 에이전트 연결 (MCP)`로 따로 연결해야 합니다.
+- **`tasksmd: command not found`가 나와요.** 설치한 폴더(`~/.local/bin`)가 PATH에 없는 경우입니다. 설치할 때 안내한 줄(`export PATH="$HOME/.local/bin:$PATH"`)을 `~/.zshrc`에 넣고 새 터미널을 여세요. 에디터를 옮기거나 다시 설치했다면 에디터를 한 번 켜면 런처가 새 위치를 따라갑니다.
+- **Cursor에서 시작 안내는?** Cursor에는 VS Code의 `Welcome: Open Walkthrough…`가 없으니 `Tasks: 시작 안내 열기`를 쓰세요.

@@ -118,7 +118,11 @@ git tag v<ver> && git push origin v<ver>
 - [ ] **검증.** `pnpm typecheck && pnpm lint && pnpm test && pnpm test:webviews && pnpm test:integration`.
 - [ ] **패키징.** `pnpm package` → `.vsix`(사내 배포용 `dist/latest.json`도 생성), 타입 파일 `dist/api-types/api/types.d.ts` 포함 확인(`unzip -l`).
 - [ ] **이전 `.vsix` 삭제**, 새 파일로 설치 확인.
-- [ ] **출처 고지.** 새로 이식한 코드가 있으면 파일 상단 주석과 NOTICE.md 목록에 추가. 새 런타임 의존성은 NOTICE.md 표에 라이선스와 함께.
+- [ ] **출처 고지.** 새로 이식한 코드가 있으면 파일 상단 주석과 NOTICE.md 목록에 추가. 번들에 들어가는 패키지는 `pnpm notices`가 `THIRD_PARTY_NOTICES.md`(라이선스 전문)를 다시 만든다(`pnpm package`에 포함, 최신이 아니면 테스트 실패). npm `tasks-cli`에도 복사된다.
+- [ ] **번들 CLI(1.1.0~).** vsix에 `extension/dist/tasksmd.cjs`가 있는지(`unzip -l`), 에디터 내장 Node로 도는지: `ELECTRON_RUN_AS_NODE=1 "<에디터 Helper (Plugin) 실행 파일>" dist/tasksmd.cjs info`.
+- [ ] **실제 에디터 점검.** 자동 테스트가 못 보는 것(Cursor 자동 MCP 등록, 시작 안내 버튼, 링크 클릭, Claude 연결)은 `manual-checklist.md` 5절.
+- [ ] **마켓 검사 주의.** 외부 프로세스 실행(`claude`, MCP 서버)·홈 폴더 파일 생성 코드가 들어 있다. 거절되면 `publishing-guide.md` 5.3(시험 이름으로 반씩 나누기, 12시간 생성 한도).
+- [ ] **알려진 한계 확인.** Windows(런처 `.cmd`, Claude Desktop 경로)는 코드·단위 테스트만 있고 실제 Windows에서 확인하지 않음(1.1.0). 확인 전에는 CHANGELOG·문서에 그대로 둔다.
 - [ ] 태그 `v<버전>` 푸시(Actions가 게시).
 
 ### C. 마켓플레이스 첫 공개(1.0.0) 때 한 번

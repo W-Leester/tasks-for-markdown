@@ -5,7 +5,7 @@
 | 문서 | 내용 |
 |---|---|
 | [2026-10-01-marketplace-upload-rejected.md](2026-10-01-marketplace-upload-rejected.md) | VS Code Marketplace 첫 업로드 거절("suspicious content") — 원인은 검색어, 2026-10-02 해결 |
-| [incidents.md](incidents.md) | 개발 중 실패 사례 모음(28건): 증상 → 원인 → 해결 → 재발 방지 |
+| [incidents.md](incidents.md) | 개발 중 실패 사례 모음(30건): 증상 → 원인 → 해결 → 재발 방지 |
 
 ## 쓰는 법
 - **큰 사건**(공개·배포가 막힘, 사용자 데이터에 영향, 반나절 이상 소요): 날짜로 시작하는 별도 문서로 쓴다. 형식: 요약 → 타임라인 → 원인 → 잘한 점 / 아쉬운 점 → 재발 방지(조치와 상태) → 결과.

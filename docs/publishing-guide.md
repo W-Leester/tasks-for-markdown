@@ -125,6 +125,8 @@ VS Code 확장을 **VS Code Marketplace**, **Open VSX**(Cursor·VSCodium 등이 
 - **움직이는 예시(GIF)** 는 설치 파일에 넣지 않는 폴더(`docs/images/`)에 두고 상대 경로로 링크한다. 한 개 0.2~0.4MB, 폭 960px 정도면 마켓 페이지에서 무리 없다. 만드는 법: [Tasks.md M22](Tasks.md).
 - **도구마다 설정 형식이 다르면 따로 적는다.** 예: MCP 설정 키는 Cursor·Claude Desktop이 `mcpServers`, VS Code가 `servers`. 하나로 합쳐 적었다가 VS Code 안내가 틀렸다(→ [실패 사례 22](postmortems/incidents.md)). 각 도구에서 한 번씩 등록해 보고 쓴다.
 - README에 다른 언어 글자가 섞이지 않게 테스트로 막는다(이 프로젝트: `tests/readme.test.ts`).
+- **README에서 에디터를 여는 링크.** GitHub·Marketplace는 `vscode://` 링크를 지운다 → `https://vscode.dev/redirect?url=vscode://<게시자>.<확장>/<경로>`(302로 넘겨줌, 확장이 없으면 VS Code가 설치를 제안). 이 우회 주소는 `cursor://`를 거부(400)하므로 Cursor는 명령 이름으로 안내하거나 자기 웹사이트에 넘겨주기 페이지를 둔다.
+- **URI 핸들러 값은 두 번 인코딩.** VS Code가 `uri.query`를 한 번 풀어서 넘기므로, 한 번만 인코딩하면 값 안의 `&`·`=`가 구분자로 바뀐다.
 
 ### 2.4 설치 파일에 들어가는 것 (`.vscodeignore`)
 - **허용 목록처럼** 생각한다: 실행에 필요한 `dist/`, `media/`(아이콘·CSS), 번역 파일, README·CHANGELOG·LICENSE·NOTICE.
@@ -135,6 +137,22 @@ VS Code 확장을 **VS Code Marketplace**, **Open VSX**(Cursor·VSCodium 등이 
 ### 2.5 코드에서 조심할 것
 - **외부 프로그램 실행**(`child_process`로 셸·PowerShell 실행)과 **마켓 밖 자체 업데이트**는 악성 확장의 전형적인 패턴이라 오해받기 쉽다. (이번 거절의 원인은 아니었다.)
 - 사용자 코드를 실행하는 기능(`new Function` 등)은 신뢰되지 않은 워크스페이스에서 꺼지도록 `capabilities.untrustedWorkspaces`에 적는다.
+- **함께 배포하는 라이브러리의 라이선스 고지.** esbuild로 묶으면 의존성이 설치 파일 안에 들어가므로 MIT·BSD·ISC의 고지 조건이 적용된다. 손으로 표를 관리하면 빠진다(이 프로젝트는 1.0.0~1.0.1에 markdown-it 등 여러 개를 빠뜨림) → 빌드 메타파일로 실제 번들 목록을 뽑아 라이선스 전문 파일을 만들고, 최신인지 테스트로 확인한다(`scripts/third-party-notices.mjs`).
+
+### 2.6 VS Code와 Cursor의 차이 (확장 입장에서)
+Cursor는 VS Code 기반이지만 같은 확장이 똑같이 동작하지 않는 곳이 있다. 설계할 때 둘 다 확인한다(설치된 Cursor 앱의 `out/vs/workbench/api/node/extensionHostProcess.js`를 검색하면 확장 API를 알 수 있다 — 앱은 실행하지 않아도 됨).
+
+| 항목 | VS Code | Cursor |
+|---|---|---|
+| MCP 서버 자동 등록 | `vscode.lm.registerMcpServerDefinitionProvider` + `contributes.mcpServerDefinitionProviders` | `vscode.cursor.mcp.registerServer({ name, server: { command, args, env } })` / `unregisterServer(name)`. 두 API 이름이 다 있으면 Cursor 것만 쓴다(이중 등록 방지) |
+| MCP 설정 파일 | `.vscode/mcp.json`, 맨 위 키 `servers` | `.cursor/mcp.json`, 키 `mcpServers` |
+| MCP 목록 화면 | 채팅 에이전트 모드의 도구(🔧) | *Cursor Settings → Customize → MCPs* (`extension-<이름>`) |
+| 시작 안내(walkthrough) | `Welcome: Open Walkthrough…` 있음 | 없음 → 확장이 `workbench.action.openWalkthrough`를 부르는 명령을 직접 제공 |
+| 링크 스킴 | `vscode://` | `cursor://` (`vscode.env.uriScheme`으로 구함) |
+| 확장 마켓 | VS Code Marketplace | Open VSX |
+| Markdown 미리보기 토글 | 기본 미리보기 | 자체 WYSIWYG 편집기(확장 렌더러를 안 씀) |
+
+- 확장에 넣은 Node 프로그램(예: CLI·MCP 서버)은 `ELECTRON_RUN_AS_NODE=1 <process.execPath>`로 실행하면 Node.js 설치 없이 돈다. 확장 호스트의 `process.execPath`는 macOS에서 `… Helper (Plugin)` 실행 파일이며 그것으로도 된다.
 
 ---
 

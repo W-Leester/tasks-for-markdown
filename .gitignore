@@ -5,5 +5,6 @@ dist/
 node_modules/
 packages/*/LICENSE
 packages/*/NOTICE.md
+packages/*/THIRD_PARTY_NOTICES.md
 packages/api/index.d.ts
 *.vsix.zip

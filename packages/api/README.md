@@ -18,7 +18,7 @@ const due = await tasks.query.run('not done\ndue before tomorrow\nsort by urgenc
 if (tasks.features.includes('notes.add')) await tasks.edit.addNote({ path: due.tasks[0].path, line: due.tasks[0].line }, 'Started');
 ```
 
-Check optional capabilities with `tasks.features` (or `await tasks.info()`), not by version number.
+Check optional capabilities with `tasks.features` (or `await tasks.info()`), not by version number. For example `links` (1.1.0) adds `ui.link(ref)`, which returns a `vscode://` / `cursor://` link that opens the task from any app.
 
 - API reference: [docs/api.en.md](https://github.com/W-Leester/tasks-for-markdown/blob/main/docs/api.en.md) (Korean: [docs/api.md](https://github.com/W-Leester/tasks-for-markdown/blob/main/docs/api.md))
 - The same types are in the repository as one self-contained file: [src/api/types.ts](https://github.com/W-Leester/tasks-for-markdown/blob/main/src/api/types.ts)

@@ -1509,7 +1509,7 @@
     "test:watch": "vitest",
     "lint": "eslint src tests packages/cli/src",
     "format": "prettier --write .",
-    "package": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\" && pnpm build:prod && pnpm build:api-types && vsce package --no-dependencies && node scripts/make-latest.mjs",
+    "package": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\" && pnpm build:prod && pnpm notices && pnpm build:api-types && vsce package --no-dependencies && node scripts/make-latest.mjs",
     "publish:vsce": "vsce publish --no-dependencies",
     "publish:ovsx": "ovsx publish --no-dependencies",
     "vscode:prepublish": "pnpm build",
@@ -1518,7 +1518,8 @@
     "build:prod": "node esbuild.config.mjs --production",
     "test:webviews": "vitest run --config vitest.webviews.config.mts",
     "build:api-types": "tsc -p tsconfig.api.json",
-    "build:packages": "pnpm --filter @hastycapybara/tasks-core build && pnpm --filter @hastycapybara/tasks-cli build && pnpm --filter @hastycapybara/tasks-api build"
+    "build:packages": "pnpm --filter @hastycapybara/tasks-core build && pnpm --filter @hastycapybara/tasks-cli build && pnpm --filter @hastycapybara/tasks-api build",
+    "notices": "node scripts/third-party-notices.mjs"
   },
   "dependencies": {
     "dayjs": "^1.11.13",

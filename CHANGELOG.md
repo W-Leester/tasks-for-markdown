@@ -10,6 +10,9 @@
 - A "Get started" walkthrough (first task, queries and the rendered view, AI agents, terminal command), opened once on the first launch and with **Tasks: Open Get Started guide**; for the first three launches a small prompt offers the `tasksmd` command (until installed or dismissed). README link: `…/guide`.
 - Insert query block, Open rendered view and the query builder's "insert into note" act on the note you were working on, even when another tab (such as the walkthrough) is in front; with no note open, Insert query block opens a sample note.
 
+**Licenses**
+- `THIRD_PARTY_NOTICES.md` lists every bundled open-source package with its license text (generated at build time). Earlier releases missed several (markdown-it and its dependencies, clsx, esm-env, and in the npm CLI the MCP SDK, zod and ajv).
+
 **Task links**
 - `vscode://hastycapybara.tasks-for-markdown/open?path=…&line=…` opens a task from any app; `/query?text=…` shows a query's results (Cursor: `cursor://…`).
 - **Tasks: Copy link to task**, **Copy link to query under cursor**.

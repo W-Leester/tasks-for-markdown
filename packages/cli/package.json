@@ -24,7 +24,8 @@
     "dist",
     "README.md",
     "LICENSE",
-    "NOTICE.md"
+    "NOTICE.md",
+    "THIRD_PARTY_NOTICES.md"
   ],
   "publishConfig": {
     "access": "public"
@@ -34,7 +35,7 @@
   },
   "scripts": {
     "build": "node build.mjs && pnpm run prepack",
-    "prepack": "node -e \"const f=require('fs');for(const n of ['LICENSE','NOTICE.md'])f.copyFileSync('../../'+n,n)\""
+    "prepack": "node -e \"const f=require('fs');for(const n of ['LICENSE','NOTICE.md','THIRD_PARTY_NOTICES.md'])f.copyFileSync('../../'+n,n)\""
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.30.1",

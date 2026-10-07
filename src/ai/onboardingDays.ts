@@ -17,14 +17,9 @@ export function onboardingDay(state: OnboardingDays, today: string): { day: numb
 }
 
 /**
- * The `tasksmd` install prompt: once a day (the first activation of the day) until the command
- * is installed or the user chose "Don't ask again" — no three-day limit.
+ * The `tasksmd` install and the AI-connect prompts: on every activation (reload, restart, new
+ * window) while still needed, until the user chooses "Don't ask again" (10-08 decision).
  */
-export function shouldPromptInstall(state: { lastDay?: string; never?: boolean }, today: string, installed: boolean): boolean {
-  return dailyPrompt(state, today, !installed);
-}
-
-/** A prompt shown once a day while it is `needed`, until the user chooses "Don't ask again". */
-export function dailyPrompt(state: { lastDay?: string; never?: boolean }, today: string, needed: boolean): boolean {
-  return needed && !state.never && state.lastDay !== today;
+export function shouldPrompt(state: { never?: boolean }, needed: boolean): boolean {
+  return needed && !state.never;
 }

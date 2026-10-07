@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { dailyPrompt, onboardingDay, shouldPromptInstall } from '../../src/ai/onboardingDays';
+import { onboardingDay, shouldPrompt } from '../../src/ai/onboardingDays';
 
 describe('onboarding counts distinct days', () => {
   it('counts a new day once, however many windows open that day', () => {
@@ -13,18 +13,10 @@ describe('onboarding counts distinct days', () => {
     expect(second).toEqual({ day: 2, next: { days: 2, lastDay: '2026-10-09' } });
   });
 
-  it('asks to install tasksmd once a day until installed or never', () => {
-    expect(shouldPromptInstall({}, '2026-10-07', false)).toBe(true);
-    expect(shouldPromptInstall({ lastDay: '2026-10-07' }, '2026-10-07', false)).toBe(false); // same day
-    expect(shouldPromptInstall({ lastDay: '2026-10-07' }, '2026-10-30', false)).toBe(true); // no 3-day limit
-    expect(shouldPromptInstall({}, '2026-10-07', true)).toBe(false);
-    expect(shouldPromptInstall({ never: true }, '2026-10-08', false)).toBe(false);
-  });
-
-  it('the generic daily prompt follows the same rule', () => {
-    expect(dailyPrompt({}, '2026-10-08', true)).toBe(true);
-    expect(dailyPrompt({}, '2026-10-08', false)).toBe(false);
-    expect(dailyPrompt({ lastDay: '2026-10-08' }, '2026-10-08', true)).toBe(false);
-    expect(dailyPrompt({ never: true }, '2026-10-09', true)).toBe(false);
+  it('asks on every activation while needed, until "Don\'t ask again"', () => {
+    expect(shouldPrompt({}, true)).toBe(true);
+    expect(shouldPrompt({}, true)).toBe(true); // again after a reload — no daily limit
+    expect(shouldPrompt({}, false)).toBe(false); // installed / connected
+    expect(shouldPrompt({ never: true }, true)).toBe(false);
   });
 });

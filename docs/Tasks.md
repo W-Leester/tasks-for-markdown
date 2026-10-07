@@ -610,7 +610,7 @@
 - [ ] 확장이 로컬 소켓을 열고 토큰 파일로 인증, CLI/MCP는 편집기가 떠 있으면 위임
 
 ### M9.7 (F1) URI 핸들러
-- [ ] `vscode://hastycapybara.tasks-for-markdown/open?path=…&line=…`, `/query?text=…` → **M23에서 진행**
+- [x] `vscode://hastycapybara.tasks-for-markdown/open?path=…&line=…`, `/query?text=…` → **M23에서 진행(완료)**
 
 ## M10. 렌더 보기 고도화 (1.4.0)
 

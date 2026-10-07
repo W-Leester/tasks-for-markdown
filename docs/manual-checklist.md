@@ -125,8 +125,10 @@ VS Code 1.138에 들어온 내장 Markdown Editor(WYSIWYG)와 `markdown.codeBloc
 5. [x] **터미널 명령** — `Tasks: 'tasksmd' 터미널 명령 설치` → 새 터미널에서 `tasksmd --help`, `tasksmd query "not done" --root <노트 폴더>`. PATH 안내가 나오면 그 줄을 넣고 다시. `제거` 명령으로 지워지는지.
    - **결과(10-07, Cursor, 시작 안내 버튼):** `~/.tasksmd/`(cjs·runtime.json)와 `~/.local/bin/tasksmd`(Cursor Helper (Plugin)로 실행하는 런처) 생성. `~/.local/bin`이 이미 PATH에 있어 안내 없이 바로 사용. `examples`에서 `tasksmd query` → Cursor 에이전트와 같은 3개. (제거 명령은 아직)
 6. [ ] **링크** — 태스크 줄에서 `Tasks: 태스크 링크 복사` → 브라우저 주소창이나 메모 앱에 붙여 넣고 누름 → 에디터가 그 줄로 이동. 쿼리 블록에서 `쿼리 링크 복사` → 결과 패널.
-7. [ ] **시작 안내** — 명령 팔레트 `Tasks: 시작 안내 열기`(VS Code는 `Welcome: Open Walkthrough…`로도) → "Tasks for Markdown 시작하기" 4단계와 버튼. (Cursor에는 `Welcome: Open Walkthrough…`가 없어 10-07에 이 명령을 추가)
-8. [ ] **첫 실행 안내** — (B) 첫째 날 시작 안내가 저절로 열림, 서로 다른 둘째·셋째 날 "시작 안내 열기 / 다시 보지 않기" 알림. (A) `tasksmd`가 없으면 매일 한 번 "'tasksmd' 명령 설치 / 나중에 / 다시 묻지 않기"(설치·다시 묻지 않기 전까지, 3일 제한 없음). 같은 날 다시 불러오면 둘 다 안 뜸. (날짜 확인은 VS Code를 끄고 `state.vscdb`의 `onboarding.lastDay`·`onboarding.cliLastDay`를 어제로 바꿔서)
+7. [x] **시작 안내** — 명령 팔레트 `Tasks: 시작 안내 열기`(VS Code는 `Welcome: Open Walkthrough…`로도) → "Tasks for Markdown 시작하기" 4단계와 버튼. (Cursor에는 `Welcome: Open Walkthrough…`가 없어 10-07에 이 명령을 추가)
+   - **결과(10-07, VS Code·Cursor):** 4단계와 버튼 동작 확인(쿼리 블록 넣기·렌더 보기는 #28 수정 후 쓰던 노트에 동작). Cursor는 `Tasks: 시작 안내 열기`로.
+8. [x] **첫 실행 안내** — (B) 첫째 날 시작 안내가 저절로 열림, 서로 다른 둘째·셋째 날 "시작 안내 열기 / 다시 보지 않기" 알림. (A) `tasksmd`가 없으면 매일 한 번 "'tasksmd' 명령 설치 / 나중에 / 다시 묻지 않기"(설치·다시 묻지 않기 전까지, 3일 제한 없음). 같은 날 다시 불러오면 둘 다 안 뜸. (날짜 확인은 VS Code를 끄고 `state.vscdb`의 `onboarding.lastDay`·`onboarding.cliLastDay`를 어제로 바꿔서)
+   - **결과(10-07, VS Code):** 첫째 날 시작 안내 자동 열림, 날짜를 하루 전으로 돌려 둘째 날 알림 확인, 설치 권유 알림 확인(사용자 "잘 됨"). 횟수는 창이 아니라 날짜 기준(점검 중 창 기준으로 14번 세어진 문제를 고침).
 9. [ ] **AI 연결 선택 창** — 에디터 줄이 체크박스 없는 "Cursor: 자동으로 연결됨" 상태 줄, `tasksmd.mcp.autoRegister`를 끄면 "자동 연결 다시 켜기"가 고를 수 있게 나옴.
 10. [ ] **제거** — `Tasks: 'tasksmd' 터미널 명령 제거` → `~/.local/bin/tasksmd` 삭제, 다른 프로그램이면 건드리지 않음.
 11. [ ] **원격(SSH)** — 원격 폴더에서 Cursor 자동 연결(원격 쪽 서버), 원격 터미널에서 `tasksmd`.

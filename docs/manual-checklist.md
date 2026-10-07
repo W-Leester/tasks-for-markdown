@@ -122,7 +122,8 @@ VS Code 1.138에 들어온 내장 Markdown Editor(WYSIWYG)와 `markdown.codeBloc
 2. [ ] **VS Code 에이전트 모드** — Copilot 채팅 에이전트 모드의 도구(🔧) 목록에 "Tasks for Markdown"이 있고, 처음 실행 허용 후 질문에 답하는지.
 3. [ ] **Claude Code 연결** — `Tasks: AI 에이전트 연결 (MCP)` → Claude Code → 알림 확인 → 그 폴더에서 `claude mcp list`에 `tasks`가 보이는지, 새 세션에서 동작하는지.
 4. [ ] **Claude Desktop 연결**(설치된 경우) — 같은 명령 → Claude Desktop → 확인 창 → 설정 파일에 `tasks` 추가·`.bak` 생성·다른 서버 유지 → Claude Desktop 재시작 후 동작.
-5. [ ] **터미널 명령** — `Tasks: 'tasksmd' 터미널 명령 설치` → 새 터미널에서 `tasksmd --help`, `tasksmd query "not done" --root <노트 폴더>`. PATH 안내가 나오면 그 줄을 넣고 다시. `제거` 명령으로 지워지는지.
+5. [x] **터미널 명령** — `Tasks: 'tasksmd' 터미널 명령 설치` → 새 터미널에서 `tasksmd --help`, `tasksmd query "not done" --root <노트 폴더>`. PATH 안내가 나오면 그 줄을 넣고 다시. `제거` 명령으로 지워지는지.
+   - **결과(10-07, Cursor, 시작 안내 버튼):** `~/.tasksmd/`(cjs·runtime.json)와 `~/.local/bin/tasksmd`(Cursor Helper (Plugin)로 실행하는 런처) 생성. `~/.local/bin`이 이미 PATH에 있어 안내 없이 바로 사용. `examples`에서 `tasksmd query` → Cursor 에이전트와 같은 3개. (제거 명령은 아직)
 6. [ ] **링크** — 태스크 줄에서 `Tasks: 태스크 링크 복사` → 브라우저 주소창이나 메모 앱에 붙여 넣고 누름 → 에디터가 그 줄로 이동. 쿼리 블록에서 `쿼리 링크 복사` → 결과 패널.
 7. [ ] **시작 안내** — 명령 팔레트 `Tasks: 시작 안내 열기`(VS Code는 `Welcome: Open Walkthrough…`로도) → "Tasks for Markdown 시작하기" 4단계와 버튼. (Cursor에는 `Welcome: Open Walkthrough…`가 없어 10-07에 이 명령을 추가)
 

@@ -120,7 +120,7 @@ VS Code 1.138에 들어온 내장 Markdown Editor(WYSIWYG)와 `markdown.codeBloc
 1. [x] **Cursor 자동 등록** — Cursor에서 노트 폴더를 열고 *Cursor Settings → MCP*(또는 Tools & Integrations)에 확장이 등록한 `tasks` 서버가 보이는지, 에이전트 채팅에서 "오늘 마감인 태스크 알려 줘"가 도구를 쓰는지.
    - **결과(2026-10-07, Cursor, `examples` 폴더):** *Customize → MCPs*의 Connected에 `extension-tasks`(User, 12 tools, 1 resource, 초록). 설정 파일 수정·npm 없이 연결됨. 채팅 "미완료 태스크 중 마감일이 가장 가까운 것 3개" → 문법 안내 리소스를 먼저 읽고 `tasks_query`로 조회, "마감일 있는 미완료 15개 중" 3개를 정확히 답함. (MCP 목록 위치: 최근 Cursor는 *Cursor Settings* 왼쪽의 **Customize** → **MCPs** 탭)
 2. [ ] **VS Code 에이전트 모드** — Copilot 채팅 에이전트 모드의 도구(🔧) 목록에 "Tasks for Markdown"이 있고, 처음 실행 허용 후 질문에 답하는지.
-3. [ ] **Claude Code 연결** — `Tasks: AI 에이전트 연결 (MCP)` → Claude Code → 알림 확인 → 그 폴더에서 `claude mcp list`에 `tasks`가 보이는지, 새 세션에서 동작하는지.
+3. [ ] **Claude Code 연결** — `Tasks: AI 에이전트 연결 (MCP)` → (설치돼 있으면 미리 체크됨) → 알림 확인 → 그 폴더에서 `claude mcp list`에 `tasks`가 보이는지, 새 세션에서 동작하는지.
 4. [ ] **Claude Desktop 연결**(설치된 경우) — 같은 명령 → Claude Desktop → 확인 창 → 설정 파일에 `tasks` 추가·`.bak` 생성·다른 서버 유지 → Claude Desktop 재시작 후 동작.
 5. [x] **터미널 명령** — `Tasks: 'tasksmd' 터미널 명령 설치` → 새 터미널에서 `tasksmd --help`, `tasksmd query "not done" --root <노트 폴더>`. PATH 안내가 나오면 그 줄을 넣고 다시. `제거` 명령으로 지워지는지.
    - **결과(10-07, Cursor, 시작 안내 버튼):** `~/.tasksmd/`(cjs·runtime.json)와 `~/.local/bin/tasksmd`(Cursor Helper (Plugin)로 실행하는 런처) 생성. `~/.local/bin`이 이미 PATH에 있어 안내 없이 바로 사용. `examples`에서 `tasksmd query` → Cursor 에이전트와 같은 3개. (제거 명령은 아직)

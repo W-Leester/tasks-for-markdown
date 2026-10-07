@@ -248,6 +248,12 @@ export function registerAi(context: vscode.ExtensionContext, deps: AiDeps): AiIn
     void vscode.window.showInformationMessage(t('Connected Claude Desktop. Quit and reopen Claude Desktop to load it.'));
   };
 
+  /** Whether one of these executables is on PATH (no process is started). */
+  const onPath = async (names: string[]) => {
+    for (const dir of (process.env.PATH ?? '').split(path.delimiter).filter(Boolean)) for (const n of names) if (await exists(path.join(dir, n))) return true;
+    return false;
+  };
+
   const connectAi = async () => {
     const status = mode === 'none' ? t('this version has no MCP registration API') : enabled() ? t('connected automatically') : vscode.workspace.isTrusted ? t('off (tasksmd.mcp.autoRegister)') : t('off in untrusted workspaces');
     type Item = vscode.QuickPickItem & { run?: () => Promise<void> };
@@ -266,8 +272,18 @@ export function registerAi(context: vscode.ExtensionContext, deps: AiDeps): AiIn
         },
       }, { label: t('Other AI tools'), kind: vscode.QuickPickItemKind.Separator });
     }
-    items.push({ label: '$(terminal) Claude Code', description: t('this project, this computer'), detail: t('Runs "claude mcp add-json --scope local"'), run: connectClaudeCode });
-    if (claudeDesktopConfigPath(process.platform, os.homedir(), process.env.APPDATA)) items.push({ label: '$(device-desktop) Claude Desktop', description: t('edits its config file after asking'), run: connectClaudeDesktop });
+    // Tools that are installed start checked, so one OK connects everything (10-08).
+    const hasClaudeCode = await onPath(process.platform === 'win32' ? ['claude.cmd', 'claude.exe', 'claude'] : ['claude']);
+    items.push({
+      label: '$(terminal) Claude Code', picked: hasClaudeCode,
+      description: hasClaudeCode ? t('this project, this computer') : t('not installed — choose it to copy the command'),
+      detail: t('Runs "claude mcp add-json --scope local"'), run: connectClaudeCode,
+    });
+    const desktopConfig = claudeDesktopConfigPath(process.platform, os.homedir(), process.env.APPDATA);
+    if (desktopConfig) {
+      const hasDesktop = await exists(path.dirname(desktopConfig));
+      items.push({ label: '$(device-desktop) Claude Desktop', picked: hasDesktop, description: hasDesktop ? t('edits its config file after asking') : t('not installed'), run: connectClaudeDesktop });
+    }
     const picked = await vscode.window.showQuickPick(items, { canPickMany: true, title: t('Connect AI agents to your tasks (MCP)'), placeHolder: t('{0}: {1} · choose what else to connect', appName, status) });
     for (const p of picked ?? []) await p.run?.();
   };

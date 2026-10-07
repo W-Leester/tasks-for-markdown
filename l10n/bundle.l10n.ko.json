@@ -404,5 +404,7 @@
   "Tasks for Markdown: install the \"tasksmd\" command to check, add and complete tasks from any terminal, in scripts and with terminal AI agents (no npm needed).": "Tasks for Markdown: \"tasksmd\" 명령을 설치하면 어느 터미널에서든, 스크립트와 터미널 AI에서도 태스크를 확인·추가·완료할 수 있습니다(npm 불필요).",
   "Tasks for Markdown: install the \"tasksmd\" command to check, add and complete tasks from any terminal, in scripts and with terminal AI agents (no npm needed). The Get Started guide shows what it can do.": "Tasks for Markdown: \"tasksmd\" 명령을 설치하면 어느 터미널에서든, 스크립트와 터미널 AI에서도 태스크를 확인·추가·완료할 수 있습니다(npm 불필요). 무엇을 할 수 있는지는 시작 안내에서 볼 수 있습니다.",
   "Don't ask again": "다시 묻지 않기",
-  "{0}: {1} · choose what else to connect": "{0}: {1} · 추가로 연결할 대상을 고르세요"
+  "{0}: {1} · choose what else to connect": "{0}: {1} · 추가로 연결할 대상을 고르세요",
+  "not installed — choose it to copy the command": "설치되지 않음 — 고르면 명령을 복사해 드림",
+  "not installed": "설치되지 않음"
 }

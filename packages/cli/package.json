@@ -1,6 +1,6 @@
 {
   "name": "@hastycapybara/tasks-cli",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Command line for Tasks for Markdown: query, add, complete and edit Obsidian Tasks-style task lines in a folder of Markdown notes — no editor required.",
   "license": "MIT",
   "author": "HastyCapybara (W.Leester)",

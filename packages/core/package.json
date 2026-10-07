@@ -1,6 +1,6 @@
 {
   "name": "@hastycapybara/tasks-core",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Obsidian Tasks-compatible task lines, dates, recurrence and query engine for Markdown — the core of Tasks for Markdown, usable from any Node program.",
   "license": "MIT",
   "author": "HastyCapybara (W.Leester)",

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-  ConfigParseError, claudeAddJsonArgs, claudeCodeHasServer, claudeDesktopHasServer, claudeAddJsonCommand, claudeDesktopConfigPath, isOurLauncher, launcherFileName, launcherScript, mergeMcpServers, pathAdvice, pickBinDir, serverName, serverSpec,
+  ConfigParseError, claudeAddJsonArgs, claudeCodeHasServer, claudeDesktopHasServer, claudeDesktopRunningFrom, claudeAddJsonCommand, claudeDesktopConfigPath, isOurLauncher, launcherFileName, launcherScript, mergeMcpServers, pathAdvice, pickBinDir, serverName, serverSpec,
 } from '../../src/ai/mcpConfig';
 
 const spec = serverSpec('/Apps/Code Helper (Plugin)', '/home/u/.tasksmd/tasksmd.cjs', '/home/u/notes');
@@ -79,5 +79,14 @@ describe('M21 MCP config helpers', () => {
     expect(claudeDesktopHasServer(JSON.stringify({ mcpServers: { tasks: {} } }), 'tasks')).toBe(true);
     expect(claudeDesktopHasServer(JSON.stringify({ mcpServers: {} }), 'tasks')).toBe(false);
     expect(claudeDesktopHasServer(undefined, 'tasks')).toBe(false);
+  });
+
+  it('detects a running Claude Desktop app (not Claude Code or its helpers)', () => {
+    expect(claudeDesktopRunningFrom('darwin', '81111 /Applications/Claude.app/Contents/MacOS/Claude\n')).toBe(true);
+    expect(claudeDesktopRunningFrom('darwin', '1825 /Applications/Claude.app/Contents/Helpers/chrome-native-host chrome-extension://x/')).toBe(false);
+    expect(claudeDesktopRunningFrom('darwin', '')).toBe(false);
+    expect(claudeDesktopRunningFrom('win32', 'Claude.exe                   1234 Console    1    150,000 K')).toBe(true);
+    expect(claudeDesktopRunningFrom('win32', 'INFO: No tasks are running which match the specified criteria.')).toBe(false);
+    expect(claudeDesktopRunningFrom('linux', 'anything')).toBe(false);
   });
 });

@@ -13,6 +13,10 @@
 **Licenses**
 - `THIRD_PARTY_NOTICES.md` lists every bundled open-source package with its license text (generated at build time). Earlier releases missed several (markdown-it and its dependencies, clsx, esm-env, and in the npm CLI the MCP SDK, zod and ajv).
 
+**AI results**
+- MCP `tasks_query` / `tasks_get` results are much smaller for agents: each task once (no repeated `groups` / `tree` copies), empty fields left out, compact JSON — about 11% of the previous size for the same query. With `group by`, `groups` lists task indexes.
+- Claude Desktop's config is written only after Claude Desktop is closed; while it runs it can overwrite the file and drop the connection.
+
 **Task links**
 - `vscode://hastycapybara.tasks-for-markdown/open?path=…&line=…` opens a task from any app; `/query?text=…` shows a query's results (Cursor: `cursor://…`).
 - **Tasks: Copy link to task**, **Copy link to query under cursor**.

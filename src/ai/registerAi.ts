@@ -6,7 +6,7 @@ import * as vscode from 'vscode';
 import { t } from '../l10n';
 import type { Settings } from '../settings/Settings';
 import {
-  ConfigParseError, claudeAddJsonArgs, claudeCodeHasServer, claudeDesktopHasServer, claudeAddJsonCommand, claudeDesktopConfigPath, isOurLauncher, launcherFileName, launcherScript, mergeMcpServers, pathAdvice, pickBinDir, serverName, serverSpec, type McpServerSpec,
+  ConfigParseError, claudeAddJsonArgs, claudeCodeHasServer, claudeDesktopHasServer, claudeDesktopRunningFrom, claudeAddJsonCommand, claudeDesktopConfigPath, isOurLauncher, launcherFileName, launcherScript, mergeMcpServers, pathAdvice, pickBinDir, serverName, serverSpec, type McpServerSpec,
 } from './mcpConfig';
 import { onboardingDay, shouldPrompt } from './onboardingDays';
 
@@ -222,6 +222,22 @@ export function registerAi(context: vscode.ExtensionContext, deps: AiDeps): AiIn
     }
   };
 
+  const claudeDesktopRunning = async () => {
+    if (process.platform === 'darwin') return claudeDesktopRunningFrom('darwin', (await run('pgrep', ['-fl', 'Claude.app/Contents/MacOS/Claude'], os.homedir())).out);
+    if (process.platform === 'win32') return claudeDesktopRunningFrom('win32', (await run('tasklist', ['/FI', '"IMAGENAME eq Claude.exe"', '/NH'], os.homedir())).out);
+    return false;
+  };
+  /** Claude Desktop rewrites its config from memory while it runs (incident #32): only write once it is closed. */
+  const waitForClaudeDesktopClosed = async (): Promise<boolean> => {
+    while (await claudeDesktopRunning()) {
+      const retry = t('Try again');
+      const choice = await vscode.window.showWarningMessage(
+        t('Claude Desktop is open. Quit it completely first ({0}) — while it runs it can write its settings back and drop the connection. Then choose "Try again".', process.platform === 'darwin' ? 'Cmd+Q' : t('File → Exit')),
+        { modal: true }, retry);
+      if (choice !== retry) return false;
+    }
+    return true;
+  };
   const connectClaudeDesktop = async (opts: { confirm?: boolean } = {}) => {
     const file = claudeDesktopConfigPath(process.platform, os.homedir(), process.env.APPDATA);
     if (!file) return void vscode.window.showWarningMessage(t('Claude Desktop is not available on this system.'));
@@ -246,10 +262,17 @@ export function registerAi(context: vscode.ExtensionContext, deps: AiDeps): AiIn
     const detail = t('Adds or updates the MCP server(s) {0} in {1}. Other servers and settings are kept; a backup is saved next to the file.', names.join(', '), file);
     // The daily prompt's "Connect" button is the consent there; the command asks first.
     if (opts.confirm !== false && (await vscode.window.showInformationMessage(t('Connect Claude Desktop to your tasks?'), { modal: true, detail }, ok)) !== ok) return;
-    if (before !== undefined) await fs.writeFile(`${file}.bak`, before);
+    if (!(await waitForClaudeDesktopClosed())) return void vscode.window.showInformationMessage(t('Claude Desktop was not connected. Run "Tasks: Connect AI agents (MCP)" again after quitting it.'));
+    // Read again: the app may have written the file while we waited.
+    const fresh = (await exists(file)) ? await fs.readFile(file, 'utf8') : undefined;
+    if (fresh !== before) {
+      text = fresh;
+      for (const f of folders) text = mergeMcpServers(text, 'mcpServers', serverName(f.name, folders.length), serverSpec(process.execPath, cli, f.uri.fsPath)).text;
+    }
+    if (fresh !== undefined) await fs.writeFile(`${file}.bak`, fresh);
     await fs.writeFile(file, text!);
     deps.log(`claude desktop config updated: ${names.join(', ')}`);
-    void vscode.window.showInformationMessage(t('Connected Claude Desktop. Quit and reopen Claude Desktop to load it.'));
+    void vscode.window.showInformationMessage(t('Connected Claude Desktop. Open Claude Desktop to use it.'));
   };
 
   /** Whether one of these executables is on PATH (no process is started). */

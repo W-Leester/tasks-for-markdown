@@ -6,7 +6,8 @@ import { loadConfig } from './config';
 import { listSavedQueries } from './savedQueries';
 import { StaleLineError } from './store';
 import { SYNTAX_REFERENCE } from './syntax';
-import { toTaskDto } from '../../../src/core/dto';
+import { toTaskDto, type GroupDto, type TaskDto } from '../../../src/core/dto';
+import type { QueryOutput } from './commands';
 
 export interface McpOptions {
   root: string;
@@ -38,7 +39,45 @@ const fields = {
   notes: z.array(z.string()).optional().describe('Replace ALL notes (indented bullets under the task), one entry per note; [] removes them. To add one note use tasks_add_note.'),
 };
 
-const text = (value: unknown) => ({ content: [{ type: 'text' as const, text: typeof value === 'string' ? value : JSON.stringify(value, null, 2) }] });
+/**
+ * Results for AI agents, kept small (every token counts in an agent's context): fields without a
+ * value (null, empty list, false) and `key` (same as `path`) are left out.
+ */
+export function compactTask(t: TaskDto): Record<string, unknown> {
+  const out: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(t)) {
+    if (k === 'key' || v === null || v === false || (Array.isArray(v) && v.length === 0)) continue;
+    out[k] = v;
+  }
+  return out;
+}
+
+export interface CompactGroup { name: string; count: number; tasks?: number[]; groups?: CompactGroup[] }
+
+/**
+ * A query result with every task once: `tasks` is the flat list, `groups` (only with `group by`)
+ * points into it by index, and sub-task nesting is in each task's `parentLine` / `depth` — the
+ * full result repeated the same tasks in `tasks`, `groups` and `tree` (10-08).
+ */
+export function compactQueryOutput(out: QueryOutput): Record<string, unknown> {
+  const index = new Map(out.tasks.map((t, i) => [`${t.key}:${t.line}`, i]));
+  const group = (g: GroupDto): CompactGroup => ({
+    name: g.name, count: g.count,
+    ...(g.tasks.length ? { tasks: g.tasks.map((t) => index.get(`${t.key}:${t.line}`) ?? -1) } : {}),
+    ...(g.children.length ? { groups: g.children.map(group) } : {}),
+  });
+  const grouped = !!out.groups && out.groups.children.length > 0;
+  return {
+    matched: out.matched,
+    shown: out.shown,
+    tasks: out.tasks.map(compactTask),
+    ...(grouped ? { groups: out.groups!.children.map(group) } : {}),
+    ...(out.runtimeErrors.length ? { runtimeErrors: out.runtimeErrors } : {}),
+  };
+}
+
+// Compact JSON: agents parse it fine, and indentation alone was a large share of each result.
+const text = (value: unknown) => ({ content: [{ type: 'text' as const, text: typeof value === 'string' ? value : JSON.stringify(value) }] });
 const failure = (err: unknown) => {
   const e = err instanceof CliError ? { code: err.code, message: err.message, details: err.details }
     : err instanceof StaleLineError ? { code: 'STALE_LINE', message: err.message, details: { expected: err.expected, actual: err.actual } }
@@ -61,9 +100,9 @@ export function createMcpServer(opts: McpOptions): McpServer {
 
   server.registerTool('tasks_query', {
     title: 'Query tasks',
-    description: 'Run a Tasks query (one instruction per line, e.g. "not done\\ndue before tomorrow\\nsort by urgency"). Returns matched/shown counts and the tasks with path, 0-based line, description, dates, priority, tags, originalMarkdown. An empty query returns every task.',
+    description: 'Run a Tasks query (one instruction per line, e.g. "not done\\ndue before tomorrow\\nsort by urgency"). Returns matched/shown counts and the tasks (each once) with path, 0-based line, description, dates, priority, tags, originalMarkdown; fields without a value are omitted. With group by, groups lists group names and the indexes of their tasks. An empty query returns every task.',
     inputSchema: { query: z.string(), source: z.string().optional().describe('Path of the note the query "lives in" for {{query.file.*}} placeholders'), limit: z.number().int().min(0).optional() },
-  }, async ({ query, source, limit }) => guard(() => runQuery(ws(), limit !== undefined ? `${query}\nlimit ${limit}` : query, source)));
+  }, async ({ query, source, limit }) => guard(() => compactQueryOutput(runQuery(ws(), limit !== undefined ? `${query}\nlimit ${limit}` : query, source))));
 
   server.registerTool('tasks_explain_query', {
     title: 'Explain a query',
@@ -75,7 +114,7 @@ export function createMcpServer(opts: McpOptions): McpServer {
     title: 'Get one task',
     description: 'The task at path:line, or an error if there is none.',
     inputSchema: { path: ref.path, line: ref.line },
-  }, async ({ path, line }) => guard(() => { const w = ws(); return toTaskDto(taskAt(w, { path, line }), w.index, w.today); }));
+  }, async ({ path, line }) => guard(() => { const w = ws(); return compactTask(toTaskDto(taskAt(w, { path, line }), w.index, w.today)); }));
 
   server.registerTool('tasks_list_saved_queries', {
     title: 'List saved queries',

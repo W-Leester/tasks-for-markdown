@@ -240,7 +240,7 @@ VS Code는 `.vscode/mcp.json`(맨 위 키가 `servers`):
 
 | 도구 | 하는 일 |
 |---|---|
-| `tasks_query { query, source?, limit? }` | 쿼리 실행. `matched`, `shown`, `tasks[]`(path, 0-based line, description, 날짜, priority, tags, originalMarkdown) |
+| `tasks_query { query, source?, limit? }` | 쿼리 실행. `matched`, `shown`, `tasks[]`(path, 0-based line, description, 날짜, priority, tags, originalMarkdown — 태스크마다 한 번, 값이 없는 필드는 생략), `group by`가 있으면 `groups[]` = `{ name, count, tasks: [tasks의 번호], groups? }`(1.1.0. 이전에는 `groups`·`tree`에 태스크가 반복됨) |
 | `tasks_explain_query { query }` | 쿼리 해석과 문법 오류(실행 안 함) |
 | `tasks_get { path, line }` | 태스크 하나 |
 | `tasks_list_saved_queries` | 저장된 쿼리 목록 |

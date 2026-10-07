@@ -153,6 +153,9 @@ Cursor는 VS Code 기반이지만 같은 확장이 똑같이 동작하지 않는
 | Markdown 미리보기 토글 | 기본 미리보기 | 자체 WYSIWYG 편집기(확장 렌더러를 안 씀) |
 | 설정 화면 `Cmd+,` | VS Code 설정(확장 설정 포함) | Cursor 자체 설정 — 확장 설정은 `Preferences: Open Settings (UI)` |
 
+- **다른 앱의 설정 파일을 쓸 때(예: Claude Desktop):** 그 앱이 켜져 있으면 메모리의 설정으로 파일을 다시 써서 우리가 넣은 내용이 사라질 수 있다(incidents #32). 실행 여부를 확인하고 꺼져 있을 때만 쓴다.
+- **AI에게 주는 응답은 작게:** MCP 도구 결과는 에이전트의 대화 용량을 쓴다. 같은 내용을 여러 모양으로 반복하지 말고, 값이 없는 필드는 빼고, 들여쓰기 없는 JSON으로(이 프로젝트: 같은 조회가 8.5KB → 0.9KB).
+
 - 확장에 넣은 Node 프로그램(예: CLI·MCP 서버)은 `ELECTRON_RUN_AS_NODE=1 <process.execPath>`로 실행하면 Node.js 설치 없이 돈다. 확장 호스트의 `process.execPath`는 macOS에서 `… Helper (Plugin)` 실행 파일이며 그것으로도 된다.
 
 ---

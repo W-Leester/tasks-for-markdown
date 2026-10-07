@@ -126,7 +126,7 @@ short mode
   - Cursor: 설정의 MCP 목록에 확장이 등록한 서버로 보입니다.
 - **Claude Code·Claude Desktop:** 명령 `Tasks: AI 에이전트 연결 (MCP)` → 설치된 도구는 미리 체크돼 있으니 OK만 누르면 모두 연결됩니다(설치되지 않은 도구는 "설치되지 않음"으로 표시).
   - Claude Code는 `claude mcp add-json --scope local`로 **이 컴퓨터의 이 프로젝트에만** 추가합니다. `claude` 명령이 없으면 터미널에 붙여 넣을 명령을 복사해 줍니다. 추가한 뒤 새 Claude Code 세션에서 쓸 수 있습니다.
-  - Claude Desktop은 설정 파일(macOS `~/Library/Application Support/Claude/claude_desktop_config.json`)에 서버를 추가합니다. 바꾸기 전에 확인을 받고, 원본은 `.bak`으로 남기며, 다른 서버 설정은 그대로 둡니다. Claude Desktop을 완전히 종료했다가 다시 열면 적용됩니다.
+  - Claude Desktop은 설정 파일(macOS `~/Library/Application Support/Claude/claude_desktop_config.json`)에 서버를 추가합니다. **Claude Desktop이 켜져 있으면 먼저 완전히 종료하라고 안내합니다**(켜져 있으면 앱이 설정을 다시 써서 연결이 지워질 수 있음). 바꾸기 전에 확인을 받고, 원본은 `.bak`으로 남기며, 다른 서버 설정은 그대로 둡니다. Claude Desktop을 완전히 종료했다가 다시 열면 적용됩니다.
   - 이 두 곳은 에디터 밖에서 돌기 때문에 `~/.tasksmd/`에 서버 파일을 복사해 두고 그것을 씁니다. 확장이 업데이트되면 다음에 에디터를 켤 때 함께 갱신됩니다.
 - AI가 고치는 줄은 읽어 간 내용과 같은지 확인한 뒤에만 바뀝니다(다르면 거절). 다만 **저장하지 않은 편집이 있는 파일**은 충돌할 수 있으니 AI에게 시키기 전에 저장하세요.
 - 확장이 없는 컴퓨터(CI 등)에서는 npm 패키지 `@hastycapybara/tasks-cli`를 씁니다(README 참고).

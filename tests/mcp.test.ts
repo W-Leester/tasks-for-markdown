@@ -54,6 +54,23 @@ describe('MCP server', () => {
     expect(ex.data.errors).toEqual([]);
   });
 
+  it('query results list each task once, without empty fields (small for agents)', async () => {
+    const q = await call('tasks_query', { query: 'not done\nsort by due' });
+    expect(Object.keys(q.data).sort()).toEqual(['matched', 'shown', 'tasks']); // no groups / tree copies
+    for (const t of q.data.tasks) {
+      expect(t).not.toHaveProperty('key');
+      expect(Object.values(t).some((v) => v === null || v === false || (Array.isArray(v) && v.length === 0))).toBe(false);
+      expect(t).toHaveProperty('originalMarkdown');
+    }
+    const g = await call('tasks_query', { query: 'not done\ngroup by filename' });
+    expect(g.data.groups.length).toBeGreaterThan(0);
+    const indexes = g.data.groups.flatMap((x: { tasks?: number[] }) => x.tasks ?? []);
+    expect(indexes.sort()).toEqual(g.data.tasks.map((_: unknown, i: number) => i)); // every task referenced once
+    expect(JSON.stringify(g.data.groups)).not.toContain('originalMarkdown');
+    const one = await call('tasks_get', { path: 'notes/todo.md', line: 0 });
+    expect(one.data).not.toHaveProperty('key');
+  });
+
   it('create → update → set_status (recurrence) → postpone → remove, with STALE_LINE', async () => {
     const created = await call('tasks_create', { file: 'notes/todo.md', description: 'call bob #work', due: '2026-10-01', priority: '1' });
     expect(created.isError).toBe(false);

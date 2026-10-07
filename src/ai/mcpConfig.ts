@@ -138,3 +138,14 @@ export function claudeDesktopHasServer(config: string | undefined, name: string)
   return hasKey(parseObject(config)?.['mcpServers'], name);
 }
 
+/**
+ * Whether Claude Desktop (the app, not Claude Code or helpers) is running, from the output of
+ * `pgrep -fl Claude.app/Contents/MacOS/Claude` (macOS) or `tasklist /FI "IMAGENAME eq Claude.exe" /NH` (Windows).
+ * While it runs it may write its config back from memory and drop our server (10-08, incident #32).
+ */
+export function claudeDesktopRunningFrom(platform: NodeJS.Platform, output: string): boolean {
+  if (platform === 'darwin') return /Claude\.app\/Contents\/MacOS\/Claude(\s|$)/m.test(output);
+  if (platform === 'win32') return /^\s*Claude\.exe\s/im.test(output);
+  return false;
+}
+

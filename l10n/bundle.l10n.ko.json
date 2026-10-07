@@ -408,5 +408,10 @@
   "not installed — choose it to copy the command": "설치되지 않음 — 고르면 명령을 복사해 드림",
   "not installed": "설치되지 않음",
   "Connect": "연결",
-  "Tasks for Markdown: {0} is installed. Connect it to your tasks (MCP) so it can find, add and complete them when you ask?": "Tasks for Markdown: {0}이(가) 설치돼 있습니다. 태스크에 연결(MCP)해서, 말로 시키면 태스크를 찾고 추가하고 완료할 수 있게 할까요?"
+  "Tasks for Markdown: {0} is installed. Connect it to your tasks (MCP) so it can find, add and complete them when you ask?": "Tasks for Markdown: {0}이(가) 설치돼 있습니다. 태스크에 연결(MCP)해서, 말로 시키면 태스크를 찾고 추가하고 완료할 수 있게 할까요?",
+  "Try again": "다시 시도",
+  "File → Exit": "파일 → 끝내기",
+  "Claude Desktop is open. Quit it completely first ({0}) — while it runs it can write its settings back and drop the connection. Then choose \"Try again\".": "Claude Desktop이 켜져 있습니다. 먼저 완전히 종료하세요({0}). 켜져 있으면 Claude Desktop이 설정을 다시 써서 연결이 지워질 수 있습니다. 종료한 뒤 \"다시 시도\"를 누르세요.",
+  "Claude Desktop was not connected. Run \"Tasks: Connect AI agents (MCP)\" again after quitting it.": "Claude Desktop은 연결하지 않았습니다. Claude Desktop을 종료한 뒤 \"Tasks: AI 에이전트 연결 (MCP)\"를 다시 실행하세요.",
+  "Connected Claude Desktop. Open Claude Desktop to use it.": "Claude Desktop을 연결했습니다. Claude Desktop을 열면 쓸 수 있습니다."
 }

@@ -242,7 +242,7 @@ VS Code: `.vscode/mcp.json` (the top-level key is `servers`):
 
 | Tool | Purpose |
 |---|---|
-| `tasks_query { query, source?, limit? }` | Run a query: `matched`, `shown`, `tasks[]` (path, 0-based line, description, dates, priority, tags, originalMarkdown) |
+| `tasks_query { query, source?, limit? }` | Run a query: `matched`, `shown`, `tasks[]` (path, 0-based line, description, dates, priority, tags, originalMarkdown — each task once, fields without a value omitted), with `group by` also `groups[]` = `{ name, count, tasks: [indexes into tasks], groups? }` (1.1.0; before, tasks were repeated in `groups`/`tree`) |
 | `tasks_explain_query { query }` | Explanation and syntax errors, without running |
 | `tasks_get { path, line }` | One task |
 | `tasks_list_saved_queries` | Saved queries |

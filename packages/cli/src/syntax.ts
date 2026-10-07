@@ -41,4 +41,7 @@ The extension's sidebar views are these queries (use them to match what the user
 Placeholders inside a note: {{query.file.folder}} {{query.file.path}} {{query.file.filename}}
 
 Lines in tool arguments are 0-based (line 0 = first line of the file); the CLI shows 1-based numbers.
+
+## Query results
+tasks_query returns { matched, shown, tasks[, groups] }. Each task appears once in tasks; fields without a value are left out (no due date → no "due"). With group by, groups is [{ name, count, tasks: [indexes into tasks], groups? }]. Sub-tasks: parentLine and depth.
 `;

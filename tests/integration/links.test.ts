@@ -36,4 +36,10 @@ suite('task links (M23)', () => {
     const r = await vscode.commands.executeCommand<string>('tasksmd.api.ui.link', { ref: { path: 'notes/project-a.md', line: 3 } });
     assert.equal(r, link);
   });
+
+  test('a /guide link (as the README sends it through vscode.dev/redirect) opens the Get Started guide', async () => {
+    const api = await getApi();
+    await api.links.handle(vscode.Uri.parse(`${vscode.env.uriScheme}://hastycapybara.tasks-for-markdown/guide?url=vscode%3A%2F%2Fhastycapybara.tasks-for-markdown%2Fguide`));
+    await vscode.commands.executeCommand('workbench.action.closeAllEditors');
+  });
 });

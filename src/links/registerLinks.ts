@@ -57,6 +57,10 @@ export async function handleTaskLink(uri: vscode.Uri, deps: LinkDeps): Promise<v
     void vscode.window.showErrorMessage(t('Tasks: {0}', errorText(link.code, link.value)));
     return;
   }
+  if (link.kind === 'guide') {
+    await vscode.commands.executeCommand('tasksmd.openWalkthrough');
+    return;
+  }
   if (link.kind === 'query') {
     deps.openQueryResults({ text: link.text, source: '', label: t('Link') });
     return;

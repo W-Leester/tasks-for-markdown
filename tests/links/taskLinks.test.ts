@@ -44,6 +44,11 @@ describe('task links (M23)', () => {
     expect(roundTrip(queryLink('vscode', 'description includes sort by function'))).toMatchObject({ kind: 'query' });
   });
 
+  it('opens the Get Started guide (README link; the vscode.dev redirect adds a url parameter)', () => {
+    expect(parseTaskLink('/guide', '')).toEqual({ kind: 'guide' });
+    expect(parseTaskLink('/guide', 'url=vscode://hastycapybara.tasks-for-markdown/guide')).toEqual({ kind: 'guide' });
+  });
+
   it('rejects unknown actions', () => {
     expect(parseTaskLink('/delete', 'path=a.md')).toEqual({ kind: 'error', code: 'unknownAction', value: 'delete' });
     expect(parseTaskLink('/', '')).toEqual({ kind: 'error', code: 'unknownAction', value: '' });

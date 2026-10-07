@@ -12,6 +12,7 @@ export const LINK_AUTHORITY = 'hastycapybara.tasks-for-markdown';
 export type ParsedLink =
   | { kind: 'open'; path: string; line: number } // line: 0-based
   | { kind: 'query'; text: string }
+  | { kind: 'guide' } // the Get Started walkthrough (README link)
   | { kind: 'error'; code: LinkError; value?: string };
 
 /** Why a link was refused; the VS Code layer turns it into a translated message. */
@@ -60,5 +61,6 @@ export function parseTaskLink(path: string, query: string): ParsedLink {
     if (FUNCTION_LINE.test(text)) return { kind: 'error', code: 'functionQuery' };
     return { kind: 'query', text };
   }
+  if (action === 'guide') return { kind: 'guide' };
   return { kind: 'error', code: 'unknownAction', value: action };
 }

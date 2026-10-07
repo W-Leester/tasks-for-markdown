@@ -277,6 +277,34 @@ export function registerAi(context: vscode.ExtensionContext, deps: AiDeps): AiIn
     // Cursor has no "Welcome: Open Walkthrough…", so offer our own entry (as the Claude Code extension does).
     vscode.commands.registerCommand('tasksmd.openWalkthrough', () => vscode.commands.executeCommand('workbench.action.openWalkthrough', `${context.extension.id}#tasksmd.start`, false)),
   );
+  // ---- the first launches: open the guide once, offer the terminal command up to 3 times -------
+  const LAUNCHES = 'onboarding.launches', DONE = 'onboarding.done';
+  const cliPresent = async () => {
+    const rt = await readRuntime();
+    if (rt?.launcher && (await exists(rt.launcher))) return true;
+    for (const dir of (process.env.PATH ?? '').split(path.delimiter).filter(Boolean)) if (await exists(path.join(dir, launcherFileName(process.platform)))) return true;
+    return false;
+  };
+  const onboard = async () => {
+    const state = context.globalState;
+    const launch = (state.get<number>(LAUNCHES) ?? 0) + 1;
+    await state.update(LAUNCHES, launch);
+    if (launch === 1) await vscode.commands.executeCommand('tasksmd.openWalkthrough');
+    if (launch > 3 || state.get<boolean>(DONE)) return;
+    const offerInstall = !(await cliPresent());
+    const install = t("Install 'tasksmd' command"), guide = t('Open the guide'), never = t("Don't show again");
+    const buttons = [...(offerInstall ? [install] : []), ...(launch > 1 ? [guide] : []), never];
+    if (buttons.length === 1) return; // nothing to offer
+    const message = offerInstall
+      ? t('Tasks for Markdown: use your tasks from any terminal with the "tasksmd" command (no npm needed), or open the Get Started guide.')
+      : t('Tasks for Markdown: open the Get Started guide to see what it can do.');
+    const choice = await vscode.window.showInformationMessage(message, ...buttons);
+    if (choice === install) { await state.update(DONE, true); await installCli(); }
+    else if (choice === guide) await vscode.commands.executeCommand('tasksmd.openWalkthrough');
+    else if (choice === never) await state.update(DONE, true);
+  };
+  if (context.extensionMode !== vscode.ExtensionMode.Test) void onboard().catch((err) => deps.log(`onboarding: ${String(err)}`));
+
   deps.log(`mcp registration: ${mode}`);
   return { mode, current: wanted };
 }

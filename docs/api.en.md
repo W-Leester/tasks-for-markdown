@@ -272,6 +272,7 @@ Links open a task or a query from anywhere outside the editor — a chat message
 - `<scheme>` is the editor's: `vscode`, `cursor`, `vscode-insiders`, … (`vscode.env.uriScheme`).
 - `open`: `path` as the API uses it (workspace-relative; multi-root: `<folder>/<path>`), `line` 1-based. Opens the text editor at that line.
 - `query`: the query results panel for `text` (lines separated by a newline).
+- `guide`: the Get Started walkthrough (no parameters). For web pages use `https://vscode.dev/redirect?url=vscode://hastycapybara.tasks-for-markdown/guide`, since GitHub and the Marketplace drop `vscode://` links; the redirect does not accept `cursor://`.
 - Values are percent-encoded **twice** (VS Code decodes the query once before the extension sees it); simple hand-written links with one layer work too as long as values contain no `&`, `=` or `+`.
 - Refused: absolute paths, `..`, files outside the open folders, `filter|sort|group by function` lines. Links only open and show — they never change files.
 - Make links with the commands `Tasks: Copy link to task` and `Tasks: Copy link to query under cursor`, or `ui.link(ref)` / `tasksmd.api.ui.link`.

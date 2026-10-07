@@ -42,6 +42,8 @@ The extension indexes every `- [ ]` line in the workspace. You can see, query an
 
 ## Getting started
 
+New here? [Open the Get Started guide in VS Code](https://vscode.dev/redirect?url=vscode://hastycapybara.tasks-for-markdown/guide) (in Cursor: **Tasks: Open Get Started guide** from the Command Palette). The guide also opens by itself the first time.
+
 1. **Open a folder with Markdown files.** Every `- [ ]` line in it becomes a task, and the **Tasks** icon appears in the Activity Bar.
 2. **Create tasks.** Write a checklist line such as `- [ ] Write the report 📅 2026-09-25`, or press `Ctrl+Shift+C` (the Ctrl key on macOS too) to open the create/edit dialog. `Ctrl+Shift+Enter` on a task line marks it done.
 3. **Filter with a query block, then view the note.** A ` ```tasks ` block lists the tasks that match its lines; `Ctrl+Shift+R` opens the note in the rendered view with the results in place. (VS Code's own Markdown preview shows the results too, but its checkboxes are display-only.) Common query lines: [Query syntax](#query-syntax).

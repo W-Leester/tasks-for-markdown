@@ -270,6 +270,7 @@ VS Code는 `.vscode/mcp.json`(맨 위 키가 `servers`):
 - `<scheme>`은 에디터마다 다릅니다: `vscode`, `cursor`, `vscode-insiders` …(`vscode.env.uriScheme`).
 - `open`: `path`는 API와 같은 경로(워크스페이스 상대, 폴더가 여럿이면 `<폴더>/<경로>`), `line`은 1부터. 텍스트 편집기에서 그 줄로 이동.
 - `query`: `text`의 쿼리 결과 패널(줄은 줄바꿈으로 구분).
+- `guide`: 시작 안내(인자 없음). 웹 페이지에는 `https://vscode.dev/redirect?url=vscode://hastycapybara.tasks-for-markdown/guide`를 씁니다(GitHub·마켓이 `vscode://` 링크를 지움). 이 우회 주소는 `cursor://`를 받지 않습니다.
 - 값은 **두 번** 퍼센트 인코딩합니다(VS Code가 확장에 넘기기 전에 한 번 풀기 때문). 손으로 쓴 한 번 인코딩한 링크도 값에 `&`, `=`, `+`가 없으면 동작합니다.
 - 거부: 절대 경로, `..`, 열린 폴더 밖의 파일, `filter|sort|group by function` 줄. 링크는 열고 보여 주기만 하고 파일을 바꾸지 않습니다.
 - 링크 만들기: 명령 `Tasks: 태스크 링크 복사`, `Tasks: 커서 위치 쿼리 링크 복사`, 또는 `ui.link(ref)` / `tasksmd.api.ui.link`.

@@ -219,6 +219,8 @@ tasksmd info                                           # version, features, sett
 
 A Model Context Protocol server built into the CLI. Claude Code, Cursor Agent, Claude Desktop and similar agents use the tasks as tools over stdio.
 
+**With the extension (1.1.0+), no npm is needed.** The same server is bundled in the extension and runs on the editor's own Node: it is registered automatically with VS Code's agent mode and Cursor (`tasksmd.mcp.autoRegister`), and **Tasks: Connect AI agents (MCP)** adds it to Claude Code (`claude mcp add-json --scope local`) or Claude Desktop (config merge after confirmation). The npm registration below is for machines without the extension.
+
 **Registration**
 
 ```bash

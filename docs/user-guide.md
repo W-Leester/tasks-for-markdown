@@ -118,6 +118,31 @@ short mode
 - **진단**: 잘못된 날짜, 없는 ID, 순환 의존성, 잘못된 반복 규칙, 날짜 없는 반복 → Problems 패널 + Quick Fix.
 - **포맷 변환**: `Tasks: 이 파일의 태스크 포맷 변환…`.
 
+## 5-1. AI 에이전트, 터미널, 링크
+
+**AI 에이전트(MCP).** 확장에 MCP 서버가 들어 있어 AI 에이전트가 태스크를 도구로 읽고 고칩니다. 서버는 에디터에 내장된 Node로 돌아가므로 Node.js·npm 설치가 필요 없습니다.
+- **VS Code(에이전트 모드)·Cursor:** 확장을 설치하면 자동으로 연결됩니다. 워크스페이스 폴더마다 서버 하나(폴더가 여럿이면 이름이 `tasks-<폴더>`). 끄려면 `tasksmd.mcp.autoRegister`를 끕니다. 신뢰되지 않은 워크스페이스에서는 연결하지 않습니다.
+  - VS Code: 채팅의 에이전트 모드 도구 목록(🔧)에 "Tasks for Markdown"이 보입니다. 처음 쓸 때 서버 시작을 허용할지 묻습니다.
+  - Cursor: 설정의 MCP 목록에 확장이 등록한 서버로 보입니다.
+- **Claude Code·Claude Desktop:** 명령 `Tasks: AI 에이전트 연결 (MCP)` → 대상을 고릅니다.
+  - Claude Code는 `claude mcp add-json --scope local`로 **이 컴퓨터의 이 프로젝트에만** 추가합니다. `claude` 명령이 없으면 터미널에 붙여 넣을 명령을 복사해 줍니다. 추가한 뒤 새 Claude Code 세션에서 쓸 수 있습니다.
+  - Claude Desktop은 설정 파일(macOS `~/Library/Application Support/Claude/claude_desktop_config.json`)에 서버를 추가합니다. 바꾸기 전에 확인을 받고, 원본은 `.bak`으로 남기며, 다른 서버 설정은 그대로 둡니다. Claude Desktop을 완전히 종료했다가 다시 열면 적용됩니다.
+  - 이 두 곳은 에디터 밖에서 돌기 때문에 `~/.tasksmd/`에 서버 파일을 복사해 두고 그것을 씁니다. 확장이 업데이트되면 다음에 에디터를 켤 때 함께 갱신됩니다.
+- AI가 고치는 줄은 읽어 간 내용과 같은지 확인한 뒤에만 바뀝니다(다르면 거절). 다만 **저장하지 않은 편집이 있는 파일**은 충돌할 수 있으니 AI에게 시키기 전에 저장하세요.
+- 확장이 없는 컴퓨터(CI 등)에서는 npm 패키지 `@hastycapybara/tasks-cli`를 씁니다(README 참고).
+
+**터미널 명령 `tasksmd`.** 명령 `Tasks: 'tasksmd' 터미널 명령 설치`를 실행하면 터미널과 스크립트에서 `tasksmd query "due today"`, `tasksmd done notes/work.md:12` 같은 명령을 쓸 수 있습니다(`tasksmd --help`).
+- macOS·Linux는 PATH에 들어 있는 `~/.local/bin` 또는 `~/bin`에 설치합니다. 둘 다 PATH에 없으면 `~/.local/bin`에 설치하고, 셸 설정 파일(예: `~/.zshrc`)에 넣을 한 줄(`export PATH="$HOME/.local/bin:$PATH"`)을 복사해 줍니다. Windows는 `%LOCALAPPDATA%\tasksmd\bin`.
+- 같은 이름의 다른 프로그램이 있으면 덮어쓰지 않습니다. 지우려면 `Tasks: 'tasksmd' 터미널 명령 제거`.
+- 에디터 내장 Node로 실행되며, 에디터 위치가 바뀌거나 확장이 업데이트돼도 에디터를 한 번 켜면 따라갑니다.
+
+**태스크 링크.** 링크를 누르면 어느 앱에서든(메신저, 다른 메모 앱, 웹 페이지, AI 답변) 에디터가 열리며 그 태스크로 이동합니다.
+- 태스크 줄에 커서를 두고 `Tasks: 태스크 링크 복사` → `vscode://hastycapybara.tasks-for-markdown/open?path=…&line=…`(Cursor에서는 `cursor://…`).
+- ```tasks 블록 안에서 `Tasks: 커서 위치 쿼리 링크 복사` → 누르면 그 쿼리 결과 패널이 열립니다.
+- 링크는 열고 보여 주기만 하고 파일을 바꾸지 않습니다. 워크스페이스 밖의 경로와 `by function` 쿼리는 거부합니다. 같은 폴더(저장소)를 연 사람에게만 의미가 있습니다.
+
+**시작 안내.** 확장을 설치하면 에디터의 "시작하기"(Welcome) 화면에 "Tasks for Markdown 시작하기" 안내가 생깁니다. 첫 태스크, 쿼리와 렌더 보기, AI 연결, 터미널 명령을 단계별 버튼으로 해 볼 수 있습니다(명령 팔레트 `Welcome: Open Walkthrough…`로도 엽니다).
+
 ## 6. 키보드로 쓰기
 
 | 화면 | 키 |

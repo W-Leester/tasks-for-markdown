@@ -79,11 +79,19 @@ group by filename
 
 ## Use it with AI
 
-Tasks for Markdown ships an [MCP](https://modelcontextprotocol.io) server, so any MCP-capable AI agent can read and change your tasks as tools: Claude Code, Cursor's agent, VS Code's agent mode, Claude Desktop. Connect it once, then ask in plain language. The recording below is a real Claude Code session. The note in the editor updates while the agent works.
+Tasks for Markdown ships an [MCP](https://modelcontextprotocol.io) server, so any MCP-capable AI agent can read and change your tasks as tools: Claude Code, Cursor's agent, VS Code's agent mode, Claude Desktop. In VS Code and Cursor it is connected the moment you install the extension; then ask in plain language. The recording below is a real Claude Code session. The note in the editor updates while the agent works.
 
 ![Claude Code answers "What is overdue?", marks the task done and adds a note; the file updates live](docs/images/demo-ai.gif)
 
-**Connect** (Node.js 18+ is needed, because the server runs from npm with `npx`):
+**Connect** — nothing to install; the server runs on the editor's own Node:
+
+- **VS Code (agent mode) and Cursor:** connected automatically when the extension is installed, one server per workspace folder (`tasksmd.mcp.autoRegister`, on by default; not in untrusted workspaces).
+- **Claude Code and Claude Desktop:** run **Tasks: Connect AI agents (MCP)** and pick them. Claude Code is added for this project on this computer (`claude mcp add-json --scope local`); Claude Desktop's config file is updated after you confirm, with a backup and every other server kept.
+
+<details>
+<summary>Without the extension (another machine, CI): the npm package</summary>
+
+Node.js 18+ is needed, because the server runs from npm with `npx`.
 
 ```bash
 # Claude Code, in your notes folder
@@ -104,6 +112,7 @@ Claude Desktop — `claude_desktop_config.json`, with the absolute path of your 
 ```json
 { "mcpServers": { "tasks": { "command": "npx", "args": ["-y", "@hastycapybara/tasks-cli", "mcp", "--root", "/path/to/notes"] } } }
 ```
+</details>
 
 **Ask things like:**
 - "What is overdue? Mark the vendor contract review done and add a note: Legal approved clause 3."
@@ -140,7 +149,8 @@ if (tasks.features?.includes('notes.add')) await tasks.edit.addNote(r.tasks[0], 
 | Extension API `getAPI(1)` | other VS Code/Cursor extensions | `query`, `edit` (create, update, setStatus, postpone, addNote, batch…), `events`, `ui`, feature detection with `features` / `info()` |
 | Commands `tasksmd.api.*` | keybindings, macros, extensions in any language | every API method as a command with JSON arguments |
 | [`@hastycapybara/tasks-api`](https://www.npmjs.com/package/@hastycapybara/tasks-api) | TypeScript | type definitions only (no runtime code) |
-| [`@hastycapybara/tasks-cli`](https://www.npmjs.com/package/@hastycapybara/tasks-cli) | terminal, scripts, CI, AI agents | `tasksmd query`, `add`, `done`, `note`, `info`, … and the MCP server — no editor needed |
+| `tasksmd` command | terminal, scripts, AI agents | `tasksmd query`, `add`, `done`, `note`, `info`, … and the MCP server. **Tasks: Install 'tasksmd' command in PATH** installs it from the extension (no npm); on machines without the editor use [`@hastycapybara/tasks-cli`](https://www.npmjs.com/package/@hastycapybara/tasks-cli) |
+| Task links | other apps, chat, AI answers | `<scheme>://hastycapybara.tasks-for-markdown/open?path=…&line=…` and `/query?text=…`; `ui.link(ref)` makes one |
 | [`@hastycapybara/tasks-core`](https://www.npmjs.com/package/@hastycapybara/tasks-core) | Node programs | the parser, query engine and recurrence as a library |
 
 The API version stays `1` while features are only added, so your extension keeps working across updates. Writes are confirmed once per caller by default (`tasksmd.api.writePolicy`), errors are plain `{ code, message }` objects, and stale writes are refused. Read the [public API reference](docs/api.en.md).
@@ -177,6 +187,8 @@ You don't have to write queries by hand. `Tasks: Open query builder` assembles o
 | Open kanban board / calendar / statistics / query builder / query results (beside the editor, follows the cursor) | — |
 | Archive completed tasks… | — |
 | Insert query block, Explain query under cursor | — |
+| Connect AI agents (MCP), Install / Uninstall 'tasksmd' command in PATH | — |
+| Copy link to task, Copy link to query under cursor (links open the task from any app: `vscode://hastycapybara.tasks-for-markdown/open?…`) | — |
 | Load status preset…, Convert task format in this file… | — |
 
 ## Settings (`tasksmd.*`)

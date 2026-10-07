@@ -1,5 +1,23 @@
 # Changelog
 
+## Unreleased (1.1.0)
+
+**AI agents and the terminal without npm**
+- The MCP server is now bundled in the extension and runs on the editor's own Node — no Node.js or npm needed.
+- VS Code (agent mode) and Cursor: the server is registered automatically, one per workspace folder (`tasksmd.mcp.autoRegister`, on by default; not in untrusted workspaces).
+- **Tasks: Connect AI agents (MCP)** adds it to Claude Code (this project on this computer) or Claude Desktop (config file updated after confirmation, with a backup).
+- **Tasks: Install 'tasksmd' command in PATH** / **Uninstall** — the CLI in any terminal; keeps working after updates.
+- A "Get started" walkthrough (first task, queries and the rendered view, AI agents, terminal command).
+
+**Task links**
+- `vscode://hastycapybara.tasks-for-markdown/open?path=…&line=…` opens a task from any app; `/query?text=…` shows a query's results (Cursor: `cursor://…`).
+- **Tasks: Copy link to task**, **Copy link to query under cursor**.
+- **API:** `ui.link(ref)` and command `tasksmd.api.ui.link`, feature `links`.
+
+### 한국어 요약
+- **npm 없이 AI 에이전트와 터미널:** MCP 서버를 확장에 넣어 에디터 내장 Node로 실행. VS Code 에이전트 모드와 Cursor는 자동 연결(`tasksmd.mcp.autoRegister`), `Tasks: AI 에이전트 연결 (MCP)`로 Claude Code·Claude Desktop 연결, `'tasksmd' 터미널 명령 설치/제거`, 시작 안내 페이지.
+- **태스크 링크:** `vscode://hastycapybara.tasks-for-markdown/open?…`, `/query?…`, 링크 복사 명령 2개, API `ui.link`(기능 `links`).
+
 ## 1.0.1 — 2026-10-05
 
 **Fixes**

@@ -113,6 +113,18 @@ VS Code 1.138에 들어온 내장 Markdown Editor(WYSIWYG)와 `markdown.codeBloc
 
 ---
 
+## 5. 1.1.0 수동 점검 (M21·M23, 2026-10-07)
+
+자동 테스트로 확인한 것: VS Code에서 서버 등록·실제 실행(MCP 응답), 설정 끄면 제거, 링크 열기·거부·`ui.link`, 설정 병합·런처 스크립트·명령 문자열(단위). **아래는 실제 에디터에서만 확인할 수 있는 것.**
+
+1. [ ] **Cursor 자동 등록** — Cursor에서 노트 폴더를 열고 *Cursor Settings → MCP*(또는 Tools & Integrations)에 확장이 등록한 `tasks` 서버가 보이는지, 에이전트 채팅에서 "오늘 마감인 태스크 알려 줘"가 도구를 쓰는지.
+2. [ ] **VS Code 에이전트 모드** — Copilot 채팅 에이전트 모드의 도구(🔧) 목록에 "Tasks for Markdown"이 있고, 처음 실행 허용 후 질문에 답하는지.
+3. [ ] **Claude Code 연결** — `Tasks: AI 에이전트 연결 (MCP)` → Claude Code → 알림 확인 → 그 폴더에서 `claude mcp list`에 `tasks`가 보이는지, 새 세션에서 동작하는지.
+4. [ ] **Claude Desktop 연결**(설치된 경우) — 같은 명령 → Claude Desktop → 확인 창 → 설정 파일에 `tasks` 추가·`.bak` 생성·다른 서버 유지 → Claude Desktop 재시작 후 동작.
+5. [ ] **터미널 명령** — `Tasks: 'tasksmd' 터미널 명령 설치` → 새 터미널에서 `tasksmd --help`, `tasksmd query "not done" --root <노트 폴더>`. PATH 안내가 나오면 그 줄을 넣고 다시. `제거` 명령으로 지워지는지.
+6. [ ] **링크** — 태스크 줄에서 `Tasks: 태스크 링크 복사` → 브라우저 주소창이나 메모 앱에 붙여 넣고 누름 → 에디터가 그 줄로 이동. 쿼리 블록에서 `쿼리 링크 복사` → 결과 패널.
+7. [ ] **시작 안내** — 명령 팔레트 `Welcome: Open Walkthrough…` → "Tasks for Markdown 시작하기" 4단계와 버튼.
+
 ## 결과 기록
 
 | 항목 | 환경 | 날짜 | 결과 | 메모 |

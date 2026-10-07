@@ -990,7 +990,7 @@
 - [x] `registerUriHandler`, 열기·쿼리 처리, 오류는 알림으로
 - [x] 링크 복사 명령 2개, API `ui.link` + `features: 'links'`, 명령 표면 `tasksmd.api.ui.link`
 - [x] 통합 테스트(핸들러 직접 호출 → 편집기 위치 확인)
-- [ ] 문서: README 명령 표, api.md, user-guide, CHANGELOG
+- [x] 문서: README 명령 표, api.md, user-guide, CHANGELOG
 
 ## M21. 확장 안에서 AI 연결 제공 — 1.1.0 (계획 2026-10-02, 착수 2026-10-07)
 
@@ -1026,15 +1026,15 @@
 - 상세 설계: design.md 7.16.
 
 ### 할 일
-- [ ] **번들:** 빌드에서 `packages/cli/dist/tasksmd.cjs` → `dist/tasksmd.cjs` 복사, vsix 포함 확인(크기 기록)
-- [ ] **자동 등록:** VS Code(provider) / Cursor(registerServer). 워크스페이스 폴더마다 하나, 폴더가 바뀌면 갱신. 설정 `tasksmd.mcp.autoRegister`(기본 켬). 신뢰되지 않은 워크스페이스에서는 등록 안 함
-- [ ] **안정 경로 + 런처:** 켜질 때 `~/.tasksmd/tasksmd.cjs`로 복사(버전 바뀔 때만), 런처는 이 파일과 에디터 실행 파일을 가리킴 → 업데이트로 확장 폴더가 바뀌어도 밖의 설정이 안 끊김
-- [ ] **`Tasks: Install 'tasksmd' command in PATH` / `Uninstall …`:** macOS·Linux는 PATH에 있는 사용자 폴더(`~/.local/bin`, `~/bin`) 중 첫 번째, 없으면 `~/.local/bin` + PATH 추가 안내(복사 버튼). Windows는 `%LOCALAPPDATA%\tasksmd\bin\tasksmd.cmd` + 안내. 우리 런처(표시 주석)만 덮어쓰기/삭제
-- [ ] **`Tasks: Connect AI agents (MCP)`:** 대상 선택 — VS Code·Cursor(자동 등록 상태 표시), Claude Code(`claude mcp add --scope local` 실행, 없으면 명령 복사), Claude Desktop(설정 파일에 병합, 바꿀 내용 미리 보기 → 확인, 백업). 기존 항목 보존
-- [ ] **시작 안내 페이지(walkthrough):** 첫 태스크, 렌더 보기, AI 연결, 터미널 명령. 사이드바 빈 화면 안내에 "AI 연결" 버튼
-- [ ] **테스트:** 런처 스크립트·설정 병합·명령 문자열(단위), 등록·실제 실행(handshake) (통합)
-- [ ] **문서:** README(영·한, "AI와 함께 쓰기"가 자동 연결 중심으로), api.md·api.en.md 8절, user-guide, CHANGELOG, 마켓 검사 주의(외부 프로세스 실행 — 1.0.0 때 원인 아니었음)
-- [ ] 1.1.0 게시(Marketplace Update + 태그)
+- [x] **번들:** 확장 빌드(esbuild)가 `packages/cli/src/main.ts`를 `dist/tasksmd.cjs`로 직접 묶음(npm 패키지와 같은 옵션). vsix 607KB → 832KB(34개 파일)
+- [x] **자동 등록:** VS Code(provider) / Cursor(registerServer). 워크스페이스 폴더마다 하나, 폴더가 바뀌면 갱신. 설정 `tasksmd.mcp.autoRegister`(기본 켬). 신뢰되지 않은 워크스페이스에서는 등록 안 함
+- [x] **안정 경로 + 런처:** 켜질 때 `~/.tasksmd/tasksmd.cjs`로 복사(버전 바뀔 때만), 런처는 이 파일과 에디터 실행 파일을 가리킴 → 업데이트로 확장 폴더가 바뀌어도 밖의 설정이 안 끊김
+- [x] **`Tasks: Install 'tasksmd' command in PATH` / `Uninstall …`:** macOS·Linux는 PATH에 있는 사용자 폴더(`~/.local/bin`, `~/bin`) 중 첫 번째, 없으면 `~/.local/bin` + PATH 추가 안내(복사 버튼). Windows는 `%LOCALAPPDATA%\tasksmd\bin\tasksmd.cmd` + 안내. 우리 런처(표시 주석)만 덮어쓰기/삭제
+- [x] **`Tasks: Connect AI agents (MCP)`:** 대상 선택 — VS Code·Cursor(자동 등록 상태 표시), Claude Code(`claude mcp add --scope local` 실행, 없으면 명령 복사), Claude Desktop(설정 파일에 병합, 바꿀 내용 미리 보기 → 확인, 백업). 기존 항목 보존
+- [x] **시작 안내 페이지(walkthrough):** 첫 태스크, 렌더 보기, AI 연결, 터미널 명령. 사이드바 빈 화면 안내에 "AI 연결" 버튼
+- [x] **테스트:** 런처 스크립트·설정 병합·명령 문자열(단위), 등록·실제 실행(handshake) (통합)
+- [x] **문서:** README(영·한, "AI와 함께 쓰기"가 자동 연결 중심으로), api.md·api.en.md 8절, user-guide, CHANGELOG, 마켓 검사 주의(외부 프로세스 실행 — 1.0.0 때 원인 아니었음)
+- [ ] 수동 점검(manual-checklist.md 5절: Cursor 자동 등록 등) → 1.1.0 게시(Marketplace Update + 태그)
 
 ## 향후 후보 (미착수)
 

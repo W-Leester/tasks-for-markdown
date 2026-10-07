@@ -79,11 +79,19 @@ group by filename
 
 ## AI와 함께 쓰기
 
-Tasks for Markdown에는 [MCP](https://modelcontextprotocol.io) 서버가 들어 있어서, MCP를 쓰는 AI 에이전트라면 어느 것이든 태스크를 도구로 읽고 고칠 수 있습니다. Claude Code, Cursor 에이전트, VS Code 에이전트 모드, Claude Desktop이 그렇습니다. 한 번 연결하면 말로 시킬 수 있습니다. 아래 화면은 실제 Claude Code 실행 장면입니다. 에이전트가 일하는 동안 에디터의 노트가 바로 바뀝니다.
+Tasks for Markdown에는 [MCP](https://modelcontextprotocol.io) 서버가 들어 있어서, MCP를 쓰는 AI 에이전트라면 어느 것이든 태스크를 도구로 읽고 고칠 수 있습니다. Claude Code, Cursor 에이전트, VS Code 에이전트 모드, Claude Desktop이 그렇습니다. VS Code와 Cursor에서는 확장을 설치하는 순간 연결되고, 그다음부터 말로 시키면 됩니다. 아래 화면은 실제 Claude Code 실행 장면입니다. 에이전트가 일하는 동안 에디터의 노트가 바로 바뀝니다.
 
 ![Claude Code가 "기한 지난 거 뭐 있어?"에 답하고, 태스크를 완료하고 메모를 추가 — 파일이 실시간으로 바뀜](docs/images/demo-ai-ko.gif)
 
-**연결** (서버를 npm에서 `npx`로 실행하므로 Node.js 18 이상이 필요합니다):
+**연결** — 따로 설치할 것이 없습니다. 서버는 에디터에 내장된 Node로 돌아갑니다.
+
+- **VS Code(에이전트 모드)와 Cursor:** 확장을 설치하면 자동으로 연결됩니다. 워크스페이스 폴더마다 서버 하나(`tasksmd.mcp.autoRegister`, 기본 켬, 신뢰되지 않은 워크스페이스에서는 안 함).
+- **Claude Code와 Claude Desktop:** 명령 **Tasks: AI 에이전트 연결 (MCP)**을 실행하고 고르세요. Claude Code는 이 컴퓨터의 이 프로젝트에만 추가하고(`claude mcp add-json --scope local`), Claude Desktop은 확인을 받은 뒤 설정 파일을 고칩니다(원본 백업, 다른 서버는 그대로).
+
+<details>
+<summary>확장 없이(다른 컴퓨터, CI): npm 패키지</summary>
+
+서버를 npm에서 `npx`로 실행하므로 Node.js 18 이상이 필요합니다.
 
 ```bash
 # Claude Code, 노트 폴더에서
@@ -104,6 +112,7 @@ Claude Desktop — `claude_desktop_config.json`, 노트 폴더의 절대 경로�
 ```json
 { "mcpServers": { "tasks": { "command": "npx", "args": ["-y", "@hastycapybara/tasks-cli", "mcp", "--root", "/path/to/notes"] } } }
 ```
+</details>
 
 **이렇게 말해 보세요:**
 - "기한 지난 거 뭐 있어? 거래처 계약 검토는 완료로 하고 '법무팀이 3조 승인'이라고 메모 남겨 줘."
@@ -140,7 +149,8 @@ if (tasks.features?.includes('notes.add')) await tasks.edit.addNote(r.tasks[0], 
 | 확장 API `getAPI(1)` | 다른 VS Code/Cursor 확장 | `query`, `edit`(create, update, setStatus, postpone, addNote, batch…), `events`, `ui`, `features` / `info()`로 기능 확인 |
 | 명령 `tasksmd.api.*` | 단축키, 매크로, 다른 언어로 만든 확장 | API의 모든 메서드를 JSON 인자를 받는 명령으로 |
 | [`@hastycapybara/tasks-api`](https://www.npmjs.com/package/@hastycapybara/tasks-api) | TypeScript | 타입 정의만(실행 코드 없음) |
-| [`@hastycapybara/tasks-cli`](https://www.npmjs.com/package/@hastycapybara/tasks-cli) | 터미널, 스크립트, CI, AI 에이전트 | `tasksmd query`, `add`, `done`, `note`, `info` … 와 MCP 서버 — 에디터 없이 |
+| `tasksmd` 명령 | 터미널, 스크립트, AI 에이전트 | `tasksmd query`, `add`, `done`, `note`, `info` … 와 MCP 서버. **Tasks: 'tasksmd' 터미널 명령 설치**로 확장에서 바로 설치(npm 불필요). 에디터가 없는 컴퓨터에서는 [`@hastycapybara/tasks-cli`](https://www.npmjs.com/package/@hastycapybara/tasks-cli) |
+| 태스크 링크 | 다른 앱, 채팅, AI 답변 | `<scheme>://hastycapybara.tasks-for-markdown/open?path=…&line=…`, `/query?text=…`. `ui.link(ref)`로 만듦 |
 | [`@hastycapybara/tasks-core`](https://www.npmjs.com/package/@hastycapybara/tasks-core) | Node 프로그램 | 파서, 쿼리 엔진, 반복 계산을 라이브러리로 |
 
 기능은 추가만 되고 API 버전은 `1`로 유지되므로, 만든 확장은 업데이트 후에도 그대로 동작합니다. 쓰기는 기본적으로 호출자마다 한 번 확인받고(`tasksmd.api.writePolicy`), 오류는 `{ code, message }` 형태이며, 옛 내용으로 쓰려 하면 거절됩니다. [공개 API 문서](docs/api.md)를 참고하세요.
@@ -177,6 +187,8 @@ if (tasks.features?.includes('notes.add')) await tasks.edit.addNote(r.tasks[0], 
 | 칸반 보드 / 캘린더 / 통계 / 쿼리 빌더 열기 | — |
 | 완료 태스크 아카이브… | — |
 | 쿼리 블록 삽입, 커서 위치 쿼리 결과 보기(에디터 옆 패널, 커서 따라가기), 커서 위치 쿼리 설명 | — |
+| AI 에이전트 연결 (MCP), 'tasksmd' 터미널 명령 설치 / 제거 | — |
+| 태스크 링크 복사, 커서 위치 쿼리 링크 복사(링크를 누르면 어느 앱에서든 그 태스크가 열림: `vscode://hastycapybara.tasks-for-markdown/open?…`) | — |
 | 상태 프리셋 불러오기…, 이 파일의 태스크 포맷 변환… | — |
 
 ## 설정 (`tasksmd.*`)

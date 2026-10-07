@@ -219,6 +219,8 @@ CLI에 들어 있는 MCP(Model Context Protocol) 서버입니다. Claude Code, C
 
 **등록**
 
+**확장이 있으면(1.1.0부터) npm이 필요 없습니다.** 같은 서버가 확장에 들어 있고 에디터 내장 Node로 돌아갑니다. VS Code 에이전트 모드와 Cursor에는 자동 등록되고(`tasksmd.mcp.autoRegister`), **Tasks: AI 에이전트 연결 (MCP)** 명령이 Claude Code(`claude mcp add-json --scope local`)나 Claude Desktop(확인 후 설정 파일 병합)에 추가합니다. 아래 npm 방식은 확장이 없는 컴퓨터용입니다.
+
 ```bash
 # Claude Code (프로젝트 폴더에서)
 claude mcp add tasks -- npx -y @hastycapybara/tasks-cli mcp --root "$PWD"

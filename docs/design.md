@@ -867,6 +867,56 @@ flowchart LR
 
 ---
 
+### 7.16 확장 안의 AI 연결과 터미널 명령 (M21)
+
+**구성.**
+
+```
+vsix ── dist/extension.js
+     └─ dist/tasksmd.cjs        (packages/cli 번들 그대로, 한 파일)
+           │ 켜질 때(버전이 바뀌었으면) 복사
+           ▼
+~/.tasksmd/tasksmd.cjs          (안정 경로: 업데이트로 확장 폴더 이름이 바뀌어도 그대로)
+~/.tasksmd/runtime.json         ({ execPath, version } — 런처가 쓰는 에디터 실행 파일)
+           ▲
+런처 ~/.local/bin/tasksmd       (사용자가 명령으로 설치한 경우만)
+```
+
+- **실행 방식.** `ELECTRON_RUN_AS_NODE=1 <process.execPath> <tasksmd.cjs> mcp --root <폴더>`. 에디터 내장 Node라 Node.js 설치 불필요. 원격(SSH)에서는 확장이 원격에서 돌므로 원격의 실행 파일·경로가 쓰인다.
+- **자동 등록(에디터 안 에이전트).** 켜질 때 한 번, 워크스페이스 폴더가 바뀔 때 다시.
+  - Cursor: `vscode.cursor?.mcp?.registerServer`가 있으면 폴더마다 `{ name: 'tasks'(폴더가 둘 이상이면 'tasks-<폴더명>'), server: { command, args, env } }`. 폴더가 빠지면 `unregisterServer`.
+  - VS Code: Cursor API가 없고 `vscode.lm?.registerMcpServerDefinitionProvider`가 있으면 provider 등록(`contributes.mcpServerDefinitionProviders` id `tasksmd.mcp`). `provideMcpServerDefinitions`는 폴더마다 `McpStdioServerDefinition`(version = 확장 버전 → 업데이트 시 VS Code가 도구 목록을 새로 읽음). 폴더 변경은 `onDidChangeMcpServerDefinitions` 이벤트로 알림.
+  - 둘 다 없으면(옛 버전) 아무것도 하지 않는다.
+  - `tasksmd.mcp.autoRegister`(기본 true)로 끔. **신뢰되지 않은 워크스페이스에서는 등록하지 않는다**(AI가 파일을 쓰는 경로).
+  - 등록 경로는 **확장 폴더의 `dist/tasksmd.cjs`**(에디터가 매번 새로 읽으므로 안정 경로가 필요 없음).
+- **밖의 도구(Claude Code, Claude Desktop, 터미널).** 안정 경로와 런처를 쓴다.
+  - 런처(macOS·Linux, `sh`):
+    ```sh
+    #!/bin/sh
+    # tasksmd launcher — installed by Tasks for Markdown (HastyCapybara.tasks-for-markdown). Remove with "Tasks: Uninstall 'tasksmd' command".
+    ELECTRON_RUN_AS_NODE=1 exec "<execPath>" "$HOME/.tasksmd/tasksmd.cjs" "$@"
+    ```
+    `<execPath>`는 설치 시점 값. 켜질 때 `runtime.json`과 함께, 우리 런처(첫 두 줄로 식별)가 있으면 다시 써서 에디터를 옮겨도 따라간다. Windows는 `tasksmd.cmd`(`set ELECTRON_RUN_AS_NODE=1` + `"<execPath>" "%USERPROFILE%\.tasksmd\tasksmd.cjs" %*`).
+  - 설치 위치: PATH에 들어 있는 사용자 폴더(`~/.local/bin`, `~/bin`) 중 첫 번째. 없으면 `~/.local/bin`에 만들고 셸 설정에 넣을 한 줄(`export PATH="$HOME/.local/bin:$PATH"`)을 복사 버튼과 함께 보여 준다(셸 파일은 직접 고치지 않음). 같은 이름의 **우리 것이 아닌 파일이 있으면 덮어쓰지 않는다.**
+- **`Tasks: Connect AI agents (MCP)`.** 다중 선택 QuickPick.
+  - VS Code / Cursor: "자동으로 연결됨"(또는 꺼짐·미지원) 상태만 보여 주고, 설정 열기로 안내.
+  - Claude Code: `claude`가 PATH에 있으면 폴더에서 `claude mcp add --scope local tasks -- <런처 또는 execPath+cjs> mcp --root <폴더>` 실행(이 PC·이 프로젝트에만). 이미 있으면 덮지 않고 알림. `claude`가 없으면 같은 명령을 복사 버튼으로.
+  - Claude Desktop: 설정 파일(macOS `~/Library/Application Support/Claude/claude_desktop_config.json`, Windows `%APPDATA%\Claude\…`)의 `mcpServers.tasks`(폴더가 여럿이면 `tasks-<폴더명>`)에 `{ command: <execPath>, args: [<안정 경로 cjs>, "mcp", "--root", <폴더>], env: { ELECTRON_RUN_AS_NODE: "1" } }` 병합. 바꿀 JSON을 미리 보여 주고 확인 → 원본을 `.bak`으로 남기고 저장. 다른 서버 항목은 그대로.
+  - 공통: 바뀌는 내용은 순수 함수(`mergeMcpConfig`, `claudeAddArgs`, `launcherScript`)로 만들고 단위 테스트.
+- **알리기.** `contributes.walkthroughs` "Get started with Tasks for Markdown": ① 첫 태스크(`Ctrl+Shift+C`) ② 쿼리 블록과 렌더 보기 ③ AI 에이전트 연결(버튼 → Connect 명령) ④ 터미널 명령 설치(버튼). 사이드바 빈 화면 안내에도 "AI 연결" 버튼. 처음 켤 때 알림은 띄우지 않는다.
+- **쓰기 정책.** MCP·CLI 쓰기는 지금처럼 파일을 직접 쓰고 `tasksmd.api.writePolicy`(확장 API용)를 따르지 않는다. 대신 모든 쓰기에 `expectedText` 확인(STALE_LINE). README·api.md에 명시.
+- **마켓 검사.** 외부 프로세스 실행·실행 파일 생성 코드가 들어간다. 1.0.0 때 거절 원인은 아니었다(postmortem). 거절되면 시험 이름 업로드로 반씩 나누는 절차(publishing-guide 5.3).
+
+### 7.17 태스크 링크(URI) (M23)
+
+- **형식.** `<scheme>://hastycapybara.tasks-for-markdown/<동작>?<인자>` — `scheme = vscode.env.uriScheme`(VS Code `vscode`, Cursor `cursor`, Insiders `vscode-insiders`).
+  - `/open?path=notes/work.md&line=12` — 1부터 세는 줄. 폴더가 여럿이면 `folder=<이름>`(없으면 첫 번째 폴더부터 찾음).
+  - `/query?text=<URL 인코딩된 쿼리, 줄바꿈은 %0A>` — 쿼리 결과 패널(`openQueryResults`).
+- **파서** `parseTaskUri(uri) → { kind: 'open', folder?, path, line } | { kind: 'query', text } | { error }` (순수 함수). 거부: 빈 경로, 절대 경로, `..` 조각, 줄 번호가 양의 정수가 아님, 쿼리에 `by function` 줄, 알 수 없는 동작.
+- **처리.** `open`: 워크스페이스 안 파일인지 확인 후 텍스트 편집기로 열고 줄 선택·가운데 정렬. `query`: 결과 패널. 오류는 알림 한 줄(무엇이 잘못됐는지).
+- **만들기.** `taskLink(scheme, folderName?, relPath, line)` / `queryLink(scheme, text)`. 명령 `tasksmd.copyTaskLink`(커서 줄 태스크), `tasksmd.copyQueryLink`(커서가 있는 쿼리 블록) → 클립보드 + 알림. 확장 API `ui.link(ref) → string`, 명령 표면 `tasksmd.api.ui.link`, 기능 이름 `links`.
+- **보안.** 링크는 열기·보기만 하고 파일을 바꾸지 않는다. JavaScript 쿼리 함수는 설정과 상관없이 링크에서 거부.
+
 ## 8. 저장소와 설정
 
 ```mermaid
@@ -1015,6 +1065,7 @@ GitHub Actions: PR마다 `typecheck + lint + test`, 태그 `v*` 푸시 시 패�
 
 | 날짜 | 버전 | 내용 |
 |---|---|---|
+| 2026-10-07 | 1.3 | 7.16 확장 안의 AI 연결과 터미널 명령(M21), 7.17 태스크 링크(M23) — 1.1.0 계획 |
 | 2026-09-30 | 1.2 | 7.15 열 너비 조절(M16) — 1.12.0 구현 |
 | 2026-09-30 | 1.1 | 7.14 개정: 전역 열 설정 연동, 본문 목록에도 제목 줄 — 1.11.0 구현 |
 | 2026-09-30 | 1.0 | 7.14 쿼리 결과 열 제목 줄(M15) — 1.10.0 구현 |

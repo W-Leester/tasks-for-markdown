@@ -34,7 +34,7 @@
 | M6 | 웹뷰: 편집 모달 + 칸반 + 쿼리 빌더 | ✅ 완료 | 2026-09-21 · unit 447 / integration 31 |
 | M7 | 추가 기능: 알림·아카이브·통계·캘린더·업데이트 확인 | ✅ 완료 | 2026-09-21 · unit 462 / integration 34 |
 | M8 | 마감: i18n·성능·접근성·문서·패키징·게시 | 🟡 코드 완료 · 사용자 작업 대기 | 1.0.0 `.vsix` 생성됨 · 남은 것: 퍼블리셔/토큰 생성, 저장소 공개 여부, M8.7 수동 테스트 |
-| M9 | 공개 API: 확장 API·명령·npm/CLI·MCP·URI | 🟡 M9.1–9.5 완료(1.3.0, npm 발행은 사용자 작업) · M9.6(선택)·9.7 남음 | docs/api-plan.md v0.2, docs/api.md |
+| M9 | 공개 API: 확장 API·명령·npm/CLI·MCP·URI | 🟡 M9.1–9.5 완료(1.3.0, npm 발행은 사용자 작업) · M9.6(선택) 남음 · M9.7은 M23으로 | docs/api-plan.md v0.2, docs/api.md |
 | M10 | 렌더 보기 고도화: 기본 편집기 대체, 정렬·보기 툴바 | ✅ 완료(1.4.0) | history-internal.md 2부 2.14 |
 | M11 | 쿼리 결과 트리 표시 | ✅ 완료(1.6.0) | 이 문서 M11, design.md 7.10 |
 | M12 | 대화상자 필드 순서·더보기, 렌더 보기 열 배치 | ✅ 완료(1.7.0) | 이 문서 M12, design.md 7.11 |
@@ -46,8 +46,9 @@
 | M18 | 마켓플레이스 정식 공개 준비(1.0.0 재시작, 저장소 공개, 영어 README, npm) | ✅ 준비 완료(1.0.0) — 계정·공개·태그는 사용자(release.md "첫 공개 순서") | 이 문서 M18, release.md |
 | M19 | 칸반 격자 배치(창 폭에 맞춰 2×2 등으로 균형 배치) | ✅ 완료(1.0.0에 포함) | 이 문서 M19 |
 | M20 | 마켓 업로드 거절 대응: 원인은 검색어 — 통과한 검색어로 교체 | ✅ 해결(2026-10-02 재업로드 성공) | 이 문서 M20 |
-| M21 | 확장 안에서 AI 연결 제공(VS Code MCP 등록, Cursor 설정 등록, 터미널 명령) | 📝 계획만(1.1.0 후보, 2026-10-02) | 이 문서 M21 |
+| M21 | 확장 안에서 AI 연결 제공(VS Code·Cursor MCP 자동 등록, 터미널 명령, AI 연결 명령, 시작 안내) | 🟡 진행 중(1.1.0, 2026-10-07) | 이 문서 M21, design.md 7.16 |
 | M22 | README 개편: 강점(AI·API) 강조, 움직이는 예시 GIF, 사이트 연결 | ✅ 1.0.1(2026-10-05) | 이 문서 M22 |
+| M23 | 태스크 링크(URI): `vscode://…/open`, `/query`, 링크 복사 명령 (M9.7) | 🟡 진행 중(1.1.0, 2026-10-07) | 이 문서 M23, design.md 7.17 |
 
 ---
 
@@ -609,7 +610,7 @@
 - [ ] 확장이 로컬 소켓을 열고 토큰 파일로 인증, CLI/MCP는 편집기가 떠 있으면 위임
 
 ### M9.7 (F1) URI 핸들러
-- [ ] `vscode://hastycapybara.tasks-for-markdown/open?path=…&line=…`, `/query?text=…`
+- [ ] `vscode://hastycapybara.tasks-for-markdown/open?path=…&line=…`, `/query?text=…` → **M23에서 진행**
 
 ## M10. 렌더 보기 고도화 (1.4.0)
 
@@ -974,7 +975,24 @@
 
 **발견한 문제(처리 완료, 10-04).** [#23](postmortems/incidents.md) 브라우저 VS Code 전용으로 확인, [#24](postmortems/incidents.md) 수정.
 
-## M21. 확장 안에서 AI 연결 제공 — 1.1.0 후보 (계획만, 2026-10-02)
+## M23. 태스크 링크(URI) — M9.7 (1.1.0, 2026-10-07)
+
+**목표.** 다른 앱(메신저, 메모, AI 답변, 대시보드)에서 링크 하나로 태스크를 열거나 쿼리 결과를 보게 한다.
+
+- `<scheme>://hastycapybara.tasks-for-markdown/open?path=<워크스페이스 상대 경로>&line=<1부터>` → 텍스트 편집기에서 그 줄로 이동. `<scheme>`은 `vscode`(VS Code), `cursor`(Cursor) 등 — `vscode.env.uriScheme`.
+- `<scheme>://hastycapybara.tasks-for-markdown/query?text=<쿼리>` → 쿼리 결과 패널.
+- **안전:** 경로는 열린 워크스페이스 폴더 안의 상대 경로만(절대 경로·`..` 거부). URI 쿼리에서 `… by function` 줄은 거부(링크로 JavaScript 실행 금지). 링크는 읽기·열기만 하고 파일을 바꾸지 않는다.
+- **링크 만들기:** `Tasks: Copy link to task`(커서 줄의 태스크, CodeLens·우클릭 메뉴는 넣지 않고 명령 팔레트), 쿼리 블록은 `Tasks: Copy link to query under cursor`. 확장 API `ui.link(ref)`(기능 이름 `links`)로 다른 확장도 링크를 만든다.
+- 상세: design.md 7.17.
+
+### 할 일
+- [ ] URI 파서(순수 함수, 단위 테스트: 정상·잘못된 경로·`..`·function 쿼리)
+- [ ] `registerUriHandler`, 열기·쿼리 처리, 오류는 알림으로
+- [ ] 링크 복사 명령 2개, API `ui.link` + `features: 'links'`, 명령 표면 `tasksmd.api.ui.link`
+- [ ] 통합 테스트(핸들러 직접 호출 → 편집기 위치 확인)
+- [ ] 문서: README 명령 표, api.md, user-guide, CHANGELOG
+
+## M21. 확장 안에서 AI 연결 제공 — 1.1.0 (계획 2026-10-02, 착수 2026-10-07)
 
 **배경.** 지금 AI 에이전트 연결(MCP)은 npm 패키지 `@hastycapybara/tasks-cli`를 `npx`로 실행하는 방식이라, 사용자가 설정 파일을 직접 고치고 Node.js가 있어야 한다. 사용자 질문: "마켓에서 확장을 설치할 때 함께 되게 할 수 없나?" → npm 패키지를 같이 설치하게 할 수는 없지만, **확장 안에서 같은 효과**를 낼 수 있다. 1.0.0 공개(세 마켓 동일 버전)를 먼저 끝낸 뒤 1.1.0으로 진행하기로 결정(사용자, 2026-10-02).
 
@@ -1001,10 +1019,22 @@
 - 설치 파일에 CLI 번들을 넣으면 크기·마켓 검사(외부 프로그램 실행으로 오해받지 않는지) — 업로드 전에 시험 이름으로 확인할지 결정. 12시간 생성 한도 주의.
 - 신뢰되지 않은 워크스페이스, 쓰기 정책(`tasksmd.api.writePolicy`)과의 관계(AI가 파일을 쓰는 경로이므로).
 
-### 할 일 (착수 시 확정)
-- [ ] 위 "확인할 것" 조사 → 설계(design.md) → 계획 확정
-- [ ] VS Code MCP 등록, 런처 + 터미널 명령 설치, AI 연결 명령(VS Code·Cursor·Claude Code·Claude Desktop), 시작 안내 페이지
-- [ ] 테스트, 문서(README·api.md·user-guide), 1.1.0 게시(Marketplace Update + 태그)
+**조사 결과(2026-10-07, 설치된 앱의 코드에서 확인, 앱은 실행하지 않음).**
+- **VS Code:** `vscode.lm.registerMcpServerDefinitionProvider` + `contributes.mcpServerDefinitionProviders`, `McpStdioServerDefinition(label, command, args, env, version)`. 우리 `@types/vscode`(1.138)에 있음. `engines.vscode`는 `^1.90.0` 유지하고 **API가 있을 때만** 쓴다(없는 버전은 조용히 건너뜀).
+- **Cursor:** 자체 확장 API `vscode.cursor.mcp.registerServer({ name, server: { command, args, env } })` / `unregisterServer(name)`이 있다(Cursor 3.23 확장 호스트 코드에서 확인). → **Cursor도 자동 등록**, `.cursor/mcp.json`을 고칠 필요 없음. Cursor에도 VS Code API 이름이 들어 있어, 둘 다 있으면 Cursor API만 쓴다(이중 등록 방지).
+- **실행:** 번들 CLI(`tasksmd.cjs`)를 에디터 내장 Node로(`process.execPath` + `ELECTRON_RUN_AS_NODE=1`). npm·Node.js 불필요(10-05 확인).
+- 상세 설계: design.md 7.16.
+
+### 할 일
+- [ ] **번들:** 빌드에서 `packages/cli/dist/tasksmd.cjs` → `dist/tasksmd.cjs` 복사, vsix 포함 확인(크기 기록)
+- [ ] **자동 등록:** VS Code(provider) / Cursor(registerServer). 워크스페이스 폴더마다 하나, 폴더가 바뀌면 갱신. 설정 `tasksmd.mcp.autoRegister`(기본 켬). 신뢰되지 않은 워크스페이스에서는 등록 안 함
+- [ ] **안정 경로 + 런처:** 켜질 때 `~/.tasksmd/tasksmd.cjs`로 복사(버전 바뀔 때만), 런처는 이 파일과 에디터 실행 파일을 가리킴 → 업데이트로 확장 폴더가 바뀌어도 밖의 설정이 안 끊김
+- [ ] **`Tasks: Install 'tasksmd' command in PATH` / `Uninstall …`:** macOS·Linux는 PATH에 있는 사용자 폴더(`~/.local/bin`, `~/bin`) 중 첫 번째, 없으면 `~/.local/bin` + PATH 추가 안내(복사 버튼). Windows는 `%LOCALAPPDATA%\tasksmd\bin\tasksmd.cmd` + 안내. 우리 런처(표시 주석)만 덮어쓰기/삭제
+- [ ] **`Tasks: Connect AI agents (MCP)`:** 대상 선택 — VS Code·Cursor(자동 등록 상태 표시), Claude Code(`claude mcp add --scope local` 실행, 없으면 명령 복사), Claude Desktop(설정 파일에 병합, 바꿀 내용 미리 보기 → 확인, 백업). 기존 항목 보존
+- [ ] **시작 안내 페이지(walkthrough):** 첫 태스크, 렌더 보기, AI 연결, 터미널 명령. 사이드바 빈 화면 안내에 "AI 연결" 버튼
+- [ ] **테스트:** 런처 스크립트·설정 병합·명령 문자열(단위), 등록·실제 실행(handshake) (통합)
+- [ ] **문서:** README(영·한, "AI와 함께 쓰기"가 자동 연결 중심으로), api.md·api.en.md 8절, user-guide, CHANGELOG, 마켓 검사 주의(외부 프로세스 실행 — 1.0.0 때 원인 아니었음)
+- [ ] 1.1.0 게시(Marketplace Update + 태그)
 
 ## 향후 후보 (미착수)
 

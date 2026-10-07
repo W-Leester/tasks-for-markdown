@@ -129,7 +129,7 @@ VS Code 1.138에 들어온 내장 Markdown Editor(WYSIWYG)와 `markdown.codeBloc
    - **결과(10-07, VS Code·Cursor):** 4단계와 버튼 동작 확인(쿼리 블록 넣기·렌더 보기는 #28 수정 후 쓰던 노트에 동작). Cursor는 `Tasks: 시작 안내 열기`로.
 8. [x] **첫 실행 안내** — (B) 첫째 날 시작 안내가 저절로 열림, 서로 다른 둘째·셋째 날 "시작 안내 열기 / 다시 보지 않기" 알림. (A) `tasksmd`가 없으면 매일 한 번 "'tasksmd' 명령 설치 / 나중에 / 다시 묻지 않기"(설치·다시 묻지 않기 전까지, 3일 제한 없음). 같은 날 다시 불러오면 둘 다 안 뜸. (날짜 확인은 VS Code를 끄고 `state.vscdb`의 `onboarding.lastDay`·`onboarding.cliLastDay`를 어제로 바꿔서)
    - **결과(10-07, VS Code):** 첫째 날 시작 안내 자동 열림, 날짜를 하루 전으로 돌려 둘째 날 알림 확인, 설치 권유 알림 확인(사용자 "잘 됨"). 횟수는 창이 아니라 날짜 기준(점검 중 창 기준으로 14번 세어진 문제를 고침).
-9. [ ] **AI 연결 선택 창** — 에디터 줄이 체크박스 없는 "Cursor: 자동으로 연결됨" 상태 줄, `tasksmd.mcp.autoRegister`를 끄면 "자동 연결 다시 켜기"가 고를 수 있게 나옴.
+9. [ ] **AI 연결 선택 창** — 입력란 안내 문구가 "Cursor: 자동으로 연결됨 · 추가로 연결할 대상을 고르세요", 목록은 Claude Code·Claude Desktop만. `tasksmd.mcp.autoRegister`를 끄면 안내가 "Cursor: 꺼짐 …"이고 "Cursor" 제목 아래 "자동 연결 다시 켜기"가 고를 수 있게 나옴. (10-07: 첫 수정의 상태 줄이 안 보여 다시 고침, incidents #31)
 10. [ ] **제거** — `Tasks: 'tasksmd' 터미널 명령 제거` → `~/.local/bin/tasksmd` 삭제, 다른 프로그램이면 건드리지 않음.
 11. [ ] **원격(SSH)** — 원격 폴더에서 Cursor 자동 연결(원격 쪽 서버), 원격 터미널에서 `tasksmd`.
 12. [ ] **Windows**(가능하면) — 런처 `tasksmd.cmd`, PATH 안내, Claude Desktop 경로(`%APPDATA%\Claude`). 확인 전까지 알려진 한계.

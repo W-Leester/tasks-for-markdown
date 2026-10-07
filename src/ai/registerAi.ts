@@ -253,20 +253,22 @@ export function registerAi(context: vscode.ExtensionContext, deps: AiDeps): AiIn
     type Item = vscode.QuickPickItem & { run?: () => Promise<void> };
     // This editor's own agent is connected automatically, so it is a status line, not a choice;
     // only when the setting is off can it be picked (to turn it back on).
-    const items: Item[] = [{ label: `${appName}: ${status}`, kind: vscode.QuickPickItemKind.Separator }];
-    if (mode !== 'none' && vscode.workspace.isTrusted && !deps.settings.get('mcp.autoRegister')) {
-      items.push({
+    // The editor's own status goes in the placeholder: a leading separator with no item right below
+    // it is not drawn (incident #31). Only when it is off is there something to pick for it.
+    const items: Item[] = [];
+    const canTurnOn = mode !== 'none' && vscode.workspace.isTrusted && !deps.settings.get('mcp.autoRegister');
+    if (canTurnOn) {
+      items.push({ label: appName, kind: vscode.QuickPickItemKind.Separator }, {
         label: `$(sparkle) ${appName}`, description: t('turn automatic connection back on'), detail: t("This editor's AI agent"),
         run: async () => {
           await deps.settings.update('mcp.autoRegister', true, vscode.ConfigurationTarget.Global);
           void vscode.window.showInformationMessage(t('{0}: {1}', appName, t('connected automatically')));
         },
-      });
+      }, { label: t('Other AI tools'), kind: vscode.QuickPickItemKind.Separator });
     }
-    items.push({ label: t('Other AI tools'), kind: vscode.QuickPickItemKind.Separator },
-      { label: '$(terminal) Claude Code', description: t('this project, this computer'), detail: t('Runs "claude mcp add-json --scope local"'), run: connectClaudeCode });
+    items.push({ label: '$(terminal) Claude Code', description: t('this project, this computer'), detail: t('Runs "claude mcp add-json --scope local"'), run: connectClaudeCode });
     if (claudeDesktopConfigPath(process.platform, os.homedir(), process.env.APPDATA)) items.push({ label: '$(device-desktop) Claude Desktop', description: t('edits its config file after asking'), run: connectClaudeDesktop });
-    const picked = await vscode.window.showQuickPick(items, { canPickMany: true, title: t('Connect AI agents to your tasks (MCP)'), placeHolder: t('Choose where to connect') });
+    const picked = await vscode.window.showQuickPick(items, { canPickMany: true, title: t('Connect AI agents to your tasks (MCP)'), placeHolder: t('{0}: {1} · choose what else to connect', appName, status) });
     for (const p of picked ?? []) await p.run?.();
   };
 

@@ -8,7 +8,7 @@ import type { Settings } from '../settings/Settings';
 import {
   ConfigParseError, claudeAddJsonArgs, claudeAddJsonCommand, claudeDesktopConfigPath, isOurLauncher, launcherFileName, launcherScript, mergeMcpServers, pathAdvice, pickBinDir, serverName, serverSpec, type McpServerSpec,
 } from './mcpConfig';
-import { onboardingDay } from './onboardingDays';
+import { onboardingDay, shouldPromptInstall } from './onboardingDays';
 
 /**
  * M21 (design.md 7.16): AI agents and the terminal without npm.
@@ -281,8 +281,9 @@ export function registerAi(context: vscode.ExtensionContext, deps: AiDeps): AiIn
       return vscode.commands.executeCommand('workbench.action.openWalkthrough', typeof step === 'string' ? { category, step: `${category}#${step}` } : category, false);
     }),
   );
-  // ---- the first days: open the guide once, offer the terminal command on up to 3 days ---------
+  // ---- onboarding: (A) tasksmd install prompt daily until done, (B) guide on the first 3 days ----
   const DAYS = 'onboarding.days', LAST_DAY = 'onboarding.lastDay', DONE = 'onboarding.done';
+  const CLI_LAST_DAY = 'onboarding.cliLastDay', CLI_NEVER = 'onboarding.cliNever';
   const cliPresent = async () => {
     const rt = await readRuntime();
     if (rt?.launcher && (await exists(rt.launcher))) return true;
@@ -293,24 +294,30 @@ export function registerAi(context: vscode.ExtensionContext, deps: AiDeps): AiIn
     const state = context.globalState;
     const now = new Date();
     const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-    // Distinct days, not activations (every window and reload activates the extension).
-    const { day: launch, next } = onboardingDay({ days: state.get<number>(DAYS) ?? 0, lastDay: state.get<string>(LAST_DAY) }, today);
-    if (launch === null) return;
+    await Promise.all([promptInstall(state, today), promptGuide(state, today)]);
+  };
+  /** (A) The tasksmd command: once a day until installed or "Don't ask again". */
+  const promptInstall = async (state: vscode.Memento, today: string) => {
+    if (!shouldPromptInstall({ lastDay: state.get<string>(CLI_LAST_DAY), never: state.get<boolean>(CLI_NEVER) }, today, await cliPresent())) return;
+    await state.update(CLI_LAST_DAY, today);
+    const install = t("Install 'tasksmd' command"), later = t('Not now'), never = t("Don't ask again");
+    const choice = await vscode.window.showInformationMessage(
+      t('Tasks for Markdown: install the "tasksmd" command to check, add and complete tasks from any terminal, in scripts and with terminal AI agents (no npm needed). The Get Started guide shows what it can do.'),
+      install, later, never);
+    if (choice === install) await installCli();
+    else if (choice === never) await state.update(CLI_NEVER, true);
+  };
+  /** (B) The Get Started guide: opened on the first day, offered on days 2 and 3 (distinct days). */
+  const promptGuide = async (state: vscode.Memento, today: string) => {
+    const { day, next } = onboardingDay({ days: state.get<number>(DAYS) ?? 0, lastDay: state.get<string>(LAST_DAY) }, today);
+    if (day === null) return;
     await state.update(DAYS, next.days);
     await state.update(LAST_DAY, next.lastDay);
-    if (launch === 1) await vscode.commands.executeCommand('tasksmd.openWalkthrough');
-    if (launch > 3 || state.get<boolean>(DONE)) return;
-    const offerInstall = !(await cliPresent());
-    const install = t("Install 'tasksmd' command"), guide = t('Open the guide'), never = t("Don't show again");
-    // Day 1 already opened the guide; on days 2 and 3 offer it again next to the install button.
-    const buttons = [...(offerInstall ? [install] : []), ...(launch > 1 ? [guide] : []), never];
-    if (buttons.length === 1) return; // nothing to offer
-    const message = offerInstall
-      ? t('Tasks for Markdown: install the "tasksmd" command to check, add and complete tasks from any terminal, in scripts and with terminal AI agents (no npm needed). The Get Started guide shows what it can do.')
-      : t('Tasks for Markdown: open the Get Started guide to see what it can do.');
-    const choice = await vscode.window.showInformationMessage(message, ...buttons);
-    if (choice === install) { await state.update(DONE, true); await installCli(); }
-    else if (choice === guide) await vscode.commands.executeCommand('tasksmd.openWalkthrough');
+    if (day === 1) return void (await vscode.commands.executeCommand('tasksmd.openWalkthrough'));
+    if (day > 3 || state.get<boolean>(DONE)) return;
+    const guide = t('Open the guide'), never = t("Don't show again");
+    const choice = await vscode.window.showInformationMessage(t('Tasks for Markdown: open the Get Started guide to see what it can do.'), guide, never);
+    if (choice === guide) await vscode.commands.executeCommand('tasksmd.openWalkthrough');
     else if (choice === never) await state.update(DONE, true);
   };
   if (context.extensionMode !== vscode.ExtensionMode.Test) void onboard().catch((err) => deps.log(`onboarding: ${String(err)}`));

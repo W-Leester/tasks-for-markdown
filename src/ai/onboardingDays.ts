@@ -15,3 +15,11 @@ export function onboardingDay(state: OnboardingDays, today: string): { day: numb
   const day = state.days + 1;
   return { day, next: { days: day, lastDay: today } };
 }
+
+/**
+ * The `tasksmd` install prompt: once a day (the first activation of the day) until the command
+ * is installed or the user chose "Don't ask again" — no three-day limit.
+ */
+export function shouldPromptInstall(state: { lastDay?: string; never?: boolean }, today: string, installed: boolean): boolean {
+  return !installed && !state.never && state.lastDay !== today;
+}

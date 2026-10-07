@@ -903,7 +903,7 @@ vsix ── dist/extension.js
   - Claude Code: `claude`가 PATH에 있으면 폴더에서 `claude mcp add --scope local tasks -- <런처 또는 execPath+cjs> mcp --root <폴더>` 실행(이 PC·이 프로젝트에만). 이미 있으면 덮지 않고 알림. `claude`가 없으면 같은 명령을 복사 버튼으로.
   - Claude Desktop: 설정 파일(macOS `~/Library/Application Support/Claude/claude_desktop_config.json`, Windows `%APPDATA%\Claude\…`)의 `mcpServers.tasks`(폴더가 여럿이면 `tasks-<폴더명>`)에 `{ command: <execPath>, args: [<안정 경로 cjs>, "mcp", "--root", <폴더>], env: { ELECTRON_RUN_AS_NODE: "1" } }` 병합. 바꿀 JSON을 미리 보여 주고 확인 → 원본을 `.bak`으로 남기고 저장. 다른 서버 항목은 그대로.
   - 공통: 바뀌는 내용은 순수 함수(`mergeMcpConfig`, `claudeAddArgs`, `launcherScript`)로 만들고 단위 테스트.
-- **알리기.** `contributes.walkthroughs` "Get started with Tasks for Markdown": ① 첫 태스크(`Ctrl+Shift+C`) ② 쿼리 블록과 렌더 보기 ③ AI 에이전트 연결(버튼 → Connect 명령) ④ 터미널 명령 설치(버튼). 사이드바 빈 화면 안내에도 "AI 연결" 버튼. 처음 켤 때 알림은 띄우지 않는다.
+- **알리기.** `contributes.walkthroughs` "Get started with Tasks for Markdown": ① 첫 태스크(`Ctrl+Shift+C`) ② 쿼리 블록과 렌더 보기 ③ AI 에이전트 연결(버튼 → Connect 명령) ④ 터미널 명령 설치(버튼). 사이드바 빈 화면 안내에도 "AI 연결" 버튼. **처음 몇 번 실행할 때 안내**(10-07 사용자 결정으로 변경): 첫 실행에 시작 안내를 한 번 자동으로 열고, 처음 3번 실행까지 "터미널 명령 설치 / 시작 안내 / 다시 보지 않기" 알림 하나(누르면 그만). 링크 `/guide`로 README에서도 시작 안내를 연다(VS Code는 `vscode.dev/redirect` 경유).
 - **쓰기 정책.** MCP·CLI 쓰기는 지금처럼 파일을 직접 쓰고 `tasksmd.api.writePolicy`(확장 API용)를 따르지 않는다. 대신 모든 쓰기에 `expectedText` 확인(STALE_LINE). README·api.md에 명시.
 - **마켓 검사.** 외부 프로세스 실행·실행 파일 생성 코드가 들어간다. 1.0.0 때 거절 원인은 아니었다(postmortem). 거절되면 시험 이름 업로드로 반씩 나누는 절차(publishing-guide 5.3).
 

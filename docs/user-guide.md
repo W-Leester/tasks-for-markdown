@@ -124,7 +124,7 @@ short mode
 - **VS Code(에이전트 모드)·Cursor:** 확장을 설치하면 자동으로 연결됩니다. 워크스페이스 폴더마다 서버 하나(폴더가 여럿이면 이름이 `tasks-<폴더>`). 끄려면 `tasksmd.mcp.autoRegister`를 끕니다. 신뢰되지 않은 워크스페이스에서는 연결하지 않습니다.
   - VS Code: 채팅의 에이전트 모드 도구 목록(🔧)에 "Tasks for Markdown"이 보입니다. 처음 쓸 때 서버 시작을 허용할지 묻습니다.
   - Cursor: 설정의 MCP 목록에 확장이 등록한 서버로 보입니다.
-- **Claude Code·Claude Desktop:** 명령 `Tasks: AI 에이전트 연결 (MCP)` → 설치된 도구는 미리 체크돼 있으니 OK만 누르면 모두 연결됩니다(설치되지 않은 도구는 "설치되지 않음"으로 표시).
+- **Claude Code·Claude Desktop:** 명령 `Tasks: AI 에이전트 연결 (MCP)` → 설치됐지만 아직 연결되지 않은 도구는 미리 체크돼 있으니 OK만 누르면 연결됩니다. 이미 연결된 도구는 "연결됨", 설치되지 않은 도구는 "설치되지 않음"으로 표시됩니다.
   - Claude Code는 `claude mcp add-json --scope local`로 **이 컴퓨터의 이 프로젝트에만** 추가합니다. `claude` 명령이 없으면 터미널에 붙여 넣을 명령을 복사해 줍니다. 추가한 뒤 새 Claude Code 세션에서 쓸 수 있습니다.
   - Claude Desktop은 설정 파일(macOS `~/Library/Application Support/Claude/claude_desktop_config.json`)에 서버를 추가합니다. **Claude Desktop이 켜져 있으면 먼저 완전히 종료하라고 안내합니다**(켜져 있으면 앱이 설정을 다시 써서 연결이 지워질 수 있음). 바꾸기 전에 확인을 받고, 원본은 `.bak`으로 남기며, 다른 서버 설정은 그대로 둡니다. Claude Desktop을 완전히 종료했다가 다시 열면 적용됩니다.
   - 이 두 곳은 에디터 밖에서 돌기 때문에 `~/.tasksmd/`에 서버 파일을 복사해 두고 그것을 씁니다. 확장이 업데이트되면 다음에 에디터를 켤 때 함께 갱신됩니다.

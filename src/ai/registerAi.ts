@@ -205,9 +205,10 @@ export function registerAi(context: vscode.ExtensionContext, deps: AiDeps): AiIn
     if (!folders.length) return void vscode.window.showWarningMessage(t('Open a folder first.'));
     const probe = await run('claude', ['--version'], folders[0]!.uri.fsPath);
     const claudeJson = opts.onlyMissing ? await readText(path.join(os.homedir(), '.claude.json')) : undefined;
+    let skipped = 0;
     for (const f of folders) {
       const name = serverName(f.name, folders.length);
-      if (opts.onlyMissing && claudeCodeHasServer(claudeJson, f.uri.fsPath, name)) continue;
+      if (opts.onlyMissing && claudeCodeHasServer(claudeJson, f.uri.fsPath, name)) { skipped++; continue; }
       const spec = serverSpec(process.execPath, cli, f.uri.fsPath);
       if (!probe.ok) {
         const copy = t('Copy the command');
@@ -220,6 +221,7 @@ export function registerAi(context: vscode.ExtensionContext, deps: AiDeps): AiIn
       if (r.ok) void vscode.window.showInformationMessage(t('Connected Claude Code to "{0}" (server "{1}", this project on this computer). Start a new Claude Code session to use it.', f.name, name));
       else void vscode.window.showWarningMessage(t('Claude Code: {0}', r.out));
     }
+    if (skipped === folders.length) void vscode.window.showInformationMessage(t('Claude Code is already connected to this folder.'));
   };
 
   const claudeDesktopRunning = async () => {
@@ -285,6 +287,22 @@ export function registerAi(context: vscode.ExtensionContext, deps: AiDeps): AiIn
     return false;
   };
 
+  /** Which Claude tools are installed and already connected for every open folder (read-only). */
+  const claudeStatus = async () => {
+    const folders = localFolders();
+    const names = folders.map((f) => ({ f, name: serverName(f.name, folders.length) }));
+    const hasCode = await onPath(process.platform === 'win32' ? ['claude.cmd', 'claude.exe', 'claude'] : ['claude']);
+    const claudeJson = hasCode ? await readText(path.join(os.homedir(), '.claude.json')) : undefined;
+    const desktopFile = claudeDesktopConfigPath(process.platform, os.homedir(), process.env.APPDATA);
+    const hasDesktop = !!desktopFile && (await exists(path.dirname(desktopFile)));
+    const desktopText = hasDesktop ? await readText(desktopFile!) : undefined;
+    return {
+      folders, desktopFile, hasCode, hasDesktop,
+      codeConnected: hasCode && names.length > 0 && names.every(({ f, name }) => claudeCodeHasServer(claudeJson, f.uri.fsPath, name)),
+      desktopConnected: hasDesktop && names.length > 0 && names.every(({ name }) => claudeDesktopHasServer(desktopText, name)),
+    };
+  };
+
   const connectAi = async () => {
     const status = mode === 'none' ? t('this version has no MCP registration API') : enabled() ? t('connected automatically') : vscode.workspace.isTrusted ? t('off (tasksmd.mcp.autoRegister)') : t('off in untrusted workspaces');
     type Item = vscode.QuickPickItem & { run?: () => Promise<void> };
@@ -304,16 +322,18 @@ export function registerAi(context: vscode.ExtensionContext, deps: AiDeps): AiIn
       }, { label: t('Other AI tools'), kind: vscode.QuickPickItemKind.Separator });
     }
     // Tools that are installed start checked, so one OK connects everything (10-08).
-    const hasClaudeCode = await onPath(process.platform === 'win32' ? ['claude.cmd', 'claude.exe', 'claude'] : ['claude']);
+    const st = await claudeStatus();
     items.push({
-      label: '$(terminal) Claude Code', picked: hasClaudeCode,
-      description: hasClaudeCode ? t('this project, this computer') : t('not installed — choose it to copy the command'),
-      detail: t('Runs "claude mcp add-json --scope local"'), run: () => connectClaudeCode(),
+      label: '$(terminal) Claude Code', picked: st.hasCode && !st.codeConnected,
+      description: !st.hasCode ? t('not installed — choose it to copy the command') : st.codeConnected ? t('connected') : t('this project, this computer'),
+      detail: t('Runs "claude mcp add-json --scope local"'), run: () => connectClaudeCode({ onlyMissing: true }),
     });
-    const desktopConfig = claudeDesktopConfigPath(process.platform, os.homedir(), process.env.APPDATA);
-    if (desktopConfig) {
-      const hasDesktop = await exists(path.dirname(desktopConfig));
-      items.push({ label: '$(device-desktop) Claude Desktop', picked: hasDesktop, description: hasDesktop ? t('edits its config file after asking') : t('not installed'), run: () => connectClaudeDesktop() });
+    if (st.desktopFile) {
+      items.push({
+        label: '$(device-desktop) Claude Desktop', picked: st.hasDesktop && !st.desktopConnected,
+        description: !st.hasDesktop ? t('not installed') : st.desktopConnected ? t('connected — choose it to update') : t('edits its config file after asking'),
+        run: () => connectClaudeDesktop(),
+      });
     }
     const picked = await vscode.window.showQuickPick(items, { canPickMany: true, title: t('Connect AI agents to your tasks (MCP)'), placeHolder: t('{0}: {1} · choose what else to connect', appName, status) });
     for (const p of picked ?? []) await p.run?.();
@@ -357,16 +377,10 @@ export function registerAi(context: vscode.ExtensionContext, deps: AiDeps): AiIn
   };
   /** (C) Claude Code / Claude Desktop installed but not connected yet: on every activation until connected or "Don't ask again". */
   const promptConnect = async (state: vscode.Memento) => {
-    const folders = localFolders();
-    if (!folders.length || !vscode.workspace.isTrusted) return;
-    const names = folders.map((f) => ({ f, name: serverName(f.name, folders.length) }));
-    const hasCode = await onPath(process.platform === 'win32' ? ['claude.cmd', 'claude.exe', 'claude'] : ['claude']);
-    const claudeJson = hasCode ? await readText(path.join(os.homedir(), '.claude.json')) : undefined;
-    const needCode = hasCode && names.some(({ f, name }) => !claudeCodeHasServer(claudeJson, f.uri.fsPath, name));
-    const desktopFile = claudeDesktopConfigPath(process.platform, os.homedir(), process.env.APPDATA);
-    const hasDesktop = !!desktopFile && (await exists(path.dirname(desktopFile)));
-    const desktopText = hasDesktop ? await readText(desktopFile!) : undefined;
-    const needDesktop = hasDesktop && names.some(({ name }) => !claudeDesktopHasServer(desktopText, name));
+    if (!localFolders().length || !vscode.workspace.isTrusted) return;
+    const st = await claudeStatus();
+    const needCode = st.hasCode && !st.codeConnected;
+    const needDesktop = st.hasDesktop && !st.desktopConnected;
     if (!shouldPrompt({ never: state.get<boolean>(AI_NEVER) }, needCode || needDesktop)) return;
     const tools = [...(needCode ? ['Claude Code'] : []), ...(needDesktop ? ['Claude Desktop'] : [])].join(', ');
     const connect = t('Connect'), later = t('Not now'), never = t("Don't ask again");

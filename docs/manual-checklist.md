@@ -133,7 +133,7 @@ VS Code 1.138에 들어온 내장 Markdown Editor(WYSIWYG)와 `markdown.codeBloc
    - **결과(10-07, VS Code·Cursor):** 4단계와 버튼 동작 확인(쿼리 블록 넣기·렌더 보기는 #28 수정 후 쓰던 노트에 동작). Cursor는 `Tasks: 시작 안내 열기`로.
 8. [x] **첫 실행 안내** — (B) 첫째 날 시작 안내가 저절로 열림, 서로 다른 둘째·셋째 날 "시작 안내 열기 / 다시 보지 않기" 알림. (A) `tasksmd`가 없으면 켜질 때마다(다시 불러오기 포함) "'tasksmd' 명령 설치 / 나중에 / 다시 묻지 않기"(설치·다시 묻지 않기 전까지). (B)는 같은 날 다시 불러오면 안 뜸. (날짜 확인은 VS Code를 끄고 `state.vscdb`의 `onboarding.lastDay`·`onboarding.cliLastDay`를 어제로 바꿔서)
    - **결과(10-07, VS Code):** 첫째 날 시작 안내 자동 열림, 날짜를 하루 전으로 돌려 둘째 날 알림 확인, 설치 권유 알림 확인(사용자 "잘 됨"). 횟수는 창이 아니라 날짜 기준(점검 중 창 기준으로 14번 세어진 문제를 고침).
-9. [x] **AI 연결 선택 창** — 입력란 안내 문구가 "Cursor: 자동으로 연결됨 · 추가로 연결할 대상을 고르세요", 목록은 Claude Code·Claude Desktop만. `tasksmd.mcp.autoRegister`를 끄면 안내가 "Cursor: 꺼짐 …"이고 "Cursor" 제목 아래 "자동 연결 다시 켜기"가 고를 수 있게 나옴. (10-07: 첫 수정의 상태 줄이 안 보여 다시 고침, incidents #31)
+9. [x] **AI 연결 선택 창** — 입력란 안내 문구가 "Cursor: 자동으로 연결됨 · 추가로 연결할 대상을 고르세요", 목록은 Claude Code·Claude Desktop만. `tasksmd.mcp.autoRegister`를 끄면 안내가 "Cursor: 꺼짐 …"이고 "Cursor" 제목 아래 "자동 연결 다시 켜기"가 고를 수 있게 나옴. (10-07: 첫 수정의 상태 줄이 안 보여 다시 고침, incidents #31) 이미 연결된 도구는 "연결됨"으로 표시되고 체크돼 있지 않음. 그래도 Claude Code를 고르면 "이미 이 폴더에 연결돼 있습니다" 안내만 나옴(10-08).
    - **결과(10-08, Cursor):** 켜진 상태 — 입력란 "Cursor: 자동으로 연결됨 · …", 목록은 Claude Code·Claude Desktop. 끈 상태 — 입력란 "Cursor: 꺼짐 …", "Cursor" 제목 아래 "자동 연결 다시 켜기" → 선택하면 알림, 설정 다시 켜짐, MCPs의 `extension-tasks` Connected로 복귀.
 13. [x] **AI 연결 알림** — Claude Code·Desktop이 설치돼 있고 연결 안 됐을 때 켜질 때마다 "연결 / 나중에 / 다시 묻지 않기". "연결" → 아직 안 된 것만 연결(Desktop 확인 창 없음, `.bak` 생성). 연결된 뒤에는 안 뜸.
    - **결과(10-08, Cursor):** 알림의 Connect 한 번으로 Claude Code·Claude Desktop 연결(아래 4번 참고).

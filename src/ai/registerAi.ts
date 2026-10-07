@@ -275,7 +275,10 @@ export function registerAi(context: vscode.ExtensionContext, deps: AiDeps): AiIn
     vscode.commands.registerCommand('tasksmd.installCli', guard(installCli)),
     vscode.commands.registerCommand('tasksmd.uninstallCli', guard(uninstallCli)),
     // Cursor has no "Welcome: Open Walkthrough…", so offer our own entry (as the Claude Code extension does).
-    vscode.commands.registerCommand('tasksmd.openWalkthrough', () => vscode.commands.executeCommand('workbench.action.openWalkthrough', `${context.extension.id}#tasksmd.start`, false)),
+    vscode.commands.registerCommand('tasksmd.openWalkthrough', (step?: unknown) => {
+      const category = `${context.extension.id}#tasksmd.start`;
+      return vscode.commands.executeCommand('workbench.action.openWalkthrough', typeof step === 'string' ? { category, step: `${category}#${step}` } : category, false);
+    }),
   );
   // ---- the first launches: open the guide once, offer the terminal command up to 3 times -------
   const LAUNCHES = 'onboarding.launches', DONE = 'onboarding.done';
@@ -292,14 +295,15 @@ export function registerAi(context: vscode.ExtensionContext, deps: AiDeps): AiIn
     if (launch === 1) await vscode.commands.executeCommand('tasksmd.openWalkthrough');
     if (launch > 3 || state.get<boolean>(DONE)) return;
     const offerInstall = !(await cliPresent());
-    const install = t("Install 'tasksmd' command"), guide = t('Open the guide'), never = t("Don't show again");
-    const buttons = [...(offerInstall ? [install] : []), ...(launch > 1 ? [guide] : []), never];
-    if (buttons.length === 1) return; // nothing to offer
+    const install = t("Install 'tasksmd' command"), why = t('What can it do?'), guide = t('Open the guide'), never = t("Don't show again");
+    const buttons = offerInstall ? [install, why, never] : launch > 1 ? [guide, never] : [];
+    if (!buttons.length) return; // nothing to offer
     const message = offerInstall
-      ? t('Tasks for Markdown: use your tasks from any terminal with the "tasksmd" command (no npm needed), or open the Get Started guide.')
+      ? t('Tasks for Markdown: install the "tasksmd" command to check, add and complete tasks from any terminal, in scripts and with terminal AI agents (no npm needed).')
       : t('Tasks for Markdown: open the Get Started guide to see what it can do.');
     const choice = await vscode.window.showInformationMessage(message, ...buttons);
     if (choice === install) { await state.update(DONE, true); await installCli(); }
+    else if (choice === why) await vscode.commands.executeCommand('tasksmd.openWalkthrough', 'cli');
     else if (choice === guide) await vscode.commands.executeCommand('tasksmd.openWalkthrough');
     else if (choice === never) await state.update(DONE, true);
   };

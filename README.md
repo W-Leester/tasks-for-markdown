@@ -124,6 +124,26 @@ Claude Desktop — `claude_desktop_config.json`, with the absolute path of your 
 
 **What the agent can do:** query with the full query language, get and create tasks, update fields, set status, postpone, add notes, remove, and explain a query. The agent reads a syntax reference first, so the lines it writes are valid Obsidian Tasks syntax. Every write carries the exact text of the line it read, and the write is refused if the line changed meanwhile. Your edits are never overwritten by an agent working from an old copy. Full tool list: [MCP server](docs/api.en.md#8-mcp-server-for-ai-agents-tasksmd-mcp).
 
+## Use it from the terminal
+
+**Tasks: Install 'tasksmd' command in PATH** (or the button in the Get Started guide) adds a `tasksmd` command to every terminal — no Node.js or npm, it runs on the editor's own Node and updates with the extension.
+
+- **Check without opening the editor:** what is due today, overdue, next.
+- **Quick changes:** add, complete, postpone, add a note.
+- **Scripts and automation:** a morning summary, a git hook that warns about overdue release tasks, a Raycast / Alfred / Shortcuts action; `--json` for tools like `jq`.
+- **Terminal AI agents:** Claude Code, Codex and others that run shell commands can use it directly.
+- **Same rules as the editor:** Obsidian Tasks syntax, done dates, the next occurrence of recurring tasks, your settings; `--expect` refuses to change a line edited meanwhile.
+
+```bash
+tasksmd query "not done
+due before today
+sort by due"                                                   # what is overdue?
+tasksmd add "- [ ] Call the bank 📅 2026-10-08" --file inbox.md   # add (creates the file)
+tasksmd postpone inbox.md:1 "next monday"                       # lines are 1-based
+tasksmd done inbox.md:1                                         # ✅ date, next occurrence
+tasksmd query "due today" --json | jq '.matched'
+```
+
 ## Extend it
 
 Tasks for Markdown is built to be built on. Another extension, a keybinding, a script or a CI job can use the same tasks through a **stable, versioned public API**. You don't need to parse Markdown yourself.

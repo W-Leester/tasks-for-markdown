@@ -58,6 +58,8 @@ suite('AI connection (M21)', () => {
 
   test('the Get Started guide opens through our own command (Cursor has no Welcome: Open Walkthrough)', async () => {
     await vscode.commands.executeCommand('tasksmd.openWalkthrough');
+    // "What can it do?" in the tasksmd prompt opens the guide at the terminal step.
+    await vscode.commands.executeCommand('tasksmd.openWalkthrough', 'cli');
     await vscode.commands.executeCommand('workbench.action.closeAllEditors');
   });
 });

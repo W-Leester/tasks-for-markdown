@@ -132,6 +132,8 @@ short mode
 - 확장이 없는 컴퓨터(CI 등)에서는 npm 패키지 `@hastycapybara/tasks-cli`를 씁니다(README 참고).
 
 **터미널 명령 `tasksmd`.** 명령 `Tasks: 'tasksmd' 터미널 명령 설치`를 실행하면 터미널과 스크립트에서 `tasksmd query "due today"`, `tasksmd done notes/work.md:12` 같은 명령을 쓸 수 있습니다(`tasksmd --help`).
+- **좋은 점:** 에디터를 열지 않고 마감 확인 · 추가·완료·미루기·메모를 바로 · 스크립트와 자동화(매일 아침 요약, git hook, Raycast·Alfred·단축어) · 터미널 AI(Claude Code, Codex 등)가 명령으로 사용 · `--json` 출력 · 에디터와 같은 규칙(완료일, 반복 다음 회차, 설정, `--expect`로 바뀐 줄 보호) · npm 불필요, 확장과 함께 업데이트.
+- 예: `tasksmd query "not done⏎due before today⏎sort by due"`(기한 지난 것), `tasksmd add "- [ ] 은행에 전화 📅 2026-10-08" --file inbox.md`, `tasksmd postpone inbox.md:1 "next monday"`, `tasksmd note inbox.md:1 "수수료 문의"`, `tasksmd done inbox.md:1`, `tasksmd query "due today" --json | jq '.matched'`. 노트 폴더에서 실행하거나 `--root <폴더>`를 줍니다.
 - macOS·Linux는 PATH에 들어 있는 `~/.local/bin` 또는 `~/bin`에 설치합니다. 둘 다 PATH에 없으면 `~/.local/bin`에 설치하고, 셸 설정 파일(예: `~/.zshrc`)에 넣을 한 줄(`export PATH="$HOME/.local/bin:$PATH"`)을 복사해 줍니다. Windows는 `%LOCALAPPDATA%\tasksmd\bin`.
 - 같은 이름의 다른 프로그램이 있으면 덮어쓰지 않습니다. 지우려면 `Tasks: 'tasksmd' 터미널 명령 제거`.
 - 에디터 내장 Node로 실행되며, 에디터 위치가 바뀌거나 확장이 업데이트돼도 에디터를 한 번 켜면 따라갑니다.

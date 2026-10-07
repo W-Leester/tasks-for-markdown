@@ -124,6 +124,26 @@ Claude Desktop — `claude_desktop_config.json`, 노트 폴더의 절대 경로�
 
 **에이전트가 할 수 있는 일:** 쿼리 언어 전체로 검색, 태스크 조회·생성, 필드 변경, 상태 변경, 미루기, 메모 추가, 삭제, 쿼리 설명. 에이전트는 먼저 문법 안내를 읽으므로 올바른 Obsidian Tasks 문법으로 씁니다. 모든 쓰기에는 읽어 간 줄의 내용이 함께 실리고, 그 사이 줄이 바뀌었으면 쓰기를 거절합니다. 그래서 옛 내용을 보고 일하는 에이전트가 사용자의 수정을 덮어쓰지 않습니다. 전체 도구 목록: [MCP 서버](docs/api.md).
 
+## 터미널에서 쓰기
+
+**Tasks: 'tasksmd' 터미널 명령 설치**(또는 시작 안내의 버튼)를 실행하면 어느 터미널에서든 `tasksmd` 명령을 쓸 수 있습니다. Node.js나 npm은 필요 없습니다. 에디터 내장 Node로 돌아가고 확장과 함께 업데이트됩니다.
+
+- **에디터를 열지 않고 확인:** 오늘 마감, 기한 지난 것, 다음 할 일.
+- **빠르게 고치기:** 추가, 완료, 미루기, 메모.
+- **스크립트와 자동화:** 매일 아침 요약, 출시 태스크가 밀리면 경고하는 git hook, Raycast·Alfred·단축어 동작. `--json`으로 `jq` 같은 도구와 연결.
+- **터미널 AI:** Claude Code, Codex처럼 셸 명령을 실행하는 AI가 바로 씁니다.
+- **에디터와 같은 규칙:** Obsidian Tasks 문법, 완료일, 반복 태스크의 다음 회차, 내 설정을 그대로 따릅니다. `--expect`를 주면 그 사이 바뀐 줄은 고치지 않습니다.
+
+```bash
+tasksmd query "not done
+due before today
+sort by due"                                                   # 기한 지난 것
+tasksmd add "- [ ] 은행에 전화 📅 2026-10-08" --file inbox.md      # 추가(파일이 없으면 만듦)
+tasksmd postpone inbox.md:1 "next monday"                       # 줄 번호는 1부터
+tasksmd done inbox.md:1                                         # 완료일, 다음 회차
+tasksmd query "due today" --json | jq '.matched'
+```
+
 ## 확장하기
 
 Tasks for Markdown은 그 위에 무언가를 만들 수 있게 설계했습니다. 다른 확장, 단축키, 스크립트, CI가 **버전이 정해진 안정적인 공개 API**로 같은 태스크를 다룹니다. 마크다운을 직접 파싱할 필요가 없습니다.

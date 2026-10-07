@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-  ConfigParseError, claudeAddJsonArgs, claudeAddJsonCommand, claudeDesktopConfigPath, isOurLauncher, launcherFileName, launcherScript, mergeMcpServers, pathAdvice, pickBinDir, serverName, serverSpec,
+  ConfigParseError, claudeAddJsonArgs, claudeCodeHasServer, claudeDesktopHasServer, claudeAddJsonCommand, claudeDesktopConfigPath, isOurLauncher, launcherFileName, launcherScript, mergeMcpServers, pathAdvice, pickBinDir, serverName, serverSpec,
 } from '../../src/ai/mcpConfig';
 
 const spec = serverSpec('/Apps/Code Helper (Plugin)', '/home/u/.tasksmd/tasksmd.cjs', '/home/u/notes');
@@ -67,5 +67,17 @@ describe('M21 MCP config helpers', () => {
     expect(claudeDesktopConfigPath('darwin', '/Users/u')).toBe('/Users/u/Library/Application Support/Claude/claude_desktop_config.json');
     expect(claudeDesktopConfigPath('win32', 'C:\\Users\\u', 'C:\\Users\\u\\AppData\\Roaming')).toBe('C:\\Users\\u\\AppData\\Roaming\\Claude\\claude_desktop_config.json');
     expect(claudeDesktopConfigPath('linux', '/home/u')).toBeUndefined();
+  });
+
+  it('reads (only) whether Claude Code and Claude Desktop already have the server', () => {
+    const claude = JSON.stringify({ oauthAccount: { x: 1 }, projects: { '/n': { mcpServers: { tasks: {} } }, '/m': {} }, mcpServers: { other: {} } });
+    expect(claudeCodeHasServer(claude, '/n', 'tasks')).toBe(true);
+    expect(claudeCodeHasServer(claude, '/m', 'tasks')).toBe(false);
+    expect(claudeCodeHasServer(JSON.stringify({ mcpServers: { tasks: {} } }), '/m', 'tasks')).toBe(true); // user scope
+    expect(claudeCodeHasServer(undefined, '/n', 'tasks')).toBe(false);
+    expect(claudeCodeHasServer('{broken', '/n', 'tasks')).toBe(false);
+    expect(claudeDesktopHasServer(JSON.stringify({ mcpServers: { tasks: {} } }), 'tasks')).toBe(true);
+    expect(claudeDesktopHasServer(JSON.stringify({ mcpServers: {} }), 'tasks')).toBe(false);
+    expect(claudeDesktopHasServer(undefined, 'tasks')).toBe(false);
   });
 });

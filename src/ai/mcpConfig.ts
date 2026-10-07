@@ -110,3 +110,31 @@ export function claudeDesktopConfigPath(platform: NodeJS.Platform, home: string,
   if (platform === 'win32') return path.win32.join(appData ?? path.win32.join(home, 'AppData', 'Roaming'), 'Claude', 'claude_desktop_config.json');
   return undefined;
 }
+
+function parseObject(text: string | undefined): Record<string, unknown> | undefined {
+  if (!text?.trim()) return undefined;
+  try {
+    const v = JSON.parse(text) as unknown;
+    return v && typeof v === 'object' && !Array.isArray(v) ? (v as Record<string, unknown>) : undefined;
+  } catch {
+    return undefined;
+  }
+}
+const hasKey = (o: unknown, name: string) => !!o && typeof o === 'object' && name in (o as Record<string, unknown>);
+
+/**
+ * Whether Claude Code already has server `name` for `folder` — read-only look at `~/.claude.json`:
+ * local scope `projects[folder].mcpServers`, or the user scope `mcpServers`.
+ */
+export function claudeCodeHasServer(claudeJson: string | undefined, folder: string, name: string): boolean {
+  const d = parseObject(claudeJson);
+  if (!d) return false;
+  const projects = d['projects'] as Record<string, { mcpServers?: unknown }> | undefined;
+  return hasKey(projects?.[folder]?.mcpServers, name) || hasKey(d['mcpServers'], name);
+}
+
+/** Whether Claude Desktop's config already has server `name` under `mcpServers`. */
+export function claudeDesktopHasServer(config: string | undefined, name: string): boolean {
+  return hasKey(parseObject(config)?.['mcpServers'], name);
+}
+

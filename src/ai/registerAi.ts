@@ -6,9 +6,9 @@ import * as vscode from 'vscode';
 import { t } from '../l10n';
 import type { Settings } from '../settings/Settings';
 import {
-  ConfigParseError, claudeAddJsonArgs, claudeAddJsonCommand, claudeDesktopConfigPath, isOurLauncher, launcherFileName, launcherScript, mergeMcpServers, pathAdvice, pickBinDir, serverName, serverSpec, type McpServerSpec,
+  ConfigParseError, claudeAddJsonArgs, claudeCodeHasServer, claudeDesktopHasServer, claudeAddJsonCommand, claudeDesktopConfigPath, isOurLauncher, launcherFileName, launcherScript, mergeMcpServers, pathAdvice, pickBinDir, serverName, serverSpec, type McpServerSpec,
 } from './mcpConfig';
-import { onboardingDay, shouldPromptInstall } from './onboardingDays';
+import { dailyPrompt, onboardingDay, shouldPromptInstall } from './onboardingDays';
 
 /**
  * M21 (design.md 7.16): AI agents and the terminal without npm.
@@ -198,13 +198,16 @@ export function registerAi(context: vscode.ExtensionContext, deps: AiDeps): AiIn
     void vscode.window.showInformationMessage(t('The "tasksmd" command is not installed.'));
   };
 
-  const connectClaudeCode = async () => {
+  const readText = async (file: string) => ((await exists(file)) ? fs.readFile(file, 'utf8') : undefined);
+  const connectClaudeCode = async (opts: { onlyMissing?: boolean } = {}) => {
     const cli = await ensureRuntime();
     const folders = localFolders();
     if (!folders.length) return void vscode.window.showWarningMessage(t('Open a folder first.'));
     const probe = await run('claude', ['--version'], folders[0]!.uri.fsPath);
+    const claudeJson = opts.onlyMissing ? await readText(path.join(os.homedir(), '.claude.json')) : undefined;
     for (const f of folders) {
       const name = serverName(f.name, folders.length);
+      if (opts.onlyMissing && claudeCodeHasServer(claudeJson, f.uri.fsPath, name)) continue;
       const spec = serverSpec(process.execPath, cli, f.uri.fsPath);
       if (!probe.ok) {
         const copy = t('Copy the command');
@@ -219,7 +222,7 @@ export function registerAi(context: vscode.ExtensionContext, deps: AiDeps): AiIn
     }
   };
 
-  const connectClaudeDesktop = async () => {
+  const connectClaudeDesktop = async (opts: { confirm?: boolean } = {}) => {
     const file = claudeDesktopConfigPath(process.platform, os.homedir(), process.env.APPDATA);
     if (!file) return void vscode.window.showWarningMessage(t('Claude Desktop is not available on this system.'));
     if (!(await exists(path.dirname(file)))) return void vscode.window.showWarningMessage(t('Claude Desktop does not seem to be installed ({0} not found).', path.dirname(file)));
@@ -241,7 +244,8 @@ export function registerAi(context: vscode.ExtensionContext, deps: AiDeps): AiIn
     }
     const ok = t('Update');
     const detail = t('Adds or updates the MCP server(s) {0} in {1}. Other servers and settings are kept; a backup is saved next to the file.', names.join(', '), file);
-    if ((await vscode.window.showInformationMessage(t('Connect Claude Desktop to your tasks?'), { modal: true, detail }, ok)) !== ok) return;
+    // The daily prompt's "Connect" button is the consent there; the command asks first.
+    if (opts.confirm !== false && (await vscode.window.showInformationMessage(t('Connect Claude Desktop to your tasks?'), { modal: true, detail }, ok)) !== ok) return;
     if (before !== undefined) await fs.writeFile(`${file}.bak`, before);
     await fs.writeFile(file, text!);
     deps.log(`claude desktop config updated: ${names.join(', ')}`);
@@ -277,12 +281,12 @@ export function registerAi(context: vscode.ExtensionContext, deps: AiDeps): AiIn
     items.push({
       label: '$(terminal) Claude Code', picked: hasClaudeCode,
       description: hasClaudeCode ? t('this project, this computer') : t('not installed — choose it to copy the command'),
-      detail: t('Runs "claude mcp add-json --scope local"'), run: connectClaudeCode,
+      detail: t('Runs "claude mcp add-json --scope local"'), run: () => connectClaudeCode(),
     });
     const desktopConfig = claudeDesktopConfigPath(process.platform, os.homedir(), process.env.APPDATA);
     if (desktopConfig) {
       const hasDesktop = await exists(path.dirname(desktopConfig));
-      items.push({ label: '$(device-desktop) Claude Desktop', picked: hasDesktop, description: hasDesktop ? t('edits its config file after asking') : t('not installed'), run: connectClaudeDesktop });
+      items.push({ label: '$(device-desktop) Claude Desktop', picked: hasDesktop, description: hasDesktop ? t('edits its config file after asking') : t('not installed'), run: () => connectClaudeDesktop() });
     }
     const picked = await vscode.window.showQuickPick(items, { canPickMany: true, title: t('Connect AI agents to your tasks (MCP)'), placeHolder: t('{0}: {1} · choose what else to connect', appName, status) });
     for (const p of picked ?? []) await p.run?.();
@@ -299,9 +303,10 @@ export function registerAi(context: vscode.ExtensionContext, deps: AiDeps): AiIn
       return vscode.commands.executeCommand('workbench.action.openWalkthrough', typeof step === 'string' ? { category, step: `${category}#${step}` } : category, false);
     }),
   );
-  // ---- onboarding: (A) tasksmd install prompt daily until done, (B) guide on the first 3 days ----
+  // ---- onboarding: (A) tasksmd daily until installed, (B) guide on the first 3 days, (C) connect Claude daily until connected
   const DAYS = 'onboarding.days', LAST_DAY = 'onboarding.lastDay', DONE = 'onboarding.done';
   const CLI_LAST_DAY = 'onboarding.cliLastDay', CLI_NEVER = 'onboarding.cliNever';
+  const AI_LAST_DAY = 'onboarding.aiLastDay', AI_NEVER = 'onboarding.aiNever';
   const cliPresent = async () => {
     const rt = await readRuntime();
     if (rt?.launcher && (await exists(rt.launcher))) return true;
@@ -312,7 +317,7 @@ export function registerAi(context: vscode.ExtensionContext, deps: AiDeps): AiIn
     const state = context.globalState;
     const now = new Date();
     const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-    await Promise.all([promptInstall(state, today), promptGuide(state, today)]);
+    await Promise.all([promptInstall(state, today), promptGuide(state, today), promptConnect(state, today)]);
   };
   /** (A) The tasksmd command: once a day until installed or "Don't ask again". */
   const promptInstall = async (state: vscode.Memento, today: string) => {
@@ -324,6 +329,30 @@ export function registerAi(context: vscode.ExtensionContext, deps: AiDeps): AiIn
       install, later, never);
     if (choice === install) await installCli();
     else if (choice === never) await state.update(CLI_NEVER, true);
+  };
+  /** (C) Claude Code / Claude Desktop installed but not connected yet: once a day until connected or "Don't ask again". */
+  const promptConnect = async (state: vscode.Memento, today: string) => {
+    const folders = localFolders();
+    if (!folders.length || !vscode.workspace.isTrusted) return;
+    const names = folders.map((f) => ({ f, name: serverName(f.name, folders.length) }));
+    const hasCode = await onPath(process.platform === 'win32' ? ['claude.cmd', 'claude.exe', 'claude'] : ['claude']);
+    const claudeJson = hasCode ? await readText(path.join(os.homedir(), '.claude.json')) : undefined;
+    const needCode = hasCode && names.some(({ f, name }) => !claudeCodeHasServer(claudeJson, f.uri.fsPath, name));
+    const desktopFile = claudeDesktopConfigPath(process.platform, os.homedir(), process.env.APPDATA);
+    const hasDesktop = !!desktopFile && (await exists(path.dirname(desktopFile)));
+    const desktopText = hasDesktop ? await readText(desktopFile!) : undefined;
+    const needDesktop = hasDesktop && names.some(({ name }) => !claudeDesktopHasServer(desktopText, name));
+    if (!dailyPrompt({ lastDay: state.get<string>(AI_LAST_DAY), never: state.get<boolean>(AI_NEVER) }, today, needCode || needDesktop)) return;
+    await state.update(AI_LAST_DAY, today);
+    const tools = [...(needCode ? ['Claude Code'] : []), ...(needDesktop ? ['Claude Desktop'] : [])].join(', ');
+    const connect = t('Connect'), later = t('Not now'), never = t("Don't ask again");
+    const choice = await vscode.window.showInformationMessage(
+      t('Tasks for Markdown: {0} is installed. Connect it to your tasks (MCP) so it can find, add and complete them when you ask?', tools),
+      connect, later, never);
+    if (choice === connect) {
+      if (needCode) await connectClaudeCode({ onlyMissing: true });
+      if (needDesktop) await connectClaudeDesktop({ confirm: false });
+    } else if (choice === never) await state.update(AI_NEVER, true);
   };
   /** (B) The Get Started guide: opened on the first day, offered on days 2 and 3 (distinct days). */
   const promptGuide = async (state: vscode.Memento, today: string) => {

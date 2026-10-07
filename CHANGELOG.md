@@ -5,7 +5,7 @@
 **AI agents and the terminal without npm**
 - The MCP server is now bundled in the extension and runs on the editor's own Node — no Node.js or npm needed.
 - VS Code (agent mode) and Cursor: the server is registered automatically, one per workspace folder (`tasksmd.mcp.autoRegister`, on by default; not in untrusted workspaces).
-- **Tasks: Connect AI agents (MCP)** adds it to Claude Code (this project on this computer) or Claude Desktop (config file updated after confirmation, with a backup).
+- **Tasks: Connect AI agents (MCP)** adds it to Claude Code (this project on this computer) or Claude Desktop (config file updated after confirmation, with a backup); installed tools start checked. If Claude Code or Claude Desktop is installed but not connected, a prompt offers to connect it once a day (until connected or "Don't ask again").
 - **Tasks: Install 'tasksmd' terminal command** / **Uninstall** — the CLI in any terminal; keeps working after updates.
 - A "Get started" walkthrough (first task, queries and the rendered view, AI agents, terminal command), opened once on the first launch and with **Tasks: Open Get Started guide**; the guide is offered again on the second and third day of use, and until the `tasksmd` command is installed (or "Don't ask again") a prompt offers it once a day. README link: `…/guide`.
 - Insert query block, Open rendered view and the query builder's "insert into note" act on the note you were working on, even when another tab (such as the walkthrough) is in front; with no note open, Insert query block opens a sample note.

@@ -406,5 +406,7 @@
   "Don't ask again": "다시 묻지 않기",
   "{0}: {1} · choose what else to connect": "{0}: {1} · 추가로 연결할 대상을 고르세요",
   "not installed — choose it to copy the command": "설치되지 않음 — 고르면 명령을 복사해 드림",
-  "not installed": "설치되지 않음"
+  "not installed": "설치되지 않음",
+  "Connect": "연결",
+  "Tasks for Markdown: {0} is installed. Connect it to your tasks (MCP) so it can find, add and complete them when you ask?": "Tasks for Markdown: {0}이(가) 설치돼 있습니다. 태스크에 연결(MCP)해서, 말로 시키면 태스크를 찾고 추가하고 완료할 수 있게 할까요?"
 }

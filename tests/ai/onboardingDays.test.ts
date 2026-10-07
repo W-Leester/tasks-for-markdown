@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { onboardingDay, shouldPromptInstall } from '../../src/ai/onboardingDays';
+import { dailyPrompt, onboardingDay, shouldPromptInstall } from '../../src/ai/onboardingDays';
 
 describe('onboarding counts distinct days', () => {
   it('counts a new day once, however many windows open that day', () => {
@@ -19,5 +19,12 @@ describe('onboarding counts distinct days', () => {
     expect(shouldPromptInstall({ lastDay: '2026-10-07' }, '2026-10-30', false)).toBe(true); // no 3-day limit
     expect(shouldPromptInstall({}, '2026-10-07', true)).toBe(false);
     expect(shouldPromptInstall({ never: true }, '2026-10-08', false)).toBe(false);
+  });
+
+  it('the generic daily prompt follows the same rule', () => {
+    expect(dailyPrompt({}, '2026-10-08', true)).toBe(true);
+    expect(dailyPrompt({}, '2026-10-08', false)).toBe(false);
+    expect(dailyPrompt({ lastDay: '2026-10-08' }, '2026-10-08', true)).toBe(false);
+    expect(dailyPrompt({ never: true }, '2026-10-09', true)).toBe(false);
   });
 });

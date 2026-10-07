@@ -150,7 +150,7 @@
   "tasksmd.walkthrough.query.title": "Filter with a query and view the note",
   "tasksmd.walkthrough.query.description": "A ```tasks block lists the tasks that match its lines. The rendered view (Ctrl+Shift+R) shows the results in place, with checkboxes.\n[Insert a query block](command:tasksmd.insertQueryBlock)\n[Open the rendered view](command:tasksmd.openRendered)",
   "tasksmd.walkthrough.ai.title": "Connect AI agents",
-  "tasksmd.walkthrough.ai.description": "This editor's AI agent is connected automatically. Connect Claude Code or Claude Desktop with one command — no npm needed.\n[Connect AI agents](command:tasksmd.connectAi)",
+  "tasksmd.walkthrough.ai.description": "This editor's AI agent is connected automatically. If Claude Code or Claude Desktop is installed, you will be offered to connect it too — no npm needed. With MCP the agent gets exact answers from the same query engine and changes tasks exactly like the editor, without overwriting your edits.\n[Connect AI agents](command:tasksmd.connectAi)",
   "tasksmd.walkthrough.cli.title": "Use your tasks from the terminal",
   "tasksmd.walkthrough.cli.description": "A `tasksmd` command in every terminal: check what is due without opening the editor, add / complete / postpone tasks, use them in scripts and with terminal AI agents. Same rules as the editor, no npm needed.\n[Install the tasksmd command](command:tasksmd.installCli)",
   "tasksmd.openWalkthrough.title": "Open Get Started guide"

@@ -150,7 +150,7 @@
   "tasksmd.walkthrough.query.title": "쿼리로 거르고 노트 보기",
   "tasksmd.walkthrough.query.description": "```tasks 블록은 조건에 맞는 태스크를 목록으로 보여 줍니다. 렌더 보기(Ctrl+Shift+R)는 그 자리에 결과와 체크박스를 보여 줍니다.\n[쿼리 블록 넣기](command:tasksmd.insertQueryBlock)\n[렌더 보기 열기](command:tasksmd.openRendered)",
   "tasksmd.walkthrough.ai.title": "AI 에이전트 연결",
-  "tasksmd.walkthrough.ai.description": "이 에디터의 AI 에이전트는 자동으로 연결됩니다. Claude Code나 Claude Desktop은 명령 하나로 연결합니다. npm은 필요 없습니다.\n[AI 에이전트 연결](command:tasksmd.connectAi)",
+  "tasksmd.walkthrough.ai.description": "이 에디터의 AI 에이전트는 자동으로 연결됩니다. Claude Code나 Claude Desktop이 설치돼 있으면 연결할지 물어봅니다(npm 불필요). MCP로 연결하면 AI가 같은 쿼리 엔진으로 정확하게 답하고, 에디터와 똑같이 태스크를 고치며, 사용자의 편집을 덮어쓰지 않습니다.\n[AI 에이전트 연결](command:tasksmd.connectAi)",
   "tasksmd.walkthrough.cli.title": "터미널에서 태스크 쓰기",
   "tasksmd.walkthrough.cli.description": "어느 터미널에서든 `tasksmd` 명령: 에디터를 열지 않고 마감을 확인하고, 태스크를 추가·완료·미루고, 스크립트와 터미널 AI에서 씁니다. 에디터와 같은 규칙, npm 불필요.\n[tasksmd 명령 설치](command:tasksmd.installCli)",
   "tasksmd.openWalkthrough.title": "시작 안내 열기"

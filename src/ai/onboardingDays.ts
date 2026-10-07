@@ -21,5 +21,10 @@ export function onboardingDay(state: OnboardingDays, today: string): { day: numb
  * is installed or the user chose "Don't ask again" — no three-day limit.
  */
 export function shouldPromptInstall(state: { lastDay?: string; never?: boolean }, today: string, installed: boolean): boolean {
-  return !installed && !state.never && state.lastDay !== today;
+  return dailyPrompt(state, today, !installed);
+}
+
+/** A prompt shown once a day while it is `needed`, until the user chooses "Don't ask again". */
+export function dailyPrompt(state: { lastDay?: string; never?: boolean }, today: string, needed: boolean): boolean {
+  return needed && !state.never && state.lastDay !== today;
 }

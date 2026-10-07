@@ -36,6 +36,11 @@ describe('MCP server', () => {
   it('lists the tools and serves the syntax resource', async () => {
     const tools = (await client.listTools()).tools.map((t) => t.name).sort();
     expect(tools).toEqual(['tasks_add_note', 'tasks_create', 'tasks_explain_query', 'tasks_get', 'tasks_info', 'tasks_list_saved_queries', 'tasks_postpone', 'tasks_query', 'tasks_remove', 'tasks_set_status', 'tasks_syntax_reference', 'tasks_update']);
+    // Read tools are marked read-only and only tasks_remove destructive, so clients can tell them apart.
+    const hints = Object.fromEntries((await client.listTools()).tools.map((t) => [t.name, t.annotations]));
+    for (const n of ['tasks_query', 'tasks_get', 'tasks_explain_query', 'tasks_list_saved_queries', 'tasks_info', 'tasks_syntax_reference']) expect(hints[n]).toMatchObject({ readOnlyHint: true, openWorldHint: false });
+    for (const n of ['tasks_create', 'tasks_update', 'tasks_add_note', 'tasks_set_status', 'tasks_postpone']) expect(hints[n]).toMatchObject({ readOnlyHint: false, destructiveHint: false });
+    expect(hints['tasks_remove']).toMatchObject({ readOnlyHint: false, destructiveHint: true });
     const res = await client.readResource({ uri: 'tasks://syntax' });
     expect((res.contents[0] as { text: string }).text).toContain('Query language');
   });

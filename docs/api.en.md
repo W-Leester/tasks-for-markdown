@@ -255,6 +255,7 @@ VS Code: `.vscode/mcp.json` (the top-level key is `servers`):
 | `tasks_remove { path, line, expectedText? }` | Delete the line |
 | `tasks_syntax_reference` / resource `tasks://syntax` | Task line format, note format, query cheat sheet (including the sidebar's smart-view queries) and rules such as the due-date requirement. The server instructions tell the agent to read it first |
 
+- **Tool annotations (1.1.0):** the six lookup tools (`tasks_query`, `tasks_get`, `tasks_explain_query`, `tasks_list_saved_queries`, `tasks_info`, `tasks_syntax_reference`) are `readOnlyHint: true`, write tools `destructiveHint: false`, only `tasks_remove` `destructiveHint: true`, all `openWorldHint: false` (standard MCP annotations). They are hints for the client's permission prompt; the client decides how it asks.
 - Write tools accept `expectedText` (the line's `originalMarkdown`) and refuse changed lines with `STALE_LINE`; the server instructions ask the agent to always pass it.
 - Every call re-scans the folder, so files changed between calls are seen. Settings are read like the CLI.
 - Files with unsaved editor changes may conflict; the instructions tell the agent to have the user save first.

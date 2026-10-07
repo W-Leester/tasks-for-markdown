@@ -253,6 +253,7 @@ VS Code는 `.vscode/mcp.json`(맨 위 키가 `servers`):
 | `tasks_remove { path, line, expectedText? }` | 줄 삭제 |
 | `tasks_syntax_reference` / 리소스 `tasks://syntax` | 태스크 줄 형식, 메모 형식, 쿼리 문법, 마감일 필수 같은 규칙 요약. 에이전트가 먼저 읽도록 서버 안내문에 적혀 있음 |
 
+- **도구 표시(1.1.0):** 조회 도구 6개(`tasks_query`·`tasks_get`·`tasks_explain_query`·`tasks_list_saved_queries`·`tasks_info`·`tasks_syntax_reference`)는 `readOnlyHint: true`, 쓰기 도구는 `destructiveHint: false`, `tasks_remove`만 `destructiveHint: true`, 모두 `openWorldHint: false`(MCP 표준 annotations). 에이전트 앱이 허용 확인에 참고하는 표시일 뿐이며, 실제로 어떻게 묻는지는 앱이 정합니다.
 - 쓰기 도구는 `expectedText`(그 줄의 `originalMarkdown`)를 받으면 그사이 바뀐 줄을 `STALE_LINE`으로 거부합니다. 서버 안내문이 에이전트에게 항상 넣으라고 권합니다.
 - 호출마다 폴더를 다시 훑어 파일이 그사이 바뀌어도 최신 상태를 봅니다. 설정은 CLI와 같이 `.vscode/settings.json`을 읽습니다.
 - 편집기에 저장 안 된 변경이 있는 파일과는 충돌할 수 있습니다. 안내문에 "먼저 저장하라고 하라"가 들어 있습니다.

@@ -15,6 +15,7 @@
 
 **AI results**
 - MCP `tasks_query` / `tasks_get` results are much smaller for agents: each task once (no repeated `groups` / `tree` copies), empty fields left out, compact JSON — about 11% of the previous size for the same query. With `group by`, `groups` lists task indexes.
+- MCP tools carry standard annotations: the six lookup tools are read-only, `tasks_remove` is marked destructive, the other edits are not — clients can use them in their permission prompts.
 - Claude Desktop's config is written only after Claude Desktop is closed; while it runs it can overwrite the file and drop the connection.
 
 **Task links**

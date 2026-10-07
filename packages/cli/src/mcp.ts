@@ -92,36 +92,45 @@ export function createMcpServer(opts: McpOptions): McpServer {
   });
   // A fresh workspace per call keeps results consistent with files edited between calls (cheap for note folders).
   const ws = (): Workspace => openWorkspace(loadConfig(opts.root), opts.today);
+  // MCP tool annotations: hints for the client's permission prompt (it decides what to do with them).
+  const READ = { readOnlyHint: true, openWorldHint: false } as const;
+  const EDIT = { readOnlyHint: false, destructiveHint: false, openWorldHint: false } as const;
+  const DELETE = { readOnlyHint: false, destructiveHint: true, openWorldHint: false } as const;
   const guard = <T>(fn: () => T) => { try { return text(fn()); } catch (err) { return failure(err); } };
 
   server.registerResource('syntax', 'tasks://syntax', { title: 'Task line and query syntax', description: 'Field emojis, order and the query language', mimeType: 'text/markdown' }, async (uri) => ({ contents: [{ uri: uri.href, mimeType: 'text/markdown', text: SYNTAX_REFERENCE }] }));
 
-  server.registerTool('tasks_syntax_reference', { title: 'Syntax reference', description: 'Returns the task line format (fields, emojis, order) and the query language cheat sheet.' }, async () => text(SYNTAX_REFERENCE));
+  server.registerTool('tasks_syntax_reference', { annotations: READ, title: 'Syntax reference', description: 'Returns the task line format (fields, emojis, order) and the query language cheat sheet.' }, async () => text(SYNTAX_REFERENCE));
 
   server.registerTool('tasks_query', {
+    annotations: READ,
     title: 'Query tasks',
     description: 'Run a Tasks query (one instruction per line, e.g. "not done\\ndue before tomorrow\\nsort by urgency"). Returns matched/shown counts and the tasks (each once) with path, 0-based line, description, dates, priority, tags, originalMarkdown; fields without a value are omitted. With group by, groups lists group names and the indexes of their tasks. An empty query returns every task.',
     inputSchema: { query: z.string(), source: z.string().optional().describe('Path of the note the query "lives in" for {{query.file.*}} placeholders'), limit: z.number().int().min(0).optional() },
   }, async ({ query, source, limit }) => guard(() => compactQueryOutput(runQuery(ws(), limit !== undefined ? `${query}\nlimit ${limit}` : query, source))));
 
   server.registerTool('tasks_explain_query', {
+    annotations: READ,
     title: 'Explain a query',
     description: 'Parse a query without running it: a human-readable explanation and any syntax errors. Use it to validate a query you composed.',
     inputSchema: { query: z.string() },
   }, async ({ query }) => guard(() => explainQuery(ws(), query)));
 
   server.registerTool('tasks_get', {
+    annotations: READ,
     title: 'Get one task',
     description: 'The task at path:line, or an error if there is none.',
     inputSchema: { path: ref.path, line: ref.line },
   }, async ({ path, line }) => guard(() => { const w = ws(); return compactTask(toTaskDto(taskAt(w, { path, line }), w.index, w.today)); }));
 
   server.registerTool('tasks_list_saved_queries', {
+    annotations: READ,
     title: 'List saved queries',
     description: 'Saved queries from tasksmd.savedQueries and .tasks/queries/*.md (name, query text). Run one with tasks_query.',
   }, async () => guard(() => listSavedQueries(loadConfig(opts.root))));
 
   server.registerTool('tasks_create', {
+    annotations: EDIT,
     title: 'Create a task',
     description: 'Append a task to a file (or insert after a 0-based line). Give the description without field emojis and use the typed fields; the line is written in canonical field order. The file is created if missing.',
     inputSchema: { ...fields, description: z.string().describe('Task text, may contain #tags'), tags: z.array(z.string()).optional().describe('Tags to append to the description, with or without #'), file: z.string().describe('Workspace-relative Markdown file'), afterLine: z.number().int().min(0).optional() },
@@ -138,6 +147,7 @@ export function createMcpServer(opts: McpOptions): McpServer {
   }));
 
   server.registerTool('tasks_update', {
+    annotations: EDIT,
     title: 'Update task fields',
     description: 'Change fields of an existing task; null removes a date/recurrence. Status (if given) is applied last with done/cancelled dates and recurrence handling.',
     inputSchema: { ...ref, ...fields },
@@ -154,29 +164,34 @@ export function createMcpServer(opts: McpOptions): McpServer {
   }));
 
   server.registerTool('tasks_add_note', {
+    annotations: EDIT,
     title: 'Add a note to a task',
     description: 'Add one note under the task: an indented plain bullet after its existing notes (or right below the task). Notes are never written on the task line itself.',
     inputSchema: { ...ref, text: z.string().min(1).describe('The note text (one line)') },
   }, async ({ path, line, expectedText, text: note }) => guard(() => addNote(ws(), { path, line }, note, expectedText)));
 
   server.registerTool('tasks_info', {
+    annotations: READ,
     title: 'Version, features and settings',
     description: 'Server version, supported features (e.g. "notes") and the workspace settings that change what edits are accepted — notably requireDueDate (tasks_create needs "due" when true).',
   }, async () => guard(() => info(ws(), opts.version ?? '0.0.0')));
 
   server.registerTool('tasks_set_status', {
+    annotations: EDIT,
     title: 'Set task status',
     description: 'Set the status symbol: "x" done (adds ✅ date and, for recurring tasks, writes the next occurrence), " " todo, "/" in progress, "-" cancelled, or a custom symbol.',
     inputSchema: { ...ref, symbol: z.string().length(1) },
   }, async ({ path, line, expectedText, symbol }) => guard(() => setStatus(ws(), { path, line }, symbol, expectedText)));
 
   server.registerTool('tasks_postpone', {
+    annotations: EDIT,
     title: 'Postpone a task',
     description: 'Move the due date (or scheduled date when there is no due date) to a date: YYYY-MM-DD or natural language such as "tomorrow", "next monday", "in 2 weeks".',
     inputSchema: { ...ref, to: z.string() },
   }, async ({ path, line, expectedText, to }) => guard(() => postpone(ws(), { path, line }, to, expectedText)));
 
   server.registerTool('tasks_remove', {
+    annotations: DELETE,
     title: 'Delete a task line',
     description: 'Delete the task line from the file. Prefer tasks_set_status with "-" (cancelled) unless the user asked to delete.',
     inputSchema: { ...ref },

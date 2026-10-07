@@ -48,6 +48,7 @@ if (info.settings.requireDueDate) { /* 만들기 화면에서 마감일을 필�
 | `info` | 1.0.0 | `extensionVersion`, `features`, `info()` |
 | `events.status` | 1.0.0 | `events.onDidChangeStatus` |
 | `isBlocking` | 1.0.0 | `TaskDto.isBlocking` |
+| `links` | 1.1.0 | `ui.link`, 태스크 링크(8a절) |
 
 ## 2. 메서드
 
@@ -101,6 +102,7 @@ if (info.settings.requireDueDate) { /* 만들기 화면에서 마감일을 필�
 | `openCalendar({ fullScreen? })` | 캘린더 |
 | `openQueryResults(query, source?)` | 쿼리 결과 패널 |
 | `reveal(ref)` | 에디터에서 그 줄로 이동 |
+| `link(ref)` | 에디터 밖에서 그 태스크를 여는 링크(기능 `links`, 8a절) |
 
 ## 3. 명령 표면 (키바인딩·매크로·다른 언어)
 
@@ -132,6 +134,7 @@ keybindings.json:
 | `tasksmd.api.edit.addNote` | `{ ref, text }` |
 | `tasksmd.api.info` | 없음 |
 | `tasksmd.api.ui.openEdit` / `reveal` | `{ ref? }` |
+| `tasksmd.api.ui.link` | `{ ref }` → 링크 문자열 |
 | `tasksmd.api.ui.openKanban` | `{ savedQueryId?, mode? }` |
 | `tasksmd.api.ui.openCalendar` | `{ fullScreen? }` |
 | `tasksmd.api.ui.openQueryResults` | `{ query, source? }` |
@@ -252,6 +255,22 @@ VS Code는 `.vscode/mcp.json`(맨 위 키가 `servers`):
 - 호출마다 폴더를 다시 훑어 파일이 그사이 바뀌어도 최신 상태를 봅니다. 설정은 CLI와 같이 `.vscode/settings.json`을 읽습니다.
 - 편집기에 저장 안 된 변경이 있는 파일과는 충돌할 수 있습니다. 안내문에 "먼저 저장하라고 하라"가 들어 있습니다.
 - 오류는 `isError`와 `{ error: { code, message } }` 본문으로 돌아옵니다.
+
+## 8a. 태스크 링크(URI)
+
+메신저, 다른 앱의 메모, 웹 페이지, AI 답변 등 에디터 밖 어디서든 링크로 태스크나 쿼리를 엽니다. 누르면 에디터가 열리거나 앞으로 오고, 확장이 처리합니다.
+
+```
+<scheme>://hastycapybara.tasks-for-markdown/open?path=notes%252Fwork.md&line=12
+<scheme>://hastycapybara.tasks-for-markdown/query?text=not%2520done%250Adue%2520today
+```
+
+- `<scheme>`은 에디터마다 다릅니다: `vscode`, `cursor`, `vscode-insiders` …(`vscode.env.uriScheme`).
+- `open`: `path`는 API와 같은 경로(워크스페이스 상대, 폴더가 여럿이면 `<폴더>/<경로>`), `line`은 1부터. 텍스트 편집기에서 그 줄로 이동.
+- `query`: `text`의 쿼리 결과 패널(줄은 줄바꿈으로 구분).
+- 값은 **두 번** 퍼센트 인코딩합니다(VS Code가 확장에 넘기기 전에 한 번 풀기 때문). 손으로 쓴 한 번 인코딩한 링크도 값에 `&`, `=`, `+`가 없으면 동작합니다.
+- 거부: 절대 경로, `..`, 열린 폴더 밖의 파일, `filter|sort|group by function` 줄. 링크는 열고 보여 주기만 하고 파일을 바꾸지 않습니다.
+- 링크 만들기: 명령 `Tasks: 태스크 링크 복사`, `Tasks: 커서 위치 쿼리 링크 복사`, 또는 `ui.link(ref)` / `tasksmd.api.ui.link`.
 
 ## 9. 호환 정책
 

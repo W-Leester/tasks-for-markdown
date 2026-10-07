@@ -423,6 +423,22 @@
         "title": "Tasks API: ui.reveal",
         "category": "Tasks",
         "enablement": "false"
+      },
+      {
+        "command": "tasksmd.api.ui.link",
+        "title": "Tasks API: ui.link",
+        "category": "Tasks",
+        "enablement": "false"
+      },
+      {
+        "command": "tasksmd.copyTaskLink",
+        "title": "%tasksmd.copyTaskLink.title%",
+        "category": "Tasks"
+      },
+      {
+        "command": "tasksmd.copyQueryLink",
+        "title": "%tasksmd.copyQueryLink.title%",
+        "category": "Tasks"
       }
     ],
     "configuration": {
@@ -1052,8 +1068,20 @@
           "when": "false"
         },
         {
+          "command": "tasksmd.api.ui.link",
+          "when": "false"
+        },
+        {
           "command": "tasksmd.previewRender",
           "when": "false"
+        },
+        {
+          "command": "tasksmd.copyTaskLink",
+          "when": "editorLangId == markdown"
+        },
+        {
+          "command": "tasksmd.copyQueryLink",
+          "when": "editorLangId == markdown"
         }
       ],
       "editor/context": [

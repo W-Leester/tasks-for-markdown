@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import { parseNaturalDate, systemClock, type Clock } from '../core/dates';
 import type { TaskIndex } from '../core/index';
 import { DateField, StatusType, Task, parseTaskLine, type StatusRegistry } from '../core/task';
+import { taskLink } from '../links/taskLinks';
 import type { IndexService } from '../index/IndexService';
 import type { QueryService } from '../services/QueryService';
 import type { SavedQueryStore } from '../services/SavedQueryStore';
@@ -57,7 +58,7 @@ export interface TasksApiDeps {
 const MAX_LINE = Number.MAX_SAFE_INTEGER;
 
 /** Optional capabilities of this build (docs/api.md "Feature list"). Add a name whenever an additive API feature ships. */
-export const API_FEATURES: readonly ApiFeature[] = ['tree', 'notes', 'notes.add', 'info', 'events.status', 'isBlocking'];
+export const API_FEATURES: readonly ApiFeature[] = ['tree', 'notes', 'notes.add', 'info', 'events.status', 'isBlocking', 'links'];
 
 /**
  * The public API (docs/api-plan.md §4). One instance per caller so the write-confirmation
@@ -353,6 +354,10 @@ export function createTasksApi(deps: TasksApiDeps, caller: ApiCaller = {}): Task
       reveal: (ref) => wrap(async () => {
         const task = await requireTask(ref);
         await vscode.commands.executeCommand('tasksmd.openTask', { key: task.location.key, line: task.location.line });
+      }),
+      link: (ref) => wrap(async () => {
+        checkRef(ref);
+        return taskLink(vscode.env.uriScheme, ref.path, ref.line);
       }),
     },
   };

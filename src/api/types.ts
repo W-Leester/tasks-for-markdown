@@ -225,7 +225,7 @@ export interface TaskStatusChangeEvent {
  * Names of optional capabilities, so a caller can check what the installed extension supports
  * (all within API version 1). See docs/api.md "Feature list" for the version each was added in.
  */
-export type ApiFeature = 'tree' | 'notes' | 'notes.add' | 'info' | 'events.status' | 'isBlocking';
+export type ApiFeature = 'tree' | 'notes' | 'notes.add' | 'info' | 'events.status' | 'isBlocking' | 'links';
 
 export interface ApiInfo {
   /** Version of the installed extension, e.g. `1.0.0`. */
@@ -302,6 +302,12 @@ export interface TasksApi {
     openQueryResults(query: string, source?: string): Promise<void>;
     /** Open the task's file in the text editor at its line. */
     reveal(ref: TaskRef): Promise<void>;
+    /**
+     * A link that opens this task from outside the editor (a chat message, a note, a web page):
+     * `<scheme>://hastycapybara.tasks-for-markdown/open?path=…&line=…`, with the running editor's
+     * scheme (`vscode`, `cursor`, …). Feature `links`.
+     */
+    link(ref: TaskRef): Promise<string>;
   };
 }
 

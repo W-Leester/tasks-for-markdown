@@ -136,5 +136,7 @@
   "tasksmd.checkForUpdates.title": "Check for updates (.vsix)",
   "tasksmd.convertFormat.title": "Convert task format in this file…",
   "tasksmd.config.language": "Language of the extension's UI (sidebar, dialogs, hints). Command titles and setting descriptions always follow the editor's display language. Reload the window after changing.",
-  "tasksmd.config.language.auto": "Follow the editor display language"
+  "tasksmd.config.language.auto": "Follow the editor display language",
+  "tasksmd.copyTaskLink.title": "Copy link to task",
+  "tasksmd.copyQueryLink.title": "Copy link to query under cursor"
 }

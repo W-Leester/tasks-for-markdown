@@ -48,6 +48,7 @@ if (info.settings.requireDueDate) { /* make the due date mandatory in your creat
 | `info` | 1.0.0 | `extensionVersion`, `features`, `info()` |
 | `events.status` | 1.0.0 | `events.onDidChangeStatus` |
 | `isBlocking` | 1.0.0 | `TaskDto.isBlocking` |
+| `links` | 1.1.0 | `ui.link`, task links (§8a) |
 - Requirements: the extension is installed and activated in the same VS Code/Cursor window, and a workspace folder is open. Outside the editor use the library, the CLI or the MCP server (§6–8).
 
 ## 2. Methods
@@ -102,6 +103,7 @@ All return `{ dispose() }`.
 | `openCalendar({ fullScreen? })` | Calendar |
 | `openQueryResults(query, source?)` | The query results panel beside the editor |
 | `reveal(ref)` | Open the file in the text editor at that line |
+| `link(ref)` | A link that opens the task from outside the editor (feature `links`, §8a) |
 
 ## 3. Command surface (keybindings, macros, other languages)
 
@@ -133,6 +135,7 @@ keybindings.json:
 | `tasksmd.api.edit.addNote` | `{ ref, text }` |
 | `tasksmd.api.info` | none |
 | `tasksmd.api.ui.openEdit` / `reveal` | `{ ref? }` |
+| `tasksmd.api.ui.link` | `{ ref }` → link string |
 | `tasksmd.api.ui.openKanban` | `{ savedQueryId?, mode? }` |
 | `tasksmd.api.ui.openCalendar` | `{ fullScreen? }` |
 | `tasksmd.api.ui.openQueryResults` | `{ query, source? }` |
@@ -254,6 +257,22 @@ VS Code: `.vscode/mcp.json` (the top-level key is `servers`):
 - Every call re-scans the folder, so files changed between calls are seen. Settings are read like the CLI.
 - Files with unsaved editor changes may conflict; the instructions tell the agent to have the user save first.
 - Errors come back with `isError` and a `{ error: { code, message } }` body.
+
+## 8a. Task links (URI)
+
+Links open a task or a query from anywhere outside the editor — a chat message, a note in another app, a web page, an AI answer. Clicking one starts (or focuses) the editor and the extension handles it.
+
+```
+<scheme>://hastycapybara.tasks-for-markdown/open?path=notes%252Fwork.md&line=12
+<scheme>://hastycapybara.tasks-for-markdown/query?text=not%2520done%250Adue%2520today
+```
+
+- `<scheme>` is the editor's: `vscode`, `cursor`, `vscode-insiders`, … (`vscode.env.uriScheme`).
+- `open`: `path` as the API uses it (workspace-relative; multi-root: `<folder>/<path>`), `line` 1-based. Opens the text editor at that line.
+- `query`: the query results panel for `text` (lines separated by a newline).
+- Values are percent-encoded **twice** (VS Code decodes the query once before the extension sees it); simple hand-written links with one layer work too as long as values contain no `&`, `=` or `+`.
+- Refused: absolute paths, `..`, files outside the open folders, `filter|sort|group by function` lines. Links only open and show — they never change files.
+- Make links with the commands `Tasks: Copy link to task` and `Tasks: Copy link to query under cursor`, or `ui.link(ref)` / `tasksmd.api.ui.link`.
 
 ## 9. Compatibility
 

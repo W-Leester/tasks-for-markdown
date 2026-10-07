@@ -910,11 +910,12 @@ vsix ── dist/extension.js
 ### 7.17 태스크 링크(URI) (M23)
 
 - **형식.** `<scheme>://hastycapybara.tasks-for-markdown/<동작>?<인자>` — `scheme = vscode.env.uriScheme`(VS Code `vscode`, Cursor `cursor`, Insiders `vscode-insiders`).
-  - `/open?path=notes/work.md&line=12` — 1부터 세는 줄. 폴더가 여럿이면 `folder=<이름>`(없으면 첫 번째 폴더부터 찾음).
+  - `/open?path=notes/work.md&line=12` — 1부터 세는 줄. `path`는 공개 API와 같은 형식(폴더가 여럿이면 `<폴더 이름>/<경로>`, 없으면 열린 폴더를 차례로 찾음). (계획의 `folder=` 인자 대신 API 경로 형식을 그대로 씀 — 구현 시 변경)
+  - 값은 두 번 퍼센트 인코딩(VS Code가 `uri.query`를 한 번 풀어서 넘기므로, 한 번만 인코딩하면 쿼리 안의 `&`·`=`가 구분자로 바뀜). 받는 쪽은 `URLSearchParams`가 두 번째 층을 푼다.
   - `/query?text=<URL 인코딩된 쿼리, 줄바꿈은 %0A>` — 쿼리 결과 패널(`openQueryResults`).
-- **파서** `parseTaskUri(uri) → { kind: 'open', folder?, path, line } | { kind: 'query', text } | { error }` (순수 함수). 거부: 빈 경로, 절대 경로, `..` 조각, 줄 번호가 양의 정수가 아님, 쿼리에 `by function` 줄, 알 수 없는 동작.
+- **파서** `parseTaskLink(path, query) → { kind: 'open', path, line } | { kind: 'query', text } | { kind: 'error', code }` (순수 함수, `src/links/taskLinks.ts`). 오류 문구는 VS Code 쪽에서 번역. 거부: 빈 경로, 절대 경로, `..` 조각, 줄 번호가 양의 정수가 아님, 쿼리에 `by function` 줄, 알 수 없는 동작.
 - **처리.** `open`: 워크스페이스 안 파일인지 확인 후 텍스트 편집기로 열고 줄 선택·가운데 정렬. `query`: 결과 패널. 오류는 알림 한 줄(무엇이 잘못됐는지).
-- **만들기.** `taskLink(scheme, folderName?, relPath, line)` / `queryLink(scheme, text)`. 명령 `tasksmd.copyTaskLink`(커서 줄 태스크), `tasksmd.copyQueryLink`(커서가 있는 쿼리 블록) → 클립보드 + 알림. 확장 API `ui.link(ref) → string`, 명령 표면 `tasksmd.api.ui.link`, 기능 이름 `links`.
+- **만들기.** `taskLink(scheme, path, line)` / `queryLink(scheme, text)`. 명령 `tasksmd.copyTaskLink`(커서 줄 태스크), `tasksmd.copyQueryLink`(커서가 있는 쿼리 블록) → 클립보드 + 알림. 확장 API `ui.link(ref) → string`, 명령 표면 `tasksmd.api.ui.link`, 기능 이름 `links`.
 - **보안.** 링크는 열기·보기만 하고 파일을 바꾸지 않는다. JavaScript 쿼리 함수는 설정과 상관없이 링크에서 거부.
 
 ## 8. 저장소와 설정

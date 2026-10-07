@@ -986,10 +986,10 @@
 - 상세: design.md 7.17.
 
 ### 할 일
-- [ ] URI 파서(순수 함수, 단위 테스트: 정상·잘못된 경로·`..`·function 쿼리)
-- [ ] `registerUriHandler`, 열기·쿼리 처리, 오류는 알림으로
-- [ ] 링크 복사 명령 2개, API `ui.link` + `features: 'links'`, 명령 표면 `tasksmd.api.ui.link`
-- [ ] 통합 테스트(핸들러 직접 호출 → 편집기 위치 확인)
+- [x] URI 파서(순수 함수, 단위 테스트: 정상·잘못된 경로·`..`·function 쿼리)
+- [x] `registerUriHandler`, 열기·쿼리 처리, 오류는 알림으로
+- [x] 링크 복사 명령 2개, API `ui.link` + `features: 'links'`, 명령 표면 `tasksmd.api.ui.link`
+- [x] 통합 테스트(핸들러 직접 호출 → 편집기 위치 확인)
 - [ ] 문서: README 명령 표, api.md, user-guide, CHANGELOG
 
 ## M21. 확장 안에서 AI 연결 제공 — 1.1.0 (계획 2026-10-02, 착수 2026-10-07)

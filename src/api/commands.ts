@@ -30,6 +30,7 @@ export const API_COMMANDS: Record<string, (api: TasksApi, a: Arg) => Promise<unk
   'tasksmd.api.ui.openCalendar': (api, a) => api.ui.openCalendar(a as never),
   'tasksmd.api.ui.openQueryResults': (api, a) => api.ui.openQueryResults(a.query as string, a.source as string | undefined),
   'tasksmd.api.ui.reveal': (api, a) => api.ui.reveal(a.ref as never),
+  'tasksmd.api.ui.link': (api, a) => api.ui.link(a.ref as never),
 };
 
 export function registerApiCommands(context: vscode.ExtensionContext, api: TasksApi): void {

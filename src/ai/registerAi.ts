@@ -8,6 +8,7 @@ import type { Settings } from '../settings/Settings';
 import {
   ConfigParseError, claudeAddJsonArgs, claudeAddJsonCommand, claudeDesktopConfigPath, isOurLauncher, launcherFileName, launcherScript, mergeMcpServers, pathAdvice, pickBinDir, serverName, serverSpec, type McpServerSpec,
 } from './mcpConfig';
+import { onboardingDay } from './onboardingDays';
 
 /**
  * M21 (design.md 7.16): AI agents and the terminal without npm.
@@ -280,8 +281,8 @@ export function registerAi(context: vscode.ExtensionContext, deps: AiDeps): AiIn
       return vscode.commands.executeCommand('workbench.action.openWalkthrough', typeof step === 'string' ? { category, step: `${category}#${step}` } : category, false);
     }),
   );
-  // ---- the first launches: open the guide once, offer the terminal command up to 3 times -------
-  const LAUNCHES = 'onboarding.launches', DONE = 'onboarding.done';
+  // ---- the first days: open the guide once, offer the terminal command on up to 3 days ---------
+  const DAYS = 'onboarding.days', LAST_DAY = 'onboarding.lastDay', DONE = 'onboarding.done';
   const cliPresent = async () => {
     const rt = await readRuntime();
     if (rt?.launcher && (await exists(rt.launcher))) return true;
@@ -290,8 +291,13 @@ export function registerAi(context: vscode.ExtensionContext, deps: AiDeps): AiIn
   };
   const onboard = async () => {
     const state = context.globalState;
-    const launch = (state.get<number>(LAUNCHES) ?? 0) + 1;
-    await state.update(LAUNCHES, launch);
+    const now = new Date();
+    const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    // Distinct days, not activations (every window and reload activates the extension).
+    const { day: launch, next } = onboardingDay({ days: state.get<number>(DAYS) ?? 0, lastDay: state.get<string>(LAST_DAY) }, today);
+    if (launch === null) return;
+    await state.update(DAYS, next.days);
+    await state.update(LAST_DAY, next.lastDay);
     if (launch === 1) await vscode.commands.executeCommand('tasksmd.openWalkthrough');
     if (launch > 3 || state.get<boolean>(DONE)) return;
     const offerInstall = !(await cliPresent());

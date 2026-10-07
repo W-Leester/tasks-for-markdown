@@ -7,7 +7,7 @@
 - VS Code (agent mode) and Cursor: the server is registered automatically, one per workspace folder (`tasksmd.mcp.autoRegister`, on by default; not in untrusted workspaces).
 - **Tasks: Connect AI agents (MCP)** adds it to Claude Code (this project on this computer) or Claude Desktop (config file updated after confirmation, with a backup).
 - **Tasks: Install 'tasksmd' command in PATH** / **Uninstall** — the CLI in any terminal; keeps working after updates.
-- A "Get started" walkthrough (first task, queries and the rendered view, AI agents, terminal command), opened once on the first launch and with **Tasks: Open Get Started guide**; for the first three launches a small prompt offers the `tasksmd` command (until installed or dismissed). README link: `…/guide`.
+- A "Get started" walkthrough (first task, queries and the rendered view, AI agents, terminal command), opened once on the first launch and with **Tasks: Open Get Started guide**; on the first three days of use (once a day) a small prompt offers the `tasksmd` command (until installed or dismissed). README link: `…/guide`.
 - Insert query block, Open rendered view and the query builder's "insert into note" act on the note you were working on, even when another tab (such as the walkthrough) is in front; with no note open, Insert query block opens a sample note.
 
 **Licenses**

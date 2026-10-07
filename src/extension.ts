@@ -27,6 +27,7 @@ import { registerSavedQueryView } from './views/registerSavedQueryView';
 import { registerTreeView } from './views/registerTreeView';
 import { registerWebviews } from './webviewHost/registerWebviews';
 import { registerLinks } from './links/registerLinks';
+import { registerAi, type AiInternals } from './ai/registerAi';
 import type { WebviewHost } from './webviewHost/WebviewHost';
 import { StatusBar } from './views/StatusBar';
 import { configureLanguage, t } from './l10n';
@@ -46,6 +47,7 @@ export interface ExtensionApi {
   /** Consumed by VS Code's built-in Markdown extension (contributes.markdown.markdownItPlugins). */
   extendMarkdownIt(md: import('markdown-it').MarkdownIt): import('markdown-it').MarkdownIt;
   links: { handle: (uri: vscode.Uri) => Promise<void> };
+  ai: AiInternals;
   webviews: { openEdit: (target: { key: string | null; line: number | null }) => WebviewHost; openKanban: () => WebviewHost; openQueryBuilder: (id: string | null) => WebviewHost; openStats: () => WebviewHost; openCalendar: () => WebviewHost; openQueryResults: (target: { text: string; source: string; label: string } | null) => WebviewHost };
 }
 
@@ -87,6 +89,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<Extens
   registerConvertCommand(context, commandDeps);
   registerQueryCommands(context, { ...commandDeps, queries, openQueryResults: webviews.openQueryResults });
   const links = registerLinks(context, { index, indexService, openQueryResults: webviews.openQueryResults, log });
+  const ai = registerAi(context, { settings, log });
   // Status types decide isDone/isCompleted, so a change means every file must be re-parsed.
   context.subscriptions.push(
     settings.onDidChange(() => {
@@ -128,7 +131,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<Extens
   if (context.extensionMode !== vscode.ExtensionMode.Test) void updates.checkOnStartup();
 
   void indexService.start();
-  const internal: ExtensionApi = { index, indexService, editService, queries, savedQueries, settings, archive, preview, extendMarkdownIt: (md) => preview.extendMarkdownIt(md), webviews, links };
+  const internal: ExtensionApi = { index, indexService, editService, queries, savedQueries, settings, archive, preview, extendMarkdownIt: (md) => preview.extendMarkdownIt(md), webviews, links, ai };
   const apiDeps = { index, indexService, editService, queries, savedQueries, settings, getStatusRegistry, log, extensionVersion: String((context.extension.packageJSON as { version?: string }).version ?? '0.0.0'), ui: { openEdit: webviews.openEdit, openKanban: webviews.openKanban, openCalendar: webviews.openCalendar, openQueryResults: webviews.openQueryResults } };
   registerApiCommands(context, createTasksApi(apiDeps, { extensionId: 'command' }));
   return {

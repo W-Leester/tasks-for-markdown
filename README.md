@@ -186,6 +186,7 @@ You don't have to write queries by hand. `Tasks: Open query builder` assembles o
 | `taskFormat` | `emoji` | Format used when writing fields (`emoji` or `dataview`) |
 | `globalFilter` | `""` | Only lines containing this text (e.g. `#task`) are tasks |
 | `language` | `auto` | Language of the extension's UI (`auto`, `en`, `ko`), independent of the editor's display language |
+| `mcp.autoRegister` | `true` | Register the bundled MCP server with this editor's AI agent (VS Code agent mode, Cursor), one per folder; not in untrusted workspaces |
 | `removeGlobalFilterFromDescription` | `true` | Hide the global filter text (e.g. `#task`) when showing descriptions; the file is not changed |
 | `include` / `exclude` / `respectGitignore` / `maxFileSizeKB` | | What gets scanned |
 | `setDoneDate` / `setCancelledDate` / `setCreatedDate` | `true` / `true` / `false` | Automatic ✅ ❌ ➕ dates |

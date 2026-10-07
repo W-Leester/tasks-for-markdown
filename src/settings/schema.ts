@@ -65,6 +65,8 @@ export interface SettingsSchema {
   'rendered.maxWidth': number;
   updateCheckUrl: string;
   language: 'auto' | 'en' | 'ko';
+  /** Register the bundled MCP server with the editor's AI agent (VS Code agent mode, Cursor) — M21. */
+  'mcp.autoRegister': boolean;
 }
 
 export const SETTINGS_SECTION = 'tasksmd';
@@ -124,6 +126,7 @@ export const SETTINGS_DEFAULTS: Readonly<SettingsSchema> = {
   'rendered.maxWidth': 0,
   updateCheckUrl: '',
   language: 'auto',
+  'mcp.autoRegister': true,
 };
 
 export type SettingsKey = keyof SettingsSchema;

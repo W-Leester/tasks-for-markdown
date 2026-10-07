@@ -439,6 +439,21 @@
         "command": "tasksmd.copyQueryLink",
         "title": "%tasksmd.copyQueryLink.title%",
         "category": "Tasks"
+      },
+      {
+        "command": "tasksmd.connectAi",
+        "title": "%tasksmd.connectAi.title%",
+        "category": "Tasks"
+      },
+      {
+        "command": "tasksmd.installCli",
+        "title": "%tasksmd.installCli.title%",
+        "category": "Tasks"
+      },
+      {
+        "command": "tasksmd.uninstallCli",
+        "title": "%tasksmd.uninstallCli.title%",
+        "category": "Tasks"
       }
     ],
     "configuration": {
@@ -895,6 +910,11 @@
             "한국어"
           ],
           "description": "%tasksmd.config.language%"
+        },
+        "tasksmd.mcp.autoRegister": {
+          "type": "boolean",
+          "default": true,
+          "description": "%tasksmd.config.mcp.autoRegister%"
         },
         "tasksmd.api.writePolicy": {
           "type": "string",
@@ -1413,6 +1433,67 @@
     "markdown.markdownItPlugins": true,
     "markdown.previewStyles": [
       "./media/preview.css"
+    ],
+    "mcpServerDefinitionProviders": [
+      {
+        "id": "tasksmd.mcp",
+        "label": "Tasks for Markdown"
+      }
+    ],
+    "walkthroughs": [
+      {
+        "id": "tasksmd.start",
+        "title": "%tasksmd.walkthrough.title%",
+        "description": "%tasksmd.walkthrough.description%",
+        "steps": [
+          {
+            "id": "firstTask",
+            "title": "%tasksmd.walkthrough.firstTask.title%",
+            "description": "%tasksmd.walkthrough.firstTask.description%",
+            "media": {
+              "markdown": "media/walkthrough/firstTask.md"
+            },
+            "completionEvents": [
+              "onCommand:tasksmd.createOrEdit",
+              "onCommand:tasksmd.toggleDone"
+            ]
+          },
+          {
+            "id": "query",
+            "title": "%tasksmd.walkthrough.query.title%",
+            "description": "%tasksmd.walkthrough.query.description%",
+            "media": {
+              "markdown": "media/walkthrough/query.md"
+            },
+            "completionEvents": [
+              "onCommand:tasksmd.insertQueryBlock",
+              "onCommand:tasksmd.openRendered"
+            ]
+          },
+          {
+            "id": "ai",
+            "title": "%tasksmd.walkthrough.ai.title%",
+            "description": "%tasksmd.walkthrough.ai.description%",
+            "media": {
+              "markdown": "media/walkthrough/ai.md"
+            },
+            "completionEvents": [
+              "onCommand:tasksmd.connectAi"
+            ]
+          },
+          {
+            "id": "cli",
+            "title": "%tasksmd.walkthrough.cli.title%",
+            "description": "%tasksmd.walkthrough.cli.description%",
+            "media": {
+              "markdown": "media/walkthrough/cli.md"
+            },
+            "completionEvents": [
+              "onCommand:tasksmd.installCli"
+            ]
+          }
+        ]
+      }
     ]
   },
   "scripts": {

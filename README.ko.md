@@ -186,6 +186,7 @@ if (tasks.features?.includes('notes.add')) await tasks.edit.addNote(r.tasks[0], 
 | `taskFormat` | `emoji` | 필드를 쓸 때 사용할 포맷 (`emoji` / `dataview`) |
 | `globalFilter` | `""` | 이 문자열(예: `#task`)이 있는 줄만 태스크로 취급 |
 | `language` | `auto` | 확장 화면 언어(`auto`, `en`, `ko`). 에디터 표시 언어와 따로 정할 수 있음 |
+| `mcp.autoRegister` | `true` | 확장에 들어 있는 MCP 서버를 이 에디터의 AI 에이전트(VS Code 에이전트 모드, Cursor)에 폴더마다 자동 등록. 신뢰되지 않은 워크스페이스에서는 안 함 |
 | `removeGlobalFilterFromDescription` | `true` | 설명을 보여 줄 때 글로벌 필터 문자열(예: `#task`)을 숨김. 파일은 그대로 |
 | `include` / `exclude` / `respectGitignore` / `maxFileSizeKB` | | 스캔 범위 |
 | `setDoneDate` / `setCancelledDate` / `setCreatedDate` | `true` / `true` / `false` | ✅ ❌ ➕ 자동 날짜 |

@@ -1,6 +1,6 @@
 import * as esbuild from 'esbuild';
 import esbuildSvelte from 'esbuild-svelte';
-import { readdirSync, existsSync } from 'node:fs';
+import { readdirSync, existsSync, readFileSync } from 'node:fs';
 
 const watch = process.argv.includes('--watch');
 const production = process.argv.includes('--production');
@@ -40,9 +40,28 @@ const webviewConfig = {
   plugins: [esbuildSvelte({ compilerOptions: { css: 'external' }, filterWarnings: (w) => w.code !== 'a11y_accesskey' })],
 };
 
+/**
+ * The CLI / MCP server, bundled into the extension (M21, design.md 7.16) so AI agents and the
+ * terminal command work without npm: the extension runs it on the editor's own Node. Same options
+ * as packages/cli/build.mjs (the npm package).
+ * @type {esbuild.BuildOptions}
+ */
+const cliConfig = {
+  entryPoints: ['packages/cli/src/main.ts'],
+  bundle: true,
+  outfile: 'dist/tasksmd.cjs',
+  platform: 'node',
+  target: 'node18',
+  format: 'cjs',
+  minify: true,
+  banner: { js: '#!/usr/bin/env node' },
+  define: { __TASKSMD_VERSION__: JSON.stringify(JSON.parse(readFileSync('packages/cli/package.json', 'utf8')).version) },
+  logLevel: 'info',
+};
+
 if (watch) {
-  const ctxs = await Promise.all([esbuild.context(extensionConfig), esbuild.context(webviewConfig)]);
+  const ctxs = await Promise.all([esbuild.context(extensionConfig), esbuild.context(webviewConfig), esbuild.context(cliConfig)]);
   await Promise.all(ctxs.map((c) => c.watch()));
 } else {
-  await Promise.all([esbuild.build(extensionConfig), esbuild.build(webviewConfig)]);
+  await Promise.all([esbuild.build(extensionConfig), esbuild.build(webviewConfig), esbuild.build(cliConfig)]);
 }

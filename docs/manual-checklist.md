@@ -119,14 +119,16 @@ VS Code 1.138에 들어온 내장 Markdown Editor(WYSIWYG)와 `markdown.codeBloc
 
 1. [x] **Cursor 자동 등록** — Cursor에서 노트 폴더를 열고 *Cursor Settings → MCP*(또는 Tools & Integrations)에 확장이 등록한 `tasks` 서버가 보이는지, 에이전트 채팅에서 "오늘 마감인 태스크 알려 줘"가 도구를 쓰는지.
    - **결과(2026-10-07, Cursor, `examples` 폴더):** *Customize → MCPs*의 Connected에 `extension-tasks`(User, 12 tools, 1 resource, 초록). 설정 파일 수정·npm 없이 연결됨. 채팅 "미완료 태스크 중 마감일이 가장 가까운 것 3개" → 문법 안내 리소스를 먼저 읽고 `tasks_query`로 조회, "마감일 있는 미완료 15개 중" 3개를 정확히 답함. (MCP 목록 위치: 최근 Cursor는 *Cursor Settings* 왼쪽의 **Customize** → **MCPs** 탭)
-2. [ ] **VS Code 에이전트 모드** — Copilot 채팅 에이전트 모드의 도구(🔧) 목록에 "Tasks for Markdown"이 있고, 처음 실행 허용 후 질문에 답하는지.
+2. [-] **VS Code 에이전트 모드** — Copilot 채팅 에이전트 모드의 도구(🔧) 목록에 "Tasks for Markdown"이 있고, 처음 실행 허용 후 질문에 답하는지.
+   - **미확인(10-08):** Copilot을 쓰지 않아 화면 확인은 생략. 대신 통합 테스트가 실제 VS Code에서 등록(`vscode.lm` provider)과 서버 실행·응답을 확인한다.
 3. [x] **Claude Code 연결** — `Tasks: AI 에이전트 연결 (MCP)` → (설치돼 있으면 미리 체크됨) → 알림 확인 → 그 폴더에서 `claude mcp list`에 `tasks`가 보이는지, 새 세션에서 동작하는지.
    - **결과(10-08, Cursor, 저장소 폴더):** 첫 실행 AI 연결 알림의 Connect로 연결 → `claude mcp list`에 `tasks … mcp --root …/Tasks-like-plugin - ✔ Connected`(Cursor Helper (Plugin) + `~/.tasksmd/tasksmd.cjs`). Claude Code 세션에 `mcp__tasks__*` 도구가 나타나 `tasks_info`(1.1.0)·`tasks_query`(샘플 3개)가 정확히 동작.
 4. [ ] **Claude Desktop 연결**(설치된 경우) — 같은 명령 → Claude Desktop → 확인 창 → 설정 파일에 `tasks` 추가·`.bak` 생성·다른 서버 유지 → Claude Desktop 재시작 후 동작.
    - **중간 결과(10-08):** 설정 파일에 `tasks` 추가·`.bak`·다른 키 보존까지 확인 → **5분 뒤 실행 중이던 Claude Desktop이 설정을 다시 써서 `tasks`가 사라짐**(incidents #32). 고친 뒤 다시 확인: Claude Desktop을 켠 채 연결 → "먼저 종료하세요 / 다시 시도" 창이 뜨는지, 종료 후 다시 시도 → 쓰기 → Claude Desktop을 열고 질문.
 5. [x] **터미널 명령** — `Tasks: 'tasksmd' 터미널 명령 설치` → 새 터미널에서 `tasksmd --help`, `tasksmd query "not done" --root <노트 폴더>`. PATH 안내가 나오면 그 줄을 넣고 다시. `제거` 명령으로 지워지는지.
    - **결과(10-07, Cursor, 시작 안내 버튼):** `~/.tasksmd/`(cjs·runtime.json)와 `~/.local/bin/tasksmd`(Cursor Helper (Plugin)로 실행하는 런처) 생성. `~/.local/bin`이 이미 PATH에 있어 안내 없이 바로 사용. `examples`에서 `tasksmd query` → Cursor 에이전트와 같은 3개. (제거 명령은 아직)
-6. [ ] **링크** — 태스크 줄에서 `Tasks: 태스크 링크 복사` → 브라우저 주소창이나 메모 앱에 붙여 넣고 누름 → 에디터가 그 줄로 이동. 쿼리 블록에서 `쿼리 링크 복사` → 결과 패널.
+6. [x] **링크** — 태스크 줄에서 `Tasks: 태스크 링크 복사` → 브라우저 주소창이나 메모 앱에 붙여 넣고 누름 → 에디터가 그 줄로 이동. 쿼리 블록에서 `쿼리 링크 복사` → 결과 패널.
+   - **결과(10-08, Cursor):** 태스크 링크 복사 → 다른 앱에서 열기 → 그 줄로 이동 확인(사용자).
 7. [x] **시작 안내** — 명령 팔레트 `Tasks: 시작 안내 열기`(VS Code는 `Welcome: Open Walkthrough…`로도) → "Tasks for Markdown 시작하기" 4단계와 버튼. (Cursor에는 `Welcome: Open Walkthrough…`가 없어 10-07에 이 명령을 추가)
    - **결과(10-07, VS Code·Cursor):** 4단계와 버튼 동작 확인(쿼리 블록 넣기·렌더 보기는 #28 수정 후 쓰던 노트에 동작). Cursor는 `Tasks: 시작 안내 열기`로.
 8. [x] **첫 실행 안내** — (B) 첫째 날 시작 안내가 저절로 열림, 서로 다른 둘째·셋째 날 "시작 안내 열기 / 다시 보지 않기" 알림. (A) `tasksmd`가 없으면 켜질 때마다(다시 불러오기 포함) "'tasksmd' 명령 설치 / 나중에 / 다시 묻지 않기"(설치·다시 묻지 않기 전까지). (B)는 같은 날 다시 불러오면 안 뜸. (날짜 확인은 VS Code를 끄고 `state.vscdb`의 `onboarding.lastDay`·`onboarding.cliLastDay`를 어제로 바꿔서)

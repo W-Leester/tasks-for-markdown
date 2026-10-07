@@ -151,6 +151,7 @@ Cursor는 VS Code 기반이지만 같은 확장이 똑같이 동작하지 않는
 | 링크 스킴 | `vscode://` | `cursor://` (`vscode.env.uriScheme`으로 구함) |
 | 확장 마켓 | VS Code Marketplace | Open VSX |
 | Markdown 미리보기 토글 | 기본 미리보기 | 자체 WYSIWYG 편집기(확장 렌더러를 안 씀) |
+| 설정 화면 `Cmd+,` | VS Code 설정(확장 설정 포함) | Cursor 자체 설정 — 확장 설정은 `Preferences: Open Settings (UI)` |
 
 - 확장에 넣은 Node 프로그램(예: CLI·MCP 서버)은 `ELECTRON_RUN_AS_NODE=1 <process.execPath>`로 실행하면 Node.js 설치 없이 돈다. 확장 호스트의 `process.execPath`는 macOS에서 `… Helper (Plugin)` 실행 파일이며 그것으로도 된다.
 

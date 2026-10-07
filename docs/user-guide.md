@@ -179,3 +179,4 @@ short mode
 - **AI 에이전트가 tasks 도구를 못 찾아요.** ① 설정 `tasksmd.mcp.autoRegister`가 켜져 있는지 ② 워크스페이스가 신뢰됨인지(제한 모드에서는 연결 안 함) ③ `Developer: Reload Window` ④ 위치 확인: Cursor는 *Cursor Settings → Customize → MCPs*에 `extension-tasks`, VS Code는 채팅 에이전트 모드의 도구(🔧) 목록 ⑤ `Tasks: 로그 보기`에서 `mcp registration:` 줄. Claude Code·Desktop은 `Tasks: AI 에이전트 연결 (MCP)`로 따로 연결해야 합니다.
 - **`tasksmd: command not found`가 나와요.** 설치한 폴더(`~/.local/bin`)가 PATH에 없는 경우입니다. 설치할 때 안내한 줄(`export PATH="$HOME/.local/bin:$PATH"`)을 `~/.zshrc`에 넣고 새 터미널을 여세요. 에디터를 옮기거나 다시 설치했다면 에디터를 한 번 켜면 런처가 새 위치를 따라갑니다.
 - **Cursor에서 시작 안내는?** Cursor에는 VS Code의 `Welcome: Open Walkthrough…`가 없으니 `Tasks: 시작 안내 열기`를 쓰세요.
+- **Cursor에서 `tasksmd.*` 설정이 안 보여요.** Cursor의 `Cmd+,`는 Cursor 자체 설정(Cursor Settings)을 엽니다. 확장 설정은 명령 팔레트의 `Preferences: Open Settings (UI)`(또는 Cursor Settings의 *Editor Settings → Open*)에서 `tasksmd`로 검색하세요.

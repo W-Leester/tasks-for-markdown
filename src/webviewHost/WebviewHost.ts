@@ -16,6 +16,7 @@ import type { Settings } from '../settings/Settings';
 import type { FromWebview, InitState, TaskFieldName, ToWebview } from '../webviews/shared/protocol';
 import { currentBundle, currentLanguage, t } from '../l10n';
 import { l10nBlock } from './l10nBlock';
+import { recentMarkdownEditor } from '../commands/recentMarkdown';
 
 export interface WebviewHostDeps {
   context: vscode.ExtensionContext;
@@ -243,8 +244,8 @@ export class WebviewHost implements vscode.Disposable {
           break;
         }
         case 'query/insert': {
-          const editor = vscode.window.activeTextEditor ?? vscode.window.visibleTextEditors.find((e) => e.document.languageId === 'markdown');
-          if (!editor || editor.document.languageId !== 'markdown') throw new Error(t('Open a Markdown file to insert a query block.'));
+          const editor = await recentMarkdownEditor();
+          if (!editor) throw new Error(t('Open a Markdown file to insert a query block.'));
           await editor.insertSnippet(new vscode.SnippetString('```tasks\n' + msg.query.trim().replace(/\$/g, '\\$') + '\n```\n$0'));
           await vscode.window.showTextDocument(editor.document, editor.viewColumn);
           break;

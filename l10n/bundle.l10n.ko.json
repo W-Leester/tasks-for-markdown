@@ -388,5 +388,9 @@
   "edits its config file after asking": "확인을 받은 뒤 설정 파일을 고침",
   "Connect AI agents to your tasks (MCP)": "AI 에이전트를 태스크에 연결 (MCP)",
   "Choose where to connect": "연결할 대상을 고르세요",
-  "This editor's AI agent": "이 에디터의 AI 에이전트"
+  "This editor's AI agent": "이 에디터의 AI 에이전트",
+  "# My tasks": "# 내 할 일",
+  "Call the bank": "은행에 전화하기",
+  "Write the report": "보고서 작성",
+  "Plan the trip": "여행 계획 세우기"
 }

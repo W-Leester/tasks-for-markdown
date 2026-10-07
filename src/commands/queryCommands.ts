@@ -3,6 +3,7 @@ import type { Task } from '../core/task';
 import type { QueryService } from '../services/QueryService';
 import { displayDescription } from '../views/taskItem';
 import { type CommandDeps, runEdit } from './registerCommands';
+import { recentMarkdownEditor } from './recentMarkdown';
 import { t } from '../l10n';
 
 interface TaskPickItem extends vscode.QuickPickItem {
@@ -89,10 +90,16 @@ export function registerQueryCommands(context: vscode.ExtensionContext, deps: Co
       qp.show();
     }),
     vscode.commands.registerCommand('tasksmd.insertQueryBlock', async () => {
-      const editor = vscode.window.activeTextEditor;
-      if (!editor || editor.document.languageId !== 'markdown') {
-        void vscode.window.showInformationMessage(t('Open a Markdown file to insert a query block.'));
-        return;
+      // From the walkthrough or palette the active tab may not be the note (incident #28).
+      let editor = await recentMarkdownEditor();
+      if (!editor) {
+        // No note at all yet: open a small sample so the block has something to show.
+        const today = new Date();
+        const iso = (d: number) => new Date(today.getFullYear(), today.getMonth(), today.getDate() + d).toLocaleDateString('sv-SE');
+        const doc = await vscode.workspace.openTextDocument({ language: 'markdown', content: `${t('# My tasks')}\n\n- [ ] ${t('Call the bank')} 📅 ${iso(0)}\n- [ ] ${t('Write the report')} ⏫ 📅 ${iso(2)}\n- [ ] ${t('Plan the trip')} 📅 ${iso(9)}\n\n` });
+        editor = await vscode.window.showTextDocument(doc);
+        const end = doc.lineAt(doc.lineCount - 1).range.end;
+        editor.selection = new vscode.Selection(end, end);
       }
       const snippet = new vscode.SnippetString('```tasks\n${1:not done}\n${2:due before next week}\n${3:sort by urgency}\n```\n');
       await editor.insertSnippet(snippet);

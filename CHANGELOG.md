@@ -8,6 +8,7 @@
 - **Tasks: Connect AI agents (MCP)** adds it to Claude Code (this project on this computer) or Claude Desktop (config file updated after confirmation, with a backup).
 - **Tasks: Install 'tasksmd' command in PATH** / **Uninstall** — the CLI in any terminal; keeps working after updates.
 - A "Get started" walkthrough (first task, queries and the rendered view, AI agents, terminal command).
+- Insert query block, Open rendered view and the query builder's "insert into note" act on the note you were working on, even when another tab (such as the walkthrough) is in front; with no note open, Insert query block opens a sample note.
 
 **Task links**
 - `vscode://hastycapybara.tasks-for-markdown/open?path=…&line=…` opens a task from any app; `/query?text=…` shows a query's results (Cursor: `cursor://…`).

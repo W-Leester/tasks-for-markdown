@@ -27,6 +27,7 @@ import { registerSavedQueryView } from './views/registerSavedQueryView';
 import { registerTreeView } from './views/registerTreeView';
 import { registerWebviews } from './webviewHost/registerWebviews';
 import { registerLinks } from './links/registerLinks';
+import { trackRecentMarkdown } from './commands/recentMarkdown';
 import { registerAi, type AiInternals } from './ai/registerAi';
 import type { WebviewHost } from './webviewHost/WebviewHost';
 import { StatusBar } from './views/StatusBar';
@@ -82,6 +83,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<Extens
 
   context.subscriptions.push(output, settings, indexService, new TaskLineContext(), { dispose: () => index.dispose() });
   const webviews = registerWebviews(context, { context, index, settings, queries, savedQueries, editService, indexService, getStatusRegistry, log });
+  trackRecentMarkdown(context);
   const commandDeps = { index, indexService, editService, settings, getStatusRegistry, log };
   registerCommands(context, commandDeps);
   registerEditCommands(context, { ...commandDeps, openEdit: (target) => webviews.openEdit(target) });

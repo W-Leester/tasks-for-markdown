@@ -6,6 +6,7 @@ import type { TaskEditService } from '../services/TaskEditService';
 import type { Settings } from '../settings/Settings';
 import type { PreviewIntegration } from './PreviewIntegration';
 import { renderDocumentHtml } from './renderDocument';
+import { recentMarkdownDocument } from '../commands/recentMarkdown';
 import { t } from '../l10n';
 import { systemClock, type Clock } from '../core/dates';
 
@@ -479,7 +480,8 @@ export function registerRenderedView(context: vscode.ExtensionContext, deps: Ren
     if (editor?.document.languageId === 'markdown') return editor.document.uri;
     const input = vscode.window.tabGroups.activeTabGroup.activeTab?.input as { uri?: vscode.Uri } | undefined;
     if (input?.uri && /\.(md|markdown)$/i.test(input.uri.path)) return input.uri;
-    return provider.active ?? undefined;
+    // Run from the walkthrough or another tab: the note the user was working on (incident #28).
+    return provider.active ?? recentMarkdownDocument()?.uri;
   };
   /** Close the other editor of the same note in the active group so switching feels like a mode toggle. */
   const closeCounterpart = async (uri: vscode.Uri, keep: 'rendered' | 'source') => {

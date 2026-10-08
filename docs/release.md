@@ -50,9 +50,9 @@ for p in tasks-core tasks-cli tasks-api; do pnpm --filter @hastycapybara/$p publ
 ## 1.1.0 게시 (2026-10-08)
 - [x] 검증: typecheck·lint, 단위 819, 웹뷰 33, 통합 61 통과, `build:packages`, `pnpm package`(35 files, vsix에 `dist/tasksmd.cjs`·`THIRD_PARTY_NOTICES.md`·walkthrough 포함), `tasks-cli` 1.1.0 `npm pack`에 `THIRD_PARTY_NOTICES.md` 포함
 - [x] 수동 점검 1·3~10·13 통과, 2(Copilot 없음)는 통합 테스트로 대신, 11 원격·12 Windows는 배포 후로(manual-checklist 5장)
-- [ ] Marketplace: 관리 페이지 *… → Update*로 `tasks-for-markdown-1.1.0.vsix` 업로드(사용자) → `validated`
-- [ ] 태그 `v1.1.0` 푸시 → Release 워크플로(Open VSX·npm 3개·GitHub Release)
-- [ ] 확인: Open VSX 1.1.0, npm `tasks-core`·`tasks-cli`·`tasks-api` 1.1.0(provenance), `tasks-cli` 페이지에 THIRD_PARTY_NOTICES
+- [x] Marketplace: 관리 페이지 *… → Update*로 `tasks-for-markdown-1.1.0.vsix` 업로드(사용자) → 09:46 KST 공개(업로드 후 약 10분 "▶ Verifying…")
+- [x] 태그 `v1.1.0` 푸시(Marketplace 공개 확인 뒤) → Release 워크플로 성공(약 2분): Open VSX, npm 3개(OIDC, 토큰 없이), GitHub Release에 vsix·tgz 3개·latest.json
+- [x] 확인: Open VSX 1.1.0(`verified=true`), npm `tasks-core`·`tasks-cli`·`tasks-api` 1.1.0(provenance 모두 있음), `tasks-cli`에 THIRD_PARTY_NOTICES. **`tasks-api`만 레지스트리 반영이 약 4분 늦음**(로그는 09:47 Published, 목록은 09:52) — 기다리면 됨
 - [ ] 설치본 교체: 개발용 vsix 대신 마켓 설치본(VS Code는 Marketplace, Cursor는 Open VSX)
 
 ## 공개 직후 할 일 (토큰 정리)

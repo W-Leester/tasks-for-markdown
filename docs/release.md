@@ -18,7 +18,7 @@
 - [x] VS Code Marketplace 웹 업로드(검색어 문제 해결 후, [포스트모템](postmortems/2026-10-01-marketplace-upload-rejected.md))
 
 ### 남은 일 (순서대로)
-1. [ ] **시험 확장 삭제** — 관리 페이지에서 `TFM …` 이름의 시험 확장들을 *… → Remove*.
+1. [x] **시험 확장 삭제** — 관리 페이지에서 `TFM …` 이름의 시험 확장들을 *… → Remove*. (2026-10-09 확인: 목록에 Tasks for Markdown 1.1.0 한 줄뿐, 시험 확장 없음)
 2. [x] **Open VSX 네임스페이스 소유권 신청** — 2026-10-03 제출: https://github.com/EclipseFdn/open-vsx.org/issues/13675 (**승인됨**, `granted` 라벨). 실수로 같은 신청을 두 번 내 #13674는 중복으로 닫힘(운영자 댓글의 "Dup of #1675"는 #13675의 오타). — open-vsx.org › 네임스페이스 `HastyCapybara` › *Claim Ownership* → GitHub 이슈: Ownership ☑, Account Age ☑, **Option 1** ☑, Claim evidence에 Marketplace 링크·퍼블리셔 링크·저장소 링크(신청자 W-Leester 소유). 승인까지 며칠.
 3. [x] **태그 푸시** (2026-10-03, Release 성공) → Release 워크플로가 Open VSX·npm 게시, GitHub Release에 `.vsix`·`.tgz` 첨부.
    ```bash

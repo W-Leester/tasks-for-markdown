@@ -13,7 +13,7 @@
 ### 완료
 - [x] 수동 점검(VS Code·Cursor·원격·테마·MCP) — [manual-checklist.md](manual-checklist.md)
 - [x] 계정: Marketplace 퍼블리셔 `HastyCapybara`, Open VSX(Eclipse 계정·Publisher Agreement·네임스페이스 `HastyCapybara`), npm 사용자 `hastycapybara`(2FA 패스키)
-- [x] GitHub Secrets: `OVSX_PAT`, `NPM_TOKEN`(90일, 2026-12-30 전후 만료). `VSCE_PAT`는 없음(Azure 구독 필요 → 웹 업로드)
+- [x] GitHub Secrets: `OVSX_PAT`. (`NPM_TOKEN`은 첫 게시용, 2026-10-09 삭제) `VSCE_PAT`는 없음(Azure 구독 필요 → 웹 업로드)
 - [x] 저장소 공개
 - [x] VS Code Marketplace 웹 업로드(검색어 문제 해결 후, [포스트모템](postmortems/2026-10-01-marketplace-upload-rejected.md))
 
@@ -74,7 +74,7 @@ for p in tasks-core tasks-cli tasks-api; do pnpm --filter @hastycapybara/$p publ
 
 ## 공개 직후 할 일 (토큰 정리)
 
-- [~] **npm Trusted Publishing으로 전환 (1.0.1에서 OIDC 게시 확인, 2026-10-05 — 토큰 삭제·접근 강화만 남음).** 워크플로 변경(208f40e)·세 패키지 Trusted Publisher 등록(Allow npm publish) 완료. 남은 것: 다음 게시에서 OIDC 확인 후 토큰 삭제·Publishing access 강화. 세 패키지가 게시되어 조건 충족.
+- [x] **npm Trusted Publishing으로 전환 — 완료(2026-10-09).** 1.0.1·1.1.0을 OIDC로 게시 확인 → GitHub Secret `NPM_TOKEN` 삭제, npm 토큰 `github-release` 폐기, 세 패키지 Publishing access를 "Require two-factor authentication and disallow bypass 2fa tokens"로(Trusted Publisher `W-Leester/tasks-for-markdown` · `release.yml` Valid 확인). 이제 npm 게시에 토큰 없음.
   - 계획: (1) 워크플로에 `permissions: id-token: write` 추가 — 첫 게시 로그의 `Skipped OIDC: ERR_PNPM_ID_TOKEN_GITHUB_WORKFLOW_INCORRECT_PERMISSIONS`가 이것 때문. pnpm이 OIDC 토큰을 받으면 토큰 없이 게시하고 출처 증명(provenance)도 붙는다. (2) npm 게시 단계를 토큰 유무와 상관없이 실행하고, `NPM_TOKEN`이 있을 때만 `.npmrc`에 쓴다(전환 확인 전까지 대비책). (3) 사용자가 npmjs.com에서 세 패키지 각각 *Settings › Trusted Publisher › GitHub Actions*: Organization or user `W-Leester`, Repository `tasks-for-markdown`, Workflow filename `release.yml`, Environment 비움. (4) 다음 게시(1.1.0)에서 로그에 OIDC 사용이 확인되면 GitHub Secret `NPM_TOKEN` 삭제 + npm에서 토큰 폐기, 각 패키지 *Publishing access*를 "Require two-factor authentication and disallow tokens"로.
 - [ ] **Open VSX Trusted Publishers로 전환**(네임스페이스 `HastyCapybara` 소유권 승인 뒤). 등록 후 `OVSX_PAT` 삭제.
 - [ ] 전환 전까지는 토큰 만료일을 달력에 적어 두고, 만료되면 새로 발급해 GitHub Secret만 바꾼다.

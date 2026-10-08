@@ -53,7 +53,7 @@ for p in tasks-core tasks-cli tasks-api; do pnpm --filter @hastycapybara/$p publ
 - [x] Marketplace: 관리 페이지 *… → Update*로 `tasks-for-markdown-1.1.0.vsix` 업로드(사용자) → 09:46 KST 공개(업로드 후 약 10분 "▶ Verifying…")
 - [x] 태그 `v1.1.0` 푸시(Marketplace 공개 확인 뒤) → Release 워크플로 성공(약 2분): Open VSX, npm 3개(OIDC, 토큰 없이), GitHub Release에 vsix·tgz 3개·latest.json
 - [x] 확인: Open VSX 1.1.0(`verified=true`), npm `tasks-core`·`tasks-cli`·`tasks-api` 1.1.0(provenance 모두 있음), `tasks-cli`에 THIRD_PARTY_NOTICES. **`tasks-api`만 레지스트리 반영이 약 4분 늦음**(로그는 09:47 Published, 목록은 09:52) — 기다리면 됨
-- [ ] 설치본 교체: 개발용 vsix 대신 마켓 설치본(VS Code는 Marketplace, Cursor는 Open VSX)
+- [x] 설치본 교체: 개발용 vsix 대신 마켓 설치본(VS Code는 Marketplace, Cursor는 Open VSX) — 2026-10-09 사용자
 
 ## 보관 파일 (`releases/`, git에 안 올림)
 

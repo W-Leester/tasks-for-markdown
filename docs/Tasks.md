@@ -33,8 +33,8 @@
 | M5 | 마크다운 미리보기 연동 (렌더 전용 — D-1) | ✅ 완료 | 2026-09-21 · unit 445 / integration 27 |
 | M6 | 웹뷰: 편집 모달 + 칸반 + 쿼리 빌더 | ✅ 완료 | 2026-09-21 · unit 447 / integration 31 |
 | M7 | 추가 기능: 알림·아카이브·통계·캘린더·업데이트 확인 | ✅ 완료 | 2026-09-21 · unit 462 / integration 34 |
-| M8 | 마감: i18n·성능·접근성·문서·패키징·게시 | 🟡 코드 완료 · 사용자 작업 대기 | 1.0.0 `.vsix` 생성됨 · 남은 것: 퍼블리셔/토큰 생성, 저장소 공개 여부, M8.7 수동 테스트 |
-| M9 | 공개 API: 확장 API·명령·npm/CLI·MCP·URI | 🟡 M9.1–9.5 완료(1.3.0, npm 발행은 사용자 작업) · M9.6(선택) 남음 · M9.7은 M23으로 | docs/api-plan.md v0.2, docs/api.md |
+| M8 | 마감: i18n·성능·접근성·문서·패키징·게시 | ✅ 완료(1.0.0 공개 2026-10-02) | Marketplace·Open VSX·npm 공개, 수동 점검 |
+| M9 | 공개 API: 확장 API·명령·npm/CLI·MCP·URI | ✅ M9.1–9.5 완료(npm 1.0.0~ 공개) · M9.7은 M23(1.1.0) · M9.6 편집기 위임(선택)만 남음 | docs/api-plan.md v0.2, docs/api.md |
 | M10 | 렌더 보기 고도화: 기본 편집기 대체, 정렬·보기 툴바 | ✅ 완료(1.4.0) | history-internal.md 2부 2.14 |
 | M11 | 쿼리 결과 트리 표시 | ✅ 완료(1.6.0) | 이 문서 M11, design.md 7.10 |
 | M12 | 대화상자 필드 순서·더보기, 렌더 보기 열 배치 | ✅ 완료(1.7.0) | 이 문서 M12, design.md 7.11 |
@@ -46,9 +46,9 @@
 | M18 | 마켓플레이스 정식 공개 준비(1.0.0 재시작, 저장소 공개, 영어 README, npm) | ✅ 준비 완료(1.0.0) — 계정·공개·태그는 사용자(release.md "첫 공개 순서") | 이 문서 M18, release.md |
 | M19 | 칸반 격자 배치(창 폭에 맞춰 2×2 등으로 균형 배치) | ✅ 완료(1.0.0에 포함) | 이 문서 M19 |
 | M20 | 마켓 업로드 거절 대응: 원인은 검색어 — 통과한 검색어로 교체 | ✅ 해결(2026-10-02 재업로드 성공) | 이 문서 M20 |
-| M21 | 확장 안에서 AI 연결 제공(VS Code·Cursor MCP 자동 등록, 터미널 명령, AI 연결 명령, 시작 안내) | 🟡 진행 중(1.1.0, 2026-10-07) | 이 문서 M21, design.md 7.16 |
+| M21 | 확장 안에서 AI 연결 제공(VS Code·Cursor MCP 자동 등록, 터미널 명령, AI 연결 명령, 시작 안내) | ✅ 완료(1.1.0 공개 2026-10-08) · 원격·Windows 확인은 배포 후 | 이 문서 M21, design.md 7.16 |
 | M22 | README 개편: 강점(AI·API) 강조, 움직이는 예시 GIF, 사이트 연결 | ✅ 1.0.1(2026-10-05) | 이 문서 M22 |
-| M23 | 태스크 링크(URI): `vscode://…/open`, `/query`, 링크 복사 명령 (M9.7) | 🟡 진행 중(1.1.0, 2026-10-07) | 이 문서 M23, design.md 7.17 |
+| M23 | 태스크 링크(URI): `vscode://…/open`, `/query`, 링크 복사 명령 (M9.7) | ✅ 완료(1.1.0 공개 2026-10-08) | 이 문서 M23, design.md 7.17 |
 
 ---
 
@@ -547,8 +547,8 @@
 
 ### M8.6 패키징·게시 (NFR-9, D§13)
 - [x] `pnpm package` → `tasks-for-markdown-1.0.0.vsix` (minified, ~370KB, 23파일), `.vscodeignore` 검증
-- [ ] **(사용자 작업)** Marketplace 퍼블리셔 `hastycapybara` 생성/PAT 발급 → Secrets `VSCE_PAT` — `docs/release.md`
-- [ ] **(사용자 작업)** Open VSX 네임스페이스 생성/토큰 → Secrets `OVSX_PAT`
+- [x] **(사용자 작업)** Marketplace 퍼블리셔 `HastyCapybara` 생성 — PAT(`VSCE_PAT`)는 Azure 구독이 필요해 쓰지 않고 웹 업로드 — `docs/release.md`
+- [x] **(사용자 작업)** Open VSX 네임스페이스 생성/토큰 → Secrets `OVSX_PAT`(소유권 승인 2026-10-03)
 - [x] GitHub Actions `release.yml` — 태그 `v*` → 빌드·테스트·패키징·Release 첨부·(시크릿 있으면) 게시
 - [x] `latest.json` 생성 스크립트 + `docs/release.md`(사내 배포 절차)
 - [ ] **(사용자 결정)** 저장소 public 전환 여부 (Marketplace 게시 시점)

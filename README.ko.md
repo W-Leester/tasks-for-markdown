@@ -88,7 +88,7 @@ Tasks for Markdown에는 [MCP](https://modelcontextprotocol.io) 서버가 들어
 **연결** — 따로 설치할 것이 없습니다. 서버는 에디터에 내장된 Node로 돌아갑니다.
 
 - **VS Code(에이전트 모드)와 Cursor:** 확장을 설치하면 자동으로 연결됩니다. 워크스페이스 폴더마다 서버 하나(`tasksmd.mcp.autoRegister`, 기본 켬, 신뢰되지 않은 워크스페이스에서는 안 함).
-- **Claude Code와 Claude Desktop:** 명령 **Tasks: AI 에이전트 연결 (MCP)**을 실행하고 고르세요. Claude Code는 이 컴퓨터의 이 프로젝트에만 추가하고(`claude mcp add-json --scope local`), Claude Desktop은 확인을 받은 뒤 설정 파일을 고칩니다(원본 백업, 다른 서버는 그대로).
+- **Claude Code와 Claude Desktop:** 명령 **Tasks: AI 에이전트 연결 (MCP)**을 실행하고 고르세요. Claude Code는 이 컴퓨터의 이 프로젝트에만 추가하고(`claude mcp add-json --scope local`), Claude Desktop은 확인을 받은 뒤 설정 파일을 고칩니다(원본 백업, 다른 서버는 그대로. Claude Desktop은 먼저 완전히 종료하세요 — 켜져 있으면 옛 설정을 다시 씁니다). 설치됐는데 연결되지 않았으면 확장이 켜질 때 연결을 권합니다. Claude Desktop은 도구를 쓸 때마다 허용을 묻는데, 조회는 커넥터 설정(`+` → 커넥터 → 커넥터 관리 → tasks)에서 읽기 도구를 *항상 허용*으로 두면 묻지 않습니다.
 
 <details>
 <summary>확장 없이(다른 컴퓨터, CI): npm 패키지</summary>

@@ -9,7 +9,7 @@ Tasks for Markdown includes an MCP server, so AI agents can read and change your
 - **This editor's agent** (VS Code agent mode, Cursor) is connected automatically.
 - **Claude Code** and **Claude Desktop**: if they are installed, a prompt offers to connect them — or run **Tasks: Connect AI agents (MCP)** any time.
 
-It runs on the editor's own Node — nothing to install.
+It runs on the editor's own Node — nothing to install. Claude Desktop asks before each tool call; to skip that for lookups, set the read-only tools to *Always allow* under `+` → Connectors → Manage connectors → tasks.
 
 ## Why MCP, not just pasting the note
 

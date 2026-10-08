@@ -899,11 +899,14 @@ vsix ── dist/extension.js
     `<execPath>`는 설치 시점 값. 켜질 때 `runtime.json`과 함께, 우리 런처(첫 두 줄로 식별)가 있으면 다시 써서 에디터를 옮겨도 따라간다. Windows는 `tasksmd.cmd`(`set ELECTRON_RUN_AS_NODE=1` + `"<execPath>" "%USERPROFILE%\.tasksmd\tasksmd.cjs" %*`).
   - 설치 위치: PATH에 들어 있는 사용자 폴더(`~/.local/bin`, `~/bin`) 중 첫 번째. 없으면 `~/.local/bin`에 만들고 셸 설정에 넣을 한 줄(`export PATH="$HOME/.local/bin:$PATH"`)을 복사 버튼과 함께 보여 준다(셸 파일은 직접 고치지 않음). 같은 이름의 **우리 것이 아닌 파일이 있으면 덮어쓰지 않는다.**
 - **`Tasks: Connect AI agents (MCP)`.** 다중 선택 QuickPick.
-  - VS Code / Cursor: "자동으로 연결됨"(또는 꺼짐·미지원) 상태만 보여 주고, 설정 열기로 안내.
-  - Claude Code: `claude`가 PATH에 있으면 폴더에서 `claude mcp add --scope local tasks -- <런처 또는 execPath+cjs> mcp --root <폴더>` 실행(이 PC·이 프로젝트에만). 이미 있으면 덮지 않고 알림. `claude`가 없으면 같은 명령을 복사 버튼으로.
-  - Claude Desktop: 설정 파일(macOS `~/Library/Application Support/Claude/claude_desktop_config.json`, Windows `%APPDATA%\Claude\…`)의 `mcpServers.tasks`(폴더가 여럿이면 `tasks-<폴더명>`)에 `{ command: <execPath>, args: [<안정 경로 cjs>, "mcp", "--root", <폴더>], env: { ELECTRON_RUN_AS_NODE: "1" } }` 병합. 바꿀 JSON을 미리 보여 주고 확인 → 원본을 `.bak`으로 남기고 저장. 다른 서버 항목은 그대로.
-  - 공통: 바뀌는 내용은 순수 함수(`mergeMcpConfig`, `claudeAddArgs`, `launcherScript`)로 만들고 단위 테스트.
+  - VS Code / Cursor: 상태는 입력란 안내 문구(placeholder)에 "Cursor: 자동으로 연결됨"(구분 제목은 아래 항목이 없으면 그려지지 않음, incidents #31). 자동 연결이 꺼져 있을 때만 "Cursor" 제목 아래 "자동 연결 다시 켜기" 항목.
+  - 각 도구 상태(10-08): 설치됐고 아직 연결 안 됨 → 미리 체크 / 이미 연결됨 → "연결됨", 체크 안 함 / 설치 안 됨 → "설치되지 않음". 연결 여부는 알림(C)과 같은 함수로 읽기만 한다.
+  - Claude Code: `claude`가 PATH에 있으면 폴더마다 `claude mcp add-json --scope local <이름> <JSON>` 실행(이 PC·이 프로젝트에만). 이미 연결된 폴더는 건너뛰고, 모두 연결돼 있으면 "이미 연결됨" 안내만. `claude`가 없으면 같은 명령을 복사 버튼으로.
+  - Claude Desktop: 설정 파일(macOS `~/Library/Application Support/Claude/claude_desktop_config.json`, Windows `%APPDATA%\Claude\…`)의 `mcpServers.tasks`(폴더가 여럿이면 `tasks-<폴더명>`)에 `{ command: <execPath>, args: [<안정 경로 cjs>, "mcp", "--root", <폴더>], env: { ELECTRON_RUN_AS_NODE: "1" } }` 병합. 바꿀 JSON을 미리 보여 주고 확인 → 원본을 `.bak`으로 남기고 저장. 다른 서버 항목은 그대로. **Claude Desktop이 켜져 있으면 쓰지 않는다**(켜진 앱이 메모리의 설정으로 파일을 다시 써서 항목이 지워짐, incidents #32): macOS `pgrep -fl Claude.app/Contents/MacOS/Claude`, Windows `tasklist` → 실행 중이면 "완전히 종료 → 다시 시도" 창. 명령이 성공했을 때만 출력을 보고 "프로세스 번호로 시작하는 줄"만 실행 중으로 인정(pgrep 오류 문장에 경로가 들어 있음).
+  - 공통: 바뀌는 내용은 순수 함수(`mcpConfig.ts`: `mergeMcpServers`, `claudeAddJsonArgs`, `launcherScript`, `pickBinDir`, `claudeCodeHasServer`, `claudeDesktopHasServer`, `claudeDesktopRunningFrom`)로 만들고 단위 테스트.
 - **알리기.** `contributes.walkthroughs` "Get started with Tasks for Markdown": ① 첫 태스크(`Ctrl+Shift+C`) ② 쿼리 블록과 렌더 보기 ③ AI 에이전트 연결(버튼 → Connect 명령) ④ 터미널 명령 설치(버튼). 사이드바 빈 화면 안내에도 "AI 연결" 버튼. **처음 몇 번 실행할 때 안내**(10-07 사용자 결정으로 변경): 첫 실행에 시작 안내를 한 번 자동으로 열고, 알림: (A) `tasksmd`가 없으면 설치하거나 "다시 묻지 않기"를 누를 때까지 **켜질 때마다**(10-08 결정, 처음엔 하루 한 번) "설치 / 나중에 / 다시 묻지 않기", (B) 둘째·셋째 날 "시작 안내 열기 / 다시 보지 않기", (C) Claude Code·Claude Desktop이 설치돼 있는데 연결되지 않았으면 연결될 때까지 켜질 때마다 "연결 / 나중에 / 다시 묻지 않기"(연결 여부는 `~/.claude.json`의 `projects[폴더].mcpServers`·사용자 범위, Desktop 설정의 `mcpServers`를 읽기만; "연결"이 동의이므로 Desktop 확인 창 생략, 백업 유지; 신뢰된 워크스페이스에서만). 확장 설치만으로 다른 앱 설정을 바꾸는 완전 자동은 하지 않는다(몰래 수정, 삭제 후 남는 항목, 모든 대화에 도구가 실림). 링크 `/guide`로 README에서도 시작 안내를 연다(VS Code는 `vscode.dev/redirect` 경유).
+- **MCP 응답 모양(10-08).** `tasks_query`·`tasks_get`은 AI 대화 용량을 아끼려고 줄인 모양을 돌려준다: 태스크는 `tasks`에 한 번, `groups`는 이름·개수·태스크 번호만, `tree`·`key`·값 없는 필드는 생략, 들여쓰기 없는 JSON(같은 조회 8,555자 → 942자). CLI `--json`과 확장 API는 그대로.
+- **도구 표시(annotations, 10-08).** 조회 6개 `readOnlyHint: true`, 쓰기 5개 `destructiveHint: false`, `tasks_remove`만 `destructiveHint: true`, 모두 `openWorldHint: false`. 허용 여부는 각 AI 앱이 정한다 — 연결할 때 "항상 허용"을 대신 넣지 않는다(앱이 관리하는 보안 확인이고 설정 파일에 칸이 없음).
 - **쓰기 정책.** MCP·CLI 쓰기는 지금처럼 파일을 직접 쓰고 `tasksmd.api.writePolicy`(확장 API용)를 따르지 않는다. 대신 모든 쓰기에 `expectedText` 확인(STALE_LINE). README·api.md에 명시.
 - **마켓 검사.** 외부 프로세스 실행·실행 파일 생성 코드가 들어간다. 1.0.0 때 거절 원인은 아니었다(postmortem). 거절되면 시험 이름 업로드로 반씩 나누는 절차(publishing-guide 5.3).
 
@@ -1071,6 +1074,7 @@ GitHub Actions: PR마다 `typecheck + lint + test`, 태그 `v*` 푸시 시 패�
 
 | 날짜 | 버전 | 내용 |
 |---|---|---|
+| 2026-10-08 | 1.5 | 1.1.0 수동 점검 반영(7.16): 연결 선택 창의 도구 상태(미리 체크·연결됨·설치되지 않음), 알림 (A)·(C)는 켜질 때마다, Claude Desktop이 켜져 있으면 설정을 쓰지 않음(incidents #32), MCP 응답 줄이기, 도구 표시(annotations) |
 | 2026-10-07 | 1.4 | 1.1.0 구현 중 변경: 첫 실행 안내(7.16, 사용자 결정), 링크 `/guide`, 명령이 '앞의 탭'이 아니라 '쓰던 노트'를 대상(incidents #28), AI 연결 선택 창의 에디터 항목은 상태 줄, 10장 보안에 AI 연결·홈 폴더 쓰기·링크·제3자 라이선스 |
 | 2026-10-07 | 1.3 | 7.16 확장 안의 AI 연결과 터미널 명령(M21), 7.17 태스크 링크(M23) — 1.1.0 계획 |
 | 2026-09-30 | 1.2 | 7.15 열 너비 조절(M16) — 1.12.0 구현 |

@@ -88,7 +88,7 @@ Tasks for Markdown ships an [MCP](https://modelcontextprotocol.io) server, so an
 **Connect** — nothing to install; the server runs on the editor's own Node:
 
 - **VS Code (agent mode) and Cursor:** connected automatically when the extension is installed, one server per workspace folder (`tasksmd.mcp.autoRegister`, on by default; not in untrusted workspaces).
-- **Claude Code and Claude Desktop:** run **Tasks: Connect AI agents (MCP)** and pick them. Claude Code is added for this project on this computer (`claude mcp add-json --scope local`); Claude Desktop's config file is updated after you confirm, with a backup and every other server kept.
+- **Claude Code and Claude Desktop:** run **Tasks: Connect AI agents (MCP)** and pick them. Claude Code is added for this project on this computer (`claude mcp add-json --scope local`); Claude Desktop's config file is updated after you confirm, with a backup and every other server kept (quit Claude Desktop first — while it runs it can write its old settings back). If either is installed but not connected, the extension offers to connect it when it starts. Claude Desktop asks before each tool call; to stop that for lookups, set the read-only tools to *Always allow* in its connector settings (`+` → Connectors → Manage connectors → tasks).
 
 <details>
 <summary>Without the extension (another machine, CI): the npm package</summary>

@@ -190,7 +190,7 @@ Cursor는 VS Code 기반이지만 같은 확장이 똑같이 동작하지 않는
 | 열쇠 (GitHub Secret) | 왜 필요했나 | 지금 |
 |---|---|---|
 | `NPM_TOKEN` | npm 토큰 없는 게시(Trusted Publishing)는 **이미 있는 패키지에만** 등록할 수 있다 → 패키지를 처음 만드는 1.0.0 게시용(4.4, 2FA 우회 필요) | 1.0.1·1.1.0이 토큰 없이(OIDC) 게시됨 → **2026-10-09 정리 완료:** Secret 삭제·npm에서 폐기·패키지마다 토큰 게시 금지(6.2의 4). 남겨 두면 새어 나갈 때 남이 악성 버전을 올릴 수 있는 90일짜리 예비 열쇠 |
-| `OVSX_PAT` | Open VSX(Cursor 마켓) 게시. 토큰 없는 게시(Trusted Publishers)는 네임스페이스 승인 뒤에만 가능 | **아직 사용.** 승인(10-03)이 났으므로 Trusted Publishers로 바꾸면 삭제(6.3) |
+| `OVSX_PAT` | Open VSX(Cursor 마켓) 게시. 토큰 없는 게시(Trusted Publishers)는 네임스페이스 승인 뒤에만 가능 | **전환 중(10-09):** 워크플로는 토큰 없는 게시를 먼저 시도하고 실패할 때만 이 Secret을 씀. 다음 배포에서 토큰 없이 게시된 것이 확인되면 Secret과 Open VSX 토큰(만료 없음) 삭제(6.3) |
 | `VSCE_PAT` | VS Code Marketplace 자동 게시 | **만들지 않음.** Azure DevOps 조직에 Azure 구독(결제 계정)이 필요해 웹 업로드로 대신(4.1) — 워크플로는 없으면 Marketplace 단계를 건너뜀 |
 
 **npm 토큰이 다시 필요한 경우:** 기존 패키지의 새 버전은 필요 없다(태그만). **새 패키지를 처음 만들 때만** 첫 게시가 필요한데, 토큰을 다시 만들기보다 내 컴퓨터에서 `npm login`(패스키 2FA) → 직접 한 번 게시 → 그 패키지에 Trusted Publisher 등록이 안전하다(토큰을 쓴다면 짧은 기한, 게시 직후 삭제). 직접 게시(`npm publish` + 2FA)는 "토큰 게시 금지" 설정과 상관없이 된다. 저장소 이름·소유자나 `release.yml` 파일 이름을 바꾸면 패키지마다 Trusted Publisher 설정도 바꿔야 한다.
@@ -382,7 +382,11 @@ gh release view v1.0.0 -R W-Leester/tasks-for-markdown --json assets --jq '.asse
 4. **다음 버전 게시 때** 로그에 OIDC로 게시된 것이 확인되면: GitHub Secret `NPM_TOKEN` 삭제 → npm에서 토큰 폐기 → 각 패키지 Publishing access를 "Require two-factor authentication and **disallow** bypass 2fa tokens"로.
 
 ### 6.3 Open VSX를 Trusted Publishers로 전환
-- 네임스페이스 승인 뒤 *Trusted Publishers*에 GitHub 저장소·워크플로를 등록하고 워크플로를 맞춘 뒤 `OVSX_PAT` 삭제.
+- 조건: 네임스페이스 **소유자**, Publisher Agreement 서명, 확장이 **이미 게시돼 있음**(첫 게시는 토큰으로 — npm과 같다). 확장 하나에 등록 하나. `package.json`의 `publisher`는 네임스페이스와 **대소문자까지** 같아야 한다.
+1. open-vsx.org → 프로필 → Settings → **Trusted Publishers → Add a trusted publisher** → 네임스페이스 → GitHub Actions: Organization or User `W-Leester`, Repository `tasks-for-markdown`, Workflow filename `release.yml`, Environment 비움(채우면 그 environment에서 도는 job만 허용). 등록은 고칠 수 없어 바꿀 땐 지우고 다시.
+2. 워크플로: `ovsx` **1.2.0 이상**(`--trusted-publishing`, Node 22 필요), `permissions: id-token: write`. **`OVSX_PAT`이 env에 있으면 ovsx가 토큰을 먼저 쓴다** → job `env`에서 빼고, 게시 단계에서 `ovsx publish --trusted-publishing`이 실패할 때만 Secret으로 다시(이 프로젝트 `release.yml`).
+3. 다음 배포 로그에서 경고("trusted publishing failed") 없이 게시된 것을 확인 → GitHub Secret `OVSX_PAT` 삭제 → Open VSX *Access Tokens*에서 토큰 삭제.
+- 참고: https://github.com/eclipse-openvsx/openvsx/wiki/Trusted-Publishing
 
 ### 6.4 그 밖
 - **설치본 교체**: 개발 중 `.vsix`로 설치한 사본을 Uninstall하고 각 마켓에서 다시 설치(이후 자동 업데이트). 내부 `.vsix` 사용자에게도 안내.

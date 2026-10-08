@@ -6,17 +6,16 @@ on:
 
 permissions:
   contents: write
-  # npm trusted publishing: GitHub issues a short-lived OIDC token that npm accepts instead of NPM_TOKEN.
+  # Trusted publishing (npm, Open VSX): GitHub issues a short-lived OIDC token the registries accept instead of a stored token.
   id-token: write
 
 jobs:
   release:
     runs-on: ubuntu-latest
     # Tokens at job level: a step's own `env` is not visible to that step's `if`.
+    # OVSX_PAT is deliberately not here: ovsx prefers OVSX_PAT over trusted publishing.
     env:
       VSCE_PAT: ${{ secrets.VSCE_PAT }}
-      OVSX_PAT: ${{ secrets.OVSX_PAT }}
-      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -49,13 +48,19 @@ jobs:
       - name: Publish to VS Code Marketplace
         if: ${{ env.VSCE_PAT != '' }}
         run: pnpm exec vsce publish --no-dependencies --packagePath *.vsix
+      # Trusted publishing (OIDC, ovsx >= 1.2.0) first; the OVSX_PAT secret is only a fallback until it is confirmed.
       - name: Publish to Open VSX
-        if: ${{ env.OVSX_PAT != '' }}
-        run: pnpm exec ovsx publish *.vsix -p "$OVSX_PAT"
-      # Trusted publishing (OIDC) first; NPM_TOKEN is only a fallback until the switch is confirmed.
+        env:
+          FALLBACK_OVSX_PAT: ${{ secrets.OVSX_PAT }}
+        run: |
+          if ! pnpm exec ovsx publish *.vsix --trusted-publishing; then
+            if [ -z "$FALLBACK_OVSX_PAT" ]; then exit 1; fi
+            echo "::warning::Open VSX trusted publishing failed; publishing with the OVSX_PAT secret"
+            pnpm exec ovsx publish *.vsix -p "$FALLBACK_OVSX_PAT"
+          fi
+      # npm trusted publishing (OIDC); no token since 1.1.0 (2026-10-09).
       - name: Publish npm packages
         run: |
-          if [ -n "${NPM_TOKEN}" ]; then echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc; fi
           for pkg in tasks-core tasks-cli tasks-api; do
             pnpm --filter "@hastycapybara/${pkg}" publish --access public --no-git-checks
           done

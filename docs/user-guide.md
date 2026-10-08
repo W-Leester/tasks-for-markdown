@@ -139,7 +139,9 @@ short mode
 - 같은 이름의 다른 프로그램이 있으면 덮어쓰지 않습니다. 지우려면 `Tasks: 'tasksmd' 터미널 명령 제거`.
 - 에디터 내장 Node로 실행되며, 에디터 위치가 바뀌거나 확장이 업데이트돼도 에디터를 한 번 켜면 따라갑니다.
 
-**원격(SSH)·컨테이너.** 확장이 원격 쪽에서 돌기 때문에 MCP 서버와 `tasksmd` 명령도 **원격 컴퓨터에** 생깁니다(원격의 노트 폴더를 다룸). 내 컴퓨터의 Claude Desktop에 원격 폴더를 연결할 수는 없습니다.
+**원격(SSH)·컨테이너.** 확장이 원격 쪽에서 돌기 때문에 MCP 서버 설정과 `tasksmd` 명령도 **원격 컴퓨터 기준으로** 만들어집니다(원격의 노트 폴더를 다룸). 내 컴퓨터의 Claude Desktop에 원격 폴더를 연결할 수는 없습니다.
+- **확인 전(1.1.0):** 원격 창에서 에디터 AI(특히 Cursor)가 MCP 서버를 원격에서 실행하는지는 아직 확인하지 못했습니다. 연결되지 않으면 원격 터미널에서 `Tasks: 'tasksmd' 터미널 명령 설치` 후, 원격에서 도는 AI(예: 원격 터미널의 Claude Code)에 `claude mcp add tasks -- tasksmd mcp --root "$PWD"`로 등록하세요. 안 되는 경우 알려 주시면 고치겠습니다.
+- **Windows:** 런처(`tasksmd.cmd`)·PATH 안내·Claude Desktop 설정 경로는 테스트로 확인했지만, 실제 Windows 화면에서는 아직 확인하지 못했습니다.
 
 **확장을 지운 뒤 남는 것.** 확장을 삭제해도 아래는 남으니, 필요하면 지우세요(확장이 있을 때 `Tasks: 'tasksmd' 터미널 명령 제거`를 먼저 실행하면 런처는 자동으로 지워집니다).
 - 터미널 명령: `~/.local/bin/tasksmd`(또는 `~/bin/tasksmd`, Windows `%LOCALAPPDATA%\tasksmd\bin\tasksmd.cmd`)

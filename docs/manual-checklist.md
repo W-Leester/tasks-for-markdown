@@ -140,8 +140,10 @@ VS Code 1.138에 들어온 내장 Markdown Editor(WYSIWYG)와 `markdown.codeBloc
    - **결과(10-08, Cursor):** 알림의 Connect 한 번으로 Claude Code·Claude Desktop 연결(아래 4번 참고).
 10. [x] **제거** — `Tasks: 'tasksmd' 터미널 명령 제거` → `~/.local/bin/tasksmd` 삭제, 다른 프로그램이면 건드리지 않음.
    - **결과(10-08):** 제거 → `tasksmd` 없음 → 다시 설치 → `~/.local/bin/tasksmd`(새 이름 주석) 정상.
-11. [ ] **원격(SSH)** — 원격 폴더에서 Cursor 자동 연결(원격 쪽 서버), 원격 터미널에서 `tasksmd`.
-12. [ ] **Windows**(가능하면) — 런처 `tasksmd.cmd`, PATH 안내, Claude Desktop 경로(`%APPDATA%\Claude`). 확인 전까지 알려진 한계.
+11. [-] **원격(SSH)** — 원격 폴더에서 Cursor 자동 연결(원격 쪽 서버), 원격 터미널에서 `tasksmd`.
+   - **1.1.0 배포 후로 미룸(10-08 결정):** 기본 기능은 10-01 원격 점검(2-2) 통과. localhost로는 서버가 원격·내 컴퓨터 어느 쪽에서 실행되는지 구분이 안 돼 다시 하지 않음 → 진짜 원격 환경이 생기거나 사용자 보고가 오면 확인. 사용자 가이드에 "확인 전"과 우회 방법을 적음(알려진 한계).
+12. [-] **Windows**(가능하면) — 런처 `tasksmd.cmd`, PATH 안내, Claude Desktop 경로(`%APPDATA%\Claude`). 확인 전까지 알려진 한계.
+   - **1.1.0 배포 후로 미룸(10-08 결정):** Windows 환경 없음. 런처 내용·PATH 판단·설정 경로·실행 확인(`tasklist`)은 단위 테스트로 확인. 사용자 가이드에 "확인 전"을 적음.
 
 ## 결과 기록
 

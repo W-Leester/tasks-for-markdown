@@ -1058,6 +1058,10 @@
 - [x] **문서:** README(영·한, "AI와 함께 쓰기"가 자동 연결 중심으로), api.md·api.en.md 8절, user-guide, CHANGELOG, 마켓 검사 주의(외부 프로세스 실행 — 1.0.0 때 원인 아니었음)
 - [ ] 수동 점검(manual-checklist.md 5절: Cursor 자동 등록 등) → 1.1.0 게시(Marketplace Update + 태그)
 
+### 1.1.0 배포 후 확인(10-08 결정)
+- [ ] **원격(SSH)에서 MCP 자동 연결:** Cursor·VS Code가 확장이 등록한 서버를 원격에서 실행하는지(localhost로는 구분 불가 → 진짜 원격 환경이나 사용자 보고로). 안 되면 원격용 등록 방식 검토
+- [ ] **Windows:** `tasksmd.cmd` 설치·PATH 안내, `tasksmd --help`, Claude Desktop(`%APPDATA%\Claude`) 연결·실행 중 감지
+
 ## 향후 후보 (미착수)
 
 ### 한글 쿼리 문법 (2026-09-27 보류)

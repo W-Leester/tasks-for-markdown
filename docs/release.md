@@ -55,6 +55,23 @@ for p in tasks-core tasks-cli tasks-api; do pnpm --filter @hastycapybara/$p publ
 - [x] 확인: Open VSX 1.1.0(`verified=true`), npm `tasks-core`·`tasks-cli`·`tasks-api` 1.1.0(provenance 모두 있음), `tasks-cli`에 THIRD_PARTY_NOTICES. **`tasks-api`만 레지스트리 반영이 약 4분 늦음**(로그는 09:47 Published, 목록은 09:52) — 기다리면 됨
 - [ ] 설치본 교체: 개발용 vsix 대신 마켓 설치본(VS Code는 Marketplace, Cursor는 Open VSX)
 
+## 보관 파일 (`releases/`, git에 안 올림)
+
+배포한 파일을 로컬에 모아 둔다. 같은 파일은 GitHub Release에도 있다(태그마다 vsix·npm tgz·latest.json 자동 첨부).
+
+| 버전 | 파일 | 출처 | SHA-256 |
+|---|---|---|---|
+| 1.1.0 | `tasks-for-markdown-1.1.0.marketplace.vsix` | VS Code Marketplace에 올린 파일(마켓에서 다시 받음) | `e979cc919ffe2d87…` |
+| 1.1.0 | `tasks-for-markdown-1.1.0.github.vsix` | GitHub Release·Open VSX(Actions 빌드) | `f45cb03d54eacaca…` |
+| 1.0.1 | `tasks-for-markdown-1.0.1.marketplace.vsix` | VS Code Marketplace에 올린 파일(마켓에서 다시 받음) | `bd43ade46bfff3a1…` |
+| 1.0.1 | `tasks-for-markdown-1.0.1.github.vsix` | GitHub Release·Open VSX(Actions 빌드) | `91e06bd16f9232de…` |
+| 1.0.0 | `tasks-for-markdown-1.0.0.marketplace.vsix` | VS Code Marketplace에 올린 파일(마켓에서 다시 받음) | `5d9b73b8a1a1c207…` |
+| 1.0.0 | `tasks-for-markdown-1.0.0.github.vsix` | GitHub Release·Open VSX(Actions 빌드) | `944bec251653fba4…` |
+| 1.0.0–1.1.0 | `hastycapybara-tasks-{core,cli,api}-<버전>.tgz` | npm에 올라간 것과 같은 GitHub Release 첨부본 | — |
+
+- Marketplace 사본은 `https://marketplace.visualstudio.com/_apis/public/gallery/publishers/HastyCapybara/vsextensions/tasks-for-markdown/<버전>/vspackage`로 다시 받을 수 있다(1.1.0: 받은 파일 크기 865,206바이트 = 업로드한 로컬 파일과 같음). 지문 전체는 `shasum -a 256 releases/*.vsix`.
+- 보관 규칙: 게시한 `.vsix`는 지우지 않고 `releases/tasks-for-markdown-<버전>.marketplace.vsix`로 옮기고, 태그 뒤 GitHub Release 파일은 `gh release download v<버전> -D releases --pattern '*.vsix' --pattern '*.tgz'`(`.github.vsix`로 이름 변경).
+
 ## 공개 직후 할 일 (토큰 정리)
 
 - [~] **npm Trusted Publishing으로 전환 (1.0.1에서 OIDC 게시 확인, 2026-10-05 — 토큰 삭제·접근 강화만 남음).** 워크플로 변경(208f40e)·세 패키지 Trusted Publisher 등록(Allow npm publish) 완료. 남은 것: 다음 게시에서 OIDC 확인 후 토큰 삭제·Publishing access 강화. 세 패키지가 게시되어 조건 충족.
@@ -125,7 +142,8 @@ git tag v<ver> && git push origin v<ver>
 - [ ] **CHANGELOG.md**에 버전·날짜·추가/변경/수정, 외부 연동 변경은 "API" 항목으로.
 - [ ] **검증.** `pnpm typecheck && pnpm lint && pnpm test && pnpm test:webviews && pnpm test:integration`.
 - [ ] **패키징.** `pnpm package` → `.vsix`(사내 배포용 `dist/latest.json`도 생성), 타입 파일 `dist/api-types/api/types.d.ts` 포함 확인(`unzip -l`).
-- [ ] **이전 `.vsix` 삭제**, 새 파일로 설치 확인.
+- [ ] **새 파일로 설치 확인.** 개발 중 만든 `.vsix`는 덮어써도 된다(저장소 루트, git에 안 올림).
+- [ ] **게시한 파일 보관(2026-10-09~).** Marketplace에 올린 바로 그 `.vsix`를 `releases/`로 옮긴다(git에 안 올림, `.gitignore`): `mv tasks-for-markdown-<버전>.vsix releases/ && shasum -a 256 releases/tasks-for-markdown-<버전>.vsix` → 아래 "보관 파일" 표에 지문 기록. GitHub Release의 `.vsix`(Open VSX에 올라간 것)는 Actions가 같은 소스로 다시 만든 것이라 파일 지문이 다르다.
 - [ ] **출처 고지.** 새로 이식한 코드가 있으면 파일 상단 주석과 NOTICE.md 목록에 추가. 번들에 들어가는 패키지는 `pnpm notices`가 `THIRD_PARTY_NOTICES.md`(라이선스 전문)를 다시 만든다(`pnpm package`에 포함, 최신이 아니면 테스트 실패). npm `tasks-cli`에도 복사된다.
 - [ ] **번들 CLI(1.1.0~).** vsix에 `extension/dist/tasksmd.cjs`가 있는지(`unzip -l`), 에디터 내장 Node로 도는지: `ELECTRON_RUN_AS_NODE=1 "<에디터 Helper (Plugin) 실행 파일>" dist/tasksmd.cjs info`.
 - [ ] **실제 에디터 점검.** 자동 테스트가 못 보는 것(Cursor 자동 MCP 등록, 시작 안내 버튼, 링크 클릭, Claude 연결)은 `manual-checklist.md` 5절.

@@ -8,3 +8,6 @@ packages/*/NOTICE.md
 packages/*/THIRD_PARTY_NOTICES.md
 packages/api/index.d.ts
 *.vsix.zip
+
+# Published builds kept locally (docs/release.md "보관 파일")
+releases/

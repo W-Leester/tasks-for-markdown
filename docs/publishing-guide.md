@@ -383,7 +383,7 @@ gh release view v1.0.0 -R W-Leester/tasks-for-markdown --json assets --jq '.asse
 
 ### 6.3 Open VSX를 Trusted Publishers로 전환
 - 조건: 네임스페이스 **소유자**, Publisher Agreement 서명, 확장이 **이미 게시돼 있음**(첫 게시는 토큰으로 — npm과 같다). 확장 하나에 등록 하나. `package.json`의 `publisher`는 네임스페이스와 **대소문자까지** 같아야 한다.
-1. open-vsx.org → 프로필 → Settings → **Trusted Publishers → Add a trusted publisher** → 네임스페이스 → GitHub Actions: Organization or User `W-Leester`, Repository `tasks-for-markdown`, Workflow filename `release.yml`, Environment 비움(채우면 그 environment에서 도는 job만 허용). 등록은 고칠 수 없어 바꿀 땐 지우고 다시.
+1. open-vsx.org → 프로필 → Settings → **Trusted Publishers → Add a trusted publisher** → Namespace, **Publisher `GitHub`**(화면 이름. 위키의 "GitHub Actions"와 같은 것), Extension → Organization or User `W-Leester`, Repository `tasks-for-markdown`, Workflow filename `release.yml`, Environment 비움(채우면 그 environment에서 도는 job만 허용). 등록은 고칠 수 없어 바꿀 땐 지우고 다시. 등록되면 목록에 "GitHub · <네임스페이스>/<확장>" 한 줄(이 프로젝트: 2026-10-09 등록).
 2. 워크플로: `ovsx` **1.2.0 이상**(`--trusted-publishing`, Node 22 필요), `permissions: id-token: write`. **`OVSX_PAT`이 env에 있으면 ovsx가 토큰을 먼저 쓴다** → job `env`에서 빼고, 게시 단계에서 `ovsx publish --trusted-publishing`이 실패할 때만 Secret으로 다시(이 프로젝트 `release.yml`).
 3. 다음 배포 로그에서 경고("trusted publishing failed") 없이 게시된 것을 확인 → GitHub Secret `OVSX_PAT` 삭제 → Open VSX *Access Tokens*에서 토큰 삭제.
 - 참고: https://github.com/eclipse-openvsx/openvsx/wiki/Trusted-Publishing

@@ -1059,7 +1059,7 @@
 - [ ] 수동 점검(manual-checklist.md 5절: Cursor 자동 등록 등) → 1.1.0 게시(Marketplace Update + 태그)
 
 ### 1.1.0 배포 후 확인(10-08 결정)
-- [ ] **Open VSX를 토큰 없는 게시(Trusted Publishing)로 전환(10-09 계획).** 지금 `OVSX_PAT`은 만료 없는 토큰. Open VSX 설정에 *Trusted Publishers* 메뉴가 생김(위키 `eclipse-openvsx/openvsx` Trusted-Publishing). 조건(네임스페이스 소유·동의서·게시된 확장) 충족. ① (사용자) Open VSX *Trusted Publishers → Add*: GitHub Actions, `W-Leester` / `tasks-for-markdown` / `release.yml`, Environment 비움(npm과 같게) ② 워크플로: `ovsx` 0.10 → **1.2.0**(첫 `--trusted-publishing` 지원, Node 22 필요 — 워크플로는 22), `OVSX_PAT`을 job `env`에서 빼고(있으면 PAT이 우선) 게시 단계는 `ovsx publish --trusted-publishing` 먼저, 실패하면 Secret이 있을 때만 PAT으로 한 번 더(npm 때와 같은 대비책) ③ 다음 배포 로그에서 OIDC 게시 확인 → Secret `OVSX_PAT` 삭제·Open VSX 토큰 삭제 ④ 문서(배포 가이드 6.3·토큰 표, release.md)
+- [ ] **Open VSX를 토큰 없는 게시(Trusted Publishing)로 전환(10-09 계획).** 지금 `OVSX_PAT`은 만료 없는 토큰. Open VSX 설정에 *Trusted Publishers* 메뉴가 생김(위키 `eclipse-openvsx/openvsx` Trusted-Publishing). 조건(네임스페이스 소유·동의서·게시된 확장) 충족. ① ✅(10-09 등록) (사용자) Open VSX *Trusted Publishers → Add*: GitHub Actions, `W-Leester` / `tasks-for-markdown` / `release.yml`, Environment 비움(npm과 같게) ② ✅(78429a3) 워크플로: `ovsx` 0.10 → **1.2.0**(첫 `--trusted-publishing` 지원, Node 22 필요 — 워크플로는 22), `OVSX_PAT`을 job `env`에서 빼고(있으면 PAT이 우선) 게시 단계는 `ovsx publish --trusted-publishing` 먼저, 실패하면 Secret이 있을 때만 PAT으로 한 번 더(npm 때와 같은 대비책) ③ 다음 배포 로그에서 OIDC 게시 확인 → Secret `OVSX_PAT` 삭제·Open VSX 토큰 삭제 ④ ✅ 문서(배포 가이드 6.3·토큰 표, release.md)
 - [ ] **원격(SSH)에서 MCP 자동 연결:** Cursor·VS Code가 확장이 등록한 서버를 원격에서 실행하는지(localhost로는 구분 불가 → 진짜 원격 환경이나 사용자 보고로). 안 되면 원격용 등록 방식 검토
 - [ ] **Windows:** `tasksmd.cmd` 설치·PATH 안내, `tasksmd --help`, Claude Desktop(`%APPDATA%\Claude`) 연결·실행 중 감지
 

@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased (1.1.0)
+## 1.1.0 — 2026-10-08
 
 **AI agents and the terminal without npm**
 - The MCP server is now bundled in the extension and runs on the editor's own Node — no Node.js or npm needed.

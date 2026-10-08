@@ -82,9 +82,12 @@ for p in tasks-core tasks-cli tasks-api; do pnpm --filter @hastycapybara/$p publ
 
 ## 한 번만 (계정·토큰)
 
-1. **VS Code Marketplace**: https://marketplace.visualstudio.com/manage 에서 퍼블리셔 `HastyCapybara` 생성 → Azure DevOps에서 PAT(Marketplace › Manage 권한) 발급 → GitHub 저장소 Secrets에 `VSCE_PAT`.
-2. **Open VSX** (Cursor용): https://open-vsx.org 에서 로그인 → 네임스페이스 `HastyCapybara` 생성(`ovsx create-namespace HastyCapybara -p <token>`) → Secrets에 `OVSX_PAT`.
-3. 두 토큰이 없으면 워크플로는 게시 단계를 건너뛰고 `.vsix`만 Release에 첨부한다.
+토큰마다 왜 필요했고 지금은 어떤지는 [배포 가이드 4장 "토큰 한눈에 보기"](publishing-guide.md#4-계정과-토큰).
+
+1. **VS Code Marketplace**: https://marketplace.visualstudio.com/manage 에서 퍼블리셔 `HastyCapybara` 생성. **PAT(`VSCE_PAT`)는 만들지 않음**(Azure 구독 필요) → 매번 관리 페이지에서 `.vsix` 웹 업로드.
+2. **Open VSX** (Cursor용): https://open-vsx.org 에서 로그인 → 네임스페이스 `HastyCapybara` 생성(`ovsx create-namespace HastyCapybara -p <token>`) → Secrets에 `OVSX_PAT`. Trusted Publishers로 바꾸면 삭제.
+3. **npm**: 첫 게시(1.0.0)만 토큰 `NPM_TOKEN`으로 하고, 그 뒤 패키지마다 Trusted Publisher 등록 → 1.0.1부터 토큰 없이 게시. 확인 후 토큰 삭제.
+4. 토큰이 없으면 워크플로는 해당 게시 단계를 건너뛰고(npm은 OIDC로 시도) `.vsix`·`.tgz`는 Release에 첨부한다.
 
 ## npm 패키지 (`@hastycapybara/tasks-core`, `@hastycapybara/tasks-cli`)
 

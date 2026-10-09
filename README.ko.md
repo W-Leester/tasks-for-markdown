@@ -272,6 +272,7 @@ VS Code/Cursor에서 `F5`를 누르면 확장이 로드된 개발용 창이 열�
 - Obsidian을 쓰신다면 원본 플러그인을 써 보세요: [Tasks 문서](https://publish.obsidian.md/tasks/) · [저장소](https://github.com/obsidian-tasks-group/obsidian-tasks)
 - 원본 프로젝트를 후원할 수 있습니다: [GitHub Sponsors (Clare Macrae)](https://github.com/sponsors/claremacrae)
 - 이식한 코드와 라이선스 고지는 [NOTICE.md](NOTICE.md)에 있습니다.
+- 라이선스: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)
 
 이 프로젝트는 Obsidian Tasks 프로젝트나 Obsidian(Dynalist Inc.)과 관련이 없으며, 그들의 보증을 받지 않았습니다.
 

@@ -275,6 +275,7 @@ This extension would not exist without [Obsidian Tasks](https://github.com/obsid
 - If you use Obsidian, try the original plugin: [Tasks documentation](https://publish.obsidian.md/tasks/) · [repository](https://github.com/obsidian-tasks-group/obsidian-tasks)
 - You can support the original project: [GitHub Sponsors (Clare Macrae)](https://github.com/sponsors/claremacrae)
 - Ported code and license notices: [NOTICE.md](NOTICE.md)
+- Licenses: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)
 
 This project is not affiliated with or endorsed by the Obsidian Tasks project or Obsidian (Dynalist Inc.).
 

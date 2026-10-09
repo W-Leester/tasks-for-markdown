@@ -3,7 +3,7 @@
  * task rows and links go back as messages. Plain DOM — no framework needed here.
  */
 import type { FromWebview, ToWebview, WebviewApi } from '../shared/protocol';
-import { applyView, clampWidth, type ColumnWidths, columnTracks, HIDEABLE_COLUMNS, type HideableColumn, widthOf, SCOPE_MODES, SORT_MODES, type ScopeMode, type SortMode, type ViewState } from './view';
+import { applyView, clampWidth, type ColumnWidths, columnTracks, fitWidth, HIDEABLE_COLUMNS, type HideableColumn, moveBoundary, widthOf, SCOPE_MODES, SORT_MODES, type ScopeMode, type SortMode, type ViewState } from './view';
 
 declare function acquireVsCodeApi(): WebviewApi;
 // Plain objects only here, so no snapshot helper (and no Svelte runtime) is needed.
@@ -37,8 +37,8 @@ function applyColumns(hidden: readonly string[]): void {
   const summary = colsMenu?.querySelector('summary');
   if (summary) summary.textContent = hiddenColumns.length ? (summary.dataset.lHidden ?? 'Columns · {0} hidden').replace('{0}', String(hiddenColumns.length)) : (summary.dataset.lLabel ?? 'Columns');
 }
-// Column header (M15): a thin line over each ```tasks result and each top-level task list in the note; hover shows
-// titles with ✕, hidden columns come back via + chips. Same setting as the toolbar menu (all notes).
+// Column header (M15): titles over each ```tasks result and each top-level task list in the note, always shown (M24);
+// hover or focus shows ✕, the + chips for hidden columns and the width grips. Same setting as the toolbar menu (all notes).
 const colLabel = (c: string) => (document.body.dataset as Record<string, string | undefined>)[`lCol${c[0]!.toUpperCase()}${c.slice(1)}`] ?? c;
 function headerHtml(): string {
   const labels = document.body.dataset;
@@ -52,7 +52,7 @@ function headerHtml(): string {
     HIDEABLE_COLUMNS.filter((c) => !hiddenColumns.includes(c))
       .map((c) =>
         `<span class="rv-colhead-cell">` +
-        `<span class="rv-colgrip" role="separator" aria-orientation="vertical" tabindex="0" data-col="${c}" aria-valuenow="${widthOf(c, columnWidths)}" aria-valuemin="3" aria-valuemax="40" aria-label="${esc(`${labels.lColWidth ?? 'Column width'}: ${colLabel(c)}`)}" title="${esc(labels.lColWidthHint ?? 'Drag to resize, double-click to reset')}"></span>` +
+        `<span class="rv-colgrip" role="separator" aria-orientation="vertical" tabindex="0" data-col="${c}" aria-valuenow="${widthOf(c, columnWidths)}" aria-valuemin="3" aria-valuemax="40" aria-label="${esc(`${labels.lColWidth ?? 'Column width'}: ${colLabel(c)}`)}" title="${esc(labels.lColWidthHint ?? 'Drag to resize, double-click to fit the content')}"></span>` +
         `<span class="rv-colhead-text">${esc(colLabel(c))}</span><button type="button" data-hide="${c}" title="${esc(hide)}" aria-label="${esc(`${hide}: ${colLabel(c)}`)}">✕</button></span>`)
       .join('')
   );
@@ -91,7 +91,8 @@ function setHiddenColumns(hidden: string[], focusFrom?: Element): void {
   if (at >= 0) content.querySelectorAll<HTMLElement>('.rv-colhead')[at]?.querySelector<HTMLElement>('button')?.focus();
 }
 
-// Column widths (M16): drag a column's left edge in the header; double-click or Home resets; ←/→ step 0.5em.
+// Column widths (M16, M24): drag a column's left edge in the header — only that boundary moves; ←/→ move it 0.5em;
+// double-click fits the content, Home resets.
 function setWidth(c: HideableColumn, em: number | null): void {
   if (em === null) delete columnWidths[c];
   else columnWidths[c] = clampWidth(em);
@@ -99,6 +100,25 @@ function setWidth(c: HideableColumn, em: number | null): void {
 }
 function saveWidths(): void {
   post({ type: 'doc/columnWidths', widths: { ...columnWidths } as Record<string, number> });
+}
+/** Natural one-line width of a cell: a hidden max-content copy next to it, so it gets the same fonts. */
+function naturalWidth(el: HTMLElement): number {
+  const probe = el.cloneNode(true) as HTMLElement;
+  probe.classList.add('rv-measure');
+  for (const g of Array.from(probe.querySelectorAll('.rv-colgrip'))) g.remove();
+  el.parentElement!.appendChild(probe);
+  const w = probe.getBoundingClientRect().width;
+  probe.remove();
+  return w;
+}
+/** Autofit width for column c: the widest visible cell or the column's title, whichever is wider. */
+function fitColumn(c: HideableColumn, grip: HTMLElement): number {
+  const px = parseFloat(getComputedStyle(grip.closest('.rv-colhead')!).fontSize) || 14;
+  let widest = naturalWidth(grip.parentElement!);
+  for (const cell of Array.from(content.querySelectorAll<HTMLElement>(`li.tfm-task > .tfm-col-${c}, li.tfm-task > p > .tfm-col-${c}`))) {
+    if (cell.getClientRects().length) widest = Math.max(widest, naturalWidth(cell)); // skip rows that are not shown
+  }
+  return fitWidth(widest, px);
 }
 /** Rebuild the headers (aria values) and put focus back on the same grip. */
 function refreshHeaders(grip: HTMLElement): void {
@@ -114,13 +134,13 @@ content.addEventListener('pointerdown', (e) => {
   e.preventDefault();
   const c = grip.dataset.col as HideableColumn;
   const startX = e.clientX;
-  const start = widthOf(c, columnWidths);
+  const start = { ...columnWidths };
   // Tracks are in em of the row font; the header uses the same font size.
   const px = parseFloat(getComputedStyle(grip.closest('.rv-colhead')!).fontSize) || 14;
   document.body.classList.add('rv-resizing');
   grip.classList.add('rv-active');
   try { grip.setPointerCapture(e.pointerId); } catch { /* not supported */ }
-  const move = (ev: PointerEvent) => setWidth(c, start - (ev.clientX - startX) / px);
+  const move = (ev: PointerEvent) => { columnWidths = moveBoundary(c, hiddenColumns, start, (ev.clientX - startX) / px); applyWidths(); };
   const up = () => {
     grip.removeEventListener('pointermove', move);
     grip.removeEventListener('pointerup', up);
@@ -138,8 +158,8 @@ content.addEventListener('keydown', (e) => {
   const grip = (e.target as Element).closest<HTMLElement>('.rv-colgrip');
   if (!grip) return;
   const c = grip.dataset.col as HideableColumn;
-  // The grip is the column's left edge: ← moves it left (wider), → right (narrower).
-  if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') setWidth(c, widthOf(c, columnWidths) + (e.key === 'ArrowLeft' ? 0.5 : -0.5));
+  // The grip is the column's left edge: ←/→ move that boundary, like dragging.
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { columnWidths = moveBoundary(c, hiddenColumns, columnWidths, e.key === 'ArrowLeft' ? -0.5 : 0.5); applyWidths(); }
   else if (e.key === 'Home') setWidth(c, null);
   else return;
   e.preventDefault();
@@ -276,7 +296,8 @@ content.addEventListener('dblclick', (e) => {
   const grip = (e.target as Element).closest<HTMLElement>('.rv-colgrip');
   if (grip) {
     e.preventDefault();
-    setWidth(grip.dataset.col as HideableColumn, null);
+    const c = grip.dataset.col as HideableColumn;
+    setWidth(c, fitColumn(c, grip));
     saveWidths();
     refreshHeaders(grip);
     return;

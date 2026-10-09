@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased (1.1.1)
+
+**Rendered view columns**
+- Column titles are always shown above query results and task lists; ✕, the + chips and the width grips appear on hover or focus.
+- Dragging a column boundary moves only that boundary: the two columns beside it trade width. Before, every boundary between the description and the dragged column moved with it.
+- Double-click a column's grip to fit the column to its widest content, like a spreadsheet (Home still resets to the default width).
+
+### 한국어 요약
+- **렌더 보기 열:** 열 이름 항상 표시(✕·`+`·손잡이는 마우스를 올릴 때), 경계를 끌면 그 경계만 움직임(양옆 두 열이 너비를 주고받음), 손잡이 더블클릭 = 내용에 맞춤.
+
 ## 1.1.0 — 2026-10-08
 
 **AI agents and the terminal without npm**

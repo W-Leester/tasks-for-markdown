@@ -387,15 +387,15 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
   .rv-cols-menu { position: absolute; top: calc(100% + 4px); left: 0; z-index: 3; display: flex; flex-direction: column; gap: 4px; padding: 8px 12px; background: var(--rv-bg-2); border: 1px solid var(--rv-stroke); border-radius: 6px; box-shadow: 0 4px 14px rgba(0,0,0,.25); white-space: nowrap; color: var(--rv-fg); }
   .rv-cols-menu label { display: flex; gap: 6px; align-items: center; cursor: pointer; }
   body.hide-col-due .tfm-col-due, body.hide-col-created .tfm-col-created, body.hide-col-more .tfm-col-more { display: none !important; }
-  /* Column header over query results and note task lists (M15): a thin line until hovered/focused, then titles with ✕ and + chips. */
+  /* Column header over query results and note task lists (M15): titles always shown (M24); ✕, + chips and grips on hover/focus. */
   .rv-colhead { display: none; }
   li.rv-colhead { list-style: none; order: -1; padding: 0; } /* first row of a note list, also while sorted */
   li.rv-colhead + li.tfm-task { border-top-color: transparent; }
   body.fields-columns .rv-colhead { display: grid; position: relative; grid-template-columns: var(--rv-cols, 1.4em minmax(8em, 1fr) 8.6em 8.6em minmax(0, 18em)); column-gap: .9em; align-items: center;
-    height: 9px; margin: -4px 0 2px; overflow: hidden; color: var(--rv-muted); border-bottom: 1px solid color-mix(in srgb, var(--rv-fg) 14%, transparent); transition: height .12s; }
-  body.fields-columns .rv-colhead > * { opacity: 0; transition: opacity .12s; }
-  body.fields-columns .rv-colhead:hover, body.fields-columns .rv-colhead:focus-within, body.rv-resizing .rv-colhead { height: 24px; }
-  body.fields-columns .rv-colhead:hover > *, body.fields-columns .rv-colhead:focus-within > *, body.rv-resizing .rv-colhead > * { opacity: 1; }
+    height: 22px; margin: 0 0 2px; overflow: hidden; color: var(--rv-muted); border-bottom: 1px solid color-mix(in srgb, var(--rv-fg) 14%, transparent); }
+  body.fields-columns .rv-colhead button, body.fields-columns .rv-colhead .rv-colhead-chips, body.fields-columns .rv-colgrip::after { opacity: 0; transition: opacity .12s; }
+  body.fields-columns .rv-colhead:is(:hover, :focus-within) :is(button, .rv-colhead-chips), body.rv-resizing .rv-colhead :is(button, .rv-colhead-chips) { opacity: 1; }
+  body.fields-columns .rv-colhead:is(:hover, :focus-within) .rv-colgrip::after, body.rv-resizing .rv-colhead .rv-colgrip::after { opacity: 1; }
   /* Same font size as the rows so the em-based grid tracks line up; only the text is small. */
   .rv-colhead-text, .rv-colhead button, .rv-colhead-chips { font-size: 11px; }
   .rv-colhead-cell { position: relative; display: inline-flex; align-items: center; gap: 3px; min-width: 0; white-space: nowrap; }
@@ -405,6 +405,8 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
   .rv-colgrip::after { content: ''; position: absolute; top: 3px; bottom: 3px; left: 4px; width: 2px; border-radius: 1px; background: color-mix(in srgb, var(--rv-fg) 22%, transparent); }
   .rv-colgrip:hover::after, .rv-colgrip:focus-visible::after, .rv-colgrip.rv-active::after { background: var(--rv-accent); }
   body.rv-resizing, body.rv-resizing * { cursor: col-resize !important; user-select: none; }
+  /* Autofit probe (M24): a hidden one-line copy of a cell, measured and removed at once. */
+  .rv-measure { position: absolute !important; left: 0; top: 0; visibility: hidden; width: max-content !important; max-width: none !important; white-space: nowrap !important; overflow: visible !important; pointer-events: none; }
   .rv-colhead button { border: none; background: transparent; color: var(--rv-muted); font: inherit; padding: 0 4px; border-radius: 3px; cursor: pointer; line-height: 16px; }
   .rv-colhead button:hover, .rv-colhead button:focus-visible { background: var(--rv-bg-3); color: var(--rv-fg); }
   .rv-colhead-desc { overflow: hidden; }
@@ -422,7 +424,7 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
 </style>
 <title>${t('Tasks: Rendered view')}</title>
 </head>
-<body data-l-col-width="${t('Column width')}" data-l-col-width-hint="${t('Drag to resize, double-click to reset')}" data-l-col-desc="${t('Description')}" data-l-col-due="${t('Due date')}" data-l-col-created="${t('Created date')}" data-l-col-more="${t('Other fields')}" data-l-col-hide="${t('Hide column')}" data-l-col-show="${t('Show column')}" data-l-edit="${t('Edit')}" data-l-postpone="${t('Postpone')}" data-l-note="${t('Add note')}" data-l-note-placeholder="${t('Note — Enter to save, Esc to cancel')}" data-l-hidden="${t('{0} hidden')}">
+<body data-l-col-width="${t('Column width')}" data-l-col-width-hint="${t('Drag to resize, double-click to fit the content')}" data-l-col-desc="${t('Description')}" data-l-col-due="${t('Due date')}" data-l-col-created="${t('Created date')}" data-l-col-more="${t('Other fields')}" data-l-col-hide="${t('Hide column')}" data-l-col-show="${t('Show column')}" data-l-edit="${t('Edit')}" data-l-postpone="${t('Postpone')}" data-l-note="${t('Add note')}" data-l-note-placeholder="${t('Note — Enter to save, Esc to cancel')}" data-l-hidden="${t('{0} hidden')}">
 <div class="rv-tools">
   <label class="rv-select"><span>${t('Sort')}</span><select id="view-sort">
     <option value="document">${t('Document order')}</option><option value="due">${t('Due date')}</option><option value="created">${t('Created date')}</option><option value="priority">${t('Priority')}</option><option value="urgency">${t('Urgency')}</option>

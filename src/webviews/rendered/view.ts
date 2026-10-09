@@ -125,6 +125,35 @@ export function widthOf(c: HideableColumn, widths: ColumnWidths = {}): number {
   return typeof w === 'number' && Number.isFinite(w) ? clampWidth(w) : DEFAULT_WIDTHS[c];
 }
 
+/** What sits left of a column's grip: the previous visible column, or the description. */
+export function leftNeighbour(c: HideableColumn, hidden: readonly string[]): HideableColumn | 'desc' {
+  const visible = HIDEABLE_COLUMNS.filter((x) => !hidden.includes(x));
+  return visible[visible.indexOf(c) - 1] ?? 'desc';
+}
+
+/**
+ * Move the boundary on `c`'s left edge by `d` em (positive = to the right) from the widths `start` (M24).
+ * Only that boundary moves: a column on the left trades width with `c` (their sum stays, both within 3–40em);
+ * with the description on the left, only `c` changes and the description absorbs it. The table is anchored
+ * at the right, so changing `c` alone would shift every boundary between the description and `c` (incident #34).
+ */
+export function moveBoundary(c: HideableColumn, hidden: readonly string[], start: ColumnWidths, d: number): ColumnWidths {
+  const w = widthOf(c, start);
+  const left = leftNeighbour(c, hidden);
+  if (left === 'desc') return { ...start, [c]: clampWidth(w - d) };
+  const lw = widthOf(left, start);
+  const lo = Math.max(MIN_WIDTH - lw, w - MAX_WIDTH);
+  const hi = Math.min(w - MIN_WIDTH, MAX_WIDTH - lw);
+  // Round the step first so the two rounded widths still add up to the same total.
+  const step = Math.round(Math.min(hi, Math.max(lo, d)) * 10) / 10;
+  return { ...start, [left]: clampWidth(lw + step), [c]: clampWidth(w - step) };
+}
+
+/** Double-click autofit (M24): the widest content in px, in em of the row font, plus a little air. */
+export function fitWidth(contentPx: number, fontPx: number): number {
+  return clampWidth((contentPx > 0 && fontPx > 0 ? contentPx / fontPx : 0) + 0.4);
+}
+
 /** grid-template-columns for the column layout without the hidden columns (the rest close up), with custom widths. */
 export function columnTracks(hidden: readonly string[], widths: ColumnWidths = {}): string {
   const track = (c: HideableColumn) => (c === 'more' ? `minmax(0, ${widthOf(c, widths)}em)` : `${widthOf(c, widths)}em`);

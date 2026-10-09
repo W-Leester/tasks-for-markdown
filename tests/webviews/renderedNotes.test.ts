@@ -153,7 +153,28 @@ describe('column widths (M16)', () => {
     expect(clampWidth(10.04)).toBe(10);
   });
 
-  it('drag the left edge (wider to the left), keyboard steps, double-click resets; saves once per drag', async () => {
+  it('moveBoundary: neighbours trade width (only that boundary moves); next to the description only the column changes', async () => {
+    const { moveBoundary, leftNeighbour, fitWidth } = await import('../../src/webviews/rendered/view');
+    expect(leftNeighbour('due', [])).toBe('desc');
+    expect(leftNeighbour('more', [])).toBe('created');
+    expect(leftNeighbour('more', ['created'])).toBe('due');
+    expect(leftNeighbour('created', ['due'])).toBe('desc');
+    // Description on the left: the column alone changes (moving right narrows it).
+    expect(moveBoundary('due', [], {}, 1)).toEqual({ due: 7.6 });
+    // Between due and created: due grows, created shrinks by the same amount; the total stays.
+    expect(moveBoundary('created', [], {}, 2)).toEqual({ due: 10.6, created: 6.6 });
+    expect(moveBoundary('created', [], { due: 10, created: 9 }, -1.25)).toEqual({ due: 8.8, created: 10.2 });
+    // Stops where either column reaches 3em or 40em.
+    expect(moveBoundary('created', [], {}, 100)).toEqual({ due: 14.2, created: 3 });
+    expect(moveBoundary('more', [], { created: 39, more: 18 }, 5)).toEqual({ created: 40, more: 17 });
+    // With created hidden, more trades with due.
+    expect(moveBoundary('more', ['created'], {}, -2)).toEqual({ due: 6.6, more: 20 });
+    expect(fitWidth(160, 16)).toBe(10.4);
+    expect(fitWidth(0, 16)).toBe(3);
+    expect(fitWidth(2000, 16)).toBe(40);
+  });
+
+  it('drag the left edge: only that boundary moves; keyboard steps; double-click fits the content; saves once per drag', async () => {
     const row = `<li class="tfm-task" data-tfm-line="0"><input type="checkbox" class="tfm-check"><span class="tfm-desc">t</span><span class="tfm-col tfm-col-due"></span><span class="tfm-col tfm-col-created"></span><span class="tfm-col tfm-col-more"></span></li>`;
     document.body.innerHTML = `<details id="view-cols"><summary>열</summary><input type="checkbox" data-col="due" checked><input type="checkbox" data-col="created" checked><input type="checkbox" data-col="more" checked></details><div id="content"></div>`;
     window.scrollTo = () => undefined;
@@ -179,19 +200,34 @@ describe('column widths (M16)', () => {
     expect(document.body.classList.contains('rv-resizing')).toBe(false);
     expect(posted).toEqual([{ type: 'doc/columnWidths', widths: { created: 10, due: 10.6 } }]);
 
-    // Keyboard: → narrows by 0.5em, Home resets; focus stays on the grip.
+    // Dragging the due|created boundary 16px right: due +1em, created −1em, nothing else moves.
+    posted.length = 0;
+    grip('created').dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, clientX: 300, button: 0 }));
+    grip('created').dispatchEvent(new MouseEvent('pointermove', { bubbles: true, clientX: 316 }));
+    expect(cols()).toBe('1.4em minmax(8em, 1fr) 11.6em 9em minmax(0, 18em)');
+    grip('created').dispatchEvent(new MouseEvent('pointerup', { bubbles: true, clientX: 316 }));
+    expect(posted).toEqual([{ type: 'doc/columnWidths', widths: { created: 9, due: 11.6 } }]);
+
+    // Keyboard: → moves the created|more boundary 0.5em right (created wider, more narrower); Home resets; focus stays.
     posted.length = 0;
     grip('more').focus();
     grip('more').dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
-    expect(cols()).toBe('1.4em minmax(8em, 1fr) 10.6em 10em minmax(0, 17.5em)');
+    expect(cols()).toBe('1.4em minmax(8em, 1fr) 11.6em 9.5em minmax(0, 17.5em)');
     expect(document.activeElement).toBe(grip('more'));
     grip('more').dispatchEvent(new KeyboardEvent('keydown', { key: 'Home', bubbles: true }));
-    expect(cols()).toBe('1.4em minmax(8em, 1fr) 10.6em 10em minmax(0, 18em)');
-    expect(posted.at(-1)).toEqual({ type: 'doc/columnWidths', widths: { created: 10, due: 10.6 } });
+    expect(cols()).toBe('1.4em minmax(8em, 1fr) 11.6em 9.5em minmax(0, 18em)');
+    expect(posted.at(-1)).toEqual({ type: 'doc/columnWidths', widths: { created: 9.5, due: 11.6 } });
 
-    // Double-click resets; another view's change is applied.
+    // Double-click fits the widest shown content (jsdom has no layout: width = 8px per character here).
+    const rect = vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function (this: HTMLElement) {
+      return { width: (this.textContent ?? '').length * 8 } as DOMRect;
+    });
+    const rects = vi.spyOn(HTMLElement.prototype, 'getClientRects').mockImplementation(() => [{}] as unknown as DOMRectList);
+    document.querySelector('.tfm-col-created')!.textContent = '➕ 2026-09-20 (Sat)'; // 18 chars → 144px → 9em + 0.4
     grip('created').dispatchEvent(new MouseEvent('dblclick', { bubbles: true }));
-    expect(cols()).toBe('1.4em minmax(8em, 1fr) 10.6em 8.6em minmax(0, 18em)');
+    expect(cols()).toBe('1.4em minmax(8em, 1fr) 11.6em 9.4em minmax(0, 18em)');
+    rect.mockRestore();
+    rects.mockRestore();
     receive({ type: 'doc/columnWidths', widths: {} });
     expect(cols()).toBe('1.4em minmax(8em, 1fr) 8.6em 8.6em minmax(0, 18em)');
   });

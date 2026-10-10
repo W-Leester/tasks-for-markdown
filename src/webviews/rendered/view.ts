@@ -133,20 +133,41 @@ export function leftNeighbour(c: HideableColumn, hidden: readonly string[]): Hid
 
 /**
  * Move the boundary on `c`'s left edge by `d` em (positive = to the right) from the widths `start` (M24).
- * Only that boundary moves: a column on the left trades width with `c` (their sum stays, both within 3–40em);
- * with the description on the left, only `c` changes and the description absorbs it. The table is anchored
- * at the right, so changing `c` alone would shift every boundary between the description and `c` (incident #34).
+ * The boundary follows the pointer and the columns right of `c` never move:
+ * - to the right, `c` narrows (to 3em) and the column on its left widens (to 40em) — or the description, if it is next to `c`;
+ * - to the left, `c` widens (to 40em) taking width from the columns on its left, nearest first, each down to 3em,
+ *   and last from the description, but only its `descRoom` em above its 8em minimum (a full description would
+ *   otherwise push every column to the right, incident #34).
  */
-export function moveBoundary(c: HideableColumn, hidden: readonly string[], start: ColumnWidths, d: number): ColumnWidths {
-  const w = widthOf(c, start);
-  const left = leftNeighbour(c, hidden);
-  if (left === 'desc') return { ...start, [c]: clampWidth(w - d) };
-  const lw = widthOf(left, start);
-  const lo = Math.max(MIN_WIDTH - lw, w - MAX_WIDTH);
-  const hi = Math.min(w - MIN_WIDTH, MAX_WIDTH - lw);
-  // Round the step first so the two rounded widths still add up to the same total.
-  const step = Math.round(Math.min(hi, Math.max(lo, d)) * 10) / 10;
-  return { ...start, [left]: clampWidth(lw + step), [c]: clampWidth(w - step) };
+export function moveBoundary(c: HideableColumn, hidden: readonly string[], start: ColumnWidths, d: number, descRoom = Infinity): ColumnWidths {
+  // Work in tenths of an em so the widths taken and given always add up.
+  const tenth = (x: number) => Math.round(x * 10);
+  const visible = HIDEABLE_COLUMNS.filter((x) => !hidden.includes(x));
+  const lefts = visible.slice(0, visible.indexOf(c)).reverse();
+  const w: Partial<Record<HideableColumn, number>> = {};
+  for (const x of visible) w[x] = tenth(widthOf(x, start));
+  const min = tenth(MIN_WIDTH), max = tenth(MAX_WIDTH);
+  let step = tenth(d);
+  const out: ColumnWidths = { ...start };
+  if (step > 0) {
+    const left = lefts[0];
+    step = Math.min(step, w[c]! - min, left ? max - w[left]! : Infinity);
+    if (step <= 0) return out;
+    w[c]! -= step;
+    if (left) { w[left]! += step; out[left] = w[left]! / 10; }
+  } else if (step < 0) {
+    let need = Math.min(-step, max - w[c]!);
+    let taken = 0;
+    for (const x of lefts) {
+      const give = Math.min(need, w[x]! - min);
+      if (give > 0) { w[x]! -= give; need -= give; taken += give; out[x] = w[x]! / 10; }
+    }
+    taken += Math.min(need, Math.max(0, Math.floor(descRoom * 10)));
+    if (taken <= 0) return out;
+    w[c]! += taken;
+  } else return out;
+  out[c] = w[c]! / 10;
+  return out;
 }
 
 /** Double-click autofit (M24): the widest content in px, in em of the row font, plus a little air. */

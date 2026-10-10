@@ -120,13 +120,28 @@ function fitColumn(c: HideableColumn, grip: HTMLElement): number {
   }
   return fitWidth(widest, px);
 }
-/** Rebuild the headers (aria values) and put focus back on the same grip. */
-function refreshHeaders(grip: HTMLElement): void {
-  const heads = Array.from(content.querySelectorAll('.rv-colhead'));
-  const at = heads.indexOf(grip.closest('.rv-colhead')!);
-  const col = grip.dataset.col;
-  applyHeaders();
-  content.querySelectorAll('.rv-colhead')[at]?.querySelector<HTMLElement>(`.rv-colgrip[data-col="${col}"]`)?.focus();
+/**
+ * Update the grips' aria values in place. Never rebuild the header here: replacing the grip between the two
+ * clicks of a double-click means the browser never fires dblclick (M24, found by dragging in a real browser).
+ */
+function syncGrips(): void {
+  for (const g of Array.from(content.querySelectorAll<HTMLElement>('.rv-colgrip'))) g.setAttribute('aria-valuenow', String(widthOf(g.dataset.col as HideableColumn, columnWidths)));
+}
+/**
+ * Widths as drawn, in em: the "more" track may be narrower than its setting in a narrow window, and the
+ * description can only give what it has above its 8em minimum. Measured on the grip's header row.
+ */
+function drawnWidths(grip: HTMLElement): { widths: ColumnWidths; descRoom: number; px: number } {
+  const head = grip.closest<HTMLElement>('.rv-colhead')!;
+  const px = parseFloat(getComputedStyle(head).fontSize) || 14;
+  const em = (el: Element | null | undefined) => (el ? el.getBoundingClientRect().width / px : 0);
+  const widths: ColumnWidths = { ...columnWidths };
+  for (const c of HIDEABLE_COLUMNS) {
+    const drawn = em(head.querySelector(`.rv-colgrip[data-col="${c}"]`)?.parentElement);
+    if (drawn > 0 && drawn < widthOf(c, columnWidths) - 0.1) widths[c] = clampWidth(drawn);
+  }
+  const desc = em(head.querySelector('.rv-colhead-desc'));
+  return { widths, descRoom: desc > 0 ? Math.max(0, desc - 8) : Infinity, px };
 }
 content.addEventListener('pointerdown', (e) => {
   const grip = (e.target as Element).closest<HTMLElement>('.rv-colgrip');
@@ -134,21 +149,28 @@ content.addEventListener('pointerdown', (e) => {
   e.preventDefault();
   const c = grip.dataset.col as HideableColumn;
   const startX = e.clientX;
-  const start = { ...columnWidths };
   // Tracks are in em of the row font; the header uses the same font size.
-  const px = parseFloat(getComputedStyle(grip.closest('.rv-colhead')!).fontSize) || 14;
+  const { widths: start, descRoom, px } = drawnWidths(grip);
   document.body.classList.add('rv-resizing');
   grip.classList.add('rv-active');
   try { grip.setPointerCapture(e.pointerId); } catch { /* not supported */ }
-  const move = (ev: PointerEvent) => { columnWidths = moveBoundary(c, hiddenColumns, start, (ev.clientX - startX) / px); applyWidths(); };
+  let moved = false;
+  const move = (ev: PointerEvent) => {
+    if (ev.clientX === startX && !moved) return;
+    moved = true;
+    columnWidths = moveBoundary(c, hiddenColumns, start, (ev.clientX - startX) / px, descRoom);
+    applyWidths();
+  };
   const up = () => {
     grip.removeEventListener('pointermove', move);
     grip.removeEventListener('pointerup', up);
     grip.removeEventListener('pointercancel', up);
     document.body.classList.remove('rv-resizing');
     grip.classList.remove('rv-active');
+    // A plain click (or the first click of a double-click) changes nothing: no save, and the grip stays in place.
+    if (!moved) return;
     saveWidths();
-    applyHeaders();
+    syncGrips();
   };
   grip.addEventListener('pointermove', move);
   grip.addEventListener('pointerup', up);
@@ -159,12 +181,16 @@ content.addEventListener('keydown', (e) => {
   if (!grip) return;
   const c = grip.dataset.col as HideableColumn;
   // The grip is the column's left edge: ←/→ move that boundary, like dragging.
-  if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { columnWidths = moveBoundary(c, hiddenColumns, columnWidths, e.key === 'ArrowLeft' ? -0.5 : 0.5); applyWidths(); }
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+    const { widths, descRoom } = drawnWidths(grip);
+    columnWidths = moveBoundary(c, hiddenColumns, widths, e.key === 'ArrowLeft' ? -0.5 : 0.5, descRoom);
+    applyWidths();
+  }
   else if (e.key === 'Home') setWidth(c, null);
   else return;
   e.preventDefault();
   saveWidths();
-  refreshHeaders(grip);
+  syncGrips();
 });
 
 for (const box of colBoxes) {
@@ -299,7 +325,7 @@ content.addEventListener('dblclick', (e) => {
     const c = grip.dataset.col as HideableColumn;
     setWidth(c, fitColumn(c, grip));
     saveWidths();
-    refreshHeaders(grip);
+    syncGrips();
     return;
   }
   if ((e.target as Element).closest('.rv-note-form, .tfm-notes, .rv-colhead')) return;

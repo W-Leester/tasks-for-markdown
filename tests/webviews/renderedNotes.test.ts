@@ -169,6 +169,12 @@ describe('column widths (M16)', () => {
     expect(moveBoundary('more', [], { created: 39, more: 18 }, 5)).toEqual({ created: 40, more: 17 });
     // With created hidden, more trades with due.
     expect(moveBoundary('more', ['created'], {}, -2)).toEqual({ due: 6.6, more: 20 });
+    // Dragging left keeps going: when the neighbour is at 3em the next column on the left gives, then the description.
+    expect(moveBoundary('more', [], { due: 5, created: 4 }, -6)).toEqual({ due: 3, created: 3, more: 24 }); // 1 + 2 from the columns, 3 from the description
+    expect(moveBoundary('more', [], { due: 3, created: 3 }, -4, 1.5)).toEqual({ due: 3, created: 3, more: 19.5 });
+    // A full description (no room) stops the boundary instead of pushing every column to the right (incident #34).
+    expect(moveBoundary('due', [], {}, -5, 0)).toEqual({});
+    expect(moveBoundary('due', [], {}, -5, 2)).toEqual({ due: 10.6 });
     expect(fitWidth(160, 16)).toBe(10.4);
     expect(fitWidth(0, 16)).toBe(3);
     expect(fitWidth(2000, 16)).toBe(40);
@@ -199,6 +205,14 @@ describe('column widths (M16)', () => {
     g.dispatchEvent(new MouseEvent('pointerup', { bubbles: true, clientX: 168 }));
     expect(document.body.classList.contains('rv-resizing')).toBe(false);
     expect(posted).toEqual([{ type: 'doc/columnWidths', widths: { created: 10, due: 10.6 } }]);
+
+    // A click without moving saves nothing and keeps the same grip element, so a double-click can fire (M24).
+    posted.length = 0;
+    const before = grip('more');
+    before.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, clientX: 400, button: 0 }));
+    before.dispatchEvent(new MouseEvent('pointerup', { bubbles: true, clientX: 400 }));
+    expect(posted).toEqual([]);
+    expect(grip('more')).toBe(before);
 
     // Dragging the due|created boundary 16px right: due +1em, created −1em, nothing else moves.
     posted.length = 0;

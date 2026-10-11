@@ -55,6 +55,14 @@ for p in tasks-core tasks-cli tasks-api; do pnpm --filter @hastycapybara/$p publ
 - [x] 확인: Open VSX 1.1.0(`verified=true`), npm `tasks-core`·`tasks-cli`·`tasks-api` 1.1.0(provenance 모두 있음), `tasks-cli`에 THIRD_PARTY_NOTICES. **`tasks-api`만 레지스트리 반영이 약 4분 늦음**(로그는 09:47 Published, 목록은 09:52) — 기다리면 됨
 - [x] 설치본 교체: 개발용 vsix 대신 마켓 설치본(VS Code는 Marketplace, Cursor는 Open VSX) — 2026-10-09 사용자
 
+## 1.1.1 게시 (2026-10-12)
+- [x] 검증: typecheck·lint, 단위 820, 웹뷰 34, 통합 61 통과, `build:packages`, `pnpm package`(35 files, `releases/`·tgz 없음 — `vsixContents` 테스트), README에 THIRD_PARTY_NOTICES 링크
+- [x] 수동 점검: 열 이름 항상 표시·끌기(한도 포함)·더블클릭 맞춤·완료일 열(사용자, VS Code·Cursor)
+- [ ] Marketplace: *… → Update*로 `tasks-for-markdown-1.1.1.vsix` 업로드(사용자) → 공개 확인 → 파일을 `releases/tasks-for-markdown-1.1.1.marketplace.vsix`로
+- [ ] 태그 `v1.1.1` → Release 워크플로. **Open VSX 토큰 없는 게시 첫 시험** — 로그에 "trusted publishing failed" 경고가 없으면 성공
+- [ ] 확인: Open VSX·npm 3개 1.1.1, GitHub Release 파일 받아 `releases/`에
+- [ ] 성공 시 `OVSX_PAT` Secret 삭제·Open VSX 토큰 삭제(배포 가이드 6.3)
+
 ## 보관 파일 (`releases/`, git에 안 올림)
 
 배포한 파일을 로컬에 모아 둔다. 같은 파일은 GitHub Release에도 있다(태그마다 vsix·npm tgz·latest.json 자동 첨부).

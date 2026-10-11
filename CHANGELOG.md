@@ -5,10 +5,11 @@
 **Rendered view columns**
 - Column titles are always shown above query results and task lists; ✕, the + chips and the width grips appear on hover or focus.
 - Dragging a column boundary follows the pointer and the table's right edge stays put: the columns beside it trade width, and when one reaches its limit the next one takes over (columns 3–80em, description at least 8em). Before, every boundary between the description and the dragged column moved with it, and a column at 40em could not be dragged further.
+- A **Done date** column between Created date and Other fields (✅ no longer sits in Other fields; cancelled dates stay there). It can be hidden and resized like the others.
 - Double-click a column's grip to fit the column to its widest content, like a spreadsheet (Home still resets to the default width).
 
 ### 한국어 요약
-- **렌더 보기 열:** 열 이름 항상 표시(✕·`+`·손잡이는 마우스를 올릴 때), 경계를 끌면 그 경계가 마우스를 따라감(양옆 열이 주고받고, 한도에 닿으면 다음 열이 이어받음, 최대 80em), 손잡이 더블클릭 = 내용에 맞춤.
+- **렌더 보기 열:** 열 이름 항상 표시(✕·`+`·손잡이는 마우스를 올릴 때), 경계를 끌면 그 경계가 마우스를 따라감(양옆 열이 주고받고, 한도에 닿으면 다음 열이 이어받음, 최대 80em), 손잡이 더블클릭 = 내용에 맞춤, **완료일 열** 추가(생성일과 나머지 필드 사이).
 
 ## 1.1.0 — 2026-10-08
 

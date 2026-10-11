@@ -9,6 +9,7 @@ import { renderDocumentHtml } from './renderDocument';
 import { recentMarkdownDocument } from '../commands/recentMarkdown';
 import { t } from '../l10n';
 import { systemClock, type Clock } from '../core/dates';
+import { clampWidth, HIDEABLE_COLUMNS } from '../webviews/rendered/columns';
 
 export const RENDERED_VIEW_TYPE = 'tasksmd.rendered';
 const VIEW_STATE_KEY = 'rendered.viewState';
@@ -16,15 +17,16 @@ const VIEW_STATE_KEY = 'rendered.viewState';
 const HIDDEN_COLUMNS_KEY = 'rendered.hiddenColumns';
 /** Column widths in em (M16) — one choice for all notes. */
 const COLUMN_WIDTHS_KEY = 'rendered.columnWidths';
-export const HIDEABLE_COLUMNS = ['due', 'created', 'more'] as const;
+// One list of columns and one width range for the host and the page (M24: the host clamped to 40em on its own).
+export { HIDEABLE_COLUMNS };
 
-/** Only known columns with a width in the allowed range (3–40em) are kept. */
+/** Only known columns with a width in the allowed range (MIN_WIDTH–MAX_WIDTH em) are kept. */
 function cleanWidths(input: unknown): Record<string, number> {
   const out: Record<string, number> = {};
   if (!input || typeof input !== 'object') return out;
   for (const c of HIDEABLE_COLUMNS) {
     const w = (input as Record<string, unknown>)[c];
-    if (typeof w === 'number' && Number.isFinite(w)) out[c] = Math.round(Math.min(40, Math.max(3, w)) * 10) / 10;
+    if (typeof w === 'number' && Number.isFinite(w)) out[c] = clampWidth(w);
   }
   return out;
 }
@@ -324,13 +326,13 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
   li.tfm-task > ul > li.tfm-task:first-child, li.tfm-task > p + ul > li.tfm-task:first-child { border-top-color: color-mix(in srgb, var(--rv-fg) 10%, transparent); }
   .tfm-fields { margin-left: .2em; } .tfm-field { white-space: nowrap; }
   /* fieldsAlign = columns (M12): the same grid on every task row so due / tags / recurrence line up vertically. */
-  body.fields-columns li.tfm-task { display: grid; grid-template-columns: var(--rv-cols, 1.4em minmax(8em, 1fr) 8.6em 8.6em minmax(0, 18em)); column-gap: .9em; align-items: baseline; }
+  body.fields-columns li.tfm-task { display: grid; grid-template-columns: var(--rv-cols, 1.4em minmax(8em, 1fr) 8.6em 8.6em 8.6em minmax(0, 18em)); column-gap: .9em; align-items: baseline; }
   body.fields-columns li.tfm-task > p { display: contents; }
   body.fields-columns li.tfm-task > .tfm-check, body.fields-columns li.tfm-task > p > .tfm-check { margin: 0; align-self: center; }
   body.fields-columns .tfm-desc { min-width: 0; }
   body.fields-columns .tfm-col { min-width: 0; font-size: .92em; }
-  body.fields-columns .tfm-col-due, body.fields-columns .tfm-col-created { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  body.fields-columns .tfm-col-created { color: var(--rv-muted); }
+  body.fields-columns .tfm-col-due, body.fields-columns .tfm-col-created, body.fields-columns .tfm-col-done { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  body.fields-columns .tfm-col-created, body.fields-columns .tfm-col-done { color: var(--rv-muted); }
   body.fields-columns .tfm-col-tags { margin-left: .3em; font-size: .92em; }
   body.fields-columns .tfm-col-tags .tfm-tag { color: var(--vscode-textLink-foreground); }
   body.fields-columns .tfm-col-more { color: var(--rv-muted); font-size: .82em; line-height: 1.5; }
@@ -386,12 +388,12 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
   .rv-cols > summary::after { content: ' ▾'; color: var(--rv-muted); }
   .rv-cols-menu { position: absolute; top: calc(100% + 4px); left: 0; z-index: 3; display: flex; flex-direction: column; gap: 4px; padding: 8px 12px; background: var(--rv-bg-2); border: 1px solid var(--rv-stroke); border-radius: 6px; box-shadow: 0 4px 14px rgba(0,0,0,.25); white-space: nowrap; color: var(--rv-fg); }
   .rv-cols-menu label { display: flex; gap: 6px; align-items: center; cursor: pointer; }
-  body.hide-col-due .tfm-col-due, body.hide-col-created .tfm-col-created, body.hide-col-more .tfm-col-more { display: none !important; }
+  body.hide-col-due .tfm-col-due, body.hide-col-created .tfm-col-created, body.hide-col-done .tfm-col-done, body.hide-col-more .tfm-col-more { display: none !important; }
   /* Column header over query results and note task lists (M15): titles always shown (M24); ✕, + chips and grips on hover/focus. */
   .rv-colhead { display: none; }
   li.rv-colhead { list-style: none; order: -1; padding: 0; } /* first row of a note list, also while sorted */
   li.rv-colhead + li.tfm-task { border-top-color: transparent; }
-  body.fields-columns .rv-colhead { display: grid; position: relative; grid-template-columns: var(--rv-cols, 1.4em minmax(8em, 1fr) 8.6em 8.6em minmax(0, 18em)); column-gap: .9em; align-items: center;
+  body.fields-columns .rv-colhead { display: grid; position: relative; grid-template-columns: var(--rv-cols, 1.4em minmax(8em, 1fr) 8.6em 8.6em 8.6em minmax(0, 18em)); column-gap: .9em; align-items: center;
     height: 22px; margin: 0 0 2px; overflow: hidden; color: var(--rv-muted); border-bottom: 1px solid color-mix(in srgb, var(--rv-fg) 14%, transparent); }
   body.fields-columns .rv-colhead button, body.fields-columns .rv-colhead .rv-colhead-chips, body.fields-columns .rv-colgrip::after { opacity: 0; transition: opacity .12s; }
   body.fields-columns .rv-colhead:is(:hover, :focus-within) :is(button, .rv-colhead-chips), body.rv-resizing .rv-colhead :is(button, .rv-colhead-chips) { opacity: 1; }
@@ -424,7 +426,7 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
 </style>
 <title>${t('Tasks: Rendered view')}</title>
 </head>
-<body data-l-col-width="${t('Column width')}" data-l-col-width-hint="${t('Drag to resize, double-click to fit the content')}" data-l-col-desc="${t('Description')}" data-l-col-due="${t('Due date')}" data-l-col-created="${t('Created date')}" data-l-col-more="${t('Other fields')}" data-l-col-hide="${t('Hide column')}" data-l-col-show="${t('Show column')}" data-l-edit="${t('Edit')}" data-l-postpone="${t('Postpone')}" data-l-note="${t('Add note')}" data-l-note-placeholder="${t('Note — Enter to save, Esc to cancel')}" data-l-hidden="${t('{0} hidden')}">
+<body data-l-col-width="${t('Column width')}" data-l-col-width-hint="${t('Drag to resize, double-click to fit the content')}" data-l-col-desc="${t('Description')}" data-l-col-due="${t('Due date')}" data-l-col-created="${t('Created date')}" data-l-col-done="${t('Done date')}" data-l-col-more="${t('Other fields')}" data-l-col-hide="${t('Hide column')}" data-l-col-show="${t('Show column')}" data-l-edit="${t('Edit')}" data-l-postpone="${t('Postpone')}" data-l-note="${t('Add note')}" data-l-note-placeholder="${t('Note — Enter to save, Esc to cancel')}" data-l-hidden="${t('{0} hidden')}">
 <div class="rv-tools">
   <label class="rv-select"><span>${t('Sort')}</span><select id="view-sort">
     <option value="document">${t('Document order')}</option><option value="due">${t('Due date')}</option><option value="created">${t('Created date')}</option><option value="priority">${t('Priority')}</option><option value="urgency">${t('Urgency')}</option>
@@ -436,6 +438,7 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
     <div class="rv-cols-menu">
       <label><input type="checkbox" data-col="due" checked> ${t('Due date')}</label>
       <label><input type="checkbox" data-col="created" checked> ${t('Created date')}</label>
+      <label><input type="checkbox" data-col="done" checked> ${t('Done date')}</label>
       <label><input type="checkbox" data-col="more" checked> ${t('Other fields')}</label>
     </div>
   </details>

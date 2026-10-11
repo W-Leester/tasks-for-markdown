@@ -58,9 +58,9 @@ for p in tasks-core tasks-cli tasks-api; do pnpm --filter @hastycapybara/$p publ
 ## 1.1.1 게시 (2026-10-12)
 - [x] 검증: typecheck·lint, 단위 820, 웹뷰 34, 통합 61 통과, `build:packages`, `pnpm package`(35 files, `releases/`·tgz 없음 — `vsixContents` 테스트), README에 THIRD_PARTY_NOTICES 링크
 - [x] 수동 점검: 열 이름 항상 표시·끌기(한도 포함)·더블클릭 맞춤·완료일 열(사용자, VS Code·Cursor)
-- [ ] Marketplace: *… → Update*로 `tasks-for-markdown-1.1.1.vsix` 업로드(사용자) → 공개 확인 → 파일을 `releases/tasks-for-markdown-1.1.1.marketplace.vsix`로
-- [ ] 태그 `v1.1.1` → Release 워크플로. **Open VSX 토큰 없는 게시 첫 시험** — 로그에 "trusted publishing failed" 경고가 없으면 성공
-- [ ] 확인: Open VSX·npm 3개 1.1.1, GitHub Release 파일 받아 `releases/`에
+- [x] Marketplace: *… → Update*로 `tasks-for-markdown-1.1.1.vsix` 업로드(사용자) → 06:04 KST 공개(약 6분). 마켓에서 다시 받은 파일이 업로드본과 지문까지 같음(`ad2ed84e…`) → `releases/`
+- [x] 태그 `v1.1.1` → Release 워크플로 성공(약 2분). **Open VSX 토큰 없는 게시 성공:** 로그 `🔐 Trusted publishing token issued … expires at +5분` → `🚀 Published v1.1.1`, 대비책 경고 없음
+- [x] 확인: Open VSX 1.1.1(`verified=true`), npm 3개 1.1.1(provenance), GitHub Release 파일 `releases/`에(`.github.vsix` `0ed91ddf…`)
 - [ ] 성공 시 `OVSX_PAT` Secret 삭제·Open VSX 토큰 삭제(배포 가이드 6.3)
 
 ## 보관 파일 (`releases/`, git에 안 올림)
@@ -69,6 +69,8 @@ for p in tasks-core tasks-cli tasks-api; do pnpm --filter @hastycapybara/$p publ
 
 | 버전 | 파일 | 출처 | SHA-256 |
 |---|---|---|---|
+| 1.1.1 | `tasks-for-markdown-1.1.1.marketplace.vsix` | VS Code Marketplace에 올린 파일(마켓에서 다시 받음, 업로드본과 같음) | `ad2ed84e3cae6b3b…` |
+| 1.1.1 | `tasks-for-markdown-1.1.1.github.vsix` | GitHub Release·Open VSX(Actions 빌드) | `0ed91ddfa6eadf19…` |
 | 1.1.0 | `tasks-for-markdown-1.1.0.marketplace.vsix` | VS Code Marketplace에 올린 파일(마켓에서 다시 받음) | `e979cc919ffe2d87…` |
 | 1.1.0 | `tasks-for-markdown-1.1.0.github.vsix` | GitHub Release·Open VSX(Actions 빌드) | `f45cb03d54eacaca…` |
 | 1.0.1 | `tasks-for-markdown-1.0.1.marketplace.vsix` | VS Code Marketplace에 올린 파일(마켓에서 다시 받음) | `bd43ade46bfff3a1…` |

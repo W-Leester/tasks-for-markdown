@@ -3,7 +3,7 @@
  * task rows and links go back as messages. Plain DOM — no framework needed here.
  */
 import type { FromWebview, ToWebview, WebviewApi } from '../shared/protocol';
-import { applyView, clampWidth, type ColumnWidths, columnTracks, fitWidth, HIDEABLE_COLUMNS, type HideableColumn, moveBoundary, widthOf, SCOPE_MODES, SORT_MODES, type ScopeMode, type SortMode, type ViewState } from './view';
+import { applyView, clampWidth, type ColumnWidths, columnTracks, fitWidth, HIDEABLE_COLUMNS, type HideableColumn, moveBoundary, MAX_WIDTH, widthOf, SCOPE_MODES, SORT_MODES, type ScopeMode, type SortMode, type ViewState } from './view';
 
 declare function acquireVsCodeApi(): WebviewApi;
 // Plain objects only here, so no snapshot helper (and no Svelte runtime) is needed.
@@ -52,7 +52,7 @@ function headerHtml(): string {
     HIDEABLE_COLUMNS.filter((c) => !hiddenColumns.includes(c))
       .map((c) =>
         `<span class="rv-colhead-cell">` +
-        `<span class="rv-colgrip" role="separator" aria-orientation="vertical" tabindex="0" data-col="${c}" aria-valuenow="${widthOf(c, columnWidths)}" aria-valuemin="3" aria-valuemax="40" aria-label="${esc(`${labels.lColWidth ?? 'Column width'}: ${colLabel(c)}`)}" title="${esc(labels.lColWidthHint ?? 'Drag to resize, double-click to fit the content')}"></span>` +
+        `<span class="rv-colgrip" role="separator" aria-orientation="vertical" tabindex="0" data-col="${c}" aria-valuenow="${widthOf(c, columnWidths)}" aria-valuemin="3" aria-valuemax="${MAX_WIDTH}" aria-label="${esc(`${labels.lColWidth ?? 'Column width'}: ${colLabel(c)}`)}" title="${esc(labels.lColWidthHint ?? 'Drag to resize, double-click to fit the content')}"></span>` +
         `<span class="rv-colhead-text">${esc(colLabel(c))}</span><button type="button" data-hide="${c}" title="${esc(hide)}" aria-label="${esc(`${hide}: ${colLabel(c)}`)}">✕</button></span>`)
       .join('')
   );

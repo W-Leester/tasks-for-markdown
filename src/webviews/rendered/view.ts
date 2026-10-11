@@ -111,7 +111,8 @@ export type HideableColumn = (typeof HIDEABLE_COLUMNS)[number];
 /** Default column widths in em (M16); "more" is a maximum and may shrink in narrow windows. */
 export const DEFAULT_WIDTHS: Record<HideableColumn, number> = { due: 8.6, created: 8.6, more: 18 };
 export const MIN_WIDTH = 3;
-export const MAX_WIDTH = 40;
+// 80em (M24, was 40): the last column has nothing on its right to widen, so its own limit is the drag's end.
+export const MAX_WIDTH = 80;
 export type ColumnWidths = Partial<Record<HideableColumn, number>>;
 
 /** Clamp to the allowed range, rounded to 0.1em. */
@@ -133,40 +134,51 @@ export function leftNeighbour(c: HideableColumn, hidden: readonly string[]): Hid
 
 /**
  * Move the boundary on `c`'s left edge by `d` em (positive = to the right) from the widths `start` (M24).
- * The boundary follows the pointer and the columns right of `c` never move:
- * - to the right, `c` narrows (to 3em) and the column on its left widens (to 40em) — or the description, if it is next to `c`;
- * - to the left, `c` widens (to 40em) taking width from the columns on its left, nearest first, each down to 3em,
- *   and last from the description, but only its `descRoom` em above its 8em minimum (a full description would
- *   otherwise push every column to the right, incident #34).
+ * The boundary follows the pointer until there is nothing left to narrow; the table's right edge stays put.
+ * - To the right: the columns right of the boundary narrow, nearest first (`c`, then the next ones), each to 3em;
+ *   the column on the left widens to 80em and the description takes the rest.
+ * - To the left: the columns right of the boundary widen, nearest first, each to 80em (incident #34: stopping when
+ *   `c` reached its maximum blocked the drag); the columns on the left narrow, nearest first, each to 3em, and last the
+ *   description, but only its `descRoom` em above its 8em minimum (a full description would otherwise push every
+ *   column to the right).
  */
 export function moveBoundary(c: HideableColumn, hidden: readonly string[], start: ColumnWidths, d: number, descRoom = Infinity): ColumnWidths {
   // Work in tenths of an em so the widths taken and given always add up.
   const tenth = (x: number) => Math.round(x * 10);
   const visible = HIDEABLE_COLUMNS.filter((x) => !hidden.includes(x));
-  const lefts = visible.slice(0, visible.indexOf(c)).reverse();
+  const at = visible.indexOf(c);
+  const rights = visible.slice(at); // c first
+  const lefts = visible.slice(0, at).reverse(); // nearest first
   const w: Partial<Record<HideableColumn, number>> = {};
   for (const x of visible) w[x] = tenth(widthOf(x, start));
   const min = tenth(MIN_WIDTH), max = tenth(MAX_WIDTH);
-  let step = tenth(d);
+  const step = tenth(d);
   const out: ColumnWidths = { ...start };
-  if (step > 0) {
-    const left = lefts[0];
-    step = Math.min(step, w[c]! - min, left ? max - w[left]! : Infinity);
-    if (step <= 0) return out;
-    w[c]! -= step;
-    if (left) { w[left]! += step; out[left] = w[left]! / 10; }
-  } else if (step < 0) {
-    let need = Math.min(-step, max - w[c]!);
-    let taken = 0;
-    for (const x of lefts) {
-      const give = Math.min(need, w[x]! - min);
-      if (give > 0) { w[x]! -= give; need -= give; taken += give; out[x] = w[x]! / 10; }
+  const changed = new Set<HideableColumn>();
+  /** Move up to `amount` tenths into (+) or out of (−) the columns, nearest first, within min/max; returns what moved. */
+  const spread = (cols: HideableColumn[], amount: number, sign: 1 | -1, limit: number): number => {
+    let left = amount;
+    for (const x of cols) {
+      const room = sign > 0 ? limit - w[x]! : w[x]! - limit;
+      const moved = Math.min(left, Math.max(0, room));
+      if (moved > 0) { w[x]! += sign * moved; left -= moved; changed.add(x); }
     }
-    taken += Math.min(need, Math.max(0, Math.floor(descRoom * 10)));
-    if (taken <= 0) return out;
-    w[c]! += taken;
+    return amount - left;
+  };
+  const capacity = (cols: HideableColumn[], sign: 1 | -1, limit: number) => cols.reduce((n, x) => n + Math.max(0, sign > 0 ? limit - w[x]! : w[x]! - limit), 0);
+  if (step > 0) {
+    const k = Math.min(step, capacity(rights, -1, min));
+    if (k <= 0) return out;
+    spread(rights, k, -1, min);
+    if (lefts[0]) spread([lefts[0]], k, 1, max); // the rest goes to the description
+  } else if (step < 0) {
+    const room = capacity(lefts, -1, min) + Math.max(0, Math.floor(descRoom * 10));
+    const k = Math.min(-step, capacity(rights, 1, max), room);
+    if (k <= 0) return out;
+    spread(rights, k, 1, max);
+    spread(lefts, k, -1, min); // what the columns cannot give comes from the description
   } else return out;
-  out[c] = w[c]! / 10;
+  for (const x of changed) out[x] = w[x]! / 10;
   return out;
 }
 

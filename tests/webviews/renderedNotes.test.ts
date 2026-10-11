@@ -145,11 +145,11 @@ describe('column header (M15, revised: global setting)', () => {
 });
 
 describe('column widths (M16)', () => {
-  it('columnTracks uses custom widths, clamped to 3–40em; bad values fall back to defaults', async () => {
+  it('columnTracks uses custom widths, clamped to 3–80em; bad values fall back to defaults', async () => {
     const { columnTracks, clampWidth } = await import('../../src/webviews/rendered/view');
     expect(columnTracks([], { due: 12, more: 25 })).toBe('1.4em minmax(8em, 1fr) 12em 8.6em minmax(0, 25em)');
     expect(columnTracks(['due'], { due: 12, created: 1, more: Number.NaN })).toBe('1.4em minmax(8em, 1fr) 3em minmax(0, 18em)');
-    expect(clampWidth(99)).toBe(40);
+    expect(clampWidth(99)).toBe(80);
     expect(clampWidth(10.04)).toBe(10);
   });
 
@@ -164,9 +164,12 @@ describe('column widths (M16)', () => {
     // Between due and created: due grows, created shrinks by the same amount; the total stays.
     expect(moveBoundary('created', [], {}, 2)).toEqual({ due: 10.6, created: 6.6 });
     expect(moveBoundary('created', [], { due: 10, created: 9 }, -1.25)).toEqual({ due: 8.8, created: 10.2 });
-    // Stops where either column reaches 3em or 40em.
-    expect(moveBoundary('created', [], {}, 100)).toEqual({ due: 14.2, created: 3 });
-    expect(moveBoundary('more', [], { created: 39, more: 18 }, 5)).toEqual({ created: 40, more: 17 });
+    // To the right past 3em the next columns narrow too; the left column widens to 80em, the description takes the rest.
+    expect(moveBoundary('created', [], {}, 100)).toEqual({ due: 29.2, created: 3, more: 3 });
+    expect(moveBoundary('more', [], { created: 79, more: 18 }, 5)).toEqual({ created: 80, more: 13 });
+    // To the left at its maximum the column keeps the boundary moving by widening the columns right of it (10-11 report).
+    expect(moveBoundary('due', [], { due: 79 }, -3)).toEqual({ due: 80, created: 10.6 });
+    expect(moveBoundary('due', [], { due: 80, created: 80, more: 80 }, -3)).toEqual({ due: 80, created: 80, more: 80 });
     // With created hidden, more trades with due.
     expect(moveBoundary('more', ['created'], {}, -2)).toEqual({ due: 6.6, more: 20 });
     // Dragging left keeps going: when the neighbour is at 3em the next column on the left gives, then the description.
@@ -177,7 +180,7 @@ describe('column widths (M16)', () => {
     expect(moveBoundary('due', [], {}, -5, 2)).toEqual({ due: 10.6 });
     expect(fitWidth(160, 16)).toBe(10.4);
     expect(fitWidth(0, 16)).toBe(3);
-    expect(fitWidth(2000, 16)).toBe(40);
+    expect(fitWidth(2000, 16)).toBe(80);
   });
 
   it('drag the left edge: only that boundary moves; keyboard steps; double-click fits the content; saves once per drag', async () => {

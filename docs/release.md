@@ -13,7 +13,7 @@
 ### 완료
 - [x] 수동 점검(VS Code·Cursor·원격·테마·MCP) — [manual-checklist.md](manual-checklist.md)
 - [x] 계정: Marketplace 퍼블리셔 `HastyCapybara`, Open VSX(Eclipse 계정·Publisher Agreement·네임스페이스 `HastyCapybara`), npm 사용자 `hastycapybara`(2FA 패스키)
-- [x] GitHub Secrets: `OVSX_PAT`. (`NPM_TOKEN`은 첫 게시용, 2026-10-09 삭제) `VSCE_PAT`는 없음(Azure 구독 필요 → 웹 업로드)
+- [x] GitHub Secrets: 없음(`NPM_TOKEN` 10-09, `OVSX_PAT` 10-12 삭제 — 둘 다 OIDC로 대체) `VSCE_PAT`는 없음(Azure 구독 필요 → 웹 업로드)
 - [x] 저장소 공개
 - [x] VS Code Marketplace 웹 업로드(검색어 문제 해결 후, [포스트모템](postmortems/2026-10-01-marketplace-upload-rejected.md))
 
@@ -61,7 +61,7 @@ for p in tasks-core tasks-cli tasks-api; do pnpm --filter @hastycapybara/$p publ
 - [x] Marketplace: *… → Update*로 `tasks-for-markdown-1.1.1.vsix` 업로드(사용자) → 06:04 KST 공개(약 6분). 마켓에서 다시 받은 파일이 업로드본과 지문까지 같음(`ad2ed84e…`) → `releases/`
 - [x] 태그 `v1.1.1` → Release 워크플로 성공(약 2분). **Open VSX 토큰 없는 게시 성공:** 로그 `🔐 Trusted publishing token issued … expires at +5분` → `🚀 Published v1.1.1`, 대비책 경고 없음
 - [x] 확인: Open VSX 1.1.1(`verified=true`), npm 3개 1.1.1(provenance), GitHub Release 파일 `releases/`에(`.github.vsix` `0ed91ddf…`)
-- [ ] 성공 시 `OVSX_PAT` Secret 삭제·Open VSX 토큰 삭제(배포 가이드 6.3)
+- [x] `OVSX_PAT` Secret 삭제·Open VSX 토큰 삭제(사용자, 10-12) → 저장소 Secret 0개. 워크플로의 토큰 대비책 제거
 
 ## 보관 파일 (`releases/`, git에 안 올림)
 
@@ -86,8 +86,8 @@ for p in tasks-core tasks-cli tasks-api; do pnpm --filter @hastycapybara/$p publ
 
 - [x] **npm Trusted Publishing으로 전환 — 완료(2026-10-09).** 1.0.1·1.1.0을 OIDC로 게시 확인 → GitHub Secret `NPM_TOKEN` 삭제, npm 토큰 `github-release` 폐기, 세 패키지 Publishing access를 "Require two-factor authentication and disallow bypass 2fa tokens"로(Trusted Publisher `W-Leester/tasks-for-markdown` · `release.yml` Valid 확인). 이제 npm 게시에 토큰 없음.
   - 계획: (1) 워크플로에 `permissions: id-token: write` 추가 — 첫 게시 로그의 `Skipped OIDC: ERR_PNPM_ID_TOKEN_GITHUB_WORKFLOW_INCORRECT_PERMISSIONS`가 이것 때문. pnpm이 OIDC 토큰을 받으면 토큰 없이 게시하고 출처 증명(provenance)도 붙는다. (2) npm 게시 단계를 토큰 유무와 상관없이 실행하고, `NPM_TOKEN`이 있을 때만 `.npmrc`에 쓴다(전환 확인 전까지 대비책). (3) 사용자가 npmjs.com에서 세 패키지 각각 *Settings › Trusted Publisher › GitHub Actions*: Organization or user `W-Leester`, Repository `tasks-for-markdown`, Workflow filename `release.yml`, Environment 비움. (4) 다음 게시(1.1.0)에서 로그에 OIDC 사용이 확인되면 GitHub Secret `NPM_TOKEN` 삭제 + npm에서 토큰 폐기, 각 패키지 *Publishing access*를 "Require two-factor authentication and disallow tokens"로.
-- [~] **Open VSX Trusted Publishers로 전환(10-09 진행 중).** 워크플로 준비 완료(`ovsx` 1.2.0, 토큰 없는 게시 먼저·실패하면 Secret). Open VSX Trusted Publisher 등록 완료(10-09, `GitHub · HastyCapybara/tasks-for-markdown`, `W-Leester/tasks-for-markdown` · `release.yml`). 남은 것: 다음 배포에서 확인 → `OVSX_PAT` Secret·Open VSX 토큰(만료 없음) 삭제. 절차: 배포 가이드 6.3
-- [ ] 전환 전까지는 토큰 만료일을 달력에 적어 두고, 만료되면 새로 발급해 GitHub Secret만 바꾼다.
+- [x] **Open VSX Trusted Publishers로 전환 — 완료(2026-10-12).** 1.1.1을 토큰 없이 게시 확인 → `OVSX_PAT` Secret·Open VSX 토큰 삭제, 워크플로는 `ovsx publish --trusted-publishing`만. **이제 배포에 저장된 토큰이 하나도 없다**(npm·Open VSX 모두 OIDC, Marketplace는 웹 업로드).
+- [x] ~~전환 전까지 토큰 만료일 관리~~ — 토큰이 없어져 필요 없음.
 - [x] **Open VSX 네임스페이스 소유권 신청**(2026-10-03 승인, #13675): VS Code Marketplace 업로드와 저장소 공개가 끝난 뒤 GitHub 이슈(Option 1 — 같은 이름의 Marketplace 퍼블리셔, 저장소는 신청자 소유)로 제출.
 
 ## 한 번만 (계정·토큰)

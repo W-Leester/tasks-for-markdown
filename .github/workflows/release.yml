@@ -13,7 +13,6 @@ jobs:
   release:
     runs-on: ubuntu-latest
     # Tokens at job level: a step's own `env` is not visible to that step's `if`.
-    # OVSX_PAT is deliberately not here: ovsx prefers OVSX_PAT over trusted publishing.
     env:
       VSCE_PAT: ${{ secrets.VSCE_PAT }}
     steps:
@@ -48,16 +47,10 @@ jobs:
       - name: Publish to VS Code Marketplace
         if: ${{ env.VSCE_PAT != '' }}
         run: pnpm exec vsce publish --no-dependencies --packagePath *.vsix
-      # Trusted publishing (OIDC, ovsx >= 1.2.0) first; the OVSX_PAT secret is only a fallback until it is confirmed.
+      # Open VSX trusted publishing (OIDC, ovsx >= 1.2.0); no token since 1.1.1 (2026-10-12). Do not add OVSX_PAT
+      # to the env: ovsx prefers a token over trusted publishing.
       - name: Publish to Open VSX
-        env:
-          FALLBACK_OVSX_PAT: ${{ secrets.OVSX_PAT }}
-        run: |
-          if ! pnpm exec ovsx publish *.vsix --trusted-publishing; then
-            if [ -z "$FALLBACK_OVSX_PAT" ]; then exit 1; fi
-            echo "::warning::Open VSX trusted publishing failed; publishing with the OVSX_PAT secret"
-            pnpm exec ovsx publish *.vsix -p "$FALLBACK_OVSX_PAT"
-          fi
+        run: pnpm exec ovsx publish *.vsix --trusted-publishing
       # npm trusted publishing (OIDC); no token since 1.1.0 (2026-10-09).
       - name: Publish npm packages
         run: |

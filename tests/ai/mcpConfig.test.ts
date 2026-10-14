@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-  ConfigParseError, claudeAddCommandWindows, claudeAddJsonArgs, claudeCodeHasServer, claudeDesktopHasServer, claudeDesktopRunningFrom, claudeAddJsonCommand, claudeDesktopConfigPath, isOurLauncher, launcherFileName, launcherScript, mergeMcpServers, pathAdvice, pickBinDir, serverName, serverSpec, shimTarget,
+  ConfigParseError, claudeAddCommandWindows, folderPathFor, claudeAddJsonArgs, claudeCodeHasServer, claudeDesktopHasServer, claudeDesktopRunningFrom, claudeAddJsonCommand, claudeDesktopConfigPath, isOurLauncher, launcherFileName, launcherScript, mergeMcpServers, pathAdvice, pickBinDir, serverName, serverSpec, shimTarget,
 } from '../../src/ai/mcpConfig';
 
 const spec = serverSpec('/Apps/Code Helper (Plugin)', '/home/u/.tasksmd/tasksmd.cjs', '/home/u/notes');
@@ -97,6 +97,14 @@ describe('M21 MCP config helpers', () => {
     expect(claudeCodeHasServer(JSON.stringify({ mcpServers: { tasks: {} } }), '/m', 'tasks')).toBe(true); // user scope
     expect(claudeCodeHasServer(undefined, '/n', 'tasks')).toBe(false);
     expect(claudeCodeHasServer('{broken', '/n', 'tasks')).toBe(false);
+    // Windows (10-14): Claude Code keys projects with forward slashes; case may differ from VS Code's fsPath.
+    const winJson = JSON.stringify({ projects: { 'C:/Users/u/Desktop/Test': { mcpServers: { tasks: {} } }, 'C:/Users/u/Other': {} } });
+    expect(claudeCodeHasServer(winJson, 'c:\\Users\\u\\Desktop\\Test', 'tasks', 'win32')).toBe(true);
+    expect(claudeCodeHasServer(winJson, 'C:\\Users\\u\\Other', 'tasks', 'win32')).toBe(false);
+    expect(claudeCodeHasServer(winJson, 'c:/users/u/desktop/test', 'tasks', 'darwin')).toBe(false); // exact elsewhere
+    expect(folderPathFor('win32', 'c:\\Users\\u\\Test')).toBe('C:\\Users\\u\\Test');
+    expect(folderPathFor('win32', '\\\\server\\share')).toBe('\\\\server\\share');
+    expect(folderPathFor('darwin', '/home/u/notes')).toBe('/home/u/notes');
     expect(claudeDesktopHasServer(JSON.stringify({ mcpServers: { tasks: {} } }), 'tasks')).toBe(true);
     expect(claudeDesktopHasServer(JSON.stringify({ mcpServers: {} }), 'tasks')).toBe(false);
     expect(claudeDesktopHasServer(undefined, 'tasks')).toBe(false);

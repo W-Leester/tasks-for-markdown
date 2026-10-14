@@ -4,10 +4,11 @@
 
 **Windows**
 - **Tasks: Connect AI agents (MCP)** now connects Claude Code on Windows. It ran `claude` through cmd.exe, which broke the quoted settings it passes, so nothing was added. `claude.exe` now starts directly, and an npm-installed `claude.cmd` runs its script on the editor's Node. The fallback command to copy uses `claude mcp add` (no JSON), which works in cmd and PowerShell.
+- Claude Code's connection is saved for the folder as your terminal names it: VS Code reports Windows folders with a lowercase drive letter (`c:\…`), so the server was stored for `c:/…` and `claude mcp list` run from `C:\…` showed nothing. The "already connected" check also never matched on Windows, so the connect prompt kept coming back.
 - Installing the `tasksmd` command explains how to add its folder to your user Path on Windows (Settings, or a PowerShell line that changes only the user Path) instead of macOS wording and `setx`, which cuts long Paths.
 
 ### 한국어 요약
-- **Windows:** Claude Code 연결이 실패하던 문제 수정(cmd.exe를 거치며 설정 인자가 깨짐 → `claude.exe`는 직접, npm `claude.cmd`는 에디터 Node로 실행). `tasksmd` 설치 후 PATH 안내를 Windows용으로(환경 변수 설정 또는 사용자 Path만 바꾸는 PowerShell 한 줄, `setx` 사용 안 함).
+- **Windows:** Claude Code 연결이 실패하던 문제 수정(cmd.exe를 거치며 설정 인자가 깨짐 → `claude.exe`는 직접, npm `claude.cmd`는 에디터 Node로 실행). `tasksmd` 설치 후 PATH 안내를 Windows용으로(환경 변수 설정 또는 사용자 Path만 바꾸는 PowerShell 한 줄, `setx` 사용 안 함). 연결이 소문자 드라이브 문자 경로(`c:/…`)에 저장돼 터미널에서 안 보이던 문제와, "이미 연결됨" 확인이 늘 실패하던 문제 수정.
 
 ## 1.1.1 — 2026-10-12
 

@@ -6,7 +6,7 @@ import * as vscode from 'vscode';
 import { t } from '../l10n';
 import type { Settings } from '../settings/Settings';
 import {
-  ConfigParseError, claudeAddJsonArgs, claudeCodeHasServer, claudeDesktopHasServer, claudeDesktopRunningFrom, claudeAddCommandWindows, claudeAddJsonCommand, claudeDesktopConfigPath, isOurLauncher, launcherFileName, launcherScript, mergeMcpServers, pathAdvice, pickBinDir, serverName, serverSpec, type McpServerSpec,
+  ConfigParseError, claudeAddJsonArgs, claudeCodeHasServer, claudeDesktopHasServer, folderPathFor, claudeDesktopRunningFrom, claudeAddCommandWindows, claudeAddJsonCommand, claudeDesktopConfigPath, isOurLauncher, launcherFileName, launcherScript, mergeMcpServers, pathAdvice, pickBinDir, serverName, serverSpec, type McpServerSpec,
 } from './mcpConfig';
 import { resolveWindowsCommand } from './winCommand';
 import { onboardingDay, shouldPrompt } from './onboardingDays';
@@ -90,7 +90,7 @@ export function registerAi(context: vscode.ExtensionContext, deps: AiDeps): AiIn
     return folders.map((f) => ({
       name: serverName(f.name, folders.length),
       label: folders.length > 1 ? `Tasks for Markdown (${f.name})` : 'Tasks for Markdown',
-      spec: serverSpec(process.execPath, bundledCli, f.uri.fsPath),
+      spec: serverSpec(process.execPath, bundledCli, folderPathFor(process.platform, f.uri.fsPath)),
     }));
   };
 
@@ -216,21 +216,22 @@ export function registerAi(context: vscode.ExtensionContext, deps: AiDeps): AiIn
     const cli = await ensureRuntime();
     const folders = localFolders();
     if (!folders.length) return void vscode.window.showWarningMessage(t('Open a folder first.'));
-    const probe = await run('claude', ['--version'], folders[0]!.uri.fsPath);
+    const probe = await run('claude', ['--version'], folderPathFor(process.platform, folders[0]!.uri.fsPath));
     const claudeJson = opts.onlyMissing ? await readText(path.join(os.homedir(), '.claude.json')) : undefined;
     let skipped = 0;
     for (const f of folders) {
       const name = serverName(f.name, folders.length);
-      if (opts.onlyMissing && claudeCodeHasServer(claudeJson, f.uri.fsPath, name)) { skipped++; continue; }
-      const spec = serverSpec(process.execPath, cli, f.uri.fsPath);
+      const dir = folderPathFor(process.platform, f.uri.fsPath);
+      if (opts.onlyMissing && claudeCodeHasServer(claudeJson, dir, name)) { skipped++; continue; }
+      const spec = serverSpec(process.execPath, cli, dir);
       if (!probe.ok) {
         const copy = t('Copy the command');
         // Windows: `claude mcp add` with plain arguments — cmd and PowerShell both mangle a quoted JSON argument.
-        const cmd = `cd ${process.platform === 'win32' ? '/d ' : ''}${JSON.stringify(f.uri.fsPath)} && ${process.platform === 'win32' ? claudeAddCommandWindows(name, spec) : claudeAddJsonCommand(name, spec)}`;
+        const cmd = `cd ${process.platform === 'win32' ? '/d ' : ''}${JSON.stringify(dir)} && ${process.platform === 'win32' ? claudeAddCommandWindows(name, spec) : claudeAddJsonCommand(name, spec)}`;
         if ((await vscode.window.showWarningMessage(t('The "claude" command was not found. Run this in a terminal to connect Claude Code: {0}', cmd), copy)) === copy) await vscode.env.clipboard.writeText(cmd);
         continue;
       }
-      const r = await run('claude', claudeAddJsonArgs(name, spec), f.uri.fsPath);
+      const r = await run('claude', claudeAddJsonArgs(name, spec), dir);
       deps.log(`claude mcp add-json ${name}: ${r.ok ? 'ok' : 'failed'} ${r.out}`);
       if (r.ok) void vscode.window.showInformationMessage(t('Connected Claude Code to "{0}" (server "{1}", this project on this computer). Start a new Claude Code session to use it.', f.name, name));
       else void vscode.window.showWarningMessage(t('Claude Code: {0}', r.out));
@@ -271,7 +272,7 @@ export function registerAi(context: vscode.ExtensionContext, deps: AiDeps): AiIn
     try {
       for (const f of folders) {
         const name = serverName(f.name, folders.length);
-        text = mergeMcpServers(text, 'mcpServers', name, serverSpec(process.execPath, cli, f.uri.fsPath)).text;
+        text = mergeMcpServers(text, 'mcpServers', name, serverSpec(process.execPath, cli, folderPathFor(process.platform, f.uri.fsPath))).text;
         names.push(name);
       }
     } catch (err) {
@@ -287,7 +288,7 @@ export function registerAi(context: vscode.ExtensionContext, deps: AiDeps): AiIn
     const fresh = (await exists(file)) ? await fs.readFile(file, 'utf8') : undefined;
     if (fresh !== before) {
       text = fresh;
-      for (const f of folders) text = mergeMcpServers(text, 'mcpServers', serverName(f.name, folders.length), serverSpec(process.execPath, cli, f.uri.fsPath)).text;
+      for (const f of folders) text = mergeMcpServers(text, 'mcpServers', serverName(f.name, folders.length), serverSpec(process.execPath, cli, folderPathFor(process.platform, f.uri.fsPath))).text;
     }
     if (fresh !== undefined) await fs.writeFile(`${file}.bak`, fresh);
     await fs.writeFile(file, text!);
@@ -312,7 +313,7 @@ export function registerAi(context: vscode.ExtensionContext, deps: AiDeps): AiIn
     const desktopText = hasDesktop ? await readText(desktopFile!) : undefined;
     return {
       folders, desktopFile, hasCode, hasDesktop,
-      codeConnected: hasCode && names.length > 0 && names.every(({ f, name }) => claudeCodeHasServer(claudeJson, f.uri.fsPath, name)),
+      codeConnected: hasCode && names.length > 0 && names.every(({ f, name }) => claudeCodeHasServer(claudeJson, folderPathFor(process.platform, f.uri.fsPath), name)),
       desktopConnected: hasDesktop && names.length > 0 && names.every(({ name }) => claudeDesktopHasServer(desktopText, name)),
     };
   };

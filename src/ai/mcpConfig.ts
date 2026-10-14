@@ -149,14 +149,25 @@ function parseObject(text: string | undefined): Record<string, unknown> | undefi
 const hasKey = (o: unknown, name: string) => !!o && typeof o === 'object' && name in (o as Record<string, unknown>);
 
 /**
- * Whether Claude Code already has server `name` for `folder` — read-only look at `~/.claude.json`:
- * local scope `projects[folder].mcpServers`, or the user scope `mcpServers`.
+ * A folder path as a terminal shows it. On Windows VS Code's `fsPath` has a lowercase drive letter (`c:\…`) but
+ * terminals use `C:\…`; Claude Code keys its per-project settings by the exact path, so a server added from
+ * `c:\…` did not show in `claude mcp list` run from `C:\…` (10-14 Windows check).
  */
-export function claudeCodeHasServer(claudeJson: string | undefined, folder: string, name: string): boolean {
+export function folderPathFor(platform: NodeJS.Platform, fsPath: string): string {
+  return platform === 'win32' ? fsPath.replace(/^([a-z]):/, (_, d: string) => `${d.toUpperCase()}:`) : fsPath;
+}
+
+/**
+ * Whether Claude Code already has server `name` for `folder` — read-only look at `~/.claude.json`:
+ * local scope `projects[folder].mcpServers`, or the user scope `mcpServers`. On Windows Claude Code writes the
+ * keys with forward slashes (`C:/Users/…`) and the case can differ, so keys are compared that way.
+ */
+export function claudeCodeHasServer(claudeJson: string | undefined, folder: string, name: string, platform: NodeJS.Platform = process.platform): boolean {
   const d = parseObject(claudeJson);
   if (!d) return false;
-  const projects = d['projects'] as Record<string, { mcpServers?: unknown }> | undefined;
-  return hasKey(projects?.[folder]?.mcpServers, name) || hasKey(d['mcpServers'], name);
+  const projects = (d['projects'] ?? {}) as Record<string, { mcpServers?: unknown }>;
+  const same = (key: string) => (platform === 'win32' ? key.replace(/\\/g, '/').toLowerCase() === folder.replace(/\\/g, '/').toLowerCase() : key === folder);
+  return Object.entries(projects).some(([key, p]) => same(key) && hasKey(p?.mcpServers, name)) || hasKey(d['mcpServers'], name);
 }
 
 /** Whether Claude Desktop's config already has server `name` under `mcpServers`. */

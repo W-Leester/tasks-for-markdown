@@ -97,9 +97,13 @@ describe('M21 MCP config helpers', () => {
     expect(claudeCodeHasServer(JSON.stringify({ mcpServers: { tasks: {} } }), '/m', 'tasks')).toBe(true); // user scope
     expect(claudeCodeHasServer(undefined, '/n', 'tasks')).toBe(false);
     expect(claudeCodeHasServer('{broken', '/n', 'tasks')).toBe(false);
-    // Windows (10-14): Claude Code keys projects with forward slashes; case may differ from VS Code's fsPath.
+    // Windows (10-14): Claude Code keys projects with forward slashes and compares case-sensitively.
     const winJson = JSON.stringify({ projects: { 'C:/Users/u/Desktop/Test': { mcpServers: { tasks: {} } }, 'C:/Users/u/Other': {} } });
-    expect(claudeCodeHasServer(winJson, 'c:\\Users\\u\\Desktop\\Test', 'tasks', 'win32')).toBe(true);
+    expect(claudeCodeHasServer(winJson, 'C:\\Users\\u\\Desktop\\Test', 'tasks', 'win32')).toBe(true);
+    expect(claudeCodeHasServer(winJson, folderPathFor('win32', 'c:\\Users\\u\\Desktop\\Test'), 'tasks', 'win32')).toBe(true);
+    // A stale lowercase-drive entry (written by 1.1.0–1.1.1) is not the folder the terminal uses.
+    const stale = JSON.stringify({ projects: { 'c:/Users/u/Desktop/Test': { mcpServers: { tasks: {} } } } });
+    expect(claudeCodeHasServer(stale, folderPathFor('win32', 'c:\\Users\\u\\Desktop\\Test'), 'tasks', 'win32')).toBe(false);
     expect(claudeCodeHasServer(winJson, 'C:\\Users\\u\\Other', 'tasks', 'win32')).toBe(false);
     expect(claudeCodeHasServer(winJson, 'c:/users/u/desktop/test', 'tasks', 'darwin')).toBe(false); // exact elsewhere
     expect(folderPathFor('win32', 'c:\\Users\\u\\Test')).toBe('C:\\Users\\u\\Test');

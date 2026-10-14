@@ -160,13 +160,15 @@ export function folderPathFor(platform: NodeJS.Platform, fsPath: string): string
 /**
  * Whether Claude Code already has server `name` for `folder` — read-only look at `~/.claude.json`:
  * local scope `projects[folder].mcpServers`, or the user scope `mcpServers`. On Windows Claude Code writes the
- * keys with forward slashes (`C:/Users/…`) and the case can differ, so keys are compared that way.
+ * keys with forward slashes (`C:/Users/…`) and matches them **case-sensitively**, so only the slashes are
+ * normalized here: ignoring case counted a stale `c:/…` entry as connected while `claude mcp list` in the
+ * terminal (`C:\…`) showed nothing (10-14). Pass `folder` through `folderPathFor` first.
  */
 export function claudeCodeHasServer(claudeJson: string | undefined, folder: string, name: string, platform: NodeJS.Platform = process.platform): boolean {
   const d = parseObject(claudeJson);
   if (!d) return false;
   const projects = (d['projects'] ?? {}) as Record<string, { mcpServers?: unknown }>;
-  const same = (key: string) => (platform === 'win32' ? key.replace(/\\/g, '/').toLowerCase() === folder.replace(/\\/g, '/').toLowerCase() : key === folder);
+  const same = (key: string) => (platform === 'win32' ? key.replace(/\\/g, '/') === folder.replace(/\\/g, '/') : key === folder);
   return Object.entries(projects).some(([key, p]) => same(key) && hasKey(p?.mcpServers, name)) || hasKey(d['mcpServers'], name);
 }
 

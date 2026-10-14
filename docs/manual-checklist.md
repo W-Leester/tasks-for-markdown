@@ -119,8 +119,9 @@ VS Code 1.138에 들어온 내장 Markdown Editor(WYSIWYG)와 `markdown.codeBloc
 
 1. [x] **Cursor 자동 등록** — Cursor에서 노트 폴더를 열고 *Cursor Settings → MCP*(또는 Tools & Integrations)에 확장이 등록한 `tasks` 서버가 보이는지, 에이전트 채팅에서 "오늘 마감인 태스크 알려 줘"가 도구를 쓰는지.
    - **결과(2026-10-07, Cursor, `examples` 폴더):** *Customize → MCPs*의 Connected에 `extension-tasks`(User, 12 tools, 1 resource, 초록). 설정 파일 수정·npm 없이 연결됨. 채팅 "미완료 태스크 중 마감일이 가장 가까운 것 3개" → 문법 안내 리소스를 먼저 읽고 `tasks_query`로 조회, "마감일 있는 미완료 15개 중" 3개를 정확히 답함. (MCP 목록 위치: 최근 Cursor는 *Cursor Settings* 왼쪽의 **Customize** → **MCPs** 탭)
-2. [-] **VS Code 에이전트 모드** — Copilot 채팅 에이전트 모드의 도구(🔧) 목록에 "Tasks for Markdown"이 있고, 처음 실행 허용 후 질문에 답하는지.
+2. [x] **VS Code 에이전트 모드** — Copilot 채팅 에이전트 모드의 도구(🔧) 목록에 "Tasks for Markdown"이 있고, 처음 실행 허용 후 질문에 답하는지.
    - **미확인(10-08):** Copilot을 쓰지 않아 화면 확인은 생략. 대신 통합 테스트가 실제 VS Code에서 등록(`vscode.lm` provider)과 서버 실행·응답을 확인한다.
+   - **결과(10-15, 1.1.2, `code serve-web` + 헤드리스 Chrome):** `MCP: List Servers`에 "Tasks for Markdown"(Stopped) → Start Server → **Running**. 신뢰되지 않은 워크스페이스에서는 목록에 없음(설계). Copilot 채팅 자체는 여전히 미확인.
 3. [x] **Claude Code 연결** — `Tasks: AI 에이전트 연결 (MCP)` → (설치돼 있으면 미리 체크됨) → 알림 확인 → 그 폴더에서 `claude mcp list`에 `tasks`가 보이는지, 새 세션에서 동작하는지.
    - **결과(10-08, Cursor, 저장소 폴더):** 첫 실행 AI 연결 알림의 Connect로 연결 → `claude mcp list`에 `tasks … mcp --root …/Tasks-like-plugin - ✔ Connected`(Cursor Helper (Plugin) + `~/.tasksmd/tasksmd.cjs`). Claude Code 세션에 `mcp__tasks__*` 도구가 나타나 `tasks_info`(1.1.0)·`tasks_query`(샘플 3개)가 정확히 동작.
 4. [x] **Claude Desktop 연결**(설치된 경우) — 같은 명령 → Claude Desktop → 확인 창 → 설정 파일에 `tasks` 추가·`.bak` 생성·다른 서버 유지 → Claude Desktop 재시작 후 동작.

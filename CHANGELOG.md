@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased (1.1.2)
+## 1.1.2 — 2026-10-15
 
 **Windows**
 - **Tasks: Connect AI agents (MCP)** now connects Claude Code on Windows. It ran `claude` through cmd.exe, which broke the quoted settings it passes, so nothing was added. `claude.exe` now starts directly, and an npm-installed `claude.cmd` runs its script on the editor's Node. The fallback command to copy (when `claude` is not on PATH) uses `claude mcp add` (no JSON) with the `--` separator quoted as `"--"`: in PowerShell an npm-installed `claude` runs through `claude.ps1`, which drops a bare `--`, so the line failed there with "unknown option '--root'". Quoted, it works in cmd and PowerShell.

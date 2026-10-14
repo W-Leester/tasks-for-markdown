@@ -55,11 +55,13 @@ for p in tasks-core tasks-cli tasks-api; do pnpm --filter @hastycapybara/$p publ
 - [x] 확인: Open VSX 1.1.0(`verified=true`), npm `tasks-core`·`tasks-cli`·`tasks-api` 1.1.0(provenance 모두 있음), `tasks-cli`에 THIRD_PARTY_NOTICES. **`tasks-api`만 레지스트리 반영이 약 4분 늦음**(로그는 09:47 Published, 목록은 09:52) — 기다리면 됨
 - [x] 설치본 교체: 개발용 vsix 대신 마켓 설치본(VS Code는 Marketplace, Cursor는 Open VSX) — 2026-10-09 사용자
 
-## 1.1.2 게시 준비 (2026-10-15)
+## 1.1.2 게시 (2026-10-15)
 - [x] 검증: typecheck·lint, 단위 825, 웹뷰 34, 통합 61 통과, `pnpm package`(35 files)
 - [x] Windows(사용자, 1.1.2 개발판 3차): Connect → "Connected Claude Code to "Test"", `claude mcp list`에 `tasks` ✅. 다른 Windows 11 PC: 런처·MCP 서버 본체 ✅, 복사용 명령 `"--"` 수정(2d561a1)
 - [x] **실제 VS Code(macOS, `code serve-web` 1.140 + 헤드리스 Chrome, 격리된 HOME)에서 1.1.2 확인:** 활성화(상태 표시줄 Open 20·사이드바 7개 보기), 신뢰 후 AI 연결 선택 창("Visual Studio Code: connected automatically", Claude Code `connected`·Claude Desktop `connected — choose it to update`, 체크 없음), `tasksmd` 설치(macOS 안내·`export PATH` 줄, 런처·runtime 생성), **MCP: List Servers → "Tasks for Markdown" Stopped → Start → Running**, 렌더 보기(열 제목 5개 항상 표시, 완료일 셀, 손잡이). 신뢰 전에는 "off in untrusted workspaces"·서버 미등록(설계대로)
-- [ ] Marketplace 업로드(사용자) → 태그 `v1.1.2` → Open VSX(토큰 없이)·npm 확인 → `releases/`
+- [x] CHANGELOG 날짜(2026-10-15), 최종 vsix(35 files)
+- [ ] Marketplace: *… → Update*로 `tasks-for-markdown-1.1.2.vsix` 업로드(사용자) → 공개 확인 → `releases/…marketplace.vsix`
+- [ ] 태그 `v1.1.2` → Release 워크플로(Open VSX 토큰 없이 — 대비책 없는 첫 배포, npm 3개) → 확인 → GitHub Release 파일 `releases/`에
 
 ## 1.1.1 게시 (2026-10-12)
 - [x] 검증: typecheck·lint, 단위 820, 웹뷰 34, 통합 61 통과, `build:packages`, `pnpm package`(35 files, `releases/`·tgz 없음 — `vsixContents` 테스트), README에 THIRD_PARTY_NOTICES 링크

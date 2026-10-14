@@ -900,7 +900,7 @@ vsix ── dist/extension.js
     ELECTRON_RUN_AS_NODE=1 exec "<execPath>" "$HOME/.tasksmd/tasksmd.cjs" "$@"
     ```
     `<execPath>`는 설치 시점 값. 켜질 때 `runtime.json`과 함께, 우리 런처(첫 두 줄로 식별)가 있으면 다시 써서 에디터를 옮겨도 따라간다. Windows는 `tasksmd.cmd`(`set ELECTRON_RUN_AS_NODE=1` + `"<execPath>" "%USERPROFILE%\.tasksmd\tasksmd.cjs" %*`).
-  - 설치 위치: PATH에 들어 있는 사용자 폴더(`~/.local/bin`, `~/bin`) 중 첫 번째. 없으면 `~/.local/bin`에 만들고 셸 설정에 넣을 한 줄(`export PATH="$HOME/.local/bin:$PATH"`)을 복사 버튼과 함께 보여 준다(셸 파일은 직접 고치지 않음). 같은 이름의 **우리 것이 아닌 파일이 있으면 덮어쓰지 않는다.**
+  - 설치 위치: PATH에 들어 있는 사용자 폴더(`~/.local/bin`, `~/bin`) 중 첫 번째. 없으면 `~/.local/bin`에 만들고 셸 설정에 넣을 한 줄(`export PATH="$HOME/.local/bin:$PATH"`)을 복사 버튼과 함께 보여 준다. **M25(1.1.3):** 설치하면 `environmentVariableCollection.prepend('PATH', …)`로 이 에디터의 새 통합 터미널에 바로 적용(영구, 제거 시 삭제). Windows는 사용자 Path(`HKCU\Environment\Path`, REG_EXPAND_SZ 유지, 중복 없이 덧붙임, `WM_SETTINGCHANGE` 방송)까지 PowerShell로 직접 추가·제거 — `setx` 금지(1024자 절단). 셸 설정 파일은 어느 플랫폼에서도 고치지 않는다(셸 파일은 직접 고치지 않음). 같은 이름의 **우리 것이 아닌 파일이 있으면 덮어쓰지 않는다.**
 - **`Tasks: Connect AI agents (MCP)`.** 다중 선택 QuickPick.
   - VS Code / Cursor: 상태는 입력란 안내 문구(placeholder)에 "Cursor: 자동으로 연결됨"(구분 제목은 아래 항목이 없으면 그려지지 않음, incidents #31). 자동 연결이 꺼져 있을 때만 "Cursor" 제목 아래 "자동 연결 다시 켜기" 항목.
   - 각 도구 상태(10-08): 설치됐고 아직 연결 안 됨 → 미리 체크 / 이미 연결됨 → "연결됨", 체크 안 함 / 설치 안 됨 → "설치되지 않음". 연결 여부는 알림(C)과 같은 함수로 읽기만 한다.

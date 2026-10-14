@@ -144,6 +144,8 @@ VS Code 1.138에 들어온 내장 Markdown Editor(WYSIWYG)와 `markdown.codeBloc
    - **1.1.0 배포 후로 미룸(10-08 결정):** 기본 기능은 10-01 원격 점검(2-2) 통과. localhost로는 서버가 원격·내 컴퓨터 어느 쪽에서 실행되는지 구분이 안 돼 다시 하지 않음 → 진짜 원격 환경이 생기거나 사용자 보고가 오면 확인. 사용자 가이드에 "확인 전"과 우회 방법을 적음(알려진 한계).
 12. [-] **Windows**(가능하면) — 런처 `tasksmd.cmd`, PATH 안내, Claude Desktop 경로(`%APPDATA%\Claude`). 확인 전까지 알려진 한계.
    - **1.1.0 배포 후로 미룸(10-08 결정):** Windows 환경 없음. 런처 내용·PATH 판단·설정 경로·실행 확인(`tasklist`)은 단위 테스트로 확인. 사용자 가이드에 "확인 전"을 적음.
+   - **10-14 Windows 점검(사용자, 1.1.1):** Claude Code 연결 실패(`claude mcp list` 비어 있음), PATH 안내가 macOS 문구+`setx` → 1.1.2로 고침(incidents #36).
+   - **10-14 다시 점검(1.1.2 개발판):** 연결 알림의 Connect → "Connected Claude Code to "Test" (server "tasks" …)" ✅. `tasksmd` 설치 → Windows 전용 안내(환경 변수 편집 또는 사용자 Path만 바꾸는 PowerShell 한 줄) ✅. 남은 확인: `claude mcp list`·Claude Code 세션 응답, PATH 반영 후 `tasksmd --help`, MCP 서버 목록, Claude Desktop(설정 파일 위치·실행 중 감지), 링크
 
 ## 결과 기록
 

@@ -60,8 +60,8 @@ for p in tasks-core tasks-cli tasks-api; do pnpm --filter @hastycapybara/$p publ
 - [x] Windows(사용자, 1.1.2 개발판 3차): Connect → "Connected Claude Code to "Test"", `claude mcp list`에 `tasks` ✅. 다른 Windows 11 PC: 런처·MCP 서버 본체 ✅, 복사용 명령 `"--"` 수정(2d561a1)
 - [x] **실제 VS Code(macOS, `code serve-web` 1.140 + 헤드리스 Chrome, 격리된 HOME)에서 1.1.2 확인:** 활성화(상태 표시줄 Open 20·사이드바 7개 보기), 신뢰 후 AI 연결 선택 창("Visual Studio Code: connected automatically", Claude Code `connected`·Claude Desktop `connected — choose it to update`, 체크 없음), `tasksmd` 설치(macOS 안내·`export PATH` 줄, 런처·runtime 생성), **MCP: List Servers → "Tasks for Markdown" Stopped → Start → Running**, 렌더 보기(열 제목 5개 항상 표시, 완료일 셀, 손잡이). 신뢰 전에는 "off in untrusted workspaces"·서버 미등록(설계대로)
 - [x] CHANGELOG 날짜(2026-10-15), 최종 vsix(35 files)
-- [ ] Marketplace: *… → Update*로 `tasks-for-markdown-1.1.2.vsix` 업로드(사용자) → 공개 확인 → `releases/…marketplace.vsix`
-- [ ] 태그 `v1.1.2` → Release 워크플로(Open VSX 토큰 없이 — 대비책 없는 첫 배포, npm 3개) → 확인 → GitHub Release 파일 `releases/`에
+- [x] Marketplace: 업로드(사용자) → 07:37 KST 공개(약 7분). 마켓에서 다시 받은 파일이 업로드본과 지문까지 같음(`bef51d09…`) → `releases/`
+- [x] 태그 `v1.1.2` → Release 성공(약 2분). **Open VSX 토큰 없이(대비책 없는 첫 배포) `🔐 token issued → 🚀 Published v1.1.2`**, npm 3개 provenance. 확인: Open VSX 1.1.2(`verified=true`), npm `tasks-core`·`tasks-cli`·`tasks-api` 1.1.2. GitHub Release 파일 `releases/`(`.github.vsix` `9b374cf8…`)
 
 ## 1.1.1 게시 (2026-10-12)
 - [x] 검증: typecheck·lint, 단위 820, 웹뷰 34, 통합 61 통과, `build:packages`, `pnpm package`(35 files, `releases/`·tgz 없음 — `vsixContents` 테스트), README에 THIRD_PARTY_NOTICES 링크
@@ -77,6 +77,8 @@ for p in tasks-core tasks-cli tasks-api; do pnpm --filter @hastycapybara/$p publ
 
 | 버전 | 파일 | 출처 | SHA-256 |
 |---|---|---|---|
+| 1.1.2 | `tasks-for-markdown-1.1.2.marketplace.vsix` | VS Code Marketplace에 올린 파일(마켓에서 다시 받음, 업로드본과 같음) | `bef51d09d6dff221…` |
+| 1.1.2 | `tasks-for-markdown-1.1.2.github.vsix` | GitHub Release·Open VSX(Actions 빌드) | `9b374cf81b9bc210…` |
 | 1.1.1 | `tasks-for-markdown-1.1.1.marketplace.vsix` | VS Code Marketplace에 올린 파일(마켓에서 다시 받음, 업로드본과 같음) | `ad2ed84e3cae6b3b…` |
 | 1.1.1 | `tasks-for-markdown-1.1.1.github.vsix` | GitHub Release·Open VSX(Actions 빌드) | `0ed91ddfa6eadf19…` |
 | 1.1.0 | `tasks-for-markdown-1.1.0.marketplace.vsix` | VS Code Marketplace에 올린 파일(마켓에서 다시 받음) | `e979cc919ffe2d87…` |

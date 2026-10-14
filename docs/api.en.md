@@ -229,6 +229,7 @@ claude mcp add tasks -- npx -y @hastycapybara/tasks-cli mcp --root "$PWD"
 # built from the repository instead of npm
 claude mcp add tasks -- node /path/to/packages/cli/dist/tasksmd.cjs mcp --root "$PWD"
 ```
+In Windows PowerShell an npm-installed `claude` runs through `claude.ps1`, which drops a bare `--`, so the line fails with "unknown option '--root'". Write `"--"` instead of `--` (it works in cmd too).
 Cursor: `.cursor/mcp.json`:
 ```json
 { "mcpServers": { "tasks": { "command": "npx", "args": ["-y", "@hastycapybara/tasks-cli", "mcp", "--root", "${workspaceFolder}"] } } }

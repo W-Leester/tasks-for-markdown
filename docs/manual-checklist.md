@@ -146,6 +146,7 @@ VS Code 1.138에 들어온 내장 Markdown Editor(WYSIWYG)와 `markdown.codeBloc
    - **1.1.0 배포 후로 미룸(10-08 결정):** Windows 환경 없음. 런처 내용·PATH 판단·설정 경로·실행 확인(`tasklist`)은 단위 테스트로 확인. 사용자 가이드에 "확인 전"을 적음.
    - **10-14 Windows 점검(사용자, 1.1.1):** Claude Code 연결 실패(`claude mcp list` 비어 있음), PATH 안내가 macOS 문구+`setx` → 1.1.2로 고침(incidents #36).
    - **10-14 다시 점검(1.1.2 개발판):** 연결 알림의 Connect → "Connected Claude Code to "Test" (server "tasks" …)" ✅. `tasksmd` 설치 → Windows 전용 안내(환경 변수 편집 또는 사용자 Path만 바꾸는 PowerShell 한 줄) ✅. 남은 확인: `claude mcp list`·Claude Code 세션 응답, PATH 반영 후 `tasksmd --help`, MCP 서버 목록, Claude Desktop(설정 파일 위치·실행 중 감지), 링크
+   - **10-15 실제 Windows 11 PC(Cursor, 마켓플레이스 1.1.1, Claude Code 2.1.39 npm 설치):** 런처 `tasksmd.cmd`로 `--help`·`info`·`list` ✅, MCP 서버 stdio(initialize → 도구 12개, `tasks_query` 70건) ✅. 등록은 1.1.1 그대로 실패("Invalid configuration")하고 reload마다 연결을 물음(incidents #36 그대로). 1.1.2의 복사용 명령을 PowerShell에 붙이면 "unknown option '--root'" → `"--"`로 고침(incidents #36 네 번째). 서버 "tasks"를 손으로 등록해 `claude mcp list` ✓ Connected, 사용자 Path 추가 후 새 PATH에서 `tasksmd info` ✅. 남은 확인: 1.1.2 vsix를 이 PC에 설치해 시작 알림이 안 뜨는지, Connect 성공, Claude Desktop, 링크
 
 ## 결과 기록
 

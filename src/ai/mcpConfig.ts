@@ -122,12 +122,14 @@ export function shimTarget(shim: string, shimDir: string): string | undefined {
 
 /**
  * The Windows command a user can paste into cmd or PowerShell: `claude mcp add` with plain arguments, because
- * neither shell passes a JSON argument with quotes intact.
+ * neither shell passes a JSON argument with quotes intact. The `--` separator is quoted: in PowerShell an
+ * npm-installed `claude` runs through `claude.ps1`, whose `$args` drops a bare `--`, so `--root` reached
+ * Claude Code as its own option ("unknown option '--root'"). `"--"` survives both shells (10-15 Windows check).
  */
 export function claudeAddCommandWindows(name: string, spec: McpServerSpec): string {
   const q = (s: string) => (/^[\w@%+=:,./\\-]+$/.test(s) ? s : `"${s}"`);
   const env = Object.entries(spec.env).map(([k, v]) => `-e ${k}=${v}`).join(' ');
-  return ['claude', 'mcp', 'add', name, '--scope', 'local', env, '--', q(spec.command), ...spec.args.map(q)].filter(Boolean).join(' ');
+  return ['claude', 'mcp', 'add', name, '--scope', 'local', env, '"--"', q(spec.command), ...spec.args.map(q)].filter(Boolean).join(' ');
 }
 
 /** Claude Desktop's config file, or undefined on platforms it does not run on. */

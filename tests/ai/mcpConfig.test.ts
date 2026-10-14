@@ -79,9 +79,14 @@ describe('M21 MCP config helpers', () => {
     expect(shimTarget('@echo off\r\nrem nothing', 'C:\\npm')).toBeUndefined();
   });
 
-  it('gives Windows users a claude mcp add line without JSON', () => {
+  it('gives Windows users a claude mcp add line without JSON, with the -- separator quoted', () => {
     const win = serverSpec('C:\\Users\\u\\AppData\\Local\\Programs\\Microsoft VS Code\\Code.exe', 'C:\\Users\\u\\.tasksmd\\tasksmd.cjs', 'C:\\Notes\\My notes');
-    expect(claudeAddCommandWindows('tasks', win)).toBe('claude mcp add tasks --scope local -e ELECTRON_RUN_AS_NODE=1 -- "C:\\Users\\u\\AppData\\Local\\Programs\\Microsoft VS Code\\Code.exe" C:\\Users\\u\\.tasksmd\\tasksmd.cjs mcp --root "C:\\Notes\\My notes"');
+    const line = claudeAddCommandWindows('tasks', win);
+    expect(line).toBe('claude mcp add tasks --scope local -e ELECTRON_RUN_AS_NODE=1 "--" "C:\\Users\\u\\AppData\\Local\\Programs\\Microsoft VS Code\\Code.exe" C:\\Users\\u\\.tasksmd\\tasksmd.cjs mcp --root "C:\\Notes\\My notes"');
+    // A bare `--` is dropped by npm's claude.ps1 shim in PowerShell (its `$args` loses it), so `--root` would
+    // reach Claude Code as an option of `mcp add`. Quoted it survives PowerShell and cmd alike.
+    expect(line.split(' ')).not.toContain('--');
+    expect(line.split(' ')).toContain('"--"');
   });
 
   it('knows where Claude Desktop keeps its config', () => {

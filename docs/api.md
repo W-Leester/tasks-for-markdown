@@ -227,6 +227,7 @@ claude mcp add tasks -- npx -y @hastycapybara/tasks-cli mcp --root "$PWD"
 # npm에 없을 때(저장소에서 빌드한 경우)
 claude mcp add tasks -- node /경로/packages/cli/dist/tasksmd.cjs mcp --root "$PWD"
 ```
+Windows PowerShell에서 npm으로 설치한 `claude`는 `claude.ps1`을 거치면서 맨 `--`가 사라져 "unknown option '--root'"가 납니다. `--` 대신 `"--"`라고 쓰세요(cmd에서도 됩니다).
 Cursor는 `.cursor/mcp.json`:
 ```json
 { "mcpServers": { "tasks": { "command": "npx", "args": ["-y", "@hastycapybara/tasks-cli", "mcp", "--root", "${workspaceFolder}"] } } }

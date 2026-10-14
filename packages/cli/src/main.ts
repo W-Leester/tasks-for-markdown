@@ -39,6 +39,7 @@ Options:
   --today <date>    pretend today is YYYY-MM-DD
   --expect <text>   refuse the edit when the line no longer equals this text
   -h, --help        this help
+  -v, --version     print the version
 
 Lines are 1-based in <path:line>. Settings are read from <root>/.vscode/settings.json (tasksmd.*).`;
 
@@ -61,11 +62,14 @@ function parseArgs(argv: string[]): Parsed {
       if (BOOLEAN_FLAGS.has(name) || next === undefined || next.startsWith('--')) flags[name] = true;
       else { flags[name] = next; i++; }
     } else if (a === '-h') flags.help = true;
+    else if (a === '-v' || a === '-V') flags.version = true;
     else positional.push(a);
   }
   return { positional, flags };
 }
-const BOOLEAN_FLAGS = new Set(['json', 'md', 'help']);
+const BOOLEAN_FLAGS = new Set(['json', 'md', 'help', 'version']);
+/** Flags any invocation may carry; anything else without a command is a typo, not a request for the help page. */
+const GLOBAL_FLAGS = new Set(['root', 'json', 'md', 'today', 'help', 'version']);
 
 function str(flags: Parsed['flags'], name: string): string | undefined {
   const v = flags[name];
@@ -103,6 +107,12 @@ function renderQuery(r: QueryOutput, json: boolean): string[] {
 export async function run(argv: string[], io: Io, isTTY = false): Promise<number> {
   const { positional, flags } = parseArgs(argv);
   const [command, ...rest] = positional;
+  if (flags.version) { io.out(`tasksmd ${CLI_VERSION}`); return 0; }
+  if (!command && !flags.help) {
+    // `tasksmd --versoin` used to print the whole help page with no hint of what was wrong (10-15).
+    const unknown = Object.keys(flags).filter((f) => !GLOBAL_FLAGS.has(f));
+    if (unknown.length) { io.err(`Unknown option "--${unknown[0]}". Try --help.`); return 2; }
+  }
   if (!command || flags.help) { io.out(HELP); return command ? 0 : 2; }
   const json = flags.json === true ? true : flags.md === true ? false : !isTTY;
   const root = path.resolve(io.cwd, str(flags, 'root') ?? '.');

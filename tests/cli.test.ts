@@ -139,5 +139,16 @@ describe('tasksmd CLI', () => {
     out = [];
     expect(await cli('frobnicate', '--md')).toBe(2);
     expect(err[0]).toContain('Unknown command');
+    // --version prints just the version; an unknown option alone names itself instead of dumping the help page.
+    out = []; err = [];
+    expect(await cli('--version')).toBe(0);
+    expect(out).toEqual([expect.stringMatching(/^tasksmd \S+$/)]);
+    out = []; err = [];
+    expect(await cli('-v')).toBe(0);
+    expect(out[0]).toMatch(/^tasksmd /);
+    out = []; err = [];
+    expect(await cli('--versoin')).toBe(2);
+    expect(err).toEqual(['Unknown option "--versoin". Try --help.']);
+    expect(out).toEqual([]);
   });
 });

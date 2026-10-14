@@ -416,5 +416,6 @@
   "connected": "연결됨",
   "connected — choose it to update": "연결됨 — 고르면 갱신",
   "Claude Code is already connected to this folder.": "Claude Code는 이미 이 폴더에 연결돼 있습니다.",
-  "Drag to resize, double-click to fit the content": "끌어서 너비 조절, 더블클릭하면 내용에 맞춤"
+  "Drag to resize, double-click to fit the content": "끌어서 너비 조절, 더블클릭하면 내용에 맞춤",
+  "Installed the \"tasksmd\" command in {0}, which is not on your PATH yet. Add that folder to your user Path (Start → \"Edit environment variables for your account\" → Path → New), or run this line in PowerShell. Then quit and reopen the editor so new terminals see it: {1}": "\"tasksmd\" 명령을 {0}에 설치했지만 아직 PATH에 없습니다. 이 폴더를 사용자 Path에 추가하세요(시작 → \"계정의 환경 변수 편집\" → Path → 새로 만들기). 또는 PowerShell에서 이 줄을 실행하세요. 그다음 에디터를 완전히 종료했다가 다시 열어야 새 터미널에 반영됩니다: {1}"
 }

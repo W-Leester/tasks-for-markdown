@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased (1.1.2)
+
+**Windows**
+- **Tasks: Connect AI agents (MCP)** now connects Claude Code on Windows. It ran `claude` through cmd.exe, which broke the quoted settings it passes, so nothing was added. `claude.exe` now starts directly, and an npm-installed `claude.cmd` runs its script on the editor's Node. The fallback command to copy uses `claude mcp add` (no JSON), which works in cmd and PowerShell.
+- Installing the `tasksmd` command explains how to add its folder to your user Path on Windows (Settings, or a PowerShell line that changes only the user Path) instead of macOS wording and `setx`, which cuts long Paths.
+
+### 한국어 요약
+- **Windows:** Claude Code 연결이 실패하던 문제 수정(cmd.exe를 거치며 설정 인자가 깨짐 → `claude.exe`는 직접, npm `claude.cmd`는 에디터 Node로 실행). `tasksmd` 설치 후 PATH 안내를 Windows용으로(환경 변수 설정 또는 사용자 Path만 바꾸는 PowerShell 한 줄, `setx` 사용 안 함).
+
 ## 1.1.1 — 2026-10-12
 
 **Rendered view columns**

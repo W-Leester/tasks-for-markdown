@@ -6,8 +6,9 @@ import * as vscode from 'vscode';
 import { t } from '../l10n';
 import type { Settings } from '../settings/Settings';
 import {
-  ConfigParseError, claudeAddJsonArgs, claudeCodeHasServer, claudeDesktopHasServer, claudeDesktopRunningFrom, claudeAddJsonCommand, claudeDesktopConfigPath, isOurLauncher, launcherFileName, launcherScript, mergeMcpServers, pathAdvice, pickBinDir, serverName, serverSpec, type McpServerSpec,
+  ConfigParseError, claudeAddJsonArgs, claudeCodeHasServer, claudeDesktopHasServer, claudeDesktopRunningFrom, claudeAddCommandWindows, claudeAddJsonCommand, claudeDesktopConfigPath, isOurLauncher, launcherFileName, launcherScript, mergeMcpServers, pathAdvice, pickBinDir, serverName, serverSpec, type McpServerSpec,
 } from './mcpConfig';
+import { resolveWindowsCommand } from './winCommand';
 import { onboardingDay, shouldPrompt } from './onboardingDays';
 
 /**
@@ -62,9 +63,17 @@ async function readRuntime(): Promise<Runtime | undefined> {
   }
 }
 
-function run(cmd: string, args: string[], cwd: string): Promise<{ ok: boolean; out: string }> {
+async function run(cmd: string, args: string[], cwd: string): Promise<{ ok: boolean; out: string }> {
+  let file = cmd, all = args, env: NodeJS.ProcessEnv | undefined;
+  if (process.platform === 'win32') {
+    const found = await resolveWindowsCommand(cmd, process.env.PATH ?? '', process.execPath, { exists, read: (p) => fs.readFile(p, 'utf8') });
+    if (!found) return { ok: false, out: `"${cmd}" was not found on PATH` };
+    file = found.file;
+    all = [...found.pre, ...args];
+    if (found.node) env = { ...process.env, ELECTRON_RUN_AS_NODE: '1' };
+  }
   return new Promise((resolve) => {
-    execFile(cmd, args, { cwd, timeout: 30_000, shell: process.platform === 'win32' }, (err, stdout, stderr) => resolve({ ok: !err, out: `${stdout}${stderr}`.trim() || (err ? err.message : '') }));
+    execFile(file, all, { cwd, timeout: 30_000, env, windowsHide: true }, (err, stdout, stderr) => resolve({ ok: !err, out: `${stdout}${stderr}`.trim() || (err ? err.message : '') }));
   });
 }
 
@@ -180,7 +189,11 @@ export function registerAi(context: vscode.ExtensionContext, deps: AiDeps): AiIn
     }
     const copy = t('Copy the line');
     const line = pathAdvice(process.platform, dir);
-    const choice = await vscode.window.showInformationMessage(t('Installed the "tasksmd" command in {0}, which is not on your PATH yet. Add this line to your shell profile (for example ~/.zshrc), then open a new terminal: {1}', dir, line), copy);
+    const choice = await vscode.window.showInformationMessage(
+      process.platform === 'win32'
+        ? t('Installed the "tasksmd" command in {0}, which is not on your PATH yet. Add that folder to your user Path (Start → "Edit environment variables for your account" → Path → New), or run this line in PowerShell. Then quit and reopen the editor so new terminals see it: {1}', dir, line)
+        : t('Installed the "tasksmd" command in {0}, which is not on your PATH yet. Add this line to your shell profile (for example ~/.zshrc), then open a new terminal: {1}', dir, line),
+      copy);
     if (choice === copy) await vscode.env.clipboard.writeText(line);
   };
 
@@ -212,7 +225,8 @@ export function registerAi(context: vscode.ExtensionContext, deps: AiDeps): AiIn
       const spec = serverSpec(process.execPath, cli, f.uri.fsPath);
       if (!probe.ok) {
         const copy = t('Copy the command');
-        const cmd = `cd ${JSON.stringify(f.uri.fsPath)} && ${claudeAddJsonCommand(name, spec)}`;
+        // Windows: `claude mcp add` with plain arguments — cmd and PowerShell both mangle a quoted JSON argument.
+        const cmd = `cd ${process.platform === 'win32' ? '/d ' : ''}${JSON.stringify(f.uri.fsPath)} && ${process.platform === 'win32' ? claudeAddCommandWindows(name, spec) : claudeAddJsonCommand(name, spec)}`;
         if ((await vscode.window.showWarningMessage(t('The "claude" command was not found. Run this in a terminal to connect Claude Code: {0}', cmd), copy)) === copy) await vscode.env.clipboard.writeText(cmd);
         continue;
       }
@@ -230,7 +244,7 @@ export function registerAi(context: vscode.ExtensionContext, deps: AiDeps): AiIn
       const r = await run('pgrep', ['-fl', 'Claude.app/Contents/MacOS/Claude'], os.homedir());
       return r.ok && claudeDesktopRunningFrom('darwin', r.out);
     }
-    if (process.platform === 'win32') return claudeDesktopRunningFrom('win32', (await run('tasklist', ['/FI', '"IMAGENAME eq Claude.exe"', '/NH'], os.homedir())).out);
+    if (process.platform === 'win32') return claudeDesktopRunningFrom('win32', (await run('tasklist', ['/FI', 'IMAGENAME eq Claude.exe', '/NH'], os.homedir())).out);
     return false;
   };
   /** Claude Desktop rewrites its config from memory while it runs (incident #32): only write once it is closed. */

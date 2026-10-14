@@ -1083,8 +1083,8 @@
 - [ ] **원격(SSH)에서 MCP 자동 연결:** Cursor·VS Code가 확장이 등록한 서버를 원격에서 실행하는지(localhost로는 구분 불가 → 진짜 원격 환경이나 사용자 보고로). 안 되면 원격용 등록 방식 검토
 - [ ] **Windows:** `tasksmd.cmd` 설치·PATH 안내, `tasksmd --help`, Claude Desktop(`%APPDATA%\Claude`) 연결·실행 중 감지
   - **10-14 Windows 점검(사용자)에서 실패 2건 → 1.1.2로 고침:**
-  - [ ] **Claude Code 연결 실패:** 알림의 연결 → 실패, `claude mcp list`는 "No MCP servers configured". 원인: Windows에서 `execFile(..., { shell: true })`로 실행해 인자가 이스케이프 없이 cmd.exe 명령줄로 합쳐짐 → `add-json`의 JSON(공백 든 `Code.exe` 경로, 따옴표)이 깨짐. 고침: 명령을 PATH·PATHEXT로 찾아 `.exe`면 셸 없이 바로, `.cmd`/`.bat`(npm 설치본 `claude.cmd`)이면 `cmd.exe /d /s /c "…"`에 인자마다 cmd 이스케이프(cross-spawn과 같은 규칙, `.cmd`는 메타 문자 두 번)·`windowsVerbatimArguments`. `tasklist` 인자도 셸 없이 맞게. 이스케이프는 순수 함수로 단위 테스트
-  - [ ] **PATH 안내가 macOS 문구:** "셸 설정 파일(~/.zshrc)에 넣으세요 + `setx PATH "%PATH%;…"`". `setx`는 1024자에서 자르고 시스템 PATH를 사용자 PATH에 섞음 → Windows 전용 안내: "시작 → 계정의 환경 변수 편집 → Path → 새로 만들기"와 사용자 PATH에만 덧붙이는 PowerShell 한 줄(`[Environment]::SetEnvironmentVariable('Path', … 'User')`) 복사, "에디터를 완전히 다시 켜야 새 터미널에 반영"
+  - [x] **Claude Code 연결 실패:** 알림의 연결 → 실패, `claude mcp list`는 "No MCP servers configured". 원인: Windows에서 `execFile(..., { shell: true })`로 실행해 인자가 이스케이프 없이 cmd.exe 명령줄로 합쳐짐 → `add-json`의 JSON(공백 든 `Code.exe` 경로, 따옴표)이 깨짐. 고침: 명령을 PATH·PATHEXT로 찾아 `.exe`면 셸 없이 바로, `.cmd`/`.bat`(npm 설치본 `claude.cmd`)이면 `cmd.exe /d /s /c "…"`에 인자마다 cmd 이스케이프(cross-spawn과 같은 규칙, `.cmd`는 메타 문자 두 번)·`windowsVerbatimArguments`. `tasklist` 인자도 셸 없이 맞게. 이스케이프는 순수 함수로 단위 테스트. **구현은 바꿈:** cmd.exe 이스케이프는 Windows 없이 검증할 수 없어 쓰지 않고, `.cmd` 심(shim)이 가리키는 스크립트를 에디터 Node로 직접 실행(`winCommand.ts`, 가짜 파일 시스템 테스트). 복사용 명령은 JSON 없는 `claude mcp add`. incidents #36
+  - [x] **PATH 안내가 macOS 문구:** "셸 설정 파일(~/.zshrc)에 넣으세요 + `setx PATH "%PATH%;…"`". `setx`는 1024자에서 자르고 시스템 PATH를 사용자 PATH에 섞음 → Windows 전용 안내: "시작 → 계정의 환경 변수 편집 → Path → 새로 만들기"와 사용자 PATH에만 덧붙이는 PowerShell 한 줄(`[Environment]::SetEnvironmentVariable('Path', … 'User')`) 복사, "에디터를 완전히 다시 켜야 새 터미널에 반영"
 
 
 ## 향후 후보 (미착수)

@@ -98,10 +98,36 @@ export function pickBinDir(platform: NodeJS.Platform, home: string, pathEnv: str
   return { dir: path.posix.join(home, '.local', 'bin'), onPath: false };
 }
 
-/** The line to add to a shell profile (or the Windows step) when the folder is not on PATH yet. */
+/**
+ * The line to add to a shell profile, or on Windows a PowerShell line that appends the folder to the *user* Path
+ * only. Not `setx PATH "%PATH%;…"`: setx cuts the value at 1024 characters and copies the system Path into the
+ * user Path (10-14 Windows check).
+ */
 export function pathAdvice(platform: NodeJS.Platform, dir: string): string {
-  if (platform === 'win32') return `setx PATH "%PATH%;${dir}"`;
+  if (platform === 'win32') {
+    const d = dir.replace(/'/g, "''");
+    return `[Environment]::SetEnvironmentVariable('Path', [Environment]::GetEnvironmentVariable('Path', 'User') + ';${d}', 'User')`;
+  }
   return `export PATH="${dir}:$PATH"`;
+}
+
+/**
+ * What an npm `.cmd` shim runs (`"%dp0%\node_modules\…\cli.js" %*`), as an absolute path — so it can be run
+ * with our own Node instead of through cmd.exe, which mangles quoted arguments such as JSON (10-14 Windows check).
+ */
+export function shimTarget(shim: string, shimDir: string): string | undefined {
+  const m = /"%~?dp0%?\\?([^"%]+\.(?:c|m)?js)"/i.exec(shim) ?? /"%~?dp0%?\\?(node_modules\\[^"%]+\.exe)"/i.exec(shim);
+  return m ? path.win32.join(shimDir, m[1]!) : undefined;
+}
+
+/**
+ * The Windows command a user can paste into cmd or PowerShell: `claude mcp add` with plain arguments, because
+ * neither shell passes a JSON argument with quotes intact.
+ */
+export function claudeAddCommandWindows(name: string, spec: McpServerSpec): string {
+  const q = (s: string) => (/^[\w@%+=:,./\\-]+$/.test(s) ? s : `"${s}"`);
+  const env = Object.entries(spec.env).map(([k, v]) => `-e ${k}=${v}`).join(' ');
+  return ['claude', 'mcp', 'add', name, '--scope', 'local', env, '--', q(spec.command), ...spec.args.map(q)].filter(Boolean).join(' ');
 }
 
 /** Claude Desktop's config file, or undefined on platforms it does not run on. */

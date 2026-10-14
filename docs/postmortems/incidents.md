@@ -259,3 +259,10 @@ Tasks for Markdown을 만들며(2026-09-21 ~) 겪은 실패를 모아 둔 문서
 - **해결:** `.vscodeignore`에 `releases/**`, `*.tgz`. **허용 목록 테스트** `tests/vsixContents.test.ts`(`vsce ls` 결과가 dist·media·l10n·package·README·CHANGELOG·LICENSE·NOTICE·THIRD_PARTY_NOTICES 밖이면 실패) — 고치기 전 상태에서 실패하는 것 확인.
 - **재발 방지:** 저장소 루트에 폴더·파일을 새로 둘 때는 `.gitignore`와 `.vscodeignore` 둘 다. 패키징 출력의 파일 수·크기를 매번 본다.
 
+## 36. Windows에서 Claude Code 연결 실패, PATH 안내가 macOS 문구 (10-14, 1.1.0~1.1.1)
+- **증상(사용자 Windows 점검):** 첫 실행 알림의 연결 → "제대로 설치가 안 됐다", `claude mcp list`는 "No MCP servers configured". `tasksmd` 설치 알림은 "셸 설정 파일(~/.zshrc)에 넣으세요: `setx PATH "%PATH%;…"`".
+- **원인:** (1) 외부 명령을 Windows에서 `execFile(..., { shell: true })`로 실행 — Node는 셸 모드에서 인자를 이스케이프 없이 cmd.exe 명령줄로 이어 붙인다. `claude mcp add-json`의 JSON(따옴표, 공백 든 `…\Microsoft VS Code\Code.exe`)이 깨졌다. npm으로 깐 `claude`는 `claude.cmd`라 셸 없이는 Node가 실행을 거부해서 셸을 켰던 것. `tasklist` 인자도 셸 기준으로 따옴표를 붙여 두었다. (2) PATH 안내 문장이 플랫폼 구분 없이 macOS 기준이었고, Windows 줄은 `setx`(1024자 절단, 시스템 Path를 사용자 Path로 복사).
+- **왜 못 잡았나:** Windows 코드는 순수 함수(런처 내용·경로) 단위 테스트만 있었고, 프로세스 실행과 화면 문구는 Windows에서 돌려 본 적이 없다("확인 전까지 알려진 한계"로 둔 상태로 1.1.0 배포).
+- **해결(1.1.2):** cmd.exe를 거치지 않는다 — PATH에서 `.exe`를 찾으면 바로, npm `.cmd` 심(shim)이면 심이 실행할 스크립트(`…\cli.js`)를 읽어 에디터 Node로(`src/ai/winCommand.ts`, 파일 접근을 주입해 가짜 Windows 파일 시스템으로 테스트). 복사용 명령은 JSON 없는 `claude mcp add … -e ELECTRON_RUN_AS_NODE=1 -- …`. PATH 안내는 Windows 전용 문장 + 사용자 Path만 바꾸는 PowerShell 한 줄.
+- **재발 방지:** Windows에서 외부 명령을 실행할 때 `shell: true`를 쓰지 않는다(인자가 이스케이프되지 않음). 플랫폼별 문구는 플랫폼마다 따로 쓴다. "Windows 미확인" 상태의 기능은 배포 후 가장 먼저 실제 Windows에서 점검한다.
+

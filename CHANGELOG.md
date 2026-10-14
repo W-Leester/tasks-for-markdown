@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased (1.1.3)
+
+**`tasksmd` in one step**
+- Installing the `tasksmd` command now makes it available in this editor's new terminals right away, on every platform (no restart, no shell profile edits). On Windows the extension also adds the folder to your user Path, so terminals opened from Start work too; uninstalling removes both.
+
+### 한국어 요약
+- **`tasksmd` 설치 한 번에:** 설치하면 이 에디터의 새 터미널에서 바로 동작(모든 플랫폼, 재시작·셸 설정 편집 없음). Windows는 사용자 Path에도 자동 추가(제거하면 함께 삭제).
+
 ## 1.1.2 — 2026-10-15
 
 **Windows**

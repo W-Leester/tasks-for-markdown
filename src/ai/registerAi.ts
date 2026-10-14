@@ -6,7 +6,7 @@ import * as vscode from 'vscode';
 import { t } from '../l10n';
 import type { Settings } from '../settings/Settings';
 import {
-  ConfigParseError, claudeAddJsonArgs, claudeCodeHasServer, claudeDesktopHasServer, folderPathFor, claudeDesktopRunningFrom, claudeAddCommandWindows, claudeAddJsonCommand, claudeDesktopConfigPath, isOurLauncher, launcherFileName, launcherScript, mergeMcpServers, pathAdvice, pickBinDir, serverName, serverSpec, type McpServerSpec,
+  ConfigParseError, claudeAddJsonArgs, claudeCodeHasServer, claudeDesktopHasServer, folderPathFor, claudeDesktopRunningFrom, claudeAddCommandWindows, claudeAddJsonCommand, claudeDesktopConfigPath, isOurLauncher, launcherFileName, launcherScript, mergeMcpServers, pathAdvice, pickBinDir, userPathScript, serverName, serverSpec, type McpServerSpec,
 } from './mcpConfig';
 import { resolveWindowsCommand } from './winCommand';
 import { onboardingDay, shouldPrompt } from './onboardingDays';
@@ -162,6 +162,8 @@ export function registerAi(context: vscode.ExtensionContext, deps: AiDeps): AiIn
   // Only refresh what the user already set up; never create ~/.tasksmd on our own.
   if (context.extensionMode !== vscode.ExtensionMode.Test) {
     void exists(STABLE_DIR()).then((has) => (has ? ensureRuntime() : undefined)).catch((err) => deps.log(`runtime refresh: ${String(err)}`));
+    // Installs from before M25 had no terminal PATH entry; a removed launcher drops it.
+    void readRuntime().then(async (rt) => terminalPath(rt?.launcher && (await exists(rt.launcher)) ? path.dirname(rt.launcher) : undefined)).catch((err) => deps.log(`terminal PATH: ${String(err)}`));
   }
 
   // ---- commands ---------------------------------------------------------------------------------
@@ -183,19 +185,38 @@ export function registerAi(context: vscode.ExtensionContext, deps: AiDeps): AiIn
     const rt = await readRuntime();
     await fs.writeFile(RUNTIME_FILE(), JSON.stringify({ ...rt, version, execPath: process.execPath, launcher: target }, null, 2) + '\n');
     deps.log(`installed launcher ${target}`);
+    terminalPath(dir);
     if (onPath) {
       void vscode.window.showInformationMessage(t('Installed the "tasksmd" command ({0}). Open a new terminal and run: tasksmd --help', target));
       return;
+    }
+    if (process.platform === 'win32') {
+      // Other terminals too: the folder goes into the user Path, as the Settings dialog would do it (M25).
+      const r = await runPowerShell(userPathScript('add', dir));
+      deps.log(`user Path add ${dir}: ${r.ok ? 'ok' : 'failed'} ${r.out}`);
+      if (r.ok) {
+        void vscode.window.showInformationMessage(t('Installed the "tasksmd" command. New terminals in this editor can use it right away; other terminals can once you open them again (the folder was added to your user Path).'));
+        return;
+      }
     }
     const copy = t('Copy the line');
     const line = pathAdvice(process.platform, dir);
     const choice = await vscode.window.showInformationMessage(
       process.platform === 'win32'
-        ? t('Installed the "tasksmd" command in {0}, which is not on your PATH yet. Add that folder to your user Path (Start → "Edit environment variables for your account" → Path → New), or run this line in PowerShell. Then quit and reopen the editor so new terminals see it: {1}', dir, line)
-        : t('Installed the "tasksmd" command in {0}, which is not on your PATH yet. Add this line to your shell profile (for example ~/.zshrc), then open a new terminal: {1}', dir, line),
+        ? t('Installed the "tasksmd" command in {0}. New terminals in this editor can use it right away. For other terminals, add that folder to your user Path (Start → "Edit environment variables for your account" → Path → New) or run this line in PowerShell: {1}', dir, line)
+        : t('Installed the "tasksmd" command in {0}. New terminals in this editor can use it right away. For other terminals, add this line to your shell profile (for example ~/.zshrc): {1}', dir, line),
       copy);
     if (choice === copy) await vscode.env.clipboard.writeText(line);
   };
+  /** Put the launcher's folder on the PATH of this editor's new terminals (M25): immediate, persistent, all platforms. */
+  function terminalPath(dir: string | undefined): void {
+    const c = context.environmentVariableCollection;
+    c.persistent = true;
+    c.description = t('Makes the "tasksmd" command available in the terminal');
+    if (dir) c.prepend('PATH', dir + path.delimiter);
+    else c.delete('PATH');
+  }
+  const runPowerShell = (script: string) => run('powershell', ['-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass', '-EncodedCommand', Buffer.from(script, 'utf16le').toString('base64')], os.homedir());
 
   const uninstallCli = async () => {
     const rt = await readRuntime();
@@ -204,6 +225,11 @@ export function registerAi(context: vscode.ExtensionContext, deps: AiDeps): AiIn
       if ((await exists(p)) && isOurLauncher(await fs.readFile(p, 'utf8'))) {
         await fs.rm(p);
         if (rt) await fs.writeFile(RUNTIME_FILE(), JSON.stringify({ ...rt, launcher: undefined }, null, 2) + '\n');
+        terminalPath(undefined);
+        if (process.platform === 'win32') {
+          const r = await runPowerShell(userPathScript('remove', path.dirname(p)));
+          deps.log(`user Path remove ${path.dirname(p)}: ${r.ok ? 'ok' : 'failed'} ${r.out}`);
+        }
         void vscode.window.showInformationMessage(t('Removed the "tasksmd" command ({0}).', p));
         return;
       }

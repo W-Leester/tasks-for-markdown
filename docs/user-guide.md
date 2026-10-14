@@ -135,8 +135,9 @@ short mode
 **터미널 명령 `tasksmd`.** 명령 `Tasks: 'tasksmd' 터미널 명령 설치`를 실행하면 터미널과 스크립트에서 `tasksmd query "due today"`, `tasksmd done notes/work.md:12` 같은 명령을 쓸 수 있습니다(`tasksmd --help`).
 - **좋은 점:** 에디터를 열지 않고 마감 확인 · 추가·완료·미루기·메모를 바로 · 스크립트와 자동화(매일 아침 요약, git hook, Raycast·Alfred·단축어) · 터미널 AI(Claude Code, Codex 등)가 명령으로 사용 · `--json` 출력 · 에디터와 같은 규칙(완료일, 반복 다음 회차, 설정, `--expect`로 바뀐 줄 보호) · npm 불필요, 확장과 함께 업데이트.
 - 예: `tasksmd query "not done⏎due before today⏎sort by due"`(기한 지난 것), `tasksmd add "- [ ] 은행에 전화 📅 2026-10-08" --file inbox.md`, `tasksmd postpone inbox.md:1 "next monday"`, `tasksmd note inbox.md:1 "수수료 문의"`, `tasksmd done inbox.md:1`, `tasksmd query "due today" --json | jq '.matched'`. 노트 폴더에서 실행하거나 `--root <폴더>`를 줍니다.
-- macOS·Linux는 PATH에 들어 있는 `~/.local/bin` 또는 `~/bin`에 설치합니다. 둘 다 PATH에 없으면 `~/.local/bin`에 설치하고, 셸 설정 파일(예: `~/.zshrc`)에 넣을 한 줄(`export PATH="$HOME/.local/bin:$PATH"`)을 복사해 줍니다. Windows는 `%LOCALAPPDATA%\tasksmd\bin`에 설치하고, PATH에 없으면 **사용자 Path에 추가하는 방법**(시작 → "계정의 환경 변수 편집" → Path → 새로 만들기, 또는 사용자 Path만 바꾸는 PowerShell 한 줄)을 알려 줍니다. `setx PATH "%PATH%;…"`는 쓰지 마세요(1024자에서 잘리고 시스템 Path가 섞임). 바꾼 뒤에는 에디터를 완전히 껐다 켜야 새 터미널에 반영됩니다.
-- 같은 이름의 다른 프로그램이 있으면 덮어쓰지 않습니다. 지우려면 `Tasks: 'tasksmd' 터미널 명령 제거`.
+- **설치하면 이 에디터에서 새로 여는 터미널에서는 바로 쓸 수 있습니다**(1.1.3부터, 모든 플랫폼). 확장이 그 폴더를 통합 터미널의 PATH에 넣어 주며 재시작이 필요 없습니다. 터미널 탭에 "확장이 환경을 바꿨다"는 표시가 보이는 것이 정상입니다.
+- macOS·Linux는 PATH에 들어 있는 `~/.local/bin` 또는 `~/bin`에 설치합니다. 둘 다 PATH에 없으면 `~/.local/bin`에 설치하고, 에디터 밖 터미널에서도 쓰려면 셸 설정 파일(예: `~/.zshrc`)에 넣을 한 줄(`export PATH="$HOME/.local/bin:$PATH"`)을 복사해 줍니다. Windows는 `%LOCALAPPDATA%\tasksmd\bin`에 설치하고, **사용자 Path에도 자동으로 추가**합니다(1.1.3부터; 시작 메뉴에서 새로 여는 터미널에 반영, 이미 열린 터미널은 다시 열기). 자동 추가가 실패하면 직접 추가하는 방법(시작 → "계정의 환경 변수 편집" → Path → 새로 만들기, 또는 사용자 Path만 바꾸는 PowerShell 한 줄)을 알려 줍니다. `setx PATH "%PATH%;…"`는 쓰지 마세요(1024자에서 잘리고 시스템 Path가 섞임).
+- 같은 이름의 다른 프로그램이 있으면 덮어쓰지 않습니다. 지우려면 `Tasks: 'tasksmd' 터미널 명령 제거` — 런처와 통합 터미널 PATH 항목, Windows 사용자 Path 항목을 함께 지웁니다.
 - 에디터 내장 Node로 실행되며, 에디터 위치가 바뀌거나 확장이 업데이트돼도 에디터를 한 번 켜면 따라갑니다.
 
 **원격(SSH)·컨테이너.** 확장이 원격 쪽에서 돌기 때문에 MCP 서버 설정과 `tasksmd` 명령도 **원격 컴퓨터 기준으로** 만들어집니다(원격의 노트 폴더를 다룸). 내 컴퓨터의 Claude Desktop에 원격 폴더를 연결할 수는 없습니다.
@@ -181,6 +182,6 @@ short mode
 - **`.vsix`로 설치했는데 업데이트는?** `tasksmd.updateCheckUrl`에 사내 `latest.json` 경로를 넣으면 하루 1회 새 버전을 알려줍니다.
 - **로그는 어디에?** `Tasks: 로그 보기` (출력 채널 "Tasks for Markdown").
 - **AI 에이전트가 tasks 도구를 못 찾아요.** ① 설정 `tasksmd.mcp.autoRegister`가 켜져 있는지 ② 워크스페이스가 신뢰됨인지(제한 모드에서는 연결 안 함) ③ `Developer: Reload Window` ④ 위치 확인: Cursor는 *Cursor Settings → Customize → MCPs*에 `extension-tasks`, VS Code는 채팅 에이전트 모드의 도구(🔧) 목록 ⑤ `Tasks: 로그 보기`에서 `mcp registration:` 줄. Claude Code·Desktop은 `Tasks: AI 에이전트 연결 (MCP)`로 따로 연결해야 합니다.
-- **`tasksmd: command not found`가 나와요.** 설치한 폴더(`~/.local/bin`)가 PATH에 없는 경우입니다. 설치할 때 안내한 줄(`export PATH="$HOME/.local/bin:$PATH"`)을 `~/.zshrc`에 넣고 새 터미널을 여세요. 에디터를 옮기거나 다시 설치했다면 에디터를 한 번 켜면 런처가 새 위치를 따라갑니다.
+- **`tasksmd: command not found`가 나와요.** 에디터 안에서는 설치 뒤 **새로 연** 터미널을 쓰세요(이미 열려 있던 터미널은 모릅니다). 에디터 밖 터미널이면 설치한 폴더(`~/.local/bin`)가 PATH에 없는 경우입니다. 설치할 때 안내한 줄(`export PATH="$HOME/.local/bin:$PATH"`)을 `~/.zshrc`에 넣고 새 터미널을 여세요. 에디터를 옮기거나 다시 설치했다면 에디터를 한 번 켜면 런처가 새 위치를 따라갑니다.
 - **Cursor에서 시작 안내는?** Cursor에는 VS Code의 `Welcome: Open Walkthrough…`가 없으니 `Tasks: 시작 안내 열기`를 쓰세요.
 - **Cursor에서 `tasksmd.*` 설정이 안 보여요.** Cursor의 `Cmd+,`는 Cursor 자체 설정(Cursor Settings)을 엽니다. 확장 설정은 명령 팔레트의 `Preferences: Open Settings (UI)`(또는 Cursor Settings의 *Editor Settings → Open*)에서 `tasksmd`로 검색하세요.

@@ -112,6 +112,33 @@ export function pathAdvice(platform: NodeJS.Platform, dir: string): string {
 }
 
 /**
+ * PowerShell that adds `dir` to (or removes it from) the *user* Path on Windows, the way the Settings dialog does
+ * (M25): the registry value is read unexpanded and written back as REG_EXPAND_SZ, nothing is duplicated, and
+ * WM_SETTINGCHANGE is broadcast so terminals opened from Start see it. Not `setx`: it cuts the value at 1024
+ * characters and copies the system Path into the user Path.
+ */
+export function userPathScript(action: 'add' | 'remove', dir: string): string {
+  const d = dir.replace(/'/g, "''");
+  const change = action === 'add'
+    ? "if ($parts -notcontains $dir) { $k.SetValue('Path', (($parts + $dir) -join ';'), [Microsoft.Win32.RegistryValueKind]::ExpandString) }"
+    : "$new = @($parts | Where-Object { $_ -ne $dir }); if ($new.Count -ne $parts.Count) { $k.SetValue('Path', ($new -join ';'), [Microsoft.Win32.RegistryValueKind]::ExpandString) }";
+  return [
+    "$ErrorActionPreference = 'Stop'",
+    `$dir = '${d}'`,
+    "$k = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey('Environment', $true)",
+    "$cur = [string]$k.GetValue('Path', '', [Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames)",
+    "$parts = @($cur -split ';' | Where-Object { $_ -ne '' })",
+    change,
+    '$k.Close()',
+    `$sig = '[DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)] public static extern IntPtr SendMessageTimeout(IntPtr hWnd, uint Msg, UIntPtr wParam, string lParam, uint fuFlags, uint uTimeout, out UIntPtr lpdwResult);'`,
+    "$w = Add-Type -MemberDefinition $sig -Name 'Env' -Namespace 'TasksForMarkdown' -PassThru",
+    '$r = [UIntPtr]::Zero',
+    "[void]$w::SendMessageTimeout([IntPtr]0xffff, 0x001A, [UIntPtr]::Zero, 'Environment', 2, 5000, [ref]$r)",
+    "'ok'",
+  ].join('\n');
+}
+
+/**
  * What an npm `.cmd` shim runs (`"%dp0%\node_modules\…\cli.js" %*`), as an absolute path — so it can be run
  * with our own Node instead of through cmd.exe, which mangles quoted arguments such as JSON (10-14 Windows check).
  */

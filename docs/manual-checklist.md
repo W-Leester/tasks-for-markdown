@@ -127,7 +127,7 @@ VS Code 1.138에 들어온 내장 Markdown Editor(WYSIWYG)와 `markdown.codeBloc
 4. [x] **Claude Desktop 연결**(설치된 경우) — 같은 명령 → Claude Desktop → 확인 창 → 설정 파일에 `tasks` 추가·`.bak` 생성·다른 서버 유지 → Claude Desktop 재시작 후 동작.
    - **중간 결과(10-08):** 설정 파일에 `tasks` 추가·`.bak`·다른 키 보존까지 확인 → **5분 뒤 실행 중이던 Claude Desktop이 설정을 다시 써서 `tasks`가 사라짐**(incidents #32). 고친 뒤 다시 확인: Claude Desktop을 켠 채 연결 → "먼저 종료하세요 / 다시 시도" 창이 뜨는지, 종료 후 다시 시도 → 쓰기 → Claude Desktop을 열고 질문.
    - **결과(10-08):** 켜진 채 연결 → "먼저 종료" 창(첫 수정은 pgrep 오류 문구를 실행 중으로 읽어 계속 뜸 → 고침), 종료 후 알림의 Connect로 연결. Claude Desktop 채팅(Cowork) 커넥터에 `tasks`가 켜져 있고, "오늘 마감이거나 지난 것" → `Query tasks` 허용 후 실제 태스크(9/28 책 반납, 계약서 검토 등)로 답함. 도구마다 허용을 물음 → 도구 표시(annotations)와 "커넥터 관리에서 읽기 도구 항상 허용" 안내 추가.
-5. [x] **터미널 명령** — `Tasks: 'tasksmd' 터미널 명령 설치` → 새 터미널에서 `tasksmd --help`, `tasksmd query "not done" --root <노트 폴더>`. PATH 안내가 나오면 그 줄을 넣고 다시. `제거` 명령으로 지워지는지.
+5. [x] **터미널 명령** — `Tasks: 'tasksmd' 터미널 명령 설치` → **설치 직후 에디터에서 새로 연 터미널**에서(1.1.3부터 PATH 없이도 됨) 그리고 에디터 밖 터미널에서 `tasksmd --help`, `tasksmd query "not done" --root <노트 폴더>`. PATH 안내가 나오면 그 줄을 넣고 다시. `제거` 명령으로 지워지는지.
    - **결과(10-07, Cursor, 시작 안내 버튼):** `~/.tasksmd/`(cjs·runtime.json)와 `~/.local/bin/tasksmd`(Cursor Helper (Plugin)로 실행하는 런처) 생성. `~/.local/bin`이 이미 PATH에 있어 안내 없이 바로 사용. `examples`에서 `tasksmd query` → Cursor 에이전트와 같은 3개. (제거 명령은 아직)
 6. [x] **링크** — 태스크 줄에서 `Tasks: 태스크 링크 복사` → 브라우저 주소창이나 메모 앱에 붙여 넣고 누름 → 에디터가 그 줄로 이동. 쿼리 블록에서 `쿼리 링크 복사` → 결과 패널.
    - **결과(10-08, Cursor):** 태스크 링크 복사 → 다른 앱에서 열기 → 그 줄로 이동 확인(사용자).

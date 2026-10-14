@@ -363,7 +363,6 @@
   "A different \"tasksmd\" already exists at {0}; it was not replaced.": "{0}에 다른 \"tasksmd\"가 이미 있어 바꾸지 않았습니다.",
   "Installed the \"tasksmd\" command ({0}). Open a new terminal and run: tasksmd --help": "\"tasksmd\" 명령을 설치했습니다({0}). 새 터미널을 열고 실행해 보세요: tasksmd --help",
   "Copy the line": "줄 복사",
-  "Installed the \"tasksmd\" command in {0}, which is not on your PATH yet. Add this line to your shell profile (for example ~/.zshrc), then open a new terminal: {1}": "\"tasksmd\" 명령을 {0}에 설치했지만 이 폴더는 아직 PATH에 없습니다. 셸 설정 파일(예: ~/.zshrc)에 다음 줄을 넣고 새 터미널을 여세요: {1}",
   "Removed the \"tasksmd\" command ({0}).": "\"tasksmd\" 명령을 제거했습니다({0}).",
   "The \"tasksmd\" command is not installed.": "\"tasksmd\" 명령이 설치되어 있지 않습니다.",
   "Open a folder first.": "먼저 폴더를 여세요.",
@@ -417,5 +416,8 @@
   "connected — choose it to update": "연결됨 — 고르면 갱신",
   "Claude Code is already connected to this folder.": "Claude Code는 이미 이 폴더에 연결돼 있습니다.",
   "Drag to resize, double-click to fit the content": "끌어서 너비 조절, 더블클릭하면 내용에 맞춤",
-  "Installed the \"tasksmd\" command in {0}, which is not on your PATH yet. Add that folder to your user Path (Start → \"Edit environment variables for your account\" → Path → New), or run this line in PowerShell. Then quit and reopen the editor so new terminals see it: {1}": "\"tasksmd\" 명령을 {0}에 설치했지만 아직 PATH에 없습니다. 이 폴더를 사용자 Path에 추가하세요(시작 → \"계정의 환경 변수 편집\" → Path → 새로 만들기). 또는 PowerShell에서 이 줄을 실행하세요. 그다음 에디터를 완전히 종료했다가 다시 열어야 새 터미널에 반영됩니다: {1}"
+  "Installed the \"tasksmd\" command. New terminals in this editor can use it right away; other terminals can once you open them again (the folder was added to your user Path).": "\"tasksmd\" 명령을 설치했습니다. 이 에디터에서 새로 여는 터미널에서는 바로 쓸 수 있고, 다른 터미널은 새로 열면 됩니다(폴더를 사용자 Path에 추가했습니다).",
+  "Installed the \"tasksmd\" command in {0}. New terminals in this editor can use it right away. For other terminals, add that folder to your user Path (Start → \"Edit environment variables for your account\" → Path → New) or run this line in PowerShell: {1}": "\"tasksmd\" 명령을 {0}에 설치했습니다. 이 에디터에서 새로 여는 터미널에서는 바로 쓸 수 있습니다. 다른 터미널에서도 쓰려면 이 폴더를 사용자 Path에 추가하거나(시작 → \"계정의 환경 변수 편집\" → Path → 새로 만들기) PowerShell에서 이 줄을 실행하세요: {1}",
+  "Installed the \"tasksmd\" command in {0}. New terminals in this editor can use it right away. For other terminals, add this line to your shell profile (for example ~/.zshrc): {1}": "\"tasksmd\" 명령을 {0}에 설치했습니다. 이 에디터에서 새로 여는 터미널에서는 바로 쓸 수 있습니다. 다른 터미널에서도 쓰려면 셸 설정 파일(예: ~/.zshrc)에 이 줄을 넣으세요: {1}",
+  "Makes the \"tasksmd\" command available in the terminal": "터미널에서 \"tasksmd\" 명령을 쓸 수 있게 합니다"
 }

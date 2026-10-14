@@ -1025,10 +1025,10 @@
 4. 알림: Windows 성공 → "설치했습니다. 이 에디터의 새 터미널에서 바로 쓸 수 있고, 다른 터미널은 새로 열면 됩니다." / 실패 → 기존 수동 안내.
 
 ### 할 일
-- [ ] 순수 함수: Windows 사용자 Path 추가·제거 PowerShell 스크립트(`userPathScript`) + 단위 테스트(폴더 포함, ExpandString, 방송, setx 없음)
-- [ ] `installCli`/`uninstallCli`/켜질 때: 환경 변수 컬렉션, Windows 사용자 Path, 문구(한국어)
-- [ ] 실제 VS Code(serve-web, 격리 HOME)에서 설치 직후 통합 터미널 `tasksmd --help` 확인; Windows는 사용자 PC에서 확인
-- [ ] 문서: design.md 7.16, user-guide(Windows 절·FAQ), CHANGELOG 1.1.3
+- [x] 순수 함수: Windows 사용자 Path 추가·제거 PowerShell 스크립트(`userPathScript`) + 단위 테스트(폴더 포함, ExpandString, 방송, setx 없음)
+- [x] `installCli`/`uninstallCli`/켜질 때: 환경 변수 컬렉션, Windows 사용자 Path, 문구(한국어)
+- [~] 실제 VS Code(serve-web, 격리 HOME)에서 설치 직후 통합 터미널 `tasksmd --help` ✅(10-15, `which` → `~/.local/bin/tasksmd`, PATH에 없는 폴더인데 동작); Windows 사용자 Path는 사용자 PC 확인 대기
+- [x] 문서: design.md 7.16, user-guide(Windows 절·FAQ), CHANGELOG 1.1.3
 
 ## M21. 확장 안에서 AI 연결 제공 — 1.1.0 (계획 2026-10-02, 착수 2026-10-07)
 

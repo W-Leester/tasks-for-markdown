@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-  ConfigParseError, claudeAddCommandWindows, folderPathFor, claudeAddJsonArgs, claudeCodeHasServer, claudeDesktopHasServer, claudeDesktopRunningFrom, claudeAddJsonCommand, claudeDesktopConfigPath, isOurLauncher, launcherFileName, launcherScript, mergeMcpServers, pathAdvice, pickBinDir, serverName, serverSpec, shimTarget,
+  ConfigParseError, claudeAddCommandWindows, folderPathFor, claudeAddJsonArgs, claudeCodeHasServer, claudeDesktopHasServer, claudeDesktopRunningFrom, claudeAddJsonCommand, claudeDesktopConfigPath, isOurLauncher, launcherFileName, launcherScript, mergeMcpServers, pathAdvice, pickBinDir, serverName, serverSpec, shimTarget, userPathScript,
 } from '../../src/ai/mcpConfig';
 
 const spec = serverSpec('/Apps/Code Helper (Plugin)', '/home/u/.tasksmd/tasksmd.cjs', '/home/u/notes');
@@ -87,6 +87,19 @@ describe('M21 MCP config helpers', () => {
     // reach Claude Code as an option of `mcp add`. Quoted it survives PowerShell and cmd alike.
     expect(line.split(' ')).not.toContain('--');
     expect(line.split(' ')).toContain('"--"');
+  });
+
+  it('writes the Windows user Path through the registry, unexpanded, without duplicates, and broadcasts the change (M25)', () => {
+    const add = userPathScript('add', "C:\\Users\\o'brien\\AppData\\Local\\tasksmd\\bin");
+    expect(add).toContain("$dir = 'C:\\Users\\o''brien\\AppData\\Local\\tasksmd\\bin'");
+    expect(add).toContain('DoNotExpandEnvironmentNames'); // keep %USERPROFILE%-style entries as they are
+    expect(add).toContain('RegistryValueKind]::ExpandString');
+    expect(add).toContain('-notcontains $dir'); // no duplicates
+    expect(add).toContain("SendMessageTimeout([IntPtr]0xffff, 0x001A"); // WM_SETTINGCHANGE
+    expect(add).not.toMatch(/setx/i);
+    const remove = userPathScript('remove', 'C:\\x\\bin');
+    expect(remove).toContain("Where-Object { $_ -ne $dir }");
+    expect(remove).not.toContain('$parts + $dir');
   });
 
   it('knows where Claude Desktop keeps its config', () => {

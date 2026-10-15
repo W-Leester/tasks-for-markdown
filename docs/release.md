@@ -55,6 +55,12 @@ for p in tasks-core tasks-cli tasks-api; do pnpm --filter @hastycapybara/$p publ
 - [x] 확인: Open VSX 1.1.0(`verified=true`), npm `tasks-core`·`tasks-cli`·`tasks-api` 1.1.0(provenance 모두 있음), `tasks-cli`에 THIRD_PARTY_NOTICES. **`tasks-api`만 레지스트리 반영이 약 4분 늦음**(로그는 09:47 Published, 목록은 09:52) — 기다리면 됨
 - [x] 설치본 교체: 개발용 vsix 대신 마켓 설치본(VS Code는 Marketplace, Cursor는 Open VSX) — 2026-10-09 사용자
 
+## 1.1.3 게시 (2026-10-15)
+- [x] 검증: typecheck·lint, 단위 826, 웹뷰 34, 통합 61 통과, `build:packages`, `pnpm package`(35 files)
+- [x] 실제 VS Code(serve-web, 격리 HOME): 설치 직후 새 통합 터미널에서 `tasksmd --help`·`which` ✅. Mac 터미널: 런처로 `--version`(1.1.3)·query·info·saved ✅
+- [ ] **Windows 사용자 Path 자동 추가는 실제 Windows에서 아직 확인 전**(실패 시 수동 안내로 돌아감). 사용자 PC 확인 후 점검표 기록
+- [ ] Marketplace 업로드(사용자) → 공개 확인 → `releases/` → 태그 `v1.1.3` → Open VSX·npm 확인 → GitHub Release 파일 `releases/`에
+
 ## 1.1.2 게시 (2026-10-15)
 - [x] 검증: typecheck·lint, 단위 825, 웹뷰 34, 통합 61 통과, `pnpm package`(35 files)
 - [x] Windows(사용자, 1.1.2 개발판 3차): Connect → "Connected Claude Code to "Test"", `claude mcp list`에 `tasks` ✅. 다른 Windows 11 PC: 런처·MCP 서버 본체 ✅, 복사용 명령 `"--"` 수정(2d561a1)

@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased (1.1.3)
+## 1.1.3 — 2026-10-15
 
 **CLI**
 - `tasksmd --version` (`-v`) prints the version. An unknown option on its own now says which option it did not understand instead of printing the whole help page.

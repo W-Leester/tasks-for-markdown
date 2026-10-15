@@ -201,7 +201,7 @@ You don't have to write queries by hand. `Tasks: Open query builder` assembles o
 | Command | Shortcut |
 |---|---|
 | Toggle task done | `Ctrl+Shift+Enter` (on a task line; Ctrl on macOS too) |
-| Toggle checkbox | `Ctrl+Shift+C` — turns the line into `- [ ] …` (a bullet keeps its marker); on a task line it removes the box |
+| Add or remove checkbox | `Ctrl+Shift+C` — turns the line into `- [ ] …` (a bullet keeps its marker); on a task line it removes the box |
 | Create or edit task | `Ctrl+Shift+/` |
 | Quick search tasks | `Cmd/Ctrl+Shift+;` |
 | Set status / priority / due / scheduled / start / recurrence / dependencies, Postpone | — |

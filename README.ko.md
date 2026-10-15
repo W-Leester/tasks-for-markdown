@@ -201,7 +201,7 @@ if (tasks.features?.includes('notes.add')) await tasks.edit.addNote(r.tasks[0], 
 | 명령 | 단축키 |
 |---|---|
 | 태스크 완료 토글 | `Ctrl+Shift+Enter` (태스크 줄에서, macOS에서도 Ctrl) |
-| 체크박스 토글 | `Ctrl+Shift+C` — 줄을 `- [ ] …`로(글머리 기호는 유지), 태스크 줄이면 체크박스를 뺌 |
+| 체크박스 만들기/지우기 | `Ctrl+Shift+C` — 줄을 `- [ ] …`로(글머리 기호는 유지), 태스크 줄이면 체크박스를 뺌 |
 | 태스크 만들기 / 편집 | `Ctrl+Shift+/` |
 | 렌더 보기로 열기 / 마크다운 소스 편집 (전환) | `Ctrl+Shift+R` |
 | 렌더 보기를 기본 편집기로 (설정/해제) | — |

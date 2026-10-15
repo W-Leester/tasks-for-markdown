@@ -1045,7 +1045,7 @@
 
 **키 다시 정함(10-16 사용자 결정): 자주 쓰는 쪽이 한 손 키.** 체크박스 토글 → **`Ctrl+Shift+C`**(마크다운 편집기에서만), 만들기/편집 대화상자 → **`Ctrl+Shift+/`**(지금 `Ctrl+Shift+C`의 범위 그대로: 터미널 밖, 편집기·사이드바). 이유: 체크박스는 자주·빠르게 쓰므로 왼손 한 손으로, 대화상자는 덜 자주. **기존 사용자에게는 바뀌는 키**이므로 CHANGELOG 맨 위에 적고, README GIF 설명·문서의 `Ctrl+Shift+C`(대화상자)를 모두 `Ctrl+Shift+/`로. 마크다운 밖(사이드바 등)에서 `Ctrl+Shift+C`는 이제 아무 것도 안 함 → Windows/Linux 기본 "외부 터미널 열기"로 돌아감.
 - [x] 키 맞바꾸기(package.json), 통합 테스트(두 키 모두), 문서·README·시작 안내·요구사항·설계·점검표, CHANGELOG
-- [ ] **명령 이름 바꾸기(10-16 사용자 결정, 1.1.5):** "Toggle checkbox / 체크박스 토글"은 완료 전환(`Ctrl+Shift+Enter`, Toggle task done)과 헷갈림 → **"Add or remove checkbox" / "체크박스 만들기/지우기"**. 명령 제목(nls), README(한·영) 명령 표, 사용자 가이드, CHANGELOG 1.1.5. 명령 ID·키·동작은 그대로
+- [x] **명령 이름 바꾸기(10-16 사용자 결정, 1.1.5):** "Toggle checkbox / 체크박스 토글"은 완료 전환(`Ctrl+Shift+Enter`, Toggle task done)과 헷갈림 → **"Add or remove checkbox" / "체크박스 만들기/지우기"**. 명령 제목(nls), README(한·영) 명령 표, 사용자 가이드, CHANGELOG 1.1.5. 명령 ID·키·동작은 그대로
 
 ### 할 일
 - [x] `toggleCheckboxLine` 순수 함수 + 단위 테스트

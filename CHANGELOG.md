@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased (1.1.5)
+
+- The `Ctrl+Shift+C` command is now called **Tasks: Add or remove checkbox** (Korean: **체크박스 만들기/지우기**). "Toggle checkbox" read like checking a task off, which is `Ctrl+Shift+Enter` (**Toggle task done**). The key and what it does are unchanged.
+
+### 한국어 요약
+- `Ctrl+Shift+C` 명령 이름을 **체크박스 만들기/지우기**(영어 Add or remove checkbox)로 바꿈 — "체크박스 토글"이 완료 전환(`Ctrl+Shift+Enter`)처럼 읽혀서. 키와 동작은 그대로.
+
 ## 1.1.4 — 2026-10-16
 
 **Editor — keys changed**

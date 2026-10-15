@@ -2,7 +2,7 @@ import * as assert from 'node:assert/strict';
 import * as vscode from 'vscode';
 import { getApi, sleep } from './helpers';
 
-suite('toggle checkbox (M26)', () => {
+suite('add or remove checkbox (M26)', () => {
   test('Ctrl+Shift+C toggles the checkbox in Markdown editors and Ctrl+Shift+/ opens the dialog, on every platform (10-16 swap)', () => {
     const pkg = vscode.extensions.getExtension('HastyCapybara.tasks-for-markdown')!.packageJSON as { contributes: { keybindings: { command: string; key: string; mac?: string; when?: string }[] } };
     const kb = pkg.contributes.keybindings.filter((k) => k.command === 'tasksmd.toggleCheckbox');

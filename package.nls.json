@@ -15,7 +15,7 @@
   "tasksmd.config.setCancelledDate": "Add a cancelled date (❌) when a task becomes CANCELLED, and remove it when it leaves CANCELLED.",
   "tasksmd.showLogs.title": "Show logs",
   "tasksmd.toggleDone.title": "Toggle task done",
-  "tasksmd.toggleCheckbox.title": "Toggle checkbox",
+  "tasksmd.toggleCheckbox.title": "Add or remove checkbox",
   "tasksmd.openTask.title": "Go to task",
   "tasksmd.openSidebar.title": "Open Tasks sidebar",
   "tasksmd.view.tasks": "Tasks",

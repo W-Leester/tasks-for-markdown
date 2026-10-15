@@ -2,12 +2,13 @@
 
 ## Unreleased (1.1.4)
 
-**Editor**
-- `Ctrl+Shift+Q` (**Tasks: Toggle checkbox**) turns the current line — or every selected line — into a checklist item (`- [ ] …`, a bullet keeps its marker) and takes the box off a task line. The quick way to make a task without the dialog; `Ctrl+Shift+C` is unchanged.
+**Editor — keys changed**
+- **`Ctrl+Shift+C` now toggles a checkbox; the create/edit dialog moved to `Ctrl+Shift+/`.** The quick, frequent action gets the one-hand key. (Change either in Keyboard Shortcuts if you prefer the old layout.)
+- `Ctrl+Shift+C` (**Tasks: Toggle checkbox**) turns the current line — or every selected line — into a checklist item (`- [ ] …`, a bullet keeps its marker) and takes the box off a task line. The quick way to make a task without the dialog; the dialog opens with `Ctrl+Shift+/`.
 - The date picker button in the create/edit dialog is drawn whole again, on dark themes too (its icon was clipped and dark on dark).
 
 ### 한국어 요약
-- **`Ctrl+Shift+Q` 체크박스 토글:** 현재 줄(또는 선택한 줄들)을 `- [ ] …`로, 태스크 줄이면 체크박스 제거. `Ctrl+Shift+C`는 그대로.
+- **키 변경:** `Ctrl+Shift+C` = 체크박스 토글(현재 줄 또는 선택한 줄을 `- [ ] …`로, 태스크 줄이면 제거), 만들기/편집 대화상자는 `Ctrl+Shift+/`로 이동.
 - **편집 창 날짜 선택 아이콘** 잘림·다크 테마에서 안 보이던 문제 수정.
 
 ## 1.1.3 — 2026-10-15

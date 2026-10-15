@@ -3,10 +3,12 @@ import * as vscode from 'vscode';
 import { getApi, sleep } from './helpers';
 
 suite('toggle checkbox (M26)', () => {
-  test('Ctrl+Shift+Q is bound in Markdown editors on every platform (Ctrl+Shift+Space never reaches the app on macOS with input-source switching)', () => {
+  test('Ctrl+Shift+C toggles the checkbox in Markdown editors and Ctrl+Shift+/ opens the dialog, on every platform (10-16 swap)', () => {
     const pkg = vscode.extensions.getExtension('HastyCapybara.tasks-for-markdown')!.packageJSON as { contributes: { keybindings: { command: string; key: string; mac?: string; when?: string }[] } };
     const kb = pkg.contributes.keybindings.filter((k) => k.command === 'tasksmd.toggleCheckbox');
-    assert.deepEqual(kb.map((k) => [k.key, k.mac, k.when]), [['ctrl+shift+q', 'ctrl+shift+q', 'editorTextFocus && editorLangId == markdown']]);
+    assert.deepEqual(kb.map((k) => [k.key, k.mac, k.when]), [['ctrl+shift+c', 'ctrl+shift+c', 'editorTextFocus && editorLangId == markdown']]);
+    const dialog = pkg.contributes.keybindings.filter((k) => k.command === 'tasksmd.createOrEdit');
+    assert.deepEqual(dialog.map((k) => [k.key, k.mac]), [['ctrl+shift+/', 'ctrl+shift+/']]);
   });
 
   test('adds a box to the line under the cursor, removes it from a task line, and follows the first line of a selection', async () => {

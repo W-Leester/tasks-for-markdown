@@ -1,5 +1,5 @@
 /**
- * Turn a line into a checklist item or back (M26, `Ctrl+Shift+/`): the quick way to get `- [ ]` without the
+ * Turn a line into a checklist item or back (M26, `Ctrl+Shift+Q`): the quick way to get `- [ ]` without the
  * create/edit dialog. Pure text — the editor command applies it to the selected lines.
  */
 

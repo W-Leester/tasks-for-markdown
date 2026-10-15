@@ -1043,6 +1043,9 @@
 **2. 편집 창 날짜 선택 아이콘이 잘려 보임(사용자 캡처, 다크 테마).** `DateInput`의 달력 선택이 `<input type="date">`를 1.6em 폭으로 줄여 놓은 것이라 Chromium이 "mm/dd/yyyy" 텍스트와 아이콘을 그 폭에 욱여넣어 아이콘 조각만 보이고, 다크 테마에서는 아이콘이 어둡게 그려짐.
 - 고침: 보이는 것은 `📅` 버튼(포커스·aria-label), 실제 `<input type="date">`는 숨겨 두고 버튼이 `showPicker()`를 부른다(없으면 포커스). 테마에 맞춰 `color-scheme`(body.vscode-dark → dark)로 팝업도 어둡게. 마감·예정·시작·생성·완료·취소 모든 날짜 칸에 적용(같은 컴포넌트). 실제 Chrome에서 다크·라이트 확인. incidents #38.
 
+**키 다시 정함(10-16 사용자 결정): 자주 쓰는 쪽이 한 손 키.** 체크박스 토글 → **`Ctrl+Shift+C`**(마크다운 편집기에서만), 만들기/편집 대화상자 → **`Ctrl+Shift+/`**(지금 `Ctrl+Shift+C`의 범위 그대로: 터미널 밖, 편집기·사이드바). 이유: 체크박스는 자주·빠르게 쓰므로 왼손 한 손으로, 대화상자는 덜 자주. **기존 사용자에게는 바뀌는 키**이므로 CHANGELOG 맨 위에 적고, README GIF 설명·문서의 `Ctrl+Shift+C`(대화상자)를 모두 `Ctrl+Shift+/`로. 마크다운 밖(사이드바 등)에서 `Ctrl+Shift+C`는 이제 아무 것도 안 함 → Windows/Linux 기본 "외부 터미널 열기"로 돌아감.
+- [ ] 키 맞바꾸기(package.json), 통합 테스트(두 키 모두), 문서·README·시작 안내·요구사항·설계·점검표, CHANGELOG
+
 ### 할 일
 - [x] `toggleCheckboxLine` 순수 함수 + 단위 테스트
 - [x] 명령·키바인딩·메뉴·l10n, 통합 테스트

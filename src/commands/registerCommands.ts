@@ -5,6 +5,7 @@ import type { IndexService } from '../index/IndexService';
 import type { Settings } from '../settings/Settings';
 import { StaleLineError, type TaskEditService } from '../services/TaskEditService';
 import { t } from '../l10n';
+import { checkboxMode, toggleCheckboxLine } from '../core/task/toggleCheckbox';
 
 export const VIEW_CONTAINER_ID = 'tasksmd';
 
@@ -89,6 +90,36 @@ export function registerCommands(context: vscode.ExtensionContext, deps: Command
     context.subscriptions.push(vscode.commands.registerCommand(id, handler));
 
   register('tasksmd.reindex', () => deps.indexService.rescan());
+
+  // M26: `- [ ]` without the dialog. The selected lines follow the first one (all gain or all lose the box).
+  register('tasksmd.toggleCheckbox', () =>
+    runEdit(deps, async () => {
+      const editor = vscode.window.activeTextEditor;
+      if (!editor) return;
+      const doc = editor.document;
+      const lines = new Set<number>();
+      for (const sel of editor.selections) {
+        // A selection ending at column 0 of a later line does not include that line.
+        const end = sel.end.line > sel.start.line && sel.end.character === 0 ? sel.end.line - 1 : sel.end.line;
+        for (let l = sel.start.line; l <= end; l++) lines.add(l);
+      }
+      const ordered = [...lines].sort((a, b) => a - b);
+      const mode = checkboxMode(doc.lineAt(ordered[0]!).text);
+      await editor.edit((eb) => {
+        for (const l of ordered) {
+          const line = doc.lineAt(l);
+          const next = toggleCheckboxLine(line.text, mode);
+          if (next !== line.text) eb.replace(line.range, next);
+        }
+      });
+      // On a single line the cursor goes after the new box, so typing continues naturally.
+      if (ordered.length === 1 && editor.selection.isEmpty) {
+        const l = ordered[0]!;
+        const col = mode === 'add' ? Math.min(doc.lineAt(l).text.length, doc.lineAt(l).text.indexOf('[ ] ') + 4) : editor.selection.active.character;
+        if (mode === 'add' && col > 0 && editor.selection.active.character < col) editor.selection = new vscode.Selection(l, col, l, col);
+      }
+    }),
+  );
 
   register('tasksmd.toggleDone', (arg) =>
     runEdit(deps, async () => {

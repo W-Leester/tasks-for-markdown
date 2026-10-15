@@ -45,7 +45,7 @@
 처음이라면 [VS Code에서 시작 안내 열기](https://vscode.dev/redirect?url=vscode://hastycapybara.tasks-for-markdown/guide)(Cursor는 명령 팔레트에서 **Tasks: 시작 안내 열기**). 시작 안내는 처음 실행할 때 저절로도 열립니다.
 
 1. **마크다운 파일이 있는 폴더를 엽니다.** 그 안의 모든 `- [ ]` 줄이 태스크가 되고, 액티비티 바에 **Tasks** 아이콘이 생깁니다.
-2. **태스크를 만듭니다.** `- [ ] 보고서 작성 📅 2026-09-25`처럼 체크리스트 줄을 쓰거나, `Ctrl+Shift+C`(macOS에서도 Ctrl 키)로 만들기/편집 대화상자를 엽니다. 태스크 줄에서 `Ctrl+Shift+Enter`를 누르면 완료됩니다.
+2. **태스크를 만듭니다.** `- [ ] 보고서 작성 📅 2026-09-25`처럼 체크리스트 줄을 쓰거나, `Ctrl+Shift+Space`로 현재 줄을 체크박스로 바꾸거나, `Ctrl+Shift+C`(macOS에서도 Ctrl 키)로 만들기/편집 대화상자를 엽니다. 태스크 줄에서 `Ctrl+Shift+Enter`를 누르면 완료됩니다.
 3. **쿼리 블록으로 거르고, 노트를 렌더링해 봅니다.** ` ```tasks ` 블록은 조건에 맞는 태스크를 목록으로 보여 줍니다. `Ctrl+Shift+R`을 누르면 노트가 렌더 보기로 열리고 그 자리에 결과가 나옵니다. (VS Code 기본 마크다운 미리보기에도 결과가 보이지만 체크박스는 표시 전용입니다.) 자주 쓰는 쿼리 줄: [쿼리 문법](#쿼리-문법).
 
 ````markdown
@@ -201,6 +201,7 @@ if (tasks.features?.includes('notes.add')) await tasks.edit.addNote(r.tasks[0], 
 | 명령 | 단축키 |
 |---|---|
 | 태스크 완료 토글 | `Ctrl+Shift+Enter` (태스크 줄에서, macOS에서도 Ctrl) |
+| 체크박스 토글 | `Ctrl+Shift+Space` — 줄을 `- [ ] …`로(글머리 기호는 유지), 태스크 줄이면 체크박스를 뺌 |
 | 태스크 만들기 / 편집 | `Ctrl+Shift+C` |
 | 렌더 보기로 열기 / 마크다운 소스 편집 (전환) | `Ctrl+Shift+R` |
 | 렌더 보기를 기본 편집기로 (설정/해제) | — |

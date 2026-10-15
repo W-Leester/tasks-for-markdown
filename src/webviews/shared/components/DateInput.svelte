@@ -42,9 +42,13 @@
     bind:value={text}
     oninput={() => (touched = true)}
   />
+  <!-- A native date input showing only its calendar button: the text part is hidden, the button fills the box.
+       (Squeezing the whole "mm/dd/yyyy + icon" input into 1.6em clipped the icon, and on dark themes it was drawn
+       dark on dark — M26. `showPicker()` is not an option: webviews are cross-origin iframes, where it throws.) -->
   <input
     class="picker"
     type="date"
+    title={t('{0} picker', label)}
     aria-label={t('{0} picker', label)}
     value={parsed ?? ''}
     onchange={(e) => { touched = true; text = (e.currentTarget as HTMLInputElement).value; }}
@@ -57,7 +61,16 @@
 <style>
   .date-input { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
   .date-input input.tfm-input { width: 12em; }
-  .picker { width: 1.6em; height: 1.9em; padding: 0; border: 1px solid var(--tfm-input-border); background: var(--tfm-input-bg); color: var(--tfm-input-fg); border-radius: 3px; cursor: pointer; }
+  .picker {
+    box-sizing: border-box; width: 2em; height: 1.9em; padding: 0; margin: 0;
+    border: 1px solid var(--tfm-input-border); background: var(--tfm-input-bg); color: var(--tfm-input-fg); border-radius: 3px; cursor: pointer;
+    color-scheme: light; /* the popup calendar and the icon follow this; dark themes switch it below */
+  }
+  /* Only the calendar button stays; Chromium centres it. Do not size or re-background the indicator — that blanks it. */
+  .picker::-webkit-datetime-edit { display: none; }
+  .picker::-webkit-calendar-picker-indicator { cursor: pointer; opacity: 0.85; }
+  .picker:hover::-webkit-calendar-picker-indicator, .picker:focus-visible::-webkit-calendar-picker-indicator { opacity: 1; }
+  :global(body.vscode-dark) .picker, :global(body.vscode-high-contrast:not(.vscode-high-contrast-light)) .picker { color-scheme: dark; }
   .hint { font-size: 0.9em; color: var(--tfm-ok); }
   .hint.bad { color: var(--tfm-warn); }
 </style>

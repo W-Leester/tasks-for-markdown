@@ -7,7 +7,7 @@
     "color": "#171d35",
     "theme": "dark"
   },
-  "version": "1.1.3",
+  "version": "1.1.4",
   "publisher": "HastyCapybara",
   "license": "MIT",
   "repository": {
@@ -49,6 +49,12 @@
         "title": "%tasksmd.toggleDone.title%",
         "category": "Tasks",
         "icon": "$(check)"
+      },
+      {
+        "command": "tasksmd.toggleCheckbox",
+        "title": "%tasksmd.toggleCheckbox.title%",
+        "category": "Tasks",
+        "icon": "$(checklist)"
       },
       {
         "command": "tasksmd.openTask",
@@ -961,6 +967,12 @@
         "when": "editorTextFocus && editorLangId == markdown && tasksmd.onTaskLine"
       },
       {
+        "command": "tasksmd.toggleCheckbox",
+        "key": "ctrl+shift+space",
+        "mac": "ctrl+shift+space",
+        "when": "editorTextFocus && editorLangId == markdown"
+      },
+      {
         "command": "tasksmd.createOrEdit",
         "key": "ctrl+shift+c",
         "mac": "ctrl+shift+c",
@@ -1132,6 +1144,10 @@
         {
           "command": "tasksmd.createOrEdit",
           "group": "0_edit@1"
+        },
+        {
+          "command": "tasksmd.toggleCheckbox",
+          "group": "0_edit@2"
         },
         {
           "command": "tasksmd.setStatus",

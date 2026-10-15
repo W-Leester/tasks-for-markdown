@@ -1044,10 +1044,10 @@
 - 고침: 보이는 것은 `📅` 버튼(포커스·aria-label), 실제 `<input type="date">`는 숨겨 두고 버튼이 `showPicker()`를 부른다(없으면 포커스). 테마에 맞춰 `color-scheme`(body.vscode-dark → dark)로 팝업도 어둡게. 마감·예정·시작·생성·완료·취소 모든 날짜 칸에 적용(같은 컴포넌트). 실제 Chrome에서 다크·라이트 확인. incidents #38.
 
 ### 할 일
-- [ ] `toggleCheckboxLine` 순수 함수 + 단위 테스트
-- [ ] 명령·키바인딩·메뉴·l10n, 통합 테스트
+- [x] `toggleCheckboxLine` 순수 함수 + 단위 테스트
+- [x] 명령·키바인딩·메뉴·l10n, 통합 테스트
 - [ ] `DateInput` 버튼+showPicker, color-scheme, 웹뷰 테스트, 실제 Chrome 확인
-- [ ] 문서(user-guide, README 한·영, 시작 안내, design.md, CHANGELOG), incidents #38
+- [x] 문서(user-guide, README 한·영, 시작 안내, design.md, CHANGELOG), incidents #38
 
 ## M21. 확장 안에서 AI 연결 제공 — 1.1.0 (계획 2026-10-02, 착수 2026-10-07)
 

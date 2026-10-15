@@ -280,3 +280,9 @@ Tasks for Markdown을 만들며(2026-09-21 ~) 겪은 실패를 모아 둔 문서
 - **해결(1.1.4):** 글자 부분(`::-webkit-datetime-edit`)을 숨기고 아이콘(`::-webkit-calendar-picker-indicator`)이 2em 상자를 채우게, `body.vscode-dark`·고대비에서는 `color-scheme: dark`. `showPicker()`는 쓰지 않음(웹뷰는 다른 출처 iframe이라 던짐). 실제 Chrome에서 다크·라이트 렌더 확인.
 - **재발 방지:** 웹뷰 UI는 **다크 테마에서 먼저** 본다(VS Code 기본이 다크). 네이티브 입력 요소를 줄일 때는 안에 그려지는 부분 전체를 확인한다.
 
+## 39. `Ctrl+Shift+Space`가 macOS에서 앱에 도착하지 않음 (10-15, 1.1.4 개발판)
+- **증상:** 체크박스 토글 키 `Ctrl+Shift+Space`를 Mac의 VS Code·Cursor에서 눌러도 아무 일도 없음. "바로 가기 키 문제 해결" 로그에는 Ctrl·Shift 키다운만 있고 **Space 이벤트가 없음** — OS 단계에서 삼켜짐(이 Mac은 입력 소스 전환이 `Ctrl+Space`).
+- **왜 못 잡았나:** 키 선택은 VS Code·Cursor의 **기본 키바인딩 목록**만 보고 했고, 동작 확인은 브라우저판 VS Code에 **합성 키 이벤트**를 넣어 했다 — 둘 다 OS/입력기 단계를 지나지 않는다.
+- **해결:** `Ctrl+Shift+/`로 변경(Mac·Windows/Linux 기본 키 없음, 글자·스페이스가 아니라 입력기가 건드리지 않음). 사용자가 실제 키보드로 확인.
+- **재발 방지:** 새 키바인딩은 **실제 키보드로, 한글 입력 상태 포함** 눌러 본다(사용자 또는 데스크톱 조작). 합성 이벤트 검증은 "에디터 안"만 증명한다. Space·Enter·방향키처럼 OS·입력기가 특별히 다루는 키는 조합 키로 피한다.
+

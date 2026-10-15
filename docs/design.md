@@ -1077,7 +1077,7 @@ GitHub Actions: PR마다 `typecheck + lint + test`, 태그 `v*` 푸시 시 패�
 
 | 날짜 | 버전 | 내용 |
 |---|---|---|
-| 2026-10-15 | 1.7 | M26: `tasksmd.toggleCheckbox`(`Ctrl+Shift+Space`, 마크다운 편집기에서만; 순수 함수 `toggleCheckboxLine`, 선택 줄은 첫 줄 기준) · `DateInput` 달력 버튼은 `<input type=date>`의 글자 부분(`::-webkit-datetime-edit`)을 숨기고 아이콘만 남김 + 테마별 `color-scheme`(incidents #38; 아이콘 크기·배경을 건드리면 사라짐, `showPicker()`는 웹뷰(다른 출처 iframe)에서 불가) |
+| 2026-10-15 | 1.7 | M26: `tasksmd.toggleCheckbox`(`Ctrl+Shift+/`, 마크다운 편집기에서만 — `Ctrl+Shift+Space`는 macOS가 앱에 넘기지 않음, incidents #39; 순수 함수 `toggleCheckboxLine`, 선택 줄은 첫 줄 기준) · `DateInput` 달력 버튼은 `<input type=date>`의 글자 부분(`::-webkit-datetime-edit`)을 숨기고 아이콘만 남김 + 테마별 `color-scheme`(incidents #38; 아이콘 크기·배경을 건드리면 사라짐, `showPicker()`는 웹뷰(다른 출처 iframe)에서 불가) |
 | 2026-10-10 | 1.6 | M24: 열 이름 항상 표시(7.14), 끈 경계만 움직이는 너비 조절·더블클릭 자동 맞춤(7.15, incidents #34) |
 | 2026-10-08 | 1.5 | 1.1.0 수동 점검 반영(7.16): 연결 선택 창의 도구 상태(미리 체크·연결됨·설치되지 않음), 알림 (A)·(C)는 켜질 때마다, Claude Desktop이 켜져 있으면 설정을 쓰지 않음(incidents #32), MCP 응답 줄이기, 도구 표시(annotations) |
 | 2026-10-07 | 1.4 | 1.1.0 구현 중 변경: 첫 실행 안내(7.16, 사용자 결정), 링크 `/guide`, 명령이 '앞의 탭'이 아니라 '쓰던 노트'를 대상(incidents #28), AI 연결 선택 창의 에디터 항목은 상태 줄, 10장 보안에 AI 연결·홈 폴더 쓰기·링크·제3자 라이선스 |

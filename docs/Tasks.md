@@ -1034,7 +1034,7 @@
 
 ## M26. 체크박스 토글 키 + 편집 창 날짜 선택 아이콘 (1.1.4, 계획 2026-10-15, 사용자 요청)
 
-**1. 체크박스 토글 `Ctrl+Shift+Space`(세 OS 공통).** 간단히 `- [ ]`만 만들고 싶을 때 대화상자 없이. 기존 `Ctrl+Shift+C`(만들기/편집 창)는 그대로.
+**1. 체크박스 토글 `Ctrl+Shift+/`(세 OS 공통; 처음 고른 `Ctrl+Shift+Space`는 macOS가 앱에 넘기지 않아 바꿈, incidents #39).** 간단히 `- [ ]`만 만들고 싶을 때 대화상자 없이. 기존 `Ctrl+Shift+C`(만들기/편집 창)는 그대로.
 - 키 선택 근거: 실제 VS Code(macOS 1.142) 단축키 편집기 검색 + Windows/Linux 기본 목록. `Ctrl+Shift+X`는 Windows 확장 탭, `Cmd+Shift+C`는 Mac 터미널, `Alt+Shift+A`는 Windows 블록 주석이라 제외. `Ctrl+Shift+Space`는 Mac 비어 있음, Windows/Linux는 매개변수 힌트(마크다운엔 없음). 마크다운 편집기(`editorTextFocus && editorLangId == markdown`)에서만.
 - 동작(현재 줄 또는 선택한 모든 줄, 순수 함수 `toggleCheckboxLine`): `텍스트` → `- [ ] 텍스트`(들여쓰기 유지) · `- 텍스트`/`* 텍스트`/`1. 텍스트` → `- [ ] 텍스트`(글머리 기호 유지) · `- [ ] 텍스트`/`- [x] 텍스트` → `- 텍스트`(체크박스 제거) · 빈 줄 → `- [ ] ` 뒤에 커서. 여러 줄은 첫 줄 기준으로 모두 같은 방향.
 - 명령 `tasksmd.toggleCheckbox`("Tasks: Toggle checkbox" / "체크박스 토글"), 편집기 우클릭 메뉴, 키바인딩. 통합 테스트(키바인딩·명령 결과), 단위 테스트.

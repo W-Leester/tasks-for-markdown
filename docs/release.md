@@ -58,7 +58,8 @@ for p in tasks-core tasks-cli tasks-api; do pnpm --filter @hastycapybara/$p publ
 ## 1.1.4 게시 (2026-10-16)
 - [x] 검증: typecheck·lint, 단위 830, 웹뷰 34, 통합 63, `build:packages`, `pnpm package`(35 files)
 - [x] 수동(사용자, Mac VS Code·Cursor): `Ctrl+Shift+C` 체크박스 토글(영문·한글), `Ctrl+Shift+/` 대화상자, 날짜 선택 아이콘(다크)
-- [ ] Marketplace 업로드(사용자) → 공개 확인 → `releases/` → 태그 `v1.1.4` → Open VSX·npm 확인 → GitHub Release 파일 `releases/`에
+- [x] Marketplace 업로드(사용자, 07:41 빌드 `eb8d6474…`) → 08:03 KST 공개(약 8분), 마켓 사본 = 업로드본 → `releases/`
+- [x] 태그 `v1.1.4` → Release 성공. Open VSX 토큰 없이(`🔐 → 🚀 v1.1.4`), npm 3개 provenance. 확인: Open VSX 1.1.4(`verified=true`), npm 3개 1.1.4. GitHub Release 파일 `releases/`(`.github.vsix` `783e8188cb319c07…`)
 
 ## 1.1.3 게시 (2026-10-15)
 - [x] 검증: typecheck·lint, 단위 826, 웹뷰 34, 통합 61 통과, `build:packages`, `pnpm package`(35 files)
@@ -89,6 +90,8 @@ for p in tasks-core tasks-cli tasks-api; do pnpm --filter @hastycapybara/$p publ
 
 | 버전 | 파일 | 출처 | SHA-256 |
 |---|---|---|---|
+| 1.1.4 | `tasks-for-markdown-1.1.4.marketplace.vsix` | VS Code Marketplace에 올린 파일(마켓에서 다시 받음, 업로드본과 같음) | `eb8d6474007d4efc…` |
+| 1.1.4 | `tasks-for-markdown-1.1.4.github.vsix` | GitHub Release·Open VSX(Actions 빌드) | `783e8188cb319c07…` |
 | 1.1.3 | `tasks-for-markdown-1.1.3.marketplace.vsix` | VS Code Marketplace에 올린 파일(마켓에서 다시 받음, 업로드본과 같음) | `8c9b00c5fa8f0fa5…` |
 | 1.1.3 | `tasks-for-markdown-1.1.3.github.vsix` | GitHub Release·Open VSX(Actions 빌드) | `8c9fff8ce8912c90…` |
 | 1.1.2 | `tasks-for-markdown-1.1.2.marketplace.vsix` | VS Code Marketplace에 올린 파일(마켓에서 다시 받음, 업로드본과 같음) | `bef51d09d6dff221…` |

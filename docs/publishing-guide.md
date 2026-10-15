@@ -169,7 +169,7 @@ Cursor는 VS Code 기반이지만 같은 확장이 똑같이 동작하지 않는
 ### 3.1 자동 검사
 - 타입 검사, 린트, 단위 테스트, 웹뷰 테스트, **실제 VS Code를 띄우는 통합 테스트**.
 - 워크스페이스 구성(패키지 추가)을 바꿨다면 `pnpm install --frozen-lockfile`이 통과하는지 로컬에서 확인(CI가 이걸로 설치한다).
-- CI에서 통합 테스트는 헤드리스 VS Code가 가끔 시작 중에 멈춘다(`CodeWindow: detected unresponsive`) → **한 번 재시도**하게 해 둔다.
+- CI에서 통합 테스트는 헤드리스 VS Code가 가끔 시작 중에 멈춘다(`CodeWindow: detected unresponsive`) → **한 번 재시도**하게 해 둔다. 두 번 연속 멈추면(1.1.3, 2026-10-15) 워크플로가 실패하는데 게시 단계 전이라 아무것도 올라가지 않은 상태 — `gh run rerun <run id> --failed`로 같은 태그를 다시 돌리면 된다(incidents #37).
 
 ### 3.2 수동 점검 (실제 에디터에서)
 점검표(이 프로젝트는 [manual-checklist.md](manual-checklist.md))를 만들고 결과를 날짜와 함께 기록한다.

@@ -268,3 +268,9 @@ Tasks for Markdown을 만들며(2026-09-21 ~) 겪은 실패를 모아 둔 문서
 - **네 번째(10-15, 실제 Windows PC에서 1.1.1 점검):** 런처 `tasksmd.cmd`와 MCP 서버 본체(stdio로 initialize·tools/list·tasks_query)는 Windows에서 정상 — 고장난 건 등록 단계와 안내문뿐임을 확인. 그런데 1.1.2의 복사용 명령 `claude mcp add … -- …`를 PowerShell에 붙여 넣으니 "unknown option '--root'". 셸 자체는 맨 `--`를 통과시키지만(`node -e` 로 확인), PowerShell은 `claude`를 npm의 **`claude.ps1` 심**으로 먼저 잡고, 그 스크립트가 `$args`로 인자를 넘기면서 PowerShell이 맨 `--`(매개변수 끝 표시)를 `$args`에서 **빼 버린다**. `claude.cmd …`·cmd.exe는 정상. → 복사용 명령의 `--`를 `"--"`로 — PowerShell은 따옴표 친 `--`를 보통 인자로 두고, cmd.exe/Node의 인자 파싱은 따옴표를 벗겨 `--`를 넘기므로 두 셸 모두 통과(둘 다 실제로 실행해 확인). 확장 내부 경로(add-json을 Node로 직접 실행)는 `--`를 안 쓰므로 무관.
 - **재발 방지:** Windows에서 외부 명령을 실행할 때 `shell: true`를 쓰지 않는다(인자가 이스케이프되지 않음). 플랫폼별 문구는 플랫폼마다 따로 쓴다. "Windows 미확인" 상태의 기능은 배포 후 가장 먼저 실제 Windows에서 점검한다. 사용자가 붙여 넣을 명령은 **Windows PowerShell 5.1에서 npm 설치판으로** 실제로 붙여 넣어 본다 — npm 심은 `.ps1`이 먼저 잡히고, `$args`를 거치는 순간 맨 `--` 같은 PowerShell 토큰이 사라진다.
 
+## 37. Release 워크플로가 통합 테스트에서 두 번 연속 멈춰 실패 (10-15, 1.1.3)
+- **증상:** 태그 `v1.1.3` 푸시 → Release 실패. 로그 끝: `CodeWindow: detected unresponsive`, Exit code 1. Open VSX·npm 게시 단계는 돌지 않음.
+- **원인:** 헤드리스 VS Code(runner의 1.142.0)가 시작 중 멈추는 알려진 불안정(배포 가이드에 기록, 1회 재시도 있음). 이번엔 재시도까지 두 번 모두 멈춤. 코드 문제 아님(로컬 61 passing, 재실행 61 passing).
+- **해결:** `gh run rerun --failed` → 통과·게시 성공. 게시 전 단계라 중복 게시 위험 없음.
+- **재발 방지:** 가이드에 재실행 절차 추가. 자주 반복되면 재시도 2회 또는 runner의 VS Code 버전 고정 검토.
+

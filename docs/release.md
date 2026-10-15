@@ -59,7 +59,8 @@ for p in tasks-core tasks-cli tasks-api; do pnpm --filter @hastycapybara/$p publ
 - [x] 검증: typecheck·lint, 단위 826, 웹뷰 34, 통합 61 통과, `build:packages`, `pnpm package`(35 files)
 - [x] 실제 VS Code(serve-web, 격리 HOME): 설치 직후 새 통합 터미널에서 `tasksmd --help`·`which` ✅. Mac 터미널: 런처로 `--version`(1.1.3)·query·info·saved ✅
 - [ ] **Windows 사용자 Path 자동 추가는 실제 Windows에서 아직 확인 전**(실패 시 수동 안내로 돌아감). 사용자 PC 확인 후 점검표 기록
-- [ ] Marketplace 업로드(사용자) → 공개 확인 → `releases/` → 태그 `v1.1.3` → Open VSX·npm 확인 → GitHub Release 파일 `releases/`에
+- [x] Marketplace 업로드(사용자) → 09:08 KST 공개(약 7분), 마켓 사본 = 업로드본(`8c9b00c5…`) → `releases/`
+- [x] 태그 `v1.1.3` → **첫 실행은 통합 테스트 단계에서 헤드리스 VS Code가 두 번 연속 멈춰 실패(게시 전 단계라 아무것도 게시 안 됨)** → `gh run rerun --failed` → 61 passing, Open VSX 토큰 없이 게시(`🔐 → 🚀 v1.1.3`), npm 3개 provenance. 확인: Open VSX 1.1.3(`verified=true`), npm 3개 1.1.3. GitHub Release 파일 `releases/`(`.github.vsix` `8c9fff8c…`)
 
 ## 1.1.2 게시 (2026-10-15)
 - [x] 검증: typecheck·lint, 단위 825, 웹뷰 34, 통합 61 통과, `pnpm package`(35 files)
@@ -83,6 +84,8 @@ for p in tasks-core tasks-cli tasks-api; do pnpm --filter @hastycapybara/$p publ
 
 | 버전 | 파일 | 출처 | SHA-256 |
 |---|---|---|---|
+| 1.1.3 | `tasks-for-markdown-1.1.3.marketplace.vsix` | VS Code Marketplace에 올린 파일(마켓에서 다시 받음, 업로드본과 같음) | `8c9b00c5fa8f0fa5…` |
+| 1.1.3 | `tasks-for-markdown-1.1.3.github.vsix` | GitHub Release·Open VSX(Actions 빌드) | `8c9fff8ce8912c90…` |
 | 1.1.2 | `tasks-for-markdown-1.1.2.marketplace.vsix` | VS Code Marketplace에 올린 파일(마켓에서 다시 받음, 업로드본과 같음) | `bef51d09d6dff221…` |
 | 1.1.2 | `tasks-for-markdown-1.1.2.github.vsix` | GitHub Release·Open VSX(Actions 빌드) | `9b374cf81b9bc210…` |
 | 1.1.1 | `tasks-for-markdown-1.1.1.marketplace.vsix` | VS Code Marketplace에 올린 파일(마켓에서 다시 받음, 업로드본과 같음) | `ad2ed84e3cae6b3b…` |

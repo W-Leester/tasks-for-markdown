@@ -49,6 +49,7 @@
 | M21 | 확장 안에서 AI 연결 제공(VS Code·Cursor MCP 자동 등록, 터미널 명령, AI 연결 명령, 시작 안내) | ✅ 완료(1.1.0 공개 2026-10-08) · 원격·Windows 확인은 배포 후 | 이 문서 M21, design.md 7.16 |
 | M22 | README 개편: 강점(AI·API) 강조, 움직이는 예시 GIF, 사이트 연결 | ✅ 1.0.1(2026-10-05) | 이 문서 M22 |
 | M24 | 렌더 보기 열 제목 항상 표시, 끈 경계만 움직이는 너비 조절, 더블클릭 자동 맞춤 | ✅ 완료(1.1.1, 2026-10-12) | 이 문서 M24, design.md 7.14·7.15 |
+| M26 | 체크박스 토글 `Ctrl+Shift+Space`, 편집 창 날짜 선택 아이콘 수정 | 🟡 진행 중(1.1.4, 2026-10-15) | 이 문서 M26 |
 | M25 | `tasksmd` 설치 한 번에: 통합 터미널 PATH(환경 변수 컬렉션), Windows 사용자 Path 자동 | ✅ 완료(1.1.3, 2026-10-15; Windows 확인됨) | 이 문서 M25, design.md 7.16 |
 | M23 | 태스크 링크(URI): `vscode://…/open`, `/query`, 링크 복사 명령 (M9.7) | ✅ 완료(1.1.0 공개 2026-10-08) | 이 문서 M23, design.md 7.17 |
 
@@ -1029,6 +1030,24 @@
 - [x] `installCli`/`uninstallCli`/켜질 때: 환경 변수 컬렉션, Windows 사용자 Path, 문구(한국어)
 - [~] 실제 VS Code(serve-web, 격리 HOME)에서 설치 직후 통합 터미널 `tasksmd --help` ✅(10-15, `which` → `~/.local/bin/tasksmd`, PATH에 없는 폴더인데 동작); Windows 사용자 Path ✅(10-15 사용자 PC, 새 cmd에서 1.1.3)
 - [x] 문서: design.md 7.16, user-guide(Windows 절·FAQ), CHANGELOG 1.1.3
+
+
+## M26. 체크박스 토글 키 + 편집 창 날짜 선택 아이콘 (1.1.4, 계획 2026-10-15, 사용자 요청)
+
+**1. 체크박스 토글 `Ctrl+Shift+Space`(세 OS 공통).** 간단히 `- [ ]`만 만들고 싶을 때 대화상자 없이. 기존 `Ctrl+Shift+C`(만들기/편집 창)는 그대로.
+- 키 선택 근거: 실제 VS Code(macOS 1.142) 단축키 편집기 검색 + Windows/Linux 기본 목록. `Ctrl+Shift+X`는 Windows 확장 탭, `Cmd+Shift+C`는 Mac 터미널, `Alt+Shift+A`는 Windows 블록 주석이라 제외. `Ctrl+Shift+Space`는 Mac 비어 있음, Windows/Linux는 매개변수 힌트(마크다운엔 없음). 마크다운 편집기(`editorTextFocus && editorLangId == markdown`)에서만.
+- 동작(현재 줄 또는 선택한 모든 줄, 순수 함수 `toggleCheckboxLine`): `텍스트` → `- [ ] 텍스트`(들여쓰기 유지) · `- 텍스트`/`* 텍스트`/`1. 텍스트` → `- [ ] 텍스트`(글머리 기호 유지) · `- [ ] 텍스트`/`- [x] 텍스트` → `- 텍스트`(체크박스 제거) · 빈 줄 → `- [ ] ` 뒤에 커서. 여러 줄은 첫 줄 기준으로 모두 같은 방향.
+- 명령 `tasksmd.toggleCheckbox`("Tasks: Toggle checkbox" / "체크박스 토글"), 편집기 우클릭 메뉴, 키바인딩. 통합 테스트(키바인딩·명령 결과), 단위 테스트.
+- 문서: user-guide 단축키 표·FAQ, README(한·영) 시작하기 2번·단축키 표, 시작 안내 1단계, design.md 키 목록, CHANGELOG 1.1.4.
+
+**2. 편집 창 날짜 선택 아이콘이 잘려 보임(사용자 캡처, 다크 테마).** `DateInput`의 달력 선택이 `<input type="date">`를 1.6em 폭으로 줄여 놓은 것이라 Chromium이 "mm/dd/yyyy" 텍스트와 아이콘을 그 폭에 욱여넣어 아이콘 조각만 보이고, 다크 테마에서는 아이콘이 어둡게 그려짐.
+- 고침: 보이는 것은 `📅` 버튼(포커스·aria-label), 실제 `<input type="date">`는 숨겨 두고 버튼이 `showPicker()`를 부른다(없으면 포커스). 테마에 맞춰 `color-scheme`(body.vscode-dark → dark)로 팝업도 어둡게. 마감·예정·시작·생성·완료·취소 모든 날짜 칸에 적용(같은 컴포넌트). 실제 Chrome에서 다크·라이트 확인. incidents #38.
+
+### 할 일
+- [ ] `toggleCheckboxLine` 순수 함수 + 단위 테스트
+- [ ] 명령·키바인딩·메뉴·l10n, 통합 테스트
+- [ ] `DateInput` 버튼+showPicker, color-scheme, 웹뷰 테스트, 실제 Chrome 확인
+- [ ] 문서(user-guide, README 한·영, 시작 안내, design.md, CHANGELOG), incidents #38
 
 ## M21. 확장 안에서 AI 연결 제공 — 1.1.0 (계획 2026-10-02, 착수 2026-10-07)
 

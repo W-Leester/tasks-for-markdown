@@ -968,8 +968,8 @@
       },
       {
         "command": "tasksmd.toggleCheckbox",
-        "key": "ctrl+shift+space",
-        "mac": "ctrl+shift+space",
+        "key": "ctrl+shift+/",
+        "mac": "ctrl+shift+/",
         "when": "editorTextFocus && editorLangId == markdown"
       },
       {

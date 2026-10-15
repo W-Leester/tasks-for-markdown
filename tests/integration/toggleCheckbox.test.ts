@@ -3,10 +3,10 @@ import * as vscode from 'vscode';
 import { getApi, sleep } from './helpers';
 
 suite('toggle checkbox (M26)', () => {
-  test('Ctrl+Shift+Space is bound in Markdown editors on every platform', () => {
+  test('Ctrl+Shift+/ is bound in Markdown editors on every platform (Ctrl+Shift+Space never reaches the app on macOS with input-source switching)', () => {
     const pkg = vscode.extensions.getExtension('HastyCapybara.tasks-for-markdown')!.packageJSON as { contributes: { keybindings: { command: string; key: string; mac?: string; when?: string }[] } };
     const kb = pkg.contributes.keybindings.filter((k) => k.command === 'tasksmd.toggleCheckbox');
-    assert.deepEqual(kb.map((k) => [k.key, k.mac, k.when]), [['ctrl+shift+space', 'ctrl+shift+space', 'editorTextFocus && editorLangId == markdown']]);
+    assert.deepEqual(kb.map((k) => [k.key, k.mac, k.when]), [['ctrl+shift+/', 'ctrl+shift+/', 'editorTextFocus && editorLangId == markdown']]);
   });
 
   test('adds a box to the line under the cursor, removes it from a task line, and follows the first line of a selection', async () => {

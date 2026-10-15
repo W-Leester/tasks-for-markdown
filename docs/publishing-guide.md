@@ -154,7 +154,7 @@ Cursor는 VS Code 기반이지만 같은 확장이 똑같이 동작하지 않는
 | 설정 화면 `Cmd+,` | VS Code 설정(확장 설정 포함) | Cursor 자체 설정 — 확장 설정은 `Preferences: Open Settings (UI)` |
 
 - **다른 앱의 설정 파일을 쓸 때(예: Claude Desktop):** 그 앱이 켜져 있으면 메모리의 설정으로 파일을 다시 써서 우리가 넣은 내용이 사라질 수 있다(incidents #32). 실행 여부를 확인하고 꺼져 있을 때만 쓴다.
-- **Cursor 마켓은 Open VSX의 거울이고 응답을 캐시한다:** 새 버전을 올린 뒤 한동안 옛 버전을 최신이라 답해 자동 업데이트가 늦을 수 있다(1.1.2·1.1.3 모두). 점검할 때는 확장 페이지의 Version을 먼저 보고, 안 올라왔으면 vsix로 직접 설치한다.
+- **Cursor 마켓(marketplace.cursorapi.com)은 Open VSX의 거울이고, 새 버전이 몇 시간 늦게 보인다:** 게시 2분 뒤 거울의 버전 목록에는 들어가지만(전체 목록 조회 flags 407·918), Cursor 앱이 쓰는 조회 모양(flags 950, "최신 버전만 + 검증된 것만")에는 옛 버전이 최신으로 한동안 남는다 — 1.1.2는 게시 9시간 뒤에도 1.1.0, 1.1.3은 1시간 뒤에도 1.1.2(2026-10-15 확인). 그래서 Cursor의 확장 페이지·Download·자동 업데이트가 늦다. 우리 쪽에서 당길 방법은 없다. 급하면 Open VSX에서 vsix를 받아 설치: `https://open-vsx.org/api/HastyCapybara/tasks-for-markdown/<버전>/file/HastyCapybara.tasks-for-markdown-<버전>.vsix`. 점검할 때는 확장 페이지의 Version을 먼저 본다.
 - **Windows에서 외부 명령은 셸 없이:** `execFile(..., { shell: true })`는 인자를 이스케이프 없이 cmd.exe 줄로 잇는다 — JSON처럼 따옴표·공백이 든 인자가 깨진다(incidents #36). `.exe`는 바로 실행하고, npm `.cmd` 심(shim)은 그 안의 스크립트를 Node로 실행. PATH 안내에 `setx`를 권하지 않는다(1024자 절단).
 - **웹뷰의 끌기·더블클릭은 실제 브라우저로 확인:** jsdom 테스트는 레이아웃이 없고 이벤트를 직접 보내서, "요소를 다시 그려 dblclick이 안 옴"·"좁은 창에서 계산이 화면과 어긋남"을 못 잡았다(incidents #34). 웹뷰 CSS·스크립트를 그대로 쓰는 시험 페이지를 헤드리스 Chrome으로 띄워 넓은 창·좁은 창에서 끌어 본다.
 - **루트에 새 폴더를 두면 `.vscodeignore`에도:** vsce는 `.gitignore`를 보지 않는다. 배포 파일 보관 폴더(`releases/`)를 `.gitignore`에만 넣었다가 npm tgz 9개가 vsix에 들어갔다(incidents #35). `vsce ls` 결과를 허용 목록과 비교하는 테스트를 두고, 패키징 출력의 파일 수·크기를 본다.

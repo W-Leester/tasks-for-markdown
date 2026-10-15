@@ -49,7 +49,7 @@
 | M21 | 확장 안에서 AI 연결 제공(VS Code·Cursor MCP 자동 등록, 터미널 명령, AI 연결 명령, 시작 안내) | ✅ 완료(1.1.0 공개 2026-10-08) · 원격·Windows 확인은 배포 후 | 이 문서 M21, design.md 7.16 |
 | M22 | README 개편: 강점(AI·API) 강조, 움직이는 예시 GIF, 사이트 연결 | ✅ 1.0.1(2026-10-05) | 이 문서 M22 |
 | M24 | 렌더 보기 열 제목 항상 표시, 끈 경계만 움직이는 너비 조절, 더블클릭 자동 맞춤 | ✅ 완료(1.1.1, 2026-10-12) | 이 문서 M24, design.md 7.14·7.15 |
-| M26 | 체크박스 토글 `Ctrl+Shift+Space`, 편집 창 날짜 선택 아이콘 수정 | 🟡 진행 중(1.1.4, 2026-10-15) | 이 문서 M26 |
+| M26 | 체크박스 토글 `Ctrl+Shift+Space`, 편집 창 날짜 선택 아이콘 수정 | ✅ 완료(1.1.4, 2026-10-16) | 이 문서 M26 |
 | M25 | `tasksmd` 설치 한 번에: 통합 터미널 PATH(환경 변수 컬렉션), Windows 사용자 Path 자동 | ✅ 완료(1.1.3, 2026-10-15; Windows 확인됨) | 이 문서 M25, design.md 7.16 |
 | M23 | 태스크 링크(URI): `vscode://…/open`, `/query`, 링크 복사 명령 (M9.7) | ✅ 완료(1.1.0 공개 2026-10-08) | 이 문서 M23, design.md 7.17 |
 
@@ -1049,7 +1049,7 @@
 ### 할 일
 - [x] `toggleCheckboxLine` 순수 함수 + 단위 테스트
 - [x] 명령·키바인딩·메뉴·l10n, 통합 테스트
-- [ ] `DateInput` 버튼+showPicker, color-scheme, 웹뷰 테스트, 실제 Chrome 확인
+- [x] `DateInput` 버튼+showPicker, color-scheme, 웹뷰 테스트, 실제 Chrome 확인
 - [x] 문서(user-guide, README 한·영, 시작 안내, design.md, CHANGELOG), incidents #38
 
 ## M21. 확장 안에서 AI 연결 제공 — 1.1.0 (계획 2026-10-02, 착수 2026-10-07)

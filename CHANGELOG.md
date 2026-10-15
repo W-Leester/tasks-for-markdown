@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased (1.1.4)
+## 1.1.4 — 2026-10-16
 
 **Editor — keys changed**
 - **`Ctrl+Shift+C` now toggles a checkbox; the create/edit dialog moved to `Ctrl+Shift+/`.** The quick, frequent action gets the one-hand key. (Change either in Keyboard Shortcuts if you prefer the old layout.)

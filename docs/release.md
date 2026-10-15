@@ -55,6 +55,11 @@ for p in tasks-core tasks-cli tasks-api; do pnpm --filter @hastycapybara/$p publ
 - [x] 확인: Open VSX 1.1.0(`verified=true`), npm `tasks-core`·`tasks-cli`·`tasks-api` 1.1.0(provenance 모두 있음), `tasks-cli`에 THIRD_PARTY_NOTICES. **`tasks-api`만 레지스트리 반영이 약 4분 늦음**(로그는 09:47 Published, 목록은 09:52) — 기다리면 됨
 - [x] 설치본 교체: 개발용 vsix 대신 마켓 설치본(VS Code는 Marketplace, Cursor는 Open VSX) — 2026-10-09 사용자
 
+## 1.1.4 게시 (2026-10-16)
+- [x] 검증: typecheck·lint, 단위 830, 웹뷰 34, 통합 63, `build:packages`, `pnpm package`(35 files)
+- [x] 수동(사용자, Mac VS Code·Cursor): `Ctrl+Shift+C` 체크박스 토글(영문·한글), `Ctrl+Shift+/` 대화상자, 날짜 선택 아이콘(다크)
+- [ ] Marketplace 업로드(사용자) → 공개 확인 → `releases/` → 태그 `v1.1.4` → Open VSX·npm 확인 → GitHub Release 파일 `releases/`에
+
 ## 1.1.3 게시 (2026-10-15)
 - [x] 검증: typecheck·lint, 단위 826, 웹뷰 34, 통합 61 통과, `build:packages`, `pnpm package`(35 files)
 - [x] 실제 VS Code(serve-web, 격리 HOME): 설치 직후 새 통합 터미널에서 `tasksmd --help`·`which` ✅. Mac 터미널: 런처로 `--version`(1.1.3)·query·info·saved ✅

@@ -1078,6 +1078,7 @@
 - [x] **단축키 바꾸기 안내:** 명령 `Tasks: 단축키 설정 열기`(키보드 단축키 편집기를 이 확장 명령만 보이게 엶), 사용자 가이드·README에 방법.
 - [x] **렌더 보기에서 고른 줄의 `Ctrl+Shift+Enter`가 새 줄을 엶(10-18 사용자):** 웹뷰가 수정 키를 보지 않고 Enter만 확인, 완료 토글 키는 텍스트 편집기에서만 → 고른 줄에서 `Ctrl+Shift+Enter` = 완료 토글(`doc/toggle`), 수정 키 없는 `Enter`만 새 줄, 다른 수정 키 조합은 무시. 웹뷰 테스트
 - [x] **완료 토글하면 줄 선택이 풀림(10-18 사용자):** 파일이 바뀌어 다시 그릴 때 선택을 버림 → 고른 줄 번호를 기억해 다시 그린 뒤 같은 줄을 다시 고름(포커스 포함, 그 줄이 없어졌으면 해제). 웹뷰 테스트
+- [ ] **소스 편집기에서 체크박스 줄 Enter 뒤 Tab 들여쓰기가 안 됨(10-18 사용자):** Markdown All in One이 새 줄에 `- [ ] `를 넣으면 끝의 공백이 우리 자동완성을 띄우고(최소 글자 0), 제안 창이 떠 있으면 Markdown All in One이 Tab·Enter를 양보(`!suggestWidgetVisible`) → 체크박스 뒤가 비어 있으면 자동으로 띄우지 않음(`Ctrl+Space`로 부르면 뜸). 단위 테스트, 브라우저 VS Code에 Markdown All in One을 넣고 Enter→Tab 확인. incidents #41
 
 - [x] 문서(user-guide, README 한·영, CHANGELOG 1.1.5, design.md)
 

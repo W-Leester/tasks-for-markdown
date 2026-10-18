@@ -16,6 +16,7 @@
   "tasksmd.showLogs.title": "Show logs",
   "tasksmd.toggleDone.title": "Toggle task done",
   "tasksmd.toggleCheckbox.title": "Add or remove checkbox",
+  "tasksmd.openKeybindings.title": "Keyboard shortcuts",
   "tasksmd.openTask.title": "Go to task",
   "tasksmd.openSidebar.title": "Open Tasks sidebar",
   "tasksmd.view.tasks": "Tasks",

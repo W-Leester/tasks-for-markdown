@@ -121,6 +121,9 @@ export function registerCommands(context: vscode.ExtensionContext, deps: Command
     }),
   );
 
+  // Keyboard Shortcuts editor showing only this extension's commands, so a key is easy to change.
+  register('tasksmd.openKeybindings', () => vscode.commands.executeCommand('workbench.action.openGlobalKeybindings', '@ext:HastyCapybara.tasks-for-markdown'));
+
   register('tasksmd.toggleDone', (arg) =>
     runEdit(deps, async () => {
       const targets = resolveTargetTasks(arg, deps);

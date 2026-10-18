@@ -121,6 +121,12 @@ export function registerEditCommands(context: vscode.ExtensionContext, deps: Com
         deps.openEdit({ key: existing.location.key, line: existing.location.line });
         return;
       }
+      // The rendered view in front with a row selected (click): edit that task, not "which task?" (M27).
+      const inRendered = await vscode.commands.executeCommand<{ key: string; line: number } | undefined>('tasksmd.rendered.selection');
+      if (inRendered) {
+        deps.openEdit(inRendered);
+        return;
+      }
       // The active editor, or — when the preview / a sidebar has focus — the Markdown editor
       // still visible next to it: its cursor line decides (edit that task, or create there).
       const editor = vscode.window.activeTextEditor?.document.languageId === 'markdown'

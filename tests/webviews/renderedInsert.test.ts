@@ -22,6 +22,8 @@ describe('rendered view: new task lines (M27)', () => {
     const li = document.querySelector<HTMLElement>('li.tfm-task[data-tfm-line="2"]')!;
     expect(li.classList.contains('rv-selected')).toBe(true);
     expect(document.activeElement).toBe(li);
+    // The host learns the selection, so Cmd/Alt+Shift+C edits this task instead of asking which one.
+    expect(posted.filter((m: FromWebview) => m.type === 'doc/select').at(-1)).toEqual({ type: 'doc/select', line: 2 });
 
     key(li, 'Enter');
     const input = document.querySelector<HTMLInputElement>('li.rv-task-form input')!;

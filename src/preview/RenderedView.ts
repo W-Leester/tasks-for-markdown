@@ -50,6 +50,7 @@ type Incoming =
   | { type: 'doc/edit'; path: string | null; line: number }
   | { type: 'doc/postpone'; path: string | null; line: number }
   | { type: 'doc/insertTask'; line: number; text: string }
+  | { type: 'doc/select'; line: number | null }
   | { type: 'doc/addNote'; path: string | null; line: number; text: string }
   | { type: 'doc/link'; href: string }
   | { type: 'doc/openSource' }
@@ -69,6 +70,8 @@ const INDEX_DEBOUNCE_MS = 400;
 export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vscode.Disposable {
   private readonly panels = new Map<string, vscode.WebviewPanel>();
   private activeDocument: vscode.Uri | null = null;
+  /** Row selected in each rendered view (M27), so the create/edit key opens it. */
+  private readonly selection = new Map<string, number>();
   /** Set by the open commands so an explicit open never bounces to the source editor. */
   explicitOpen = new Set<string>();
 
@@ -78,6 +81,14 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
   get active(): vscode.Uri | null {
     return this.activeDocument;
   }
+  /** The task row selected in the rendered view that is in front, if any (for Cmd/Alt+Shift+C). */
+  selectedInActive(): { key: string; line: number } | undefined {
+    const doc = this.activeDocument;
+    if (!doc) return undefined;
+    const line = this.selection.get(doc.toString());
+    return line === undefined ? undefined : { key: doc.toString(), line };
+  }
+
 
   async resolveCustomTextEditor(document: vscode.TextDocument, panel: vscode.WebviewPanel): Promise<void> {
     const key = document.uri.toString();
@@ -160,6 +171,10 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
           await this.deps.editService.addNote(task, msg.text);
           break;
         }
+        case 'doc/select':
+          if (msg.line === null) this.selection.delete(document.uri.toString());
+          else this.selection.set(document.uri.toString(), msg.line);
+          break;
         case 'doc/insertTask': {
           const task = this.taskFor(null, msg.line, document);
           if (!task) throw new Error(t('That task is no longer at line {0}; the view has been refreshed.', msg.line + 1));
@@ -497,6 +512,8 @@ export async function setRenderedDefault(on: boolean): Promise<void> {
 /** Registers the custom editor and the commands that open it. */
 export function registerRenderedView(context: vscode.ExtensionContext, deps: RenderedViewDeps): RenderedViewProvider {
   const provider = new RenderedViewProvider(deps);
+  // Internal: the row selected in the rendered view in front, for the create/edit command (M27).
+  context.subscriptions.push(vscode.commands.registerCommand('tasksmd.rendered.selection', () => provider.selectedInActive()));
   const activeMarkdownUri = (arg: unknown): vscode.Uri | undefined => {
     if (arg instanceof vscode.Uri) return arg;
     const editor = vscode.window.activeTextEditor;

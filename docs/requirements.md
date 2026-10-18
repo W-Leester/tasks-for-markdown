@@ -23,7 +23,7 @@
 | 저장된 쿼리 | settings.json + 워크스페이스 파일 둘 다 |
 | 미리보기 | VS Code 기본 미리보기에 플러그인 주입 |
 | 칸반 | 사이드바 WebviewView + 에디터 패널 둘 다 |
-| 키 | 토글 `Ctrl+Shift+Enter`(macOS에서도 Ctrl; 처음에는 `Cmd/Ctrl+Enter`였으나 Markdown All in One과 충돌해 2026-10-01 변경), 편집 모달 `Ctrl+Shift+/`(1.1.4부터, 모든 OS; 그 전 `Ctrl+Shift+C`는 체크박스 토글로 바뀜. 이전 기록: 처음 계획은 `Cmd/Ctrl+Shift+T`), 빠른 검색 `Cmd/Ctrl+Shift+;` |
+| 키 | 토글 `Ctrl+Shift+Enter`(macOS에서도 Ctrl; 처음에는 `Cmd/Ctrl+Enter`였으나 Markdown All in One과 충돌해 2026-10-01 변경), 편집 모달 macOS `Cmd+Shift+C` / Windows·Linux `Alt+Shift+C`(1.1.5부터; 1.1.4는 `Ctrl+Shift+/`, 모든 OS; 그 전 `Ctrl+Shift+C`는 체크박스 토글로 바뀜. 이전 기록: 처음 계획은 `Cmd/Ctrl+Shift+T`), 빠른 검색 `Cmd/Ctrl+Shift+;` |
 | 추가 기능(v1) | 알림(토스트+OS), 수동 아카이브 명령, 주 단위 통계, 캘린더(월간+주간) |
 | AI 연동(MCP) | **v1.x로 연기** |
 | 언어·날짜 | UI 영어+한국어, 상대 날짜("3일 남음"), 주 시작 월요일 |
@@ -288,7 +288,7 @@ Obsidian Tasks 쿼리 문법과 호환되는 텍스트 기반 엔진. 한 줄 = 
 | `tasksmd.toggleDone` | `Ctrl+Shift+Enter` (마크다운 파일에서, 태스크 줄일 때; macOS에서도 Ctrl. 2026-10-01 `Ctrl/Cmd+Enter`에서 변경) | 상태 순환(FR-1.18) |
 | `tasksmd.setStatus` | — | 상태 선택 QuickPick |
 | `tasksmd.toggleCheckbox` | `Ctrl+Shift+C` (1.1.4, 모든 OS, 마크다운 편집기에서만; Windows/Linux "외부 터미널 열기"는 마크다운 밖에서 그대로) |
-| `tasksmd.createOrEdit` | `Ctrl+Shift+/` (1.1.4부터, 모든 OS·macOS·Windows 모두 기본 키 없음). 이전: `Ctrl+Shift+C` (모든 OS 동일; macOS는 미할당, Windows/Linux의 "외부 터미널 열기"를 덮음. `when: !terminalFocus && !inputFocus`라 터미널 복사는 유지) | 편집 모달 |
+| `tasksmd.createOrEdit` | macOS `Cmd+Shift+C`, Windows·Linux `Alt+Shift+C` (1.1.5부터; 마크다운 편집기·렌더 보기·Tasks 사이드바에서만 — macOS 기본 "새 외부 터미널"은 다른 곳에서 유지). 1.1.4: `Ctrl+Shift+/`. 이전: `Ctrl+Shift+C` (모든 OS 동일; macOS는 미할당, Windows/Linux의 "외부 터미널 열기"를 덮음. `when: !terminalFocus && !inputFocus`라 터미널 복사는 유지) | 편집 모달 |
 | `tasksmd.setPriority` / `setDueDate` / `setScheduledDate` / `setStartDate` / `setRecurrence` / `setDependencies` | — | 개별 QuickPick |
 | `tasksmd.postpone` | — | 마감/예정일을 N일 미룸(내일/다음주/… 선택) |
 | `tasksmd.quickSearch` | `Ctrl/Cmd+Shift+;` | 빠른 검색 |

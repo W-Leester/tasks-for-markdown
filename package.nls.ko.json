@@ -16,6 +16,7 @@
   "tasksmd.showLogs.title": "로그 보기",
   "tasksmd.toggleDone.title": "태스크 완료 토글",
   "tasksmd.toggleCheckbox.title": "체크박스 만들기/지우기",
+  "tasksmd.openKeybindings.title": "단축키 설정 열기",
   "tasksmd.openTask.title": "태스크로 이동",
   "tasksmd.openSidebar.title": "Tasks 사이드바 열기",
   "tasksmd.view.tasks": "태스크",

@@ -230,6 +230,7 @@ window.addEventListener('message', (e: MessageEvent<ToWebview>) => {
   addTaskRows();
   refreshView();
   window.scrollTo(0, y);
+  if (selected) post({ type: 'doc/select', line: null });
   selected = null;
   awaitingRender = false;
   // An open new-task input survives re-renders (an insert re-renders twice: the edit, then the save).
@@ -328,6 +329,7 @@ function selectRow(li: HTMLElement): void {
   selected?.classList.remove('rv-selected');
   selected = li;
   li.classList.add('rv-selected');
+  post({ type: 'doc/select', line: Number(li.dataset.tfmLine) });
   li.tabIndex = -1;
   li.focus({ preventScroll: true });
 }
@@ -399,7 +401,7 @@ content.addEventListener('keydown', (e) => {
   if (!li || li !== selected || e.target !== li) return;
   if (e.isComposing || e.keyCode === 229) return;
   if (e.key === 'Enter') { e.preventDefault(); openTaskForm(li); }
-  else if (e.key === 'Escape') { li.classList.remove('rv-selected'); selected = null; li.blur(); }
+  else if (e.key === 'Escape') { li.classList.remove('rv-selected'); selected = null; li.blur(); post({ type: 'doc/select', line: null }); }
 });
 
 /** Input under the task row; Enter adds the note (an indented bullet) to the file, Esc/blur closes it. */

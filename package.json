@@ -57,6 +57,12 @@
         "icon": "$(checklist)"
       },
       {
+        "command": "tasksmd.openKeybindings",
+        "title": "%tasksmd.openKeybindings.title%",
+        "category": "Tasks",
+        "icon": "$(keyboard)"
+      },
+      {
         "command": "tasksmd.openTask",
         "title": "%tasksmd.openTask.title%",
         "category": "Tasks",
@@ -974,9 +980,9 @@
       },
       {
         "command": "tasksmd.createOrEdit",
-        "key": "ctrl+shift+/",
-        "mac": "ctrl+shift+/",
-        "when": "!terminalFocus && (editorTextFocus || !inputFocus)"
+        "key": "alt+shift+c",
+        "mac": "cmd+shift+c",
+        "when": "!terminalFocus && (editorTextFocus && editorLangId == markdown || activeCustomEditorId == tasksmd.rendered || focusedView =~ /^tasksmd\\./)"
       },
       {
         "command": "tasksmd.quickSearch",

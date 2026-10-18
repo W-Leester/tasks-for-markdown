@@ -111,7 +111,7 @@ export class TaskEditService {
     // Deleting the last line: take the preceding line break instead so no trailing blank line remains.
     if (line === doc.lineCount - 1 && line > 0) edit.delete(uri, new vscode.Range(doc.lineAt(line - 1).range.end, range.end));
     else edit.delete(uri, range);
-    const ok = await vscode.workspace.applyEdit(edit);
+    const ok = await applyToDocument(doc, edit);
     if (!ok) throw new Error(`Could not edit ${uri.fsPath}`);
     this.deps.indexService.indexText(uri, doc.getText());
     if (shouldSave) await doc.save();
@@ -180,7 +180,7 @@ export class TaskEditService {
     const eol = doc.eol === vscode.EndOfLine.CRLF ? '\r\n' : '\n';
     const result = build(doc, edit, eol);
     if (edit.size === 0) return result; // nothing to change (e.g. same notes)
-    const ok = await vscode.workspace.applyEdit(edit);
+    const ok = await applyToDocument(doc, edit);
     if (!ok) throw new Error(`Could not edit ${uri.fsPath}`);
     // Keep the index exact immediately instead of waiting for the debounced document event.
     this.deps.indexService.indexText(uri, doc.getText());
@@ -217,7 +217,7 @@ export class TaskEditService {
         targetLine = line + 1;
       }
     }
-    const ok = await vscode.workspace.applyEdit(edit);
+    const ok = await applyToDocument(doc, edit);
     if (!ok) throw new Error(`Could not edit ${uri.fsPath}`);
     this.deps.indexService.indexText(uri, doc.getText());
     if (shouldSave) await doc.save();
@@ -272,6 +272,21 @@ export class TaskEditService {
       else edit.delete(uri, new vscode.Range(doc.lineAt(n.line - 1).range.end, doc.lineAt(endLine).range.end));
     }
   }
+}
+
+/**
+ * Apply `edit` (all of it on `doc`). Through the editor showing the document when there is one: workspace.applyEdit
+ * shrinks a replacement in a visible editor to what changed by comparing UTF-16 units, and cut 🔁/📅/🔺/🔼… (they share
+ * their first unit) in half — "🔁 every day " written before "📅" came out as "\udd01 every day \ud83d📅" (incident #44).
+ * Documents not shown anywhere are not affected.
+ */
+async function applyToDocument(doc: vscode.TextDocument, edit: vscode.WorkspaceEdit): Promise<boolean> {
+  const editor = vscode.window.visibleTextEditors.find((e) => e.document === doc);
+  if (!editor) return vscode.workspace.applyEdit(edit);
+  const edits = edit.entries().flatMap(([uri, list]) => (uri.toString() === doc.uri.toString() ? list : []));
+  return editor.edit((b) => {
+    for (const e of edits) b.replace(e.range, e.newText);
+  });
 }
 
 function docLines(doc: vscode.TextDocument): string[] {

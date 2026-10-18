@@ -35,7 +35,10 @@ suite('task line actions (M30)', () => {
     assert.ok(ours.every((h) => h.position.line === 1 && h.position.character === line.length), 'at the end of the task line');
     const cmds = ours.flatMap(partCommands);
     assert.equal(cmds.filter((c) => c === 'tasksmd.markDone').length, 1, 'one set of buttons');
-    for (const c of ['tasksmd.markDone', 'tasksmd.setPriority', 'tasksmd.setDueDate', 'tasksmd.createOrEdit']) assert.ok(cmds.includes(c), c);
+    for (const c of ['tasksmd.markDone', 'tasksmd.createOrEdit']) assert.ok(cmds.includes(c), c);
+    // Priority and due open a drop-down on the line (M31).
+    const picks = ours.flatMap((h) => (typeof h.label === 'string' ? [] : h.label)).filter((p) => p.command?.command === 'tasksmd.inlinePick').map((p) => (p.command!.arguments![0] as { kind: string }).kind);
+    for (const k of ['priority', 'due']) assert.ok(picks.includes(k), k);
     // The editor cuts a line's hints off after editor.inlayHints.maximumLength (43 by default, all hints of the line
     // together): Edit was hidden behind "…". In Markdown we lift the limit.
     const total = ours.reduce((n, h) => n + labelLength(h), 0);

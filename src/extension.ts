@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { registerConvertCommand } from './commands/convertCommand';
 import { registerEditCommands } from './commands/editCommands';
+import { InlinePicker } from './editor/InlinePicker';
 import { registerQueryCommands } from './commands/queryCommands';
 import { registerCommands } from './commands/registerCommands';
 import { registerStatusCommands } from './commands/statusCommands';
@@ -87,6 +88,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<Extens
   const commandDeps = { index, indexService, editService, settings, getStatusRegistry, log };
   registerCommands(context, commandDeps);
   registerEditCommands(context, { ...commandDeps, openEdit: (target) => webviews.openEdit(target) });
+  const picker = new InlinePicker(commandDeps);
+  picker.register(context);
   registerStatusCommands(context, commandDeps);
   registerConvertCommand(context, commandDeps);
   registerQueryCommands(context, { ...commandDeps, queries, openQueryResults: webviews.openQueryResults });
@@ -108,7 +111,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<Extens
   context.subscriptions.push(codeLens, vscode.languages.registerCodeLensProvider(markdown, codeLens), vscode.languages.registerInlayHintsProvider(markdown, codeLens));
   context.subscriptions.push(vscode.languages.registerHoverProvider(markdown, new TaskHoverProvider({ index, settings, getStatusRegistry })));
   // Markdown has quickSuggestions off by default, so a space is the trigger (like Obsidian's auto-suggest).
-  const completion = new TaskCompletionProvider({ index, settings });
+  const completion = new TaskCompletionProvider({ index, settings, picker });
   context.subscriptions.push(vscode.languages.registerCompletionItemProvider(markdown, completion, ' '), openSuggestionsWhileTyping(completion));
   const diagnostics = new TaskDiagnostics({ index, settings, getStatusRegistry });
   context.subscriptions.push(diagnostics, vscode.languages.registerCodeActionsProvider(markdown, diagnostics, { providedCodeActionKinds: TaskDiagnostics.providedCodeActionKinds }));

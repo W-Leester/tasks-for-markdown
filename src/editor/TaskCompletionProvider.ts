@@ -12,6 +12,8 @@ export interface CompletionDeps {
   index: TaskIndex;
   settings: Settings;
   clock?: Clock;
+  /** A task button's drop-down open on this line (M31) comes first. */
+  picker?: { items(document: vscode.TextDocument, position: vscode.Position): vscode.CompletionList | undefined };
 }
 
 /** Text just before the cursor that means "a date is expected here": `📅 `, `[due:: `, … */
@@ -39,7 +41,9 @@ interface Keyword {
 export class TaskCompletionProvider implements vscode.CompletionItemProvider {
   constructor(private readonly deps: CompletionDeps) {}
 
-  provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, _token: vscode.CancellationToken, context: vscode.CompletionContext): vscode.CompletionItem[] {
+  provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, _token: vscode.CancellationToken, context: vscode.CompletionContext): vscode.CompletionItem[] | vscode.CompletionList {
+    const picking = this.deps.picker?.items(document, position);
+    if (picking) return picking;
     if (!this.deps.settings.get('autoSuggest.enabled')) return [];
     const line = document.lineAt(position.line).text;
     if (!isTaskLine(line)) return [];

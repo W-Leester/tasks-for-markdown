@@ -2,6 +2,8 @@
 
 ## Unreleased (1.1.5)
 
+- **Fixed: adding 🔁, 🔺, 🔼, 🔽 or 🛫 in front of 📅 broke both emoji** in a file open in the editor (since 1.0; through the buttons, menus and the dialog). The editor shrank the edit by UTF-16 units and cut emoji that share their first unit in half. The CLI and MCP were not affected.
+- **The task buttons' choices open right below the line** instead of at the top of the window: Priority ▾, 📅 Due ▾, ⏳ ▾, 🔁 Repeat ▾ and Postpone show a drop-down there. Pick one, or type a date or rule (`next fri`, `3일 후`, `every 2 weeks`) and it appears first. From the menus and the command palette the picker stays at the top.
 - **Task suggestions open as you type a keyword, not on every space.** Type `d` (due), `pr` (priority), `ev` (every …) and the list appears; a bare space or Korean text never opens it — the list popping up on each space interrupted typing in Korean and turned `space → Enter` into picking a suggestion. `Ctrl+Space` still opens it anytime. The extension opens the list itself when a typed letter starts a keyword; no editor settings are changed. Set `tasksmd.autoSuggest.minMatch` to `0` to also open it right after a space.
 - **Task buttons at the end of the line.** `✓ Done · Priority ▾ · 📅 Due ▾ · 🔁 Repeat ▾ · ⏱ Postpone · ✎ Edit` now sit right after the cursor's task line instead of above it. They are inlay hints, so press them with **Cmd+click** (Ctrl+click on Windows and Linux). To keep them above the line with a plain click, set `tasksmd.codeLens.position` to `above`. In Markdown files the extension lifts `editor.inlayHints.maximumLength` so the whole row fits.
 - **Quick search (`Cmd/Ctrl+Shift+;`) only takes the key in Markdown editors, the rendered view and the Tasks sidebar.** In code files VS Code's "Focus Breadcrumbs" works again. The command palette still runs it from anywhere.
@@ -13,6 +15,8 @@
 - The `Ctrl+Shift+C` command is now called **Tasks: Add or remove checkbox** (Korean: **체크박스 만들기/지우기**). "Toggle checkbox" read like checking a task off, which is `Ctrl+Shift+Enter` (**Toggle task done**). The key and what it does are unchanged.
 
 ### 한국어 요약
+- **수정: 📅 앞에 🔁·🔺·🔼·🔽·🛫를 넣으면 두 이모지가 깨지던 문제**(1.0부터, 편집기에 열린 파일에서 버튼·메뉴·대화상자로 고칠 때). 편집기가 편집을 UTF-16 단위로 줄이며 첫 단위가 같은 이모지를 반으로 자름. CLI·MCP는 영향 없음.
+- **태스크 버튼의 선택창이 그 줄 바로 아래 드롭다운으로:** 우선순위 ▾·📅 마감 ▾·⏳ ▾·🔁 반복 ▾·미루기. 고르거나 날짜·규칙을 그대로 치면(`next fri`, `3일 후`) 맨 위에. 메뉴·명령 팔레트에서는 예전처럼 위쪽.
 - **자동완성은 키워드를 칠 때:** `d`·`pr`·`ev`를 치면 뜨고, 스페이스만이나 한글에는 안 뜸(스페이스마다 뜨던 목록이 한글 입력을 끊었음). `Ctrl+Space`는 언제나. 편집기 설정은 그대로(영문 글자가 키워드와 맞으면 확장이 목록을 엶). 예전 동작은 `tasksmd.autoSuggest.minMatch` = 0.
 - **태스크 버튼을 줄 끝에:** `✓ 완료 · 우선순위 ▾ · 📅 마감 ▾ · 🔁 · ⏱ 미루기 · ✎ 편집`이 커서 줄 위가 아니라 **끝에**. 인레이 힌트라 **Cmd+클릭**(Windows·Linux Ctrl+클릭). 예전처럼 줄 위·그냥 클릭은 `tasksmd.codeLens.position` = `above`.
 - **빠른 검색 키(`Cmd/Ctrl+Shift+;`)는 마크다운 편집기·렌더 보기·Tasks 사이드바에서만** — 코드 파일에서는 "브레드크럼에 포커스"가 다시 동작.

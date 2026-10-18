@@ -27,6 +27,8 @@ interface TaskAction {
   glyph?: string;
   command: string;
   tooltip?: string;
+  /** Opens a drop-down on the line (M31) instead of running `command` on the task. */
+  pick?: 'priority' | 'due' | 'scheduled' | 'recurrence' | 'postpone';
 }
 
 /**
@@ -64,7 +66,7 @@ export class TaskCodeLensProvider implements vscode.CodeLensProvider, vscode.Inl
     for (const { task, line, today } of this.taskLines(document)) {
       const range = new vscode.Range(line, 0, line, 0);
       for (const a of this.actionsFor(task, today)) {
-        out.push(new vscode.CodeLens(range, { title: a.icon ? `$(${a.icon}) ${a.label}` : a.label, command: a.command, arguments: [task], tooltip: a.tooltip }));
+        out.push(new vscode.CodeLens(range, { title: a.icon ? `$(${a.icon}) ${a.label}` : a.label, ...this.invocation(a, task), tooltip: a.tooltip }));
       }
     }
     return out;
@@ -81,7 +83,7 @@ export class TaskCodeLensProvider implements vscode.CodeLensProvider, vscode.Inl
       const at = new vscode.Position(line, document.lineAt(line).text.length);
       for (const a of this.actionsFor(task, today)) {
         const part = new vscode.InlayHintLabelPart(a.glyph ? `${a.glyph} ${a.label}` : a.label);
-        part.command = { title: a.label, command: a.command, arguments: [task] };
+        part.command = { title: a.label, ...this.invocation(a, task) };
         // The editor runs an inlay hint's command on Cmd/Ctrl+click only (a plain click just places the cursor).
         part.tooltip = t('{0} ({1}+click)', a.tooltip ?? a.label, process.platform === 'darwin' ? 'Cmd' : 'Ctrl');
         const hint = new vscode.InlayHint(at, [part]);
@@ -137,6 +139,10 @@ export class TaskCodeLensProvider implements vscode.CodeLensProvider, vscode.Inl
     return out;
   }
 
+  private invocation(a: TaskAction, task: Task): { command: string; arguments: unknown[] } {
+    return a.pick ? { command: 'tasksmd.inlinePick', arguments: [{ kind: a.pick, task }] } : { command: a.command, arguments: [task] };
+  }
+
   private actionsFor(task: Task, today: import('dayjs').Dayjs): TaskAction[] {
     const out: TaskAction[] = [];
     out.push(
@@ -146,15 +152,15 @@ export class TaskCodeLensProvider implements vscode.CodeLensProvider, vscode.Inl
     );
     if (!task.isCompleted) {
       const p = task.priority;
-      out.push({ label: `${PRIORITY_EMOJI[p] ? PRIORITY_EMOJI[p] + ' ' : ''}${t(PRIORITY_LABEL[p])} ▾`, command: 'tasksmd.setPriority' });
+      out.push({ label: `${PRIORITY_EMOJI[p] ? PRIORITY_EMOJI[p] + ' ' : ''}${t(PRIORITY_LABEL[p])} ▾`, command: 'tasksmd.setPriority', pick: 'priority' });
       const dueTitle = task.due?.date
         ? `📅 ${task.due.date.format('MMM D')} · ${relativeText(describeRelative(task.due.date, today))} ▾`
         : `📅 ${t('Due')} ▾`;
-      out.push({ label: dueTitle, command: 'tasksmd.setDueDate' });
-      if (task.scheduled?.date) out.push({ label: `⏳ ${task.scheduled.date.format('MMM D')} ▾`, command: 'tasksmd.setScheduledDate' });
-      if (task.recurrenceText) out.push({ label: `🔁 ${task.recurrenceText} ▾`, command: 'tasksmd.setRecurrence' });
-      else if (task.due || task.scheduled || task.start) out.push({ label: `🔁 ${t('Repeat')} ▾`, command: 'tasksmd.setRecurrence' });
-      if (task.due || task.scheduled) out.push({ label: t('Postpone'), icon: 'watch', glyph: '⏱', command: 'tasksmd.postpone' });
+      out.push({ label: dueTitle, command: 'tasksmd.setDueDate', pick: 'due' });
+      if (task.scheduled?.date) out.push({ label: `⏳ ${task.scheduled.date.format('MMM D')} ▾`, command: 'tasksmd.setScheduledDate', pick: 'scheduled' });
+      if (task.recurrenceText) out.push({ label: `🔁 ${task.recurrenceText} ▾`, command: 'tasksmd.setRecurrence', pick: 'recurrence' });
+      else if (task.due || task.scheduled || task.start) out.push({ label: `🔁 ${t('Repeat')} ▾`, command: 'tasksmd.setRecurrence', pick: 'recurrence' });
+      if (task.due || task.scheduled) out.push({ label: t('Postpone'), icon: 'watch', glyph: '⏱', command: 'tasksmd.postpone', pick: 'postpone' });
     }
     out.push({ label: t('Edit'), icon: 'edit', glyph: '✎', command: 'tasksmd.createOrEdit' });
     return out;

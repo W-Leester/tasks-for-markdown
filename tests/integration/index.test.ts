@@ -122,7 +122,7 @@ suite('editor providers', () => {
     assert.ok(ours.length >= 4, `expected buttons, got ${ours.length}`);
     assert.ok(ours.every((o) => o.line === 6), 'buttons only on cursor line');
     assert.ok(ours.some((o) => o.part.command!.command === 'tasksmd.markDone'));
-    assert.ok(ours.some((o) => o.part.command!.command === 'tasksmd.setDueDate' && o.part.value.includes('Sep 25')));
+    assert.ok(ours.some((o) => o.part.command!.command === 'tasksmd.inlinePick' && (o.part.command!.arguments![0] as { kind: string }).kind === 'due' && o.part.value.includes('Sep 25')));
     await vscode.commands.executeCommand('workbench.action.closeAllEditors');
   });
 

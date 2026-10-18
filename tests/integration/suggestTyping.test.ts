@@ -51,9 +51,11 @@ suite('auto-suggest while typing (incident #42)', () => {
     assert.notEqual(await typeAndAccept(' '), '- [ ] write report ');
   });
 
-  test('Markdown gets quick suggestions without word-based ones', () => {
-    const md = vscode.workspace.getConfiguration('editor', { languageId: 'markdown' });
-    assert.equal(md.get<{ other: string }>('quickSuggestions')?.other, 'on');
-    assert.equal(md.get('wordBasedSuggestions'), 'off');
+  test("the editor's Markdown suggestion settings are left alone", () => {
+    // Cursor's built-in Markdown extension turns quick suggestions off as its own default; contributing ours in the
+    // same place lost there (incident #42). We open the list ourselves instead.
+    const pkg = vscode.extensions.getExtension('HastyCapybara.tasks-for-markdown')!.packageJSON as { contributes: { configurationDefaults?: Record<string, Record<string, unknown>> } };
+    const md = pkg.contributes.configurationDefaults?.['[markdown]'] ?? {};
+    assert.ok(!('editor.quickSuggestions' in md) && !('editor.wordBasedSuggestions' in md), JSON.stringify(md));
   });
 });

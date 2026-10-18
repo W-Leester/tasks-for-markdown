@@ -1116,7 +1116,8 @@
 - [x] 2 다시: 테스트(먼저 실패 — 스페이스만·한글·설정 3개 실패 확인) → 구현 → 문서
 - [x] 2 다시: 사용자 확인(Cursor) → **❌ 자동완성이 아예 안 뜸**(10-19). Cursor 내장 `markdown-language-features`가 같은 자리에 `[markdown] editor.quickSuggestions` 전부 off를 기본값으로 넣음 — 확장끼리의 기본값 충돌이라 어느 쪽이 이기는지는 편집기마다 다름(VS Code 테스트에서는 우리가 이김). incidents #42에 추가.
 - **2 세 번째(10-19):** 편집기 기본값에 기대지 않음 — 영문 글자 한 개가 입력되고 그 단어(앞 단어 포함 최대 3개)가 키워드 단어의 앞부분과 맞으면(`due`의 `d`, `every w`) 확장이 직접 `editor.action.triggerSuggest`. 기준 길이는 `max(1, minMatch)`, 그 길이가 되는 순간 한 번만. 한글·숫자·기호는 안 염(맞는 키워드가 없음 → "No suggestions" 창도 안 뜸). `configurationDefaults`의 quickSuggestions·wordBasedSuggestions는 뺌.
-- [ ] 2 세 번째: 테스트(먼저 실패) → 구현 → 문서 → 사용자 확인(Cursor)
+- [x] 2 세 번째: 테스트(먼저 실패 — `du` 실패 확인) → 구현 → 문서
+- [ ] 2 세 번째: 사용자 확인(Cursor)
 
 ## M30. 태스크 줄 버튼을 줄 끝에 (1.1.5, 계획 2026-10-18, 사용자 요청)
 

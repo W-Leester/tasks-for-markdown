@@ -45,13 +45,7 @@
   "contributes": {
     "configurationDefaults": {
       "[markdown]": {
-        "editor.inlayHints.maximumLength": 0,
-        "editor.quickSuggestions": {
-          "other": "on",
-          "comments": "off",
-          "strings": "off"
-        },
-        "editor.wordBasedSuggestions": "off"
+        "editor.inlayHints.maximumLength": 0
       }
     },
     "commands": [

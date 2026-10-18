@@ -72,6 +72,29 @@ export class TaskCompletionProvider implements vscode.CompletionItemProvider {
     return this.keywordItems(position, prefix, today, keywords);
   }
 
+  /**
+   * Right after a typed letter: should the list open now? Yes when the word just reached `max(1, minMatch)` letters
+   * and it (with up to two words before it) starts a keyword word — `d` (due), `every w`. The editor itself never asks
+   * on letters in Markdown (quick suggestions are off there, and Cursor keeps them off), so we open it. Korean or other
+   * text matches no keyword and never opens it; the list popping up on every space interrupted Korean typing (#42).
+   */
+  shouldOpenAfterTyping(document: vscode.TextDocument, position: vscode.Position): boolean {
+    if (!this.deps.settings.get('autoSuggest.enabled')) return false;
+    const line = document.lineAt(position.line).text;
+    if (!isTaskLine(line)) return false;
+    const before = line.slice(0, position.character);
+    if (DATE_CONTEXT_RE.test(before)) return false;
+    const words = (KEYWORD_PREFIX_RE.exec(before)?.[1] ?? '').split(' ').filter((w) => w.length > 0);
+    const last = words.at(-1) ?? '';
+    if (!/^[A-Za-z]+$/.test(last) || last.length !== Math.max(1, this.deps.settings.get('autoSuggest.minMatch'))) return false;
+    const keywords = this.keywords((this.deps.clock ?? systemClock).now().startOf('day'));
+    for (let n = Math.min(3, words.length); n >= 1; n--) {
+      const cand = words.slice(-n).join(' ').toLowerCase();
+      if (keywords.some((k) => score(k.match, cand) >= 2)) return true;
+    }
+    return false;
+  }
+
   // ---- keyword mode --------------------------------------------------------------------------
 
   private keywords(today: Dayjs): Keyword[] {
@@ -181,4 +204,15 @@ function score(candidate: string, needle: string): number {
   if (candidate.split(' ').some((w) => w.startsWith(needle))) return 2;
   if (candidate.includes(needle)) return 1;
   return 0;
+}
+
+/** Open the list when a typed letter starts a keyword (see `shouldOpenAfterTyping`). */
+export function openSuggestionsWhileTyping(provider: TaskCompletionProvider): vscode.Disposable {
+  return vscode.workspace.onDidChangeTextDocument((e) => {
+    if (e.document.languageId !== 'markdown' || e.document !== vscode.window.activeTextEditor?.document) return;
+    if (e.contentChanges.length !== 1) return;
+    const c = e.contentChanges[0]!;
+    if (c.rangeLength !== 0 || !/^[A-Za-z]$/.test(c.text)) return;
+    if (provider.shouldOpenAfterTyping(e.document, c.range.start.translate(0, 1))) void vscode.commands.executeCommand('editor.action.triggerSuggest');
+  });
 }

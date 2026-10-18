@@ -6,7 +6,7 @@ import { registerCommands } from './commands/registerCommands';
 import { registerStatusCommands } from './commands/statusCommands';
 import { TaskIndex } from './core/index';
 import { TaskCodeLensProvider } from './editor/TaskCodeLensProvider';
-import { TaskCompletionProvider } from './editor/TaskCompletionProvider';
+import { TaskCompletionProvider, openSuggestionsWhileTyping } from './editor/TaskCompletionProvider';
 import { TaskDecorations } from './editor/TaskDecorations';
 import { TaskDiagnostics } from './editor/TaskDiagnostics';
 import { TaskHoverProvider } from './editor/TaskHoverProvider';
@@ -108,7 +108,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<Extens
   context.subscriptions.push(codeLens, vscode.languages.registerCodeLensProvider(markdown, codeLens), vscode.languages.registerInlayHintsProvider(markdown, codeLens));
   context.subscriptions.push(vscode.languages.registerHoverProvider(markdown, new TaskHoverProvider({ index, settings, getStatusRegistry })));
   // Markdown has quickSuggestions off by default, so a space is the trigger (like Obsidian's auto-suggest).
-  context.subscriptions.push(vscode.languages.registerCompletionItemProvider(markdown, new TaskCompletionProvider({ index, settings }), ' '));
+  const completion = new TaskCompletionProvider({ index, settings });
+  context.subscriptions.push(vscode.languages.registerCompletionItemProvider(markdown, completion, ' '), openSuggestionsWhileTyping(completion));
   const diagnostics = new TaskDiagnostics({ index, settings, getStatusRegistry });
   context.subscriptions.push(diagnostics, vscode.languages.registerCodeActionsProvider(markdown, diagnostics, { providedCodeActionKinds: TaskDiagnostics.providedCodeActionKinds }));
 

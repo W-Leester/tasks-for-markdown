@@ -9,7 +9,8 @@ import {
   ConfigParseError, claudeAddJsonArgs, claudeCodeHasServer, claudeDesktopHasServer, folderPathFor, claudeDesktopRunningFrom, claudeAddCommandWindows, claudeAddJsonCommand, claudeDesktopConfigPath, isOurLauncher, launcherFileName, launcherScript, mergeMcpServers, pathAdvice, pickBinDir, userPathScript, serverName, serverSpec, type McpServerSpec,
 } from './mcpConfig';
 import { resolveWindowsCommand } from './winCommand';
-import { onboardingDay, shouldPrompt } from './onboardingDays';
+import type { TaskIndex } from '../core/index';
+import { onboardingDay, mcpWanted, shouldPrompt } from './onboardingDays';
 
 /**
  * M21 (design.md 7.16): AI agents and the terminal without npm.
@@ -21,6 +22,8 @@ import { onboardingDay, shouldPrompt } from './onboardingDays';
 export interface AiDeps {
   settings: Settings;
   log: (msg: string) => void;
+  /** M29: MCP registration and the install/connect prompts wait for a folder that has tasks. */
+  index?: TaskIndex;
 }
 
 interface Runtime {
@@ -83,7 +86,9 @@ export function registerAi(context: vscode.ExtensionContext, deps: AiDeps): AiIn
   const appName = vscode.env.appName;
 
   const localFolders = () => (vscode.workspace.workspaceFolders ?? []).filter((f) => f.uri.scheme === 'file');
-  const enabled = () => deps.settings.get('mcp.autoRegister') && vscode.workspace.isTrusted;
+  /** No index (this module tested alone): behave as before. */
+  const hasTasks = () => (deps.index ? deps.index.taskCount() > 0 : true);
+  const enabled = () => mcpWanted({ enabled: deps.settings.get('mcp.autoRegister'), trusted: vscode.workspace.isTrusted, hasTasks: hasTasks() });
   const wanted = () => {
     if (!enabled()) return [];
     const folders = localFolders();
@@ -140,6 +145,14 @@ export function registerAi(context: vscode.ExtensionContext, deps: AiDeps): AiIn
     vscode.workspace.onDidGrantWorkspaceTrust(() => sync()),
     deps.settings.onDidChange(() => sync(), ['mcp.autoRegister']),
   );
+  // M29: register once the folder turns out to have tasks (after indexing, or when the first task is written).
+  if (deps.index) {
+    let had = hasTasks();
+    const recheck = () => { const now = hasTasks(); if (now !== had) { had = now; sync(); } };
+    const a = deps.index.onDidChange(recheck);
+    const b = deps.index.onDidChangeProgress(recheck);
+    context.subscriptions.push({ dispose: () => { a.dispose(); b.dispose(); } });
+  }
 
   // ---- stable copy for tools outside the editor ------------------------------------------------
   /** Copy the CLI to ~/.tasksmd (when missing or from another version) and record how to run it. */
@@ -404,11 +417,17 @@ export function registerAi(context: vscode.ExtensionContext, deps: AiDeps): AiIn
     const state = context.globalState;
     const now = new Date();
     const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-    await Promise.all([promptInstall(state), promptGuide(state, today), promptConnect(state)]);
+    // (A)(C) wait for a folder with tasks — a README alone activates the extension (M29); (B) the guide does not.
+    const whenTasks = new Promise<void>((resolve) => {
+      if (!deps.index || hasTasks()) return resolve();
+      const sub = deps.index.onDidChange(() => { if (hasTasks()) { sub.dispose(); resolve(); } });
+      context.subscriptions.push({ dispose: () => sub.dispose() });
+    });
+    await Promise.all([promptGuide(state, today), whenTasks.then(() => Promise.all([promptInstall(state), promptConnect(state)]))]);
   };
   /** (A) The tasksmd command: on every activation until installed or "Don't ask again". */
   const promptInstall = async (state: vscode.Memento) => {
-    if (!shouldPrompt({ never: state.get<boolean>(CLI_NEVER) }, !(await cliPresent()))) return;
+    if (!shouldPrompt({ never: state.get<boolean>(CLI_NEVER) }, !(await cliPresent()), { hasTasks: hasTasks() })) return;
     const install = t("Install 'tasksmd' command"), later = t('Not now'), never = t("Don't ask again");
     const choice = await vscode.window.showInformationMessage(
       t('Tasks for Markdown: install the "tasksmd" command to check, add and complete tasks from any terminal, in scripts and with terminal AI agents (no npm needed). The Get Started guide shows what it can do.'),
@@ -422,7 +441,7 @@ export function registerAi(context: vscode.ExtensionContext, deps: AiDeps): AiIn
     const st = await claudeStatus();
     const needCode = st.hasCode && !st.codeConnected;
     const needDesktop = st.hasDesktop && !st.desktopConnected;
-    if (!shouldPrompt({ never: state.get<boolean>(AI_NEVER) }, needCode || needDesktop)) return;
+    if (!shouldPrompt({ never: state.get<boolean>(AI_NEVER) }, needCode || needDesktop, { hasTasks: hasTasks() })) return;
     const tools = [...(needCode ? ['Claude Code'] : []), ...(needDesktop ? ['Claude Desktop'] : [])].join(', ');
     const connect = t('Connect'), later = t('Not now'), never = t("Don't ask again");
     const choice = await vscode.window.showInformationMessage(

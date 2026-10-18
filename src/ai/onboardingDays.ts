@@ -20,6 +20,12 @@ export function onboardingDay(state: OnboardingDays, today: string): { day: numb
  * The `tasksmd` install and the AI-connect prompts: on every activation (reload, restart, new
  * window) while still needed, until the user chooses "Don't ask again" (10-08 decision).
  */
-export function shouldPrompt(state: { never?: boolean }, needed: boolean): boolean {
-  return needed && !state.never;
+export function shouldPrompt(state: { never?: boolean }, needed: boolean, workspace: { hasTasks: boolean } = { hasTasks: true }): boolean {
+  // M29: a README alone activates the extension; in a folder without tasks it stays quiet.
+  return needed && !state.never && workspace.hasTasks;
+}
+
+/** Register the MCP server for the editor's agent only where it is useful: enabled, trusted and with tasks (M29). */
+export function mcpWanted(s: { enabled: boolean; trusted: boolean; hasTasks: boolean }): boolean {
+  return s.enabled && s.trusted && s.hasTasks;
 }

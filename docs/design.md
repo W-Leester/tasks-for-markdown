@@ -1077,6 +1077,7 @@ GitHub Actions: PR마다 `typecheck + lint + test`, 태그 `v*` 푸시 시 패�
 
 | 날짜 | 버전 | 내용 |
 |---|---|---|
+| 2026-10-18 | 1.9 | M29: 원래 기능 가로채지 않기 — `tasksmd.quickSearch` 키에 `when`(마크다운 편집기·`activeCustomEditorId == tasksmd.rendered`·`focusedView =~ /^tasksmd\./`, `!terminalFocus`); 자동완성 `minMatch` 기본 2 + 영문 글자 트리거(공백만으로는 안 뜸); 태스크 0개 폴더에서는 상태 표시줄 숨김·MCP 등록 안 함·(A)(C) 알림 보류(순수 함수 `mcpWanted`/`shouldPrompt`, `index.onDidChange`·`onDidChangeProgress`로 다시 판단) |
 | 2026-10-18 | 1.8 | M27: 렌더 보기에서 새 태스크 줄 — 본문 행 선택(클릭, `rv-selected`) → `Enter`/`＋`/목록 끝 `＋ 태스크 추가` → 입력칸, `doc/insertTask {line,text}` → `TaskEditService.insertTaskBelow`(순수 함수 `insertAfterTask`: 블록(메모·하위) 끝, 같은 깊이·글머리, 번호 목록은 다음 번호) → `doc/inserted {line}`. 다음 입력칸은 응답과 다시 그리기 **둘 다** 온 뒤 열고, 열린 입력칸은 다시 그리기(삽입 후 편집·저장으로 두 번)를 넘어 유지(값 포함). 다시 그릴 때 지워지는 입력칸의 blur는 무시(incidents #40) |
 | 2026-10-15 | 1.7 | M26: `tasksmd.toggleCheckbox`(`Ctrl+Shift+Q` → 10-16 `Ctrl+Shift+C`로, 대화상자는 `Ctrl+Shift+/`로 맞바꿈; 마크다운 편집기에서만 — `Ctrl+Shift+Space`는 macOS가 앱에 넘기지 않음, incidents #39; 순수 함수 `toggleCheckboxLine`, 선택 줄은 첫 줄 기준) · `DateInput` 달력 버튼은 `<input type=date>`의 글자 부분(`::-webkit-datetime-edit`)을 숨기고 아이콘만 남김 + 테마별 `color-scheme`(incidents #38; 아이콘 크기·배경을 건드리면 사라짐, `showPicker()`는 웹뷰(다른 출처 iframe)에서 불가) |
 | 2026-10-10 | 1.6 | M24: 열 이름 항상 표시(7.14), 끈 경계만 움직이는 너비 조절·더블클릭 자동 맞춤(7.15, incidents #34) |

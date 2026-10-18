@@ -91,7 +91,7 @@ export const SETTINGS_DEFAULTS: Readonly<SettingsSchema> = {
   'decorations.gutterIcons': true,
   'codeLens.mode': 'cursorLine',
   'autoSuggest.enabled': true,
-  'autoSuggest.minMatch': 0,
+  'autoSuggest.minMatch': 2,
   'autoSuggest.maxItems': 8,
   'recurrence.insertPosition': 'above',
   'recurrence.idHandling': 'keep',

@@ -144,8 +144,8 @@ suite('auto-suggest', () => {
   const guard = new FixtureGuard();
   teardown(() => guard.restore());
 
-  async function complete(doc: vscode.TextDocument, line: number, character: number): Promise<vscode.CompletionItem[]> {
-    const list = await vscode.commands.executeCommand<vscode.CompletionList>('vscode.executeCompletionItemProvider', doc.uri, new vscode.Position(line, character), ' ');
+  async function complete(doc: vscode.TextDocument, line: number, character: number, trigger = ' '): Promise<vscode.CompletionItem[]> {
+    const list = await vscode.commands.executeCommand<vscode.CompletionList>('vscode.executeCompletionItemProvider', doc.uri, new vscode.Position(line, character), trigger);
     // Only our items carry these kinds; other providers (paths, words) use different ones.
     return list.items.filter((i) => i.kind === vscode.CompletionItemKind.Event || i.kind === vscode.CompletionItemKind.Value);
   }
@@ -160,7 +160,11 @@ suite('auto-suggest', () => {
     const n = doc.lineCount;
     assert.deepEqual(await complete(doc, n - 3, '- [ ] '.length), [], 'fresh "- [ ] " line');
     assert.deepEqual(await complete(doc, n - 2, '  - [ ] '.length), [], 'fresh indented "- [ ] " line');
-    assert.ok((await complete(doc, n - 1, '- [ ] write '.length)).length > 0, 'after some text the list shows');
+    // M29: a space alone never opens it (Enter after "text " must stay a newline); two letters of a keyword do.
+    assert.deepEqual(await complete(doc, n - 1, '- [ ] write '.length), [], 'just a space after text: no list');
+    await editor.edit((eb) => eb.insert(new vscode.Position(n - 1, '- [ ] write '.length), 'du'));
+    const typed = await complete(doc, n - 1, '- [ ] write du'.length, 'u');
+    assert.ok(typed.some((i) => labelOf(i).includes('📅')), 'two letters of "due" show the due-date suggestion');
     const invoked = await vscode.commands.executeCommand<vscode.CompletionList>('vscode.executeCompletionItemProvider', doc.uri, new vscode.Position(n - 3, '- [ ] '.length));
     assert.ok(invoked.items.some((i) => i.kind === vscode.CompletionItemKind.Event || i.kind === vscode.CompletionItemKind.Value), 'Ctrl+Space (invoke) still suggests');
   });

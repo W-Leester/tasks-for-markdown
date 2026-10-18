@@ -604,7 +604,7 @@
         },
         "tasksmd.autoSuggest.minMatch": {
           "type": "number",
-          "default": 0,
+          "default": 2,
           "minimum": 0,
           "maximum": 3,
           "description": "%tasksmd.config.autoSuggest.minMatch%"
@@ -987,7 +987,8 @@
       {
         "command": "tasksmd.quickSearch",
         "key": "ctrl+shift+;",
-        "mac": "cmd+shift+;"
+        "mac": "cmd+shift+;",
+        "when": "!terminalFocus && (editorTextFocus && editorLangId == markdown || activeCustomEditorId == tasksmd.rendered || focusedView =~ /^tasksmd\\./)"
       },
       {
         "command": "tasksmd.openRendered",

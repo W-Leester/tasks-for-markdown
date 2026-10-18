@@ -21,7 +21,7 @@ Obsidian Tasks 플러그인과 같은 문법으로 VS Code / Cursor 안에서 �
 
 두 포맷 모두 읽으며, 쓸 때는 `tasksmd.taskFormat` 설정을 따릅니다. 필드 순서는 Obsidian과 동일하게 정규화됩니다.
 
-**자동완성**: 태스크 줄에서 스페이스를 치면 제안이 뜹니다(체크박스 뒤가 아직 빈 `- [ ] ` 줄에서는 저절로 뜨지 않음 — Markdown All in One의 Enter·Tab을 막지 않도록, 1.1.5부터. 필요하면 `Ctrl+Space`). `due` → 📅 뒤에 `tomorrow`, `next fri`, `3일 후`, `10월 6일` 같은 자연어를 치면 날짜로 바뀝니다. `pri` → 우선순위, `every` → 반복, `id` → 자동 발급 ID.
+**자동완성**: 태스크 줄에서 키워드를 **두 글자** 치면 제안이 뜹니다(`du` → 📅 마감일, `pr` → 우선순위, `ev` → 🔁 반복). 스페이스만으로는 뜨지 않습니다 — 설명을 쓰다 `스페이스 → Enter`가 제안 선택이 되거나 Markdown All in One의 Enter·Tab을 막지 않도록(1.1.5부터; 예전처럼 스페이스마다 띄우려면 `tasksmd.autoSuggest.minMatch`를 `0`으로). 언제든 `Ctrl+Space`로 부를 수 있습니다. `due` → 📅 뒤에 `tomorrow`, `next fri`, `3일 후`, `10월 6일` 같은 자연어를 치면 날짜로 바뀝니다. `pri` → 우선순위, `every` → 반복, `id` → 자동 발급 ID.
 
 ## 2. 편집
 
@@ -116,7 +116,7 @@ short mode
 - **통계** (`Tasks: 통계 열기`): 최근 N주 완료/생성/기한 초과/잔량, 태그·폴더 필터.
 - **아카이브** (`Tasks: 완료 태스크 아카이브…`): N일 이상 지난 완료 태스크를 미리보기에서 고른 뒤 `Archive.md`로 이동(원본 링크 포함).
 - **알림**: 시작 시·지정 시각에 오늘/초과 요약, 마감 임박 묶음 알림(스누즈), OS 알림.
-- **빠른 검색** `Cmd/Ctrl+Shift+;`.
+- **빠른 검색** `Cmd/Ctrl+Shift+;` — 마크다운 편집기·렌더 보기·Tasks 사이드바에서(1.1.5부터; 코드 파일에서는 VS Code 기본 "브레드크럼에 포커스"가 그대로). 다른 곳에서는 명령 팔레트의 `Tasks: 빠른 검색`.
 - **커스텀 상태**: `tasksmd.statuses` 또는 `Tasks: 상태 프리셋 불러오기…`(Minimal / ITS / Things). 동작은 심볼이 아니라 타입(TODO / IN_PROGRESS / ON_HOLD / DONE / CANCELLED / NON_TASK)을 따릅니다.
 - **진단**: 잘못된 날짜, 없는 ID, 순환 의존성, 잘못된 반복 규칙, 날짜 없는 반복 → Problems 패널 + Quick Fix.
 - **포맷 변환**: `Tasks: 이 파일의 태스크 포맷 변환…`.
@@ -124,7 +124,7 @@ short mode
 ## 5-1. AI 에이전트, 터미널, 링크
 
 **AI 에이전트(MCP).** 확장에 MCP 서버가 들어 있어 AI 에이전트가 태스크를 도구로 읽고 고칩니다. 서버는 에디터에 내장된 Node로 돌아가므로 Node.js·npm 설치가 필요 없습니다.
-- **VS Code(에이전트 모드)·Cursor:** 확장을 설치하면 자동으로 연결됩니다. 워크스페이스 폴더마다 서버 하나(폴더가 여럿이면 이름이 `tasks-<폴더>`). 끄려면 `tasksmd.mcp.autoRegister`를 끕니다. 신뢰되지 않은 워크스페이스에서는 연결하지 않습니다.
+- **VS Code(에이전트 모드)·Cursor:** 확장을 설치하면 자동으로 연결됩니다. 워크스페이스 폴더마다 서버 하나(폴더가 여럿이면 이름이 `tasks-<폴더>`). 끄려면 `tasksmd.mcp.autoRegister`를 끕니다. 신뢰되지 않은 워크스페이스, 그리고 **태스크가 하나도 없는 폴더**(README만 있는 코딩 프로젝트 등)에서는 연결하지 않습니다 — 첫 태스크를 쓰고 저장하면 그때 연결됩니다(1.1.5부터). 상태 표시줄의 태스크 개수와 `tasksmd` 설치·AI 연결 알림도 마찬가지입니다.
   - VS Code: 채팅의 에이전트 모드 도구 목록(🔧)에 "Tasks for Markdown"이 보입니다. 처음 쓸 때 서버 시작을 허용할지 묻습니다.
   - Cursor: 설정의 MCP 목록에 확장이 등록한 서버로 보입니다.
 - **Claude Code·Claude Desktop:** 명령 `Tasks: AI 에이전트 연결 (MCP)` → 설치됐지만 아직 연결되지 않은 도구는 미리 체크돼 있으니 OK만 누르면 연결됩니다. 이미 연결된 도구는 "연결됨", 설치되지 않은 도구는 "설치되지 않음"으로 표시됩니다.
@@ -184,7 +184,7 @@ short mode
 - **Cursor에서 쿼리 블록이 그냥 코드로 보여요.** 오른쪽 위 "Preview | Markdown" 토글의 Preview는 Cursor 자체 WYSIWYG 편집기라 확장이 개입할 수 없고, `Cmd+Shift+V`도 이 토글에 묶여 있습니다. "Markdown"으로 전환한 뒤 블록 위 `▶ 결과 보기` CodeLens로 결과 패널을 열거나, 명령 팔레트에서 `Markdown: Open Preview to the Side`로 VS Code 미리보기를 여세요(Cursor에서는 `Cmd+K`가 AI 인라인 편집이라 `Cmd+K V`가 안 됩니다).
 - **`.vsix`로 설치했는데 업데이트는?** `tasksmd.updateCheckUrl`에 사내 `latest.json` 경로를 넣으면 하루 1회 새 버전을 알려줍니다.
 - **로그는 어디에?** `Tasks: 로그 보기` (출력 채널 "Tasks for Markdown").
-- **AI 에이전트가 tasks 도구를 못 찾아요.** ① 설정 `tasksmd.mcp.autoRegister`가 켜져 있는지 ② 워크스페이스가 신뢰됨인지(제한 모드에서는 연결 안 함) ③ `Developer: Reload Window` ④ 위치 확인: Cursor는 *Cursor Settings → Customize → MCPs*에 `extension-tasks`, VS Code는 채팅 에이전트 모드의 도구(🔧) 목록 ⑤ `Tasks: 로그 보기`에서 `mcp registration:` 줄. Claude Code·Desktop은 `Tasks: AI 에이전트 연결 (MCP)`로 따로 연결해야 합니다.
+- **AI 에이전트가 tasks 도구를 못 찾아요.** ① 설정 `tasksmd.mcp.autoRegister`가 켜져 있는지 ② 워크스페이스가 신뢰됨인지(제한 모드에서는 연결 안 함), 폴더에 태스크(`- [ ] …`)가 하나라도 있는지 ③ `Developer: Reload Window` ④ 위치 확인: Cursor는 *Cursor Settings → Customize → MCPs*에 `extension-tasks`, VS Code는 채팅 에이전트 모드의 도구(🔧) 목록 ⑤ `Tasks: 로그 보기`에서 `mcp registration:` 줄. Claude Code·Desktop은 `Tasks: AI 에이전트 연결 (MCP)`로 따로 연결해야 합니다.
 - **`tasksmd: command not found`가 나와요.** 에디터 안에서는 설치 뒤 **새로 연** 터미널을 쓰세요(이미 열려 있던 터미널은 모릅니다). 에디터 밖 터미널이면 설치한 폴더(`~/.local/bin`)가 PATH에 없는 경우입니다. 설치할 때 안내한 줄(`export PATH="$HOME/.local/bin:$PATH"`)을 `~/.zshrc`에 넣고 새 터미널을 여세요. 에디터를 옮기거나 다시 설치했다면 에디터를 한 번 켜면 런처가 새 위치를 따라갑니다.
 - **Cursor에서 시작 안내는?** Cursor에는 VS Code의 `Welcome: Open Walkthrough…`가 없으니 `Tasks: 시작 안내 열기`를 쓰세요.
 - **Cursor에서 `tasksmd.*` 설정이 안 보여요.** Cursor의 `Cmd+,`는 Cursor 자체 설정(Cursor Settings)을 엽니다. 확장 설정은 명령 팔레트의 `Preferences: Open Settings (UI)`(또는 Cursor Settings의 *Editor Settings → Open*)에서 `tasksmd`로 검색하세요.

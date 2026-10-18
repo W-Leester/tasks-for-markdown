@@ -23,7 +23,6 @@ export class StatusBar implements vscode.Disposable {
     const s2 = index.onDidChangeProgress(() => this.render());
     this.disposables.push({ dispose: () => s1.dispose() }, { dispose: () => s2.dispose() }, this.item);
     this.render();
-    this.item.show();
   }
 
   private schedule(): void {
@@ -33,6 +32,9 @@ export class StatusBar implements vscode.Disposable {
 
   render(): void {
     const p = this.index.progress;
+    // M29: nothing to show in a folder without tasks (a README alone activates the extension).
+    if (p.state !== 'scanning' && this.index.taskCount() === 0) { this.item.hide(); return; }
+    this.item.show();
     if (p.state === 'scanning') {
       this.item.text = p.total ? `$(sync~spin) Tasks ${p.done}/${p.total}` : '$(sync~spin) Tasks';
       this.item.tooltip = t('Indexing tasks…');

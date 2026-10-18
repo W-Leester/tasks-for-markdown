@@ -49,7 +49,7 @@
   "tasksmd.config.codeLens.mode.cursorLine": "Only above the task line that has the cursor",
   "tasksmd.config.codeLens.mode.all": "Above every visible task line",
   "tasksmd.config.autoSuggest.enabled": "Offer task field suggestions (due, priority, every week, id…) while typing on a task line.",
-  "tasksmd.config.autoSuggest.minMatch": "Minimum typed characters before keyword suggestions appear automatically (0 = right after a space). Ctrl+Space always shows them.",
+  "tasksmd.config.autoSuggest.minMatch": "Minimum typed characters of a keyword before suggestions appear automatically (default 2, e.g. \"du\" for due; 0 = right after a space, which can turn Enter into accepting a suggestion). Ctrl+Space always shows them.",
   "tasksmd.config.autoSuggest.maxItems": "Maximum number of keyword suggestions shown.",
   "tasksmd.config.recurrence.insertPosition": "Where the next instance of a completed recurring task is inserted.",
   "tasksmd.config.recurrence.idHandling": "What happens to the 🆔 of a recurring task on its next instance.",

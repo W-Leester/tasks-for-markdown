@@ -91,7 +91,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<Extens
   registerConvertCommand(context, commandDeps);
   registerQueryCommands(context, { ...commandDeps, queries, openQueryResults: webviews.openQueryResults });
   const links = registerLinks(context, { index, indexService, openQueryResults: webviews.openQueryResults, log });
-  const ai = registerAi(context, { settings, log });
+  const ai = registerAi(context, { settings, log, index });
   // Status types decide isDone/isCompleted, so a change means every file must be re-parsed.
   context.subscriptions.push(
     settings.onDidChange(() => {
@@ -108,7 +108,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<Extens
   context.subscriptions.push(codeLens, vscode.languages.registerCodeLensProvider(markdown, codeLens));
   context.subscriptions.push(vscode.languages.registerHoverProvider(markdown, new TaskHoverProvider({ index, settings, getStatusRegistry })));
   // Markdown has quickSuggestions off by default, so a space is the trigger (like Obsidian's auto-suggest).
-  context.subscriptions.push(vscode.languages.registerCompletionItemProvider(markdown, new TaskCompletionProvider({ index, settings }), ' '));
+  // Space and letters trigger: with autoSuggest.minMatch 2 the list opens on the second letter of a keyword ("du"),
+  // never on a bare space, where Enter must stay a newline (M29, incident #41).
+  context.subscriptions.push(vscode.languages.registerCompletionItemProvider(markdown, new TaskCompletionProvider({ index, settings }), ' ', ...'abcdefghijklmnopqrstuvwxyz'));
   const diagnostics = new TaskDiagnostics({ index, settings, getStatusRegistry });
   context.subscriptions.push(diagnostics, vscode.languages.registerCodeActionsProvider(markdown, diagnostics, { providedCodeActionKinds: TaskDiagnostics.providedCodeActionKinds }));
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { onboardingDay, shouldPrompt } from '../../src/ai/onboardingDays';
+import { mcpWanted, onboardingDay, shouldPrompt } from '../../src/ai/onboardingDays';
 
 describe('onboarding counts distinct days', () => {
   it('counts a new day once, however many windows open that day', () => {
@@ -18,5 +18,14 @@ describe('onboarding counts distinct days', () => {
     expect(shouldPrompt({}, true)).toBe(true); // again after a reload — no daily limit
     expect(shouldPrompt({}, false)).toBe(false); // installed / connected
     expect(shouldPrompt({ never: true }, true)).toBe(false);
+  });
+
+  it('stays quiet in a folder without tasks — a README alone activates the extension (M29)', () => {
+    expect(shouldPrompt({}, true, { hasTasks: false })).toBe(false);
+    expect(shouldPrompt({}, true, { hasTasks: true })).toBe(true);
+    expect(mcpWanted({ enabled: true, trusted: true, hasTasks: false })).toBe(false);
+    expect(mcpWanted({ enabled: true, trusted: true, hasTasks: true })).toBe(true);
+    expect(mcpWanted({ enabled: false, trusted: true, hasTasks: true })).toBe(false);
+    expect(mcpWanted({ enabled: true, trusted: false, hasTasks: true })).toBe(false);
   });
 });

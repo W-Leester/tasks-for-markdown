@@ -15,6 +15,15 @@ suite('add or remove checkbox (M26)', () => {
     assert.match(dialog[0]!.when!, /focusedView =~ \/\^tasksmd/);
   });
 
+  test('quick search key only in Markdown, the rendered view and our sidebar — it took "Focus Breadcrumbs" everywhere (M29)', () => {
+    const pkg = vscode.extensions.getExtension('HastyCapybara.tasks-for-markdown')!.packageJSON as { contributes: { keybindings: { command: string; key: string; mac?: string; when?: string }[] } };
+    const kb = pkg.contributes.keybindings.find((k) => k.command === 'tasksmd.quickSearch')!;
+    assert.ok(kb.when, 'has a when clause');
+    assert.match(kb.when!, /editorLangId == markdown/);
+    assert.match(kb.when!, /activeCustomEditorId == tasksmd\.rendered/);
+    assert.match(kb.when!, /focusedView =~ \/\^tasksmd/);
+  });
+
   test('no rendered view in front → no rendered selection; the shortcuts command exists', async () => {
     assert.equal(await vscode.commands.executeCommand('tasksmd.rendered.selection'), undefined);
     assert.ok((await vscode.commands.getCommands(true)).includes('tasksmd.openKeybindings'));

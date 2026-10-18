@@ -291,7 +291,7 @@ Obsidian Tasks 쿼리 문법과 호환되는 텍스트 기반 엔진. 한 줄 = 
 | `tasksmd.createOrEdit` | macOS `Cmd+Shift+C`, Windows·Linux `Alt+Shift+C` (1.1.5부터; 마크다운 편집기·렌더 보기·Tasks 사이드바에서만 — macOS 기본 "새 외부 터미널"은 다른 곳에서 유지). 1.1.4: `Ctrl+Shift+/`. 이전: `Ctrl+Shift+C` (모든 OS 동일; macOS는 미할당, Windows/Linux의 "외부 터미널 열기"를 덮음. `when: !terminalFocus && !inputFocus`라 터미널 복사는 유지) | 편집 모달 |
 | `tasksmd.setPriority` / `setDueDate` / `setScheduledDate` / `setStartDate` / `setRecurrence` / `setDependencies` | — | 개별 QuickPick |
 | `tasksmd.postpone` | — | 마감/예정일을 N일 미룸(내일/다음주/… 선택) |
-| `tasksmd.quickSearch` | `Ctrl/Cmd+Shift+;` | 빠른 검색 |
+| `tasksmd.quickSearch` | `Ctrl/Cmd+Shift+;` | 빠른 검색 (1.1.5부터 마크다운 편집기·렌더 보기·Tasks 사이드바에서만, M29) |
 | `tasksmd.archiveCompleted` | — | 완료 태스크 아카이브 (12.2) |
 | `tasksmd.openStats` / `openCalendar` | — | 통계 / 캘린더 패널 |
 | `tasksmd.checkForUpdates` | — | 사내 배포 경로에서 새 버전 확인 (12.5) |
@@ -325,7 +325,7 @@ Obsidian Tasks 쿼리 문법과 호환되는 텍스트 기반 엔진. 한 줄 = 
 | `statuses` | 기본 4종 | 커스텀 상태 배열 |
 | `decorations.*` | 각종 on/off | 5.1 |
 | `codeLens.mode` | `cursorLine` | `off` / `cursorLine` / `all` |
-| `autoSuggest.enabled` / `minMatch` / `maxItems` | `true` / `0` / `6` | |
+| `autoSuggest.enabled` / `minMatch` / `maxItems` | `true` / `2` / `6` | 1.1.5에서 `minMatch` 0 → 2 (M29) |
 | `preview.enabled` / `preview.renderBadges` | `true` / `true` | 6장 |
 | `query.allowFunctions` | `false` | `filter/sort/group by function` 허용 (opt-in) |
 | `savedQueries` | `[]` | 저장된 쿼리 (`.tasks/queries/*.md`와 병행) |

@@ -20,15 +20,26 @@ const PRIORITY_LABEL: Record<Priority, string> = {
   [Priority.Lowest]: 'Lowest',
 };
 
+/** One button: `icon` is a codicon for CodeLens, `glyph` the plain-text stand-in for an inlay hint (which cannot draw codicons). */
+interface TaskAction {
+  label: string;
+  icon?: string;
+  glyph?: string;
+  command: string;
+  tooltip?: string;
+}
+
 /**
- * Clickable actions above task lines (FR-3.7 / FR-3.8):
+ * Clickable actions on task lines (FR-3.7 / FR-3.8):
  *   ✔ Done · ⏫ High ▾ · 📅 Sep 25 ▾ · 🔁 weekly ▾ · ✎ Edit
- * Mode `cursorLine` (default) shows lenses only for the line with the cursor, `all` for every
- * task line in view, `off` disables the provider's output.
+ * At the end of the line as inlay hints (`codeLens.position: lineEnd`, default since M30) or above it as
+ * CodeLens (`above`). Mode `cursorLine` (default) shows them only for the line with the cursor, `all` for
+ * every task line in view, `off` disables both.
  */
-export class TaskCodeLensProvider implements vscode.CodeLensProvider, vscode.Disposable {
+export class TaskCodeLensProvider implements vscode.CodeLensProvider, vscode.InlayHintsProvider, vscode.Disposable {
   private readonly changeEmitter = new vscode.EventEmitter<void>();
   readonly onDidChangeCodeLenses = this.changeEmitter.event;
+  readonly onDidChangeInlayHints = this.changeEmitter.event;
   private readonly disposables: vscode.Disposable[] = [];
   private lastCursorLine = -1;
 
@@ -43,11 +54,46 @@ export class TaskCodeLensProvider implements vscode.CodeLensProvider, vscode.Dis
           this.changeEmitter.fire();
         }
       }),
-      deps.settings.onDidChange(() => this.changeEmitter.fire(), ['codeLens.mode', 'globalFilter']),
+      deps.settings.onDidChange(() => this.changeEmitter.fire(), ['codeLens.mode', 'codeLens.position', 'globalFilter']),
     );
   }
 
   provideCodeLenses(document: vscode.TextDocument): vscode.CodeLens[] {
+    const out: vscode.CodeLens[] = this.queryBlockLenses(document);
+    if (this.deps.settings.get('codeLens.position') !== 'above') return out;
+    for (const { task, line, today } of this.taskLines(document)) {
+      const range = new vscode.Range(line, 0, line, 0);
+      for (const a of this.actionsFor(task, today)) {
+        out.push(new vscode.CodeLens(range, { title: a.icon ? `$(${a.icon}) ${a.label}` : a.label, command: a.command, arguments: [task], tooltip: a.tooltip }));
+      }
+    }
+    return out;
+  }
+
+  /**
+   * The same buttons right after the end of the line (M30): CodeLens can only sit above it. One hint per button —
+   * the editor cuts a hint off after `editor.inlayHints.maximumLength` (43) characters, which hid Edit.
+   */
+  provideInlayHints(document: vscode.TextDocument): vscode.InlayHint[] {
+    if (this.deps.settings.get('codeLens.position') === 'above') return [];
+    const out: vscode.InlayHint[] = [];
+    for (const { task, line, today } of this.taskLines(document)) {
+      const at = new vscode.Position(line, document.lineAt(line).text.length);
+      for (const a of this.actionsFor(task, today)) {
+        const part = new vscode.InlayHintLabelPart(a.glyph ? `${a.glyph} ${a.label}` : a.label);
+        part.command = { title: a.label, command: a.command, arguments: [task] };
+        // The editor runs an inlay hint's command on Cmd/Ctrl+click only (a plain click just places the cursor).
+        part.tooltip = t('{0} ({1}+click)', a.tooltip ?? a.label, process.platform === 'darwin' ? 'Cmd' : 'Ctrl');
+        const hint = new vscode.InlayHint(at, [part]);
+        hint.paddingLeft = true;
+        out.push(hint);
+      }
+    }
+    return out;
+  }
+
+  /** Task lines that get buttons under the current mode, parsed. */
+  private taskLines(document: vscode.TextDocument): { task: Task; line: number; today: import('dayjs').Dayjs }[] {
     const mode = this.deps.settings.get('codeLens.mode');
     if (mode === 'off') return [];
     const editor = vscode.window.visibleTextEditors.find((e) => e.document === document);
@@ -64,15 +110,13 @@ export class TaskCodeLensProvider implements vscode.CodeLensProvider, vscode.Dis
     const registry = this.deps.getStatusRegistry();
     const globalFilter = this.deps.settings.get('globalFilter') || undefined;
     const today = (this.deps.clock ?? systemClock).now().startOf('day');
-    const out: vscode.CodeLens[] = this.queryBlockLenses(document);
+    const out: { task: Task; line: number; today: import('dayjs').Dayjs }[] = [];
     for (const line of lines) {
       if (line >= document.lineCount) continue;
       const text = document.lineAt(line).text;
       if (!isTaskLine(text)) continue;
       const task = parseTaskLine(text, { statusRegistry: registry, globalFilter, location: { key: document.uri.toString(), path: '', line, heading: null, frontmatterTags: [], depth: 0, parentLine: null } });
-      if (!task) continue;
-      const range = new vscode.Range(line, 0, line, 0);
-      out.push(...this.lensesFor(task, range, today));
+      if (task) out.push({ task, line, today });
     }
     return out;
   }
@@ -93,27 +137,26 @@ export class TaskCodeLensProvider implements vscode.CodeLensProvider, vscode.Dis
     return out;
   }
 
-  private lensesFor(task: Task, range: vscode.Range, today: import('dayjs').Dayjs): vscode.CodeLens[] {
-    const lens = (title: string, command: string, tooltip?: string) => new vscode.CodeLens(range, { title, command, arguments: [task], tooltip });
-    const out: vscode.CodeLens[] = [];
+  private actionsFor(task: Task, today: import('dayjs').Dayjs): TaskAction[] {
+    const out: TaskAction[] = [];
     out.push(
       task.isCompleted
-        ? lens(`$(debug-restart) ${t('Reopen')}`, 'tasksmd.reopen')
-        : lens(`$(check) ${t('Done')}`, 'tasksmd.markDone', t('Mark as done')),
+        ? { label: t('Reopen'), icon: 'debug-restart', glyph: '↺', command: 'tasksmd.reopen' }
+        : { label: t('Done'), icon: 'check', glyph: '✓', command: 'tasksmd.markDone', tooltip: t('Mark as done') },
     );
     if (!task.isCompleted) {
       const p = task.priority;
-      out.push(lens(`${PRIORITY_EMOJI[p] ? PRIORITY_EMOJI[p] + ' ' : ''}${t(PRIORITY_LABEL[p])} ▾`, 'tasksmd.setPriority'));
+      out.push({ label: `${PRIORITY_EMOJI[p] ? PRIORITY_EMOJI[p] + ' ' : ''}${t(PRIORITY_LABEL[p])} ▾`, command: 'tasksmd.setPriority' });
       const dueTitle = task.due?.date
         ? `📅 ${task.due.date.format('MMM D')} · ${relativeText(describeRelative(task.due.date, today))} ▾`
         : `📅 ${t('Due')} ▾`;
-      out.push(lens(dueTitle, 'tasksmd.setDueDate'));
-      if (task.scheduled?.date) out.push(lens(`⏳ ${task.scheduled.date.format('MMM D')} ▾`, 'tasksmd.setScheduledDate'));
-      if (task.recurrenceText) out.push(lens(`🔁 ${task.recurrenceText} ▾`, 'tasksmd.setRecurrence'));
-      else if (task.due || task.scheduled || task.start) out.push(lens(`🔁 ${t('Repeat')} ▾`, 'tasksmd.setRecurrence'));
-      if (task.due || task.scheduled) out.push(lens(`$(watch) ${t('Postpone')}`, 'tasksmd.postpone'));
+      out.push({ label: dueTitle, command: 'tasksmd.setDueDate' });
+      if (task.scheduled?.date) out.push({ label: `⏳ ${task.scheduled.date.format('MMM D')} ▾`, command: 'tasksmd.setScheduledDate' });
+      if (task.recurrenceText) out.push({ label: `🔁 ${task.recurrenceText} ▾`, command: 'tasksmd.setRecurrence' });
+      else if (task.due || task.scheduled || task.start) out.push({ label: `🔁 ${t('Repeat')} ▾`, command: 'tasksmd.setRecurrence' });
+      if (task.due || task.scheduled) out.push({ label: t('Postpone'), icon: 'watch', glyph: '⏱', command: 'tasksmd.postpone' });
     }
-    out.push(lens(`$(edit) ${t('Edit')}`, 'tasksmd.createOrEdit'));
+    out.push({ label: t('Edit'), icon: 'edit', glyph: '✎', command: 'tasksmd.createOrEdit' });
     return out;
   }
 

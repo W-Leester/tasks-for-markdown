@@ -43,6 +43,11 @@
   "main": "./dist/extension.js",
   "l10n": "./l10n",
   "contributes": {
+    "configurationDefaults": {
+      "[markdown]": {
+        "editor.inlayHints.maximumLength": 0
+      }
+    },
     "commands": [
       {
         "command": "tasksmd.toggleDone",
@@ -597,6 +602,19 @@
           ],
           "description": "%tasksmd.config.codeLens.mode%"
         },
+        "tasksmd.codeLens.position": {
+          "type": "string",
+          "enum": [
+            "lineEnd",
+            "above"
+          ],
+          "default": "lineEnd",
+          "enumDescriptions": [
+            "%tasksmd.config.codeLens.position.lineEnd%",
+            "%tasksmd.config.codeLens.position.above%"
+          ],
+          "description": "%tasksmd.config.codeLens.position%"
+        },
         "tasksmd.autoSuggest.enabled": {
           "type": "boolean",
           "default": true,
@@ -604,7 +622,7 @@
         },
         "tasksmd.autoSuggest.minMatch": {
           "type": "number",
-          "default": 2,
+          "default": 0,
           "minimum": 0,
           "maximum": 3,
           "description": "%tasksmd.config.autoSuggest.minMatch%"

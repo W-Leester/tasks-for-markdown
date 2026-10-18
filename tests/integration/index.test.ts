@@ -111,18 +111,18 @@ suite('smoke', () => {
 });
 
 suite('editor providers', () => {
-  test('code lenses appear for the cursor line only (default mode)', async () => {
+  test('task buttons appear for the cursor line only (default mode, at the end of the line since M30)', async () => {
     await getApi();
     const doc = await vscode.workspace.openTextDocument(fixtureUri('notes/week-38.md'));
     const editor = await vscode.window.showTextDocument(doc);
     editor.selection = new vscode.Selection(6, 0, 6, 0);
     await sleep(150);
-    const lenses = await vscode.commands.executeCommand<vscode.CodeLens[]>('vscode.executeCodeLensProvider', doc.uri);
-    const ours = lenses.filter((l) => l.command?.command.startsWith('tasksmd.'));
-    assert.ok(ours.length >= 4, `expected lenses, got ${ours.length}`);
-    assert.ok(ours.every((l) => l.range.start.line === 6), 'lenses only on cursor line');
-    assert.ok(ours.some((l) => l.command!.command === 'tasksmd.markDone'));
-    assert.ok(ours.some((l) => l.command!.command === 'tasksmd.setDueDate' && l.command!.title.includes('Sep 25')));
+    const hints = await vscode.commands.executeCommand<vscode.InlayHint[]>('vscode.executeInlayHintProvider', doc.uri, new vscode.Range(0, 0, doc.lineCount, 0));
+    const ours = hints.flatMap((h) => (typeof h.label === 'string' ? [] : h.label.filter((p) => p.command?.command.startsWith('tasksmd.')).map((p) => ({ line: h.position.line, part: p }))));
+    assert.ok(ours.length >= 4, `expected buttons, got ${ours.length}`);
+    assert.ok(ours.every((o) => o.line === 6), 'buttons only on cursor line');
+    assert.ok(ours.some((o) => o.part.command!.command === 'tasksmd.markDone'));
+    assert.ok(ours.some((o) => o.part.command!.command === 'tasksmd.setDueDate' && o.part.value.includes('Sep 25')));
     await vscode.commands.executeCommand('workbench.action.closeAllEditors');
   });
 
@@ -144,8 +144,8 @@ suite('auto-suggest', () => {
   const guard = new FixtureGuard();
   teardown(() => guard.restore());
 
-  async function complete(doc: vscode.TextDocument, line: number, character: number, trigger = ' '): Promise<vscode.CompletionItem[]> {
-    const list = await vscode.commands.executeCommand<vscode.CompletionList>('vscode.executeCompletionItemProvider', doc.uri, new vscode.Position(line, character), trigger);
+  async function complete(doc: vscode.TextDocument, line: number, character: number): Promise<vscode.CompletionItem[]> {
+    const list = await vscode.commands.executeCommand<vscode.CompletionList>('vscode.executeCompletionItemProvider', doc.uri, new vscode.Position(line, character), ' ');
     // Only our items carry these kinds; other providers (paths, words) use different ones.
     return list.items.filter((i) => i.kind === vscode.CompletionItemKind.Event || i.kind === vscode.CompletionItemKind.Value);
   }
@@ -160,11 +160,7 @@ suite('auto-suggest', () => {
     const n = doc.lineCount;
     assert.deepEqual(await complete(doc, n - 3, '- [ ] '.length), [], 'fresh "- [ ] " line');
     assert.deepEqual(await complete(doc, n - 2, '  - [ ] '.length), [], 'fresh indented "- [ ] " line');
-    // M29: a space alone never opens it (Enter after "text " must stay a newline); two letters of a keyword do.
-    assert.deepEqual(await complete(doc, n - 1, '- [ ] write '.length), [], 'just a space after text: no list');
-    await editor.edit((eb) => eb.insert(new vscode.Position(n - 1, '- [ ] write '.length), 'du'));
-    const typed = await complete(doc, n - 1, '- [ ] write du'.length, 'u');
-    assert.ok(typed.some((i) => labelOf(i).includes('📅')), 'two letters of "due" show the due-date suggestion');
+    assert.ok((await complete(doc, n - 1, '- [ ] write '.length)).length > 0, 'after some text the list shows');
     const invoked = await vscode.commands.executeCommand<vscode.CompletionList>('vscode.executeCompletionItemProvider', doc.uri, new vscode.Position(n - 3, '- [ ] '.length));
     assert.ok(invoked.items.some((i) => i.kind === vscode.CompletionItemKind.Event || i.kind === vscode.CompletionItemKind.Value), 'Ctrl+Space (invoke) still suggests');
   });

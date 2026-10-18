@@ -169,6 +169,7 @@ Obsidian Tasks 플러그인이 제공하는 "마크다운 파일 안의 체크�
 
 - FR-3.7 태스크 줄 위에 액션 렌즈를 표시한다: `✔ 완료` · `우선순위: 높음 ▾` · `📅 9/25 ▾` · `🔁 매주 ▾` · `✎ 편집`. 각 항목 클릭 시 QuickPick 또는 편집 모달이 열린다.
 - FR-3.8 렌즈는 커서가 있는 줄에만 / 모든 태스크 줄에 / 끄기 중 선택(설정). 기본값은 "커서가 있는 줄에만"(세로 공간 절약).
+- FR-3.8a (1.1.5, M30) 위치: 줄 끝(기본, 인레이 힌트 — Cmd/Ctrl+클릭) / 줄 위(CodeLens — 클릭). 설정 `codeLens.position`. 마크다운에서 `editor.inlayHints.maximumLength` 기본을 0으로(한 줄 합계 43자에서 잘려 `편집`이 숨었음).
 
 ### 5.3 Hover
 
@@ -325,7 +326,8 @@ Obsidian Tasks 쿼리 문법과 호환되는 텍스트 기반 엔진. 한 줄 = 
 | `statuses` | 기본 4종 | 커스텀 상태 배열 |
 | `decorations.*` | 각종 on/off | 5.1 |
 | `codeLens.mode` | `cursorLine` | `off` / `cursorLine` / `all` |
-| `autoSuggest.enabled` / `minMatch` / `maxItems` | `true` / `2` / `6` | 1.1.5에서 `minMatch` 0 → 2 (M29) |
+| `codeLens.position` | `lineEnd` | `lineEnd`(인레이 힌트) / `above`(CodeLens), 1.1.5 M30 |
+| `autoSuggest.enabled` / `minMatch` / `maxItems` | `true` / `0` / `6` | |
 | `preview.enabled` / `preview.renderBadges` | `true` / `true` | 6장 |
 | `query.allowFunctions` | `false` | `filter/sort/group by function` 허용 (opt-in) |
 | `savedQueries` | `[]` | 저장된 쿼리 (`.tasks/queries/*.md`와 병행) |

@@ -2,7 +2,7 @@
 
 ## Unreleased (1.1.5)
 
-- **Task suggestions no longer open on every space.** In a task line the list now appears when you type two letters of a keyword (`du` → 📅 due, `pr` → priority, `ev` → 🔁 recurrence), not after a bare space — so `space → Enter` makes a new line instead of picking a suggestion, and Markdown All in One keeps Enter and Tab. `Ctrl+Space` still opens it anytime; set `tasksmd.autoSuggest.minMatch` to `0` for the old behaviour.
+- **Task buttons at the end of the line.** `✓ Done · Priority ▾ · 📅 Due ▾ · 🔁 Repeat ▾ · ⏱ Postpone · ✎ Edit` now sit right after the cursor's task line instead of above it. They are inlay hints, so press them with **Cmd+click** (Ctrl+click on Windows and Linux). To keep them above the line with a plain click, set `tasksmd.codeLens.position` to `above`. In Markdown files the extension lifts `editor.inlayHints.maximumLength` so the whole row fits.
 - **Quick search (`Cmd/Ctrl+Shift+;`) only takes the key in Markdown editors, the rendered view and the Tasks sidebar.** In code files VS Code's "Focus Breadcrumbs" works again. The command palette still runs it from anywhere.
 - **Quiet in folders without tasks.** Opening a code project that only has a README no longer shows the task count in the status bar, registers the MCP server with the editor's AI, or asks to install `tasksmd` / connect AI tools. Write and save the first `- [ ] …` and they turn on.
 - **Enter / Tab in checklists work with Markdown All in One again.** On a fresh `- [ ] ` line (nothing written after the box yet) the task suggestions no longer pop up by themselves; an open suggestion list made Markdown All in One give up Tab (indent) and Enter. Start typing and they appear as before, or press `Ctrl+Space`.
@@ -12,7 +12,7 @@
 - The `Ctrl+Shift+C` command is now called **Tasks: Add or remove checkbox** (Korean: **체크박스 만들기/지우기**). "Toggle checkbox" read like checking a task off, which is `Ctrl+Shift+Enter` (**Toggle task done**). The key and what it does are unchanged.
 
 ### 한국어 요약
-- **자동완성이 스페이스마다 뜨지 않음:** 키워드를 두 글자(`du`·`pr`·`ev`) 치면 뜸. `스페이스 → Enter`는 줄바꿈. `Ctrl+Space`는 언제나. 예전 동작은 `tasksmd.autoSuggest.minMatch` = 0.
+- **태스크 버튼을 줄 끝에:** `✓ 완료 · 우선순위 ▾ · 📅 마감 ▾ · 🔁 · ⏱ 미루기 · ✎ 편집`이 커서 줄 위가 아니라 **끝에**. 인레이 힌트라 **Cmd+클릭**(Windows·Linux Ctrl+클릭). 예전처럼 줄 위·그냥 클릭은 `tasksmd.codeLens.position` = `above`.
 - **빠른 검색 키(`Cmd/Ctrl+Shift+;`)는 마크다운 편집기·렌더 보기·Tasks 사이드바에서만** — 코드 파일에서는 "브레드크럼에 포커스"가 다시 동작.
 - **태스크 없는 폴더에서는 조용히:** README만 있는 프로젝트에서 상태 표시줄 개수·에디터 AI용 MCP 등록·설치/연결 알림 없음. 첫 태스크를 저장하면 켜짐.
 - **Markdown All in One과 함께 Enter·Tab:** 체크박스 뒤가 빈 `- [ ] ` 줄에서는 제안 목록이 저절로 뜨지 않음(떠 있으면 Markdown All in One이 Tab 들여쓰기·Enter를 양보했음). 글자를 쓰거나 `Ctrl+Space`로 부르면 뜸.

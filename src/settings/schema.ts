@@ -26,6 +26,7 @@ export interface SettingsSchema {
   'decorations.dimFields': boolean;
   'decorations.gutterIcons': boolean;
   'codeLens.mode': 'off' | 'cursorLine' | 'all';
+  'codeLens.position': 'lineEnd' | 'above';
   'autoSuggest.enabled': boolean;
   'autoSuggest.minMatch': number;
   'autoSuggest.maxItems': number;
@@ -90,8 +91,9 @@ export const SETTINGS_DEFAULTS: Readonly<SettingsSchema> = {
   'decorations.dimFields': true,
   'decorations.gutterIcons': true,
   'codeLens.mode': 'cursorLine',
+  'codeLens.position': 'lineEnd',
   'autoSuggest.enabled': true,
-  'autoSuggest.minMatch': 2,
+  'autoSuggest.minMatch': 0,
   'autoSuggest.maxItems': 8,
   'recurrence.insertPosition': 'above',
   'recurrence.idHandling': 'keep',

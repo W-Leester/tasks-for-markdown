@@ -1107,7 +1107,7 @@
 - [x] 실제 VS Code 확인(브라우저 VS Code: 1 ✅, 3 상태 표시줄 ✅, 3 MCP는 `serve-web`이 항상 "신뢰 안 됨"이라 신뢰 검사만 임시로 끈 빌드로 ✅ — 없음 → 첫 태스크 저장 뒤 등록). 2는 하네스에서 트리거 문자 자동 제안이 원래 안 열려(최소 0으로 둔 대조군도 안 열림, `Ctrl+Space`는 열림) 데스크톱 확인 필요
 - [x] 문서(user-guide·requirements·CHANGELOG·design·점검표), 사용자 검증 방법
 - [x] 사용자 데스크톱 검증(10-18): 1·3 ✅. **2 ❌** — `du`를 쳐도 목록이 안 뜸(영문 글자 트리거가 데스크톱에서도 동작 안 함, incidents #42). 사용자: "원래처럼 바로 뜨는 게 더 좋다"
-- [ ] 2 되돌리기: `minMatch` 기본 0, 트리거는 공백만(빈 `- [ ] ` 줄 제외(#41)는 유지). 테스트를 원래 기대로, 문서 되돌림
+- [x] 2 되돌리기: `minMatch` 기본 0, 트리거는 공백만(빈 `- [ ] ` 줄 제외(#41)는 유지). 테스트를 원래 기대로, 문서 되돌림
 
 ## M30. 태스크 줄 버튼을 줄 끝에 (1.1.5, 계획 2026-10-18, 사용자 요청)
 
@@ -1119,8 +1119,10 @@
 - 사용자가 `editor.inlayHints.enabled`를 꺼 두면 안 보임 → 설정 설명에 적음.
 
 ### 할 일
-- [ ] 테스트(먼저 실패): 커서 줄 끝에 인레이 힌트(명령 `tasksmd.markDone` 등), 그 줄 CodeLens 없음; `above`면 반대
-- [ ] 구현, 설정·nls, 실제 VS Code 확인, 문서(user-guide·README·CHANGELOG·design·requirements·점검표)
+- [x] 테스트(먼저 실패): 커서 줄 끝에 인레이 힌트(명령 `tasksmd.markDone` 등), 그 줄 CodeLens 없음; `above`면 반대
+- [x] 구현, 설정·nls, 실제 VS Code 확인, 문서(user-guide·README·CHANGELOG·design·requirements·점검표)
+- **구현 중 발견(브라우저 VS Code):** ① 힌트 하나에 다 넣으니 "반복…"에서 잘림 → 버튼마다 힌트 하나 ② 그래도 `✎ …` — 길이 제한(43자)이 **한 줄 합계** → `configurationDefaults` `[markdown]` `editor.inlayHints.maximumLength: 0`(테스트: 합계가 한도 안) ③ 그냥 클릭은 실행 안 됨, **Cmd+클릭**만(VS Code 동작, 바꿀 수 없음). 사용자에게 물어 줄 끝(Cmd+클릭)을 기본으로 결정(10-18). 툴팁에 "(Cmd+클릭)"
+- [ ] 사용자 데스크톱 확인
 
 ## M21. 확장 안에서 AI 연결 제공 — 1.1.0 (계획 2026-10-02, 착수 2026-10-07)
 

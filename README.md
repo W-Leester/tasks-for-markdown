@@ -228,7 +228,7 @@ You don't have to write queries by hand. `Tasks: Open query builder` assembles o
 | `setDoneDate` / `setCancelledDate` / `setCreatedDate` | `true` / `true` / `false` | Automatic ✅ ❌ ➕ dates |
 | `statuses` | 4 core statuses | Custom checkbox symbols, names, next symbol and type |
 | `recurrence.insertPosition` / `idHandling` / `copyDependsOn` / `removeScheduledDate` | `above` / `keep` / `true` / `false` | Next-instance behaviour |
-| `decorations.*`, `codeLens.mode`, `autoSuggest.*` | | Editor assistance |
+| `decorations.*`, `codeLens.mode` / `codeLens.position`, `autoSuggest.*` | `cursorLine` / `lineEnd` | Editor assistance; task buttons at the end of the line (`above` = CodeLens) |
 | `preview.enabled` / `preview.renderBadges` | `true` | Markdown preview rendering |
 | `savedQueries` | `[]` | Saved queries (also `.tasks/queries/*.md`) |
 | `query.allowFunctions` | `false` | Allow `by function` JavaScript in queries (trusted workspaces only) |

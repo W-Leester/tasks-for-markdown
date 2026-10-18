@@ -21,17 +21,18 @@ Obsidian Tasks 플러그인과 같은 문법으로 VS Code / Cursor 안에서 �
 
 두 포맷 모두 읽으며, 쓸 때는 `tasksmd.taskFormat` 설정을 따릅니다. 필드 순서는 Obsidian과 동일하게 정규화됩니다.
 
-**자동완성**: 태스크 줄에서 키워드를 **두 글자** 치면 제안이 뜹니다(`du` → 📅 마감일, `pr` → 우선순위, `ev` → 🔁 반복). 스페이스만으로는 뜨지 않습니다 — 설명을 쓰다 `스페이스 → Enter`가 제안 선택이 되거나 Markdown All in One의 Enter·Tab을 막지 않도록(1.1.5부터; 예전처럼 스페이스마다 띄우려면 `tasksmd.autoSuggest.minMatch`를 `0`으로). 언제든 `Ctrl+Space`로 부를 수 있습니다. `due` → 📅 뒤에 `tomorrow`, `next fri`, `3일 후`, `10월 6일` 같은 자연어를 치면 날짜로 바뀝니다. `pri` → 우선순위, `every` → 반복, `id` → 자동 발급 ID.
+**자동완성**: 태스크 줄에서 스페이스를 치면 제안이 뜹니다(체크박스 뒤가 아직 빈 `- [ ] ` 줄에서는 저절로 뜨지 않음 — Markdown All in One의 Enter·Tab을 막지 않도록, 1.1.5부터. 필요하면 `Ctrl+Space`). 제안 창이 떠 있을 때 `Enter`는 제안을 고르므로, 줄을 바꾸려면 `Esc` 뒤 `Enter`. 키워드를 몇 글자 친 뒤에만 띄우려면 `tasksmd.autoSuggest.minMatch`(예: 2). `due` → 📅 뒤에 `tomorrow`, `next fri`, `3일 후`, `10월 6일` 같은 자연어를 치면 날짜로 바뀝니다. `pri` → 우선순위, `every` → 반복, `id` → 자동 발급 ID.
 
 ## 2. 편집
 
 | 동작 | 방법 |
 |---|---|
-| 완료/다시 열기 | 태스크 줄에서 `Ctrl+Shift+Enter`(macOS에서도 Ctrl 키), 사이드바 체크박스, CodeLens `✔ Done`, 호버 카드 |
+| 완료/다시 열기 | 태스크 줄에서 `Ctrl+Shift+Enter`(macOS에서도 Ctrl 키), 사이드바 체크박스, 태스크 줄 끝 버튼 `✓ 완료`(Cmd/Ctrl+클릭), 호버 카드 |
 | 체크박스 만들기/지우기 | `Ctrl+Shift+C`(1.1.4부터, 명령 이름 `Tasks: 체크박스 만들기/지우기`) — 현재 줄(또는 선택한 줄들)을 `- [ ] …`로 바꿉니다. 글머리 기호 줄은 기호를 유지하고, 이미 태스크 줄이면 체크박스를 뺍니다. 날짜·반복까지 넣으려면 `Cmd+Shift+C`(macOS) / `Alt+Shift+C`(Windows·Linux) |
 | 상태 순환 | 토글은 상태의 "다음 심볼"로 이동합니다 (`[ ]`→`[x]`→`[ ]`, `[/]`→`[x]`). 완료 타입이 되면 ✅ 날짜가 붙고, 벗어나면 제거됩니다 |
 | 편집 대화상자 | `Cmd+Shift+C`(macOS) / `Alt+Shift+C`(Windows·Linux) — 위에서부터 상태·설명·우선순위·마감일·태그·반복. 예정일·시작일·의존·생성일·완료 시 동작은 **더보기**에 접혀 있고(값이 있으면 자동으로 펼침), 완료일·취소일은 편집할 때만 더보기에 나옵니다. 태그 칸은 설명 끝의 태그를 따로 보여 주고 적용할 때 다시 붙입니다. 아래에 결과 줄 미리보기 |
-| 개별 필드 | 우클릭 › Tasks › 우선순위/마감일/예정일/시작일/반복/의존성/미루기, 또는 CodeLens 클릭 |
+| 개별 필드 | 우클릭 › Tasks › 우선순위/마감일/예정일/시작일/반복/의존성/미루기, 또는 줄 끝 버튼 |
+| 줄 끝 버튼 | 커서가 있는 태스크 줄 **끝에** `✓ 완료 · 우선순위 ▾ · 📅 마감 ▾ · 🔁 반복 ▾ · ⏱ 미루기 · ✎ 편집`(1.1.5부터). VS Code 인레이 힌트라 **Cmd+클릭(Windows·Linux는 Ctrl+클릭)** 으로 누릅니다(그냥 클릭은 커서만 옮김). 예전처럼 줄 **위**에 두고 그냥 클릭하려면 설정 `tasksmd.codeLens.position`을 `above`로. 모든 태스크 줄에 보이기·끄기는 `tasksmd.codeLens.mode`. 안 보이면 `editor.inlayHints.enabled`가 켜져 있는지 확인 |
 | 여러 줄 | 여러 줄을 선택하고 `Ctrl+Shift+Enter` |
 | 단축키가 안 먹을 때 | 다른 확장이 같은 키를 쓰면 그쪽이 먼저 잡을 수 있습니다. `Keyboard Shortcuts`에서 `Tasks: Toggle task done`(한국어 화면: `태스크 완료 토글`)을 찾아 원하는 키로 바꾸세요. 기본 키가 `Cmd/Ctrl+Enter`가 아니라 `Ctrl+Shift+Enter`인 것도 Markdown All in One이 `Cmd/Ctrl+Enter`를 먼저 가져가서입니다. Windows/Linux에서 `Ctrl+Shift+Enter`는 원래 "위에 줄 삽입"이지만, 태스크 줄 위에서만 완료 토글로 바뀌고 다른 줄에서는 그대로입니다 |
 | 단축키 바꾸기 | 명령 `Tasks: 단축키 설정 열기`(1.1.5부터)를 실행하면 키보드 단축키 편집기가 이 확장의 명령만 보이게 열립니다. 바꿀 명령을 더블클릭하고 원하는 키를 누른 뒤 `Enter`. (직접 열려면 `Cmd/Ctrl+K` → `Cmd/Ctrl+S`, 검색창에 `@ext:HastyCapybara.tasks-for-markdown`) |

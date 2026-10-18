@@ -62,5 +62,6 @@
   "Add note": "Add note",
   "Note — Enter to save, Esc to cancel": "Note — Enter to save, Esc to cancel",
   "{0} notes": "{0} notes",
-  "Empty note": "Empty note"
+  "Empty note": "Empty note",
+  "{0} ({1}+click)": "{0} ({1}+click)"
 }

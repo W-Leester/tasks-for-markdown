@@ -21,7 +21,7 @@ Obsidian Tasks 플러그인과 같은 문법으로 VS Code / Cursor 안에서 �
 
 두 포맷 모두 읽으며, 쓸 때는 `tasksmd.taskFormat` 설정을 따릅니다. 필드 순서는 Obsidian과 동일하게 정규화됩니다.
 
-**자동완성**: 태스크 줄에서 스페이스를 치면 제안이 뜹니다. `due` → 📅 뒤에 `tomorrow`, `next fri`, `3일 후`, `10월 6일` 같은 자연어를 치면 날짜로 바뀝니다. `pri` → 우선순위, `every` → 반복, `id` → 자동 발급 ID.
+**자동완성**: 태스크 줄에서 스페이스를 치면 제안이 뜹니다(체크박스 뒤가 아직 빈 `- [ ] ` 줄에서는 저절로 뜨지 않음 — Markdown All in One의 Enter·Tab을 막지 않도록, 1.1.5부터. 필요하면 `Ctrl+Space`). `due` → 📅 뒤에 `tomorrow`, `next fri`, `3일 후`, `10월 6일` 같은 자연어를 치면 날짜로 바뀝니다. `pri` → 우선순위, `every` → 반복, `id` → 자동 발급 ID.
 
 ## 2. 편집
 

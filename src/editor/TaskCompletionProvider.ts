@@ -17,6 +17,8 @@ export interface CompletionDeps {
 /** Text just before the cursor that means "a date is expected here": `📅 `, `[due:: `, … */
 const DATE_CONTEXT_RE = /(?:([➕🛫⏳⌛📅📆🗓✅❌])️?|[[(](created|start|scheduled|due|completion|cancelled)::)\s*([^\s\]).]*(?: [^\s\]).]*)*)$/u;
 const KEYWORD_PREFIX_RE = /(?:^|\s)([\p{L}\p{N} ]*)$/u;
+/** A task line with nothing after the checkbox yet. */
+const EMPTY_TASK_RE = /^\s*(?:[-*+]|\d+[.)])\s+\[[^\]]\]\s*$/;
 
 interface Keyword {
   match: string; // what the user types
@@ -48,6 +50,10 @@ export class TaskCompletionProvider implements vscode.CompletionItemProvider {
     if (date) return this.dateItems(position, date[3] ?? '', today);
 
     const invoked = context.triggerKind === vscode.CompletionTriggerKind.Invoke;
+    // Nothing written after the checkbox yet ("- [ ] "): no automatic list. A list editor such as Markdown All in
+    // One inserts "- [ ] " on Enter, and an open suggestion widget makes it give up Tab (indent) and Enter (10-18).
+    // Ctrl+Space still shows the suggestions.
+    if (!invoked && EMPTY_TASK_RE.test(before)) return [];
     const tail = (KEYWORD_PREFIX_RE.exec(before)?.[1] ?? '').trimStart();
     // Match the longest run of trailing words (up to 3) that looks like a keyword: "pri", "every w",
     // "on completion d"; otherwise just the last word.

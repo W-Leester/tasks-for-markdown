@@ -151,6 +151,20 @@ suite('auto-suggest', () => {
   }
   const labelOf = (i: vscode.CompletionItem) => (typeof i.label === 'string' ? i.label : i.label.label);
 
+  test('nothing written after the checkbox yet: no automatic list (it took Tab/Enter from list editors, 10-18); typed text and Ctrl+Space still suggest', async () => {
+    await getApi();
+    guard.protect('notes/project-a.md');
+    const doc = await vscode.workspace.openTextDocument(fixtureUri('notes/project-a.md'));
+    const editor = await vscode.window.showTextDocument(doc);
+    await editor.edit((eb) => eb.insert(new vscode.Position(doc.lineCount, 0), '\n- [ ] \n  - [ ] \n- [ ] write '));
+    const n = doc.lineCount;
+    assert.deepEqual(await complete(doc, n - 3, '- [ ] '.length), [], 'fresh "- [ ] " line');
+    assert.deepEqual(await complete(doc, n - 2, '  - [ ] '.length), [], 'fresh indented "- [ ] " line');
+    assert.ok((await complete(doc, n - 1, '- [ ] write '.length)).length > 0, 'after some text the list shows');
+    const invoked = await vscode.commands.executeCommand<vscode.CompletionList>('vscode.executeCompletionItemProvider', doc.uri, new vscode.Position(n - 3, '- [ ] '.length));
+    assert.ok(invoked.items.some((i) => i.kind === vscode.CompletionItemKind.Event || i.kind === vscode.CompletionItemKind.Value), 'Ctrl+Space (invoke) still suggests');
+  });
+
   test('keyword mode on a task line, none on a plain line', async () => {
     await getApi();
     guard.protect('notes/project-a.md');

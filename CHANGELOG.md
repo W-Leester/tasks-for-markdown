@@ -2,6 +2,7 @@
 
 ## Unreleased (1.1.5)
 
+- **Task suggestions open as you type a keyword, not on every space.** Type `d` (due), `pr` (priority), `ev` (every …) and the list appears; a bare space or Korean text never opens it — the list popping up on each space interrupted typing in Korean and turned `space → Enter` into picking a suggestion. `Ctrl+Space` still opens it anytime. For this the extension turns on VS Code's quick suggestions in Markdown files and turns off word-based suggestions there (your own settings win). Set `tasksmd.autoSuggest.minMatch` to `0` to also open it right after a space.
 - **Task buttons at the end of the line.** `✓ Done · Priority ▾ · 📅 Due ▾ · 🔁 Repeat ▾ · ⏱ Postpone · ✎ Edit` now sit right after the cursor's task line instead of above it. They are inlay hints, so press them with **Cmd+click** (Ctrl+click on Windows and Linux). To keep them above the line with a plain click, set `tasksmd.codeLens.position` to `above`. In Markdown files the extension lifts `editor.inlayHints.maximumLength` so the whole row fits.
 - **Quick search (`Cmd/Ctrl+Shift+;`) only takes the key in Markdown editors, the rendered view and the Tasks sidebar.** In code files VS Code's "Focus Breadcrumbs" works again. The command palette still runs it from anywhere.
 - **Quiet in folders without tasks.** Opening a code project that only has a README no longer shows the task count in the status bar, registers the MCP server with the editor's AI, or asks to install `tasksmd` / connect AI tools. Write and save the first `- [ ] …` and they turn on.
@@ -12,6 +13,7 @@
 - The `Ctrl+Shift+C` command is now called **Tasks: Add or remove checkbox** (Korean: **체크박스 만들기/지우기**). "Toggle checkbox" read like checking a task off, which is `Ctrl+Shift+Enter` (**Toggle task done**). The key and what it does are unchanged.
 
 ### 한국어 요약
+- **자동완성은 키워드를 칠 때:** `d`·`pr`·`ev`를 치면 뜨고, 스페이스만이나 한글에는 안 뜸(스페이스마다 뜨던 목록이 한글 입력을 끊었음). `Ctrl+Space`는 언제나. 마크다운에서만 VS Code 빠른 제안을 켜고 단어 기반 제안을 끔(직접 정한 설정이 우선). 예전 동작은 `tasksmd.autoSuggest.minMatch` = 0.
 - **태스크 버튼을 줄 끝에:** `✓ 완료 · 우선순위 ▾ · 📅 마감 ▾ · 🔁 · ⏱ 미루기 · ✎ 편집`이 커서 줄 위가 아니라 **끝에**. 인레이 힌트라 **Cmd+클릭**(Windows·Linux Ctrl+클릭). 예전처럼 줄 위·그냥 클릭은 `tasksmd.codeLens.position` = `above`.
 - **빠른 검색 키(`Cmd/Ctrl+Shift+;`)는 마크다운 편집기·렌더 보기·Tasks 사이드바에서만** — 코드 파일에서는 "브레드크럼에 포커스"가 다시 동작.
 - **태스크 없는 폴더에서는 조용히:** README만 있는 프로젝트에서 상태 표시줄 개수·에디터 AI용 MCP 등록·설치/연결 알림 없음. 첫 태스크를 저장하면 켜짐.

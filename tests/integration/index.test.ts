@@ -160,7 +160,9 @@ suite('auto-suggest', () => {
     const n = doc.lineCount;
     assert.deepEqual(await complete(doc, n - 3, '- [ ] '.length), [], 'fresh "- [ ] " line');
     assert.deepEqual(await complete(doc, n - 2, '  - [ ] '.length), [], 'fresh indented "- [ ] " line');
-    assert.ok((await complete(doc, n - 1, '- [ ] write '.length)).length > 0, 'after some text the list shows');
+    // A bare space never opens it by default (it interrupted Korean typing); keyword letters do, through the editor's
+    // quick suggestions (suggestTyping.test.ts).
+    assert.deepEqual(await complete(doc, n - 1, '- [ ] write '.length), [], 'just a space after text: no list');
     const invoked = await vscode.commands.executeCommand<vscode.CompletionList>('vscode.executeCompletionItemProvider', doc.uri, new vscode.Position(n - 3, '- [ ] '.length));
     assert.ok(invoked.items.some((i) => i.kind === vscode.CompletionItemKind.Event || i.kind === vscode.CompletionItemKind.Value), 'Ctrl+Space (invoke) still suggests');
   });

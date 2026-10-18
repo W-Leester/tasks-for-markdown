@@ -93,7 +93,7 @@ export const SETTINGS_DEFAULTS: Readonly<SettingsSchema> = {
   'codeLens.mode': 'cursorLine',
   'codeLens.position': 'lineEnd',
   'autoSuggest.enabled': true,
-  'autoSuggest.minMatch': 0,
+  'autoSuggest.minMatch': 1,
   'autoSuggest.maxItems': 8,
   'recurrence.insertPosition': 'above',
   'recurrence.idHandling': 'keep',

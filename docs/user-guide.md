@@ -21,7 +21,7 @@ Obsidian Tasks 플러그인과 같은 문법으로 VS Code / Cursor 안에서 �
 
 두 포맷 모두 읽으며, 쓸 때는 `tasksmd.taskFormat` 설정을 따릅니다. 필드 순서는 Obsidian과 동일하게 정규화됩니다.
 
-**자동완성**: 태스크 줄에서 스페이스를 치면 제안이 뜹니다(체크박스 뒤가 아직 빈 `- [ ] ` 줄에서는 저절로 뜨지 않음 — Markdown All in One의 Enter·Tab을 막지 않도록, 1.1.5부터. 필요하면 `Ctrl+Space`). 제안 창이 떠 있을 때 `Enter`는 제안을 고르므로, 줄을 바꾸려면 `Esc` 뒤 `Enter`. 키워드를 몇 글자 친 뒤에만 띄우려면 `tasksmd.autoSuggest.minMatch`(예: 2). `due` → 📅 뒤에 `tomorrow`, `next fri`, `3일 후`, `10월 6일` 같은 자연어를 치면 날짜로 바뀝니다. `pri` → 우선순위, `every` → 반복, `id` → 자동 발급 ID.
+**자동완성**: 태스크 줄에서 키워드를 치기 시작하면 제안이 뜹니다(`d` → 📅 마감일, `pr` → 우선순위, `ev` → 🔁 반복). 스페이스만으로는 뜨지 않고, 한글을 칠 때도 뜨지 않습니다(1.1.5부터 — 스페이스마다 뜨던 목록이 한글 입력을 끊었음). 언제든 `Ctrl+Space`로 부를 수 있습니다. 영어로 설명을 쓸 때는 `start`·`due` 같은 단어에서도 뜨므로, 그 끝에서 줄을 바꾸려면 `Esc` 뒤 `Enter`. 이를 위해 확장이 마크다운 파일에서만 VS Code의 빠른 제안(`editor.quickSuggestions`)을 켜고 문서 단어 제안(`editor.wordBasedSuggestions`)을 끕니다 — 직접 설정해 두면 그 값이 우선합니다. 예전처럼 스페이스 직후에도 띄우려면 `tasksmd.autoSuggest.minMatch`를 `0`으로. `due` → 📅 뒤에 `tomorrow`, `next fri`, `3일 후`, `10월 6일` 같은 자연어를 치면 날짜로 바뀝니다. `pri` → 우선순위, `every` → 반복, `id` → 자동 발급 ID.
 
 ## 2. 편집
 

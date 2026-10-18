@@ -45,7 +45,13 @@
   "contributes": {
     "configurationDefaults": {
       "[markdown]": {
-        "editor.inlayHints.maximumLength": 0
+        "editor.inlayHints.maximumLength": 0,
+        "editor.quickSuggestions": {
+          "other": "on",
+          "comments": "off",
+          "strings": "off"
+        },
+        "editor.wordBasedSuggestions": "off"
       }
     },
     "commands": [
@@ -622,7 +628,7 @@
         },
         "tasksmd.autoSuggest.minMatch": {
           "type": "number",
-          "default": 0,
+          "default": 1,
           "minimum": 0,
           "maximum": 3,
           "description": "%tasksmd.config.autoSuggest.minMatch%"

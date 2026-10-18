@@ -327,7 +327,7 @@ Obsidian Tasks 쿼리 문법과 호환되는 텍스트 기반 엔진. 한 줄 = 
 | `decorations.*` | 각종 on/off | 5.1 |
 | `codeLens.mode` | `cursorLine` | `off` / `cursorLine` / `all` |
 | `codeLens.position` | `lineEnd` | `lineEnd`(인레이 힌트) / `above`(CodeLens), 1.1.5 M30 |
-| `autoSuggest.enabled` / `minMatch` / `maxItems` | `true` / `0` / `6` | |
+| `autoSuggest.enabled` / `minMatch` / `maxItems` | `true` / `1` / `6` | 1.1.5에서 `minMatch` 0 → 1: 스페이스만으로는 안 뜨고 키워드 글자에서(마크다운 빠른 제안, #42) |
 | `preview.enabled` / `preview.renderBadges` | `true` / `true` | 6장 |
 | `query.allowFunctions` | `false` | `filter/sort/group by function` 허용 (opt-in) |
 | `savedQueries` | `[]` | 저장된 쿼리 (`.tasks/queries/*.md`와 병행) |

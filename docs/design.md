@@ -1077,6 +1077,7 @@ GitHub Actions: PR마다 `typecheck + lint + test`, 태그 `v*` 푸시 시 패�
 
 | 날짜 | 버전 | 내용 |
 |---|---|---|
+| 2026-10-19 | 1.11 | 자동완성은 키워드 글자에서: VS Code는 단어 글자에 트리거 문자를 쓰지 않고 빠른 제안으로만 provider를 부름 → `configurationDefaults` `[markdown]` `editor.quickSuggestions.other: on`, `editor.wordBasedSuggestions: off`; `autoSuggest.minMatch` 기본 1(스페이스 트리거만 막음, 빠른 제안은 `Invoke`라 상관없음). 한글은 맞는 키워드가 없어 목록이 안 뜸. 실제 타이핑 통합 테스트(`type` → `acceptSelectedSuggestion`) |
 | 2026-10-18 | 1.10 | M30: 태스크 버튼을 줄 끝에 — `TaskCodeLensProvider`가 `InlayHintsProvider`도 구현(버튼 목록 `actionsFor` 하나를 CodeLens·인레이가 같이 씀, 버튼마다 힌트 하나, 툴팁에 Cmd/Ctrl+클릭). 설정 `codeLens.position`(`lineEnd`|`above`). `configurationDefaults`로 `[markdown] editor.inlayHints.maximumLength: 0` — 힌트 길이 제한이 한 줄 합계라 `편집`이 "…"로 잘림. 인레이 명령은 VS Code가 Cmd/Ctrl+클릭으로만 실행(API로 못 바꿈). 자동완성 2글자(M29-2)는 되돌림(#42) |
 | 2026-10-18 | 1.9 | M29: 원래 기능 가로채지 않기 — `tasksmd.quickSearch` 키에 `when`(마크다운 편집기·`activeCustomEditorId == tasksmd.rendered`·`focusedView =~ /^tasksmd\./`, `!terminalFocus`); 태스크 0개 폴더에서는 상태 표시줄 숨김·MCP 등록 안 함·(A)(C) 알림 보류(순수 함수 `mcpWanted`/`shouldPrompt`, `index.onDidChange`·`onDidChangeProgress`로 다시 판단) |
 | 2026-10-18 | 1.8 | M27: 렌더 보기에서 새 태스크 줄 — 본문 행 선택(클릭, `rv-selected`) → `Enter`/`＋`/목록 끝 `＋ 태스크 추가` → 입력칸, `doc/insertTask {line,text}` → `TaskEditService.insertTaskBelow`(순수 함수 `insertAfterTask`: 블록(메모·하위) 끝, 같은 깊이·글머리, 번호 목록은 다음 번호) → `doc/inserted {line}`. 다음 입력칸은 응답과 다시 그리기 **둘 다** 온 뒤 열고, 열린 입력칸은 다시 그리기(삽입 후 편집·저장으로 두 번)를 넘어 유지(값 포함). 다시 그릴 때 지워지는 입력칸의 blur는 무시(incidents #40) |

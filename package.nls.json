@@ -52,7 +52,7 @@
   "tasksmd.config.codeLens.position.lineEnd": "At the end of the task line",
   "tasksmd.config.codeLens.position.above": "Above the task line (CodeLens, as before 1.1.5)",
   "tasksmd.config.autoSuggest.enabled": "Offer task field suggestions (due, priority, every week, id…) while typing on a task line.",
-  "tasksmd.config.autoSuggest.minMatch": "Minimum typed characters before keyword suggestions appear automatically (0 = right after a space). Ctrl+Space always shows them.",
+  "tasksmd.config.autoSuggest.minMatch": "Minimum typed characters before keyword suggestions appear automatically (default 1: as you type a keyword such as \"due\", never on a bare space; 0 = right after a space too, which can interrupt typing in Korean and other IME languages). Ctrl+Space always shows them.",
   "tasksmd.config.autoSuggest.maxItems": "Maximum number of keyword suggestions shown.",
   "tasksmd.config.recurrence.insertPosition": "Where the next instance of a completed recurring task is inserted.",
   "tasksmd.config.recurrence.idHandling": "What happens to the 🆔 of a recurring task on its next instance.",

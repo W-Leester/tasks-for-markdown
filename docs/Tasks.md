@@ -1108,6 +1108,12 @@
 - [x] 문서(user-guide·requirements·CHANGELOG·design·점검표), 사용자 검증 방법
 - [x] 사용자 데스크톱 검증(10-18): 1·3 ✅. **2 ❌** — `du`를 쳐도 목록이 안 뜸(영문 글자 트리거가 데스크톱에서도 동작 안 함, incidents #42). 사용자: "원래처럼 바로 뜨는 게 더 좋다"
 - [x] 2 되돌리기: `minMatch` 기본 0, 트리거는 공백만(빈 `- [ ] ` 줄 제외(#41)는 유지). 테스트를 원래 기대로, 문서 되돌림
+- **2 다시(10-19, 사용자 결정 "글자 치면 뜨기"):** 되돌린 뒤 사용자 보고 — 스페이스마다 뜨는 목록이 **한글 입력을 끊음**(`autoSuggest.enabled` 끄니 해결). 진짜 원인 확인(#42 갱신): VS Code는 글자를 쳤을 때 트리거 문자를 보지 않고 **빠른 제안(quick suggestions)** 으로만 묻는데, 마크다운은 빠른 제안이 기본 꺼짐. 그래서 글자 트리거·`isIncomplete` 모두 효과 없음(데스크톱 VS Code 테스트 호스트에서 provider 호출 로그로 확인).
+  - `configurationDefaults` `[markdown]`: `editor.quickSuggestions` other on(주석·문자열 off), `editor.wordBasedSuggestions` off(문서 단어 제안이 산문마다 뜨지 않게). 사용자가 직접 정한 값이 우선.
+  - `autoSuggest.minMatch` 기본 **1**: 스페이스(트리거 문자)만으로는 안 뜸. 글자는 빠른 제안이 부름(`Invoke`라 최소 글자와 무관) → 키워드에 맞는 글자면 바로 뜸, 한글은 맞는 키워드가 없어 안 뜸.
+  - 실제 타이핑 통합 테스트(`type` 명령 → `acceptSelectedSuggestion`으로 목록이 떴는지 판단): 스페이스만 안 뜸, `du` 뜸, 한글 안 뜸. 고치기 전 실패 확인.
+  - 남는 점: 영어로 설명을 쓸 때 `start`·`due` 같은 단어에서도 뜸 → 그 끝에서 Enter는 제안 선택(Esc 후 Enter). 문서에 적음.
+- [ ] 2 다시: 테스트(먼저 실패) → 구현 → 문서 → 사용자 확인
 
 ## M30. 태스크 줄 버튼을 줄 끝에 (1.1.5, 계획 2026-10-18, 사용자 요청)
 

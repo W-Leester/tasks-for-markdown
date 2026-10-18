@@ -46,6 +46,7 @@ Windows에서는 키 표기가 `Cmd+Shift+C`(macOS) / `Alt+Shift+C`(Windows·Lin
 
 VS Code와 다른 부분만 봅니다.
 1. `Cmd+Shift+C`(macOS) / `Alt+Shift+C`(Windows·Linux), `Ctrl+Shift+R`, `Ctrl+Shift+Enter`가 **Cursor의 기본 키와 충돌하지 않는지**: 텍스트 편집기, 렌더 보기, Cursor Preview 모드, 채팅 패널에 포커스가 있을 때 각각 눌러 엉뚱한 동작(다른 편집기 닫힘 등)이 없는지.
+   - **Markdown All in One과 함께(10-18 추가):** 체크박스 줄 끝 `Enter` → 다음 줄에 `- [ ] `, 이어서 `Tab` → 들여쓰기. 제안 창이 끼어들지 않아야 함(incidents #41).
 2. Cursor Preview 토글은 결과가 안 나오는 것이 정상입니다(설계상 불가). 대신 `Ctrl+Shift+R` 렌더 보기와 CodeLens `▷ 결과 보기`가 되는지.
 3. 명령 팔레트 → `Markdown: Open Preview to the Side`로 연 표준 미리보기가 **빈 화면이 아닌지**. 예전에 비어 보이던 증상이 1.0.1 이후 사라졌는지 확인이 필요한 항목입니다. 비어 있으면 `Help: Toggle Developer Tools` 콘솔의 빨간 줄을 붙여 주세요.
 4. Markdown All in One을 켠 상태와 끈 상태 모두에서 미리보기 뱃지가 보이는지.

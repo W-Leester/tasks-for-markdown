@@ -25,6 +25,16 @@ describe('rendered view: new task lines (M27)', () => {
     // The host learns the selection, so Cmd/Alt+Shift+C edits this task instead of asking which one.
     expect(posted.filter((m: FromWebview) => m.type === 'doc/select').at(-1)).toEqual({ type: 'doc/select', line: 2 });
 
+    // Ctrl+Shift+Enter on the selected row toggles done (as in the editor) and does not open an input; other modifiers do nothing.
+    posted.length = 0;
+    key(li, 'Enter', { ctrlKey: true, shiftKey: true });
+    expect(posted).toEqual([{ type: 'doc/toggle', path: null, line: 2 }]);
+    expect(document.querySelector('li.rv-task-form')).toBeNull();
+    key(li, 'Enter', { metaKey: true });
+    key(li, 'Enter', { shiftKey: true });
+    expect(document.querySelector('li.rv-task-form')).toBeNull();
+    expect(posted).toHaveLength(1);
+
     key(li, 'Enter');
     const input = document.querySelector<HTMLInputElement>('li.rv-task-form input')!;
     expect(input).not.toBeNull();

@@ -400,7 +400,13 @@ content.addEventListener('keydown', (e) => {
   const li = (e.target as Element).closest?.('li.tfm-task') as HTMLElement | null;
   if (!li || li !== selected || e.target !== li) return;
   if (e.isComposing || e.keyCode === 229) return;
-  if (e.key === 'Enter') { e.preventDefault(); openTaskForm(li); }
+  if (e.key === 'Enter') {
+    // Ctrl+Shift+Enter is "toggle done" in the editor; on a selected row it is too. Only a plain Enter adds a line.
+    if (e.ctrlKey && e.shiftKey && !e.altKey && !e.metaKey) { e.preventDefault(); post({ type: 'doc/toggle', path: null, line: Number(li.dataset.tfmLine) }); return; }
+    if (e.ctrlKey || e.shiftKey || e.altKey || e.metaKey) return;
+    e.preventDefault();
+    openTaskForm(li);
+  }
   else if (e.key === 'Escape') { li.classList.remove('rv-selected'); selected = null; li.blur(); post({ type: 'doc/select', line: null }); }
 });
 

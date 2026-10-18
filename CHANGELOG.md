@@ -4,7 +4,7 @@
 
 - **The create/edit dialog key is now `Cmd+Shift+C` on macOS and `Alt+Shift+C` on Windows and Linux** (it was `Ctrl+Shift+/` in 1.1.4). On macOS it is taken only in Markdown editors, the rendered view and the Tasks sidebar, so VS Code's "new external terminal" keeps working elsewhere. In the rendered view it opens the selected row's task instead of asking which one.
 - **Tasks: Keyboard shortcuts** opens the Keyboard Shortcuts editor showing only this extension's commands, to change any key.
-- **Add tasks in the rendered view.** Click a task row and press `Enter` (or ＋ on the row, or "＋ Add task" at the end of a list): an input opens right below it, at the same depth. `Enter` writes `- [ ] …` there and opens the next input, so you can add several in a row; `Esc` or an empty `Enter` stops. One line per task, so Undo takes it back. Not in query results.
+- **Add tasks in the rendered view.** Click a task row and press `Enter` (or ＋ on the row, or "＋ Add task" at the end of a list): an input opens right below it, at the same depth. `Enter` writes `- [ ] …` there and opens the next input, so you can add several in a row; `Esc` or an empty `Enter` stops. One line per task, so Undo takes it back. Not in query results. On a selected row `Ctrl+Shift+Enter` toggles done, as in the editor.
 - The `Ctrl+Shift+C` command is now called **Tasks: Add or remove checkbox** (Korean: **체크박스 만들기/지우기**). "Toggle checkbox" read like checking a task off, which is `Ctrl+Shift+Enter` (**Toggle task done**). The key and what it does are unchanged.
 
 ### 한국어 요약

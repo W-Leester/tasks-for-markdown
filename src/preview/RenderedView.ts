@@ -49,6 +49,7 @@ type Incoming =
   | { type: 'doc/toggle'; path: string | null; line: number }
   | { type: 'doc/edit'; path: string | null; line: number }
   | { type: 'doc/postpone'; path: string | null; line: number }
+  | { type: 'doc/insertTask'; line: number; text: string }
   | { type: 'doc/addNote'; path: string | null; line: number; text: string }
   | { type: 'doc/link'; href: string }
   | { type: 'doc/openSource' }
@@ -157,6 +158,13 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
           const task = this.taskFor(msg.path, msg.line, document);
           if (!task) throw new Error(t('That task is no longer at line {0}; the view has been refreshed.', msg.line + 1));
           await this.deps.editService.addNote(task, msg.text);
+          break;
+        }
+        case 'doc/insertTask': {
+          const task = this.taskFor(null, msg.line, document);
+          if (!task) throw new Error(t('That task is no longer at line {0}; the view has been refreshed.', msg.line + 1));
+          const line = await this.deps.editService.insertTaskBelow(task, msg.text);
+          void panel.webview.postMessage({ type: 'doc/inserted', line });
           break;
         }
         case 'doc/link':
@@ -359,6 +367,16 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
   li.tfm-note::before { content: '💬'; display: inline-block; width: 1.9em; margin-left: -1.9em; font-size: .8em; opacity: .7; }
   body.fields-columns li.tfm-task:has(> .tfm-desc > .tfm-notes[open]) > .tfm-check { align-self: start; margin-top: .3em; }
   li.tfm-note > p:first-child { display: inline; }
+  /* M27: the selected row (Enter adds a task below it), the new-task input and the "＋ Add task" row at the end of a list. */
+  li.tfm-task.rv-selected { outline: 1px solid var(--rv-accent); outline-offset: 1px; border-radius: 3px; }
+  li.tfm-task:focus { outline: none; }
+  li.tfm-task.rv-selected:focus { outline: 1px solid var(--rv-accent); }
+  li.rv-task-form { list-style: none; margin: 3px 0; }
+  li.rv-task-form input { width: 100%; max-width: 40em; box-sizing: border-box; background: var(--rv-bg-2); color: var(--rv-fg); border: 1px solid var(--rv-accent); border-radius: 4px; padding: 3px 7px; font: inherit; }
+  li.rv-task-form input:disabled { opacity: .6; }
+  li.rv-addrow { list-style: none; order: 99999; margin: 2px 0; }
+  li.rv-addrow button { border: none; background: transparent; color: var(--rv-muted); font: inherit; font-size: .92em; padding: 2px 4px; border-radius: 4px; cursor: pointer; opacity: .55; }
+  li.rv-addrow button:hover, li.rv-addrow button:focus-visible { opacity: 1; background: var(--rv-bg-2); color: var(--rv-fg); }
   .rv-note-form { display: block; flex-basis: 100%; grid-column: 1 / -1; margin: 4px 0 4px 1.6em; }
   .rv-note-form input { width: 100%; max-width: 40em; box-sizing: border-box; background: var(--rv-bg-2); color: var(--rv-fg); border: 1px solid var(--rv-accent); border-radius: 4px; padding: 3px 7px; font: inherit; font-size: .93em; outline: none; }
   .tfm-notes > summary { color: var(--rv-muted); }
@@ -426,7 +444,7 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
 </style>
 <title>${t('Tasks: Rendered view')}</title>
 </head>
-<body data-l-col-width="${t('Column width')}" data-l-col-width-hint="${t('Drag to resize, double-click to fit the content')}" data-l-col-desc="${t('Description')}" data-l-col-due="${t('Due date')}" data-l-col-created="${t('Created date')}" data-l-col-done="${t('Done date')}" data-l-col-more="${t('Other fields')}" data-l-col-hide="${t('Hide column')}" data-l-col-show="${t('Show column')}" data-l-edit="${t('Edit')}" data-l-postpone="${t('Postpone')}" data-l-note="${t('Add note')}" data-l-note-placeholder="${t('Note — Enter to save, Esc to cancel')}" data-l-hidden="${t('{0} hidden')}">
+<body data-l-col-width="${t('Column width')}" data-l-col-width-hint="${t('Drag to resize, double-click to fit the content')}" data-l-col-desc="${t('Description')}" data-l-col-due="${t('Due date')}" data-l-col-created="${t('Created date')}" data-l-col-done="${t('Done date')}" data-l-col-more="${t('Other fields')}" data-l-col-hide="${t('Hide column')}" data-l-col-show="${t('Show column')}" data-l-edit="${t('Edit')}" data-l-postpone="${t('Postpone')}" data-l-note="${t('Add note')}" data-l-note-placeholder="${t('Note — Enter to save, Esc to cancel')}" data-l-add-below="${t('Add a task below')}" data-l-add-task="${t('Add task')}" data-l-task-placeholder="${t('New task — Enter to add, Esc to stop')}" data-l-hidden="${t('{0} hidden')}">
 <div class="rv-tools">
   <label class="rv-select"><span>${t('Sort')}</span><select id="view-sort">
     <option value="document">${t('Document order')}</option><option value="due">${t('Due date')}</option><option value="created">${t('Created date')}</option><option value="priority">${t('Priority')}</option><option value="urgency">${t('Urgency')}</option>

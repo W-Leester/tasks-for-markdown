@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { dayjs, type Dayjs } from '../core/dates/dayjs';
 import { StatusType, type StatusRegistry, type Status, type Task, type TaskFields, applyStatusChange, generateTaskId, serializeTask } from '../core/task';
 import type { TaskIndex } from '../core/index';
-import { cleanNoteTexts, noteBlock } from '../core/file';
+import { cleanNoteTexts, insertAfterTask, newTaskLine, noteBlock } from '../core/file';
 import { t } from '../l10n';
 import type { IndexService } from '../index/IndexService';
 import type { Settings } from '../settings/Settings';
@@ -138,6 +138,22 @@ export class TaskEditService {
       const after = block.notes.length ? block.notes[block.notes.length - 1]!.end : line;
       edit.insert(uri, doc.lineAt(after).range.end, eol + block.childIndent + block.marker + ' ' + note);
       return after + 1;
+    });
+  }
+
+  /**
+   * Insert a new task line below `task`'s block (after its notes and nested items), at the same depth — the
+   * rendered view's Enter / ＋ (M27). Returns the new line number. One insert, so Undo takes it back.
+   */
+  async insertTaskBelow(task: Task, typed: string): Promise<number> {
+    if (!typed.trim()) throw new Error(t('Empty task'));
+    const uri = vscode.Uri.parse(task.location.key);
+    const line = task.location.line;
+    return this.withLine(uri, line, task.originalMarkdown, (doc, edit, eol) => {
+      const at = insertAfterTask(docLines(doc), line);
+      if (!at) throw new Error(t('That task is no longer at line {0}; the view has been refreshed.', line + 1));
+      edit.insert(uri, doc.lineAt(at.after).range.end, eol + newTaskLine(at, typed));
+      return at.after + 1;
     });
   }
 

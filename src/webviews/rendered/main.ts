@@ -206,6 +206,7 @@ scopeSel?.addEventListener('change', () => { view = { ...view, scope: scopeSel.v
 window.addEventListener('message', (e: MessageEvent<ToWebview>) => {
   const m = e.data;
   if (m.type === 'doc/columns') { applyColumns(m.hidden); return; }
+  if (m.type === 'doc/inserted') { chainLine = m.line; continueChain(); return; }
   if (m.type === 'doc/columnWidths') { columnWidths = { ...m.widths }; applyWidths(); applyHeaders(); return; }
   if (m.type !== 'doc/html') return;
   document.documentElement.style.setProperty('--rv-font-size', `${m.fontSize}px`);
@@ -218,12 +219,22 @@ window.addEventListener('message', (e: MessageEvent<ToWebview>) => {
   if (sortSel) sortSel.value = view.sort;
   if (scopeSel) scopeSel.value = view.scope;
   const y = window.scrollY;
+  formText = content.querySelector<HTMLInputElement>('li.rv-task-form input')?.value ?? '';
+  // Removing a focused input fires its blur while it is still attached; that is not the user leaving it.
+  rerendering = true;
   content.innerHTML = m.html;
+  rerendering = false;
   columnWidths = { ...(m.columnWidths ?? {}) };
   applyColumns(m.hiddenColumns ?? []);
   addRowActions();
+  addTaskRows();
   refreshView();
   window.scrollTo(0, y);
+  selected = null;
+  awaitingRender = false;
+  // An open new-task input survives re-renders (an insert re-renders twice: the edit, then the save).
+  if (formLine !== null && chainLine === null) { const li = bodyRow(formLine); if (li) openTaskForm(li, formText); else formLine = null; }
+  continueChain();
 });
 
 /** Obsidian-style per-row buttons (✎ edit, ⏩ postpone, 💬 note) that appear on hover. */
@@ -245,6 +256,7 @@ function addRowActions(): void {
     button('edit', '✎', labels.lEdit ?? 'Edit');
     if (li.querySelector(':scope > .tfm-fields .tfm-due, :scope > .tfm-fields .tfm-scheduled, :scope > .tfm-badges .tfm-due, :scope > .tfm-badges .tfm-scheduled, :scope > p > .tfm-fields .tfm-due, :scope > p > .tfm-fields .tfm-scheduled, :scope > .tfm-col .tfm-due, :scope > .tfm-col .tfm-scheduled, :scope > p > .tfm-col .tfm-due, :scope > p > .tfm-col .tfm-scheduled')) button('postpone', '⏩', labels.lPostpone ?? 'Postpone');
     button('note', '💬', labels.lNote ?? 'Add note');
+    if (li.dataset.tfmPath === undefined) button('add', '＋', labels.lAddBelow ?? 'Add a task below'); // note body only (M27)
     // Before any nested list so the buttons stay on the task's own line.
     const nested = li.querySelector(':scope > ul, :scope > ol');
     const para = li.querySelector(':scope > p');
@@ -277,6 +289,7 @@ content.addEventListener('click', (e) => {
     const ref = taskRef(action);
     if (!ref) return;
     if (action.dataset.act === 'note') openNoteForm(action.closest<HTMLElement>('li.tfm-task')!, ref);
+    else if (action.dataset.act === 'add') openTaskForm(action.closest<HTMLElement>('li.tfm-task')!);
     else post({ type: action.dataset.act === 'postpone' ? 'doc/postpone' : 'doc/edit', ...ref });
     return;
   }
@@ -290,7 +303,103 @@ content.addEventListener('click', (e) => {
   if (a) {
     e.preventDefault();
     post({ type: 'doc/link', href: a.getAttribute('href')! });
+    return;
   }
+  const add = target.closest<HTMLElement>('li.rv-addrow');
+  if (add) { e.preventDefault(); const last = lastTaskOf(add.parentElement!); if (last) openTaskForm(last); return; }
+  // M27: clicking a note-body task row selects it; Enter then adds a task below it.
+  const row = target.closest<HTMLElement>('li.tfm-task');
+  if (row && row.dataset.tfmPath === undefined && row.dataset.tfmLine !== undefined && !target.closest('input, button, textarea, details, summary, .tfm-notes')) selectRow(row);
+});
+
+// ---- M27: new task lines from the rendered view ----
+let selected: HTMLElement | null = null;
+/**
+ * Line of the task just inserted; the next input opens below it once the view shows the new task. The host's
+ * reply (doc/inserted) and the re-rendered note (doc/html) can come in either order, so both must have arrived.
+ */
+let chainLine: number | null = null;
+let awaitingRender = false;
+/** The row the new-task input sits under, and what was typed, to put it back after a re-render. */
+let formLine: number | null = null;
+let formText = '';
+let rerendering = false;
+function selectRow(li: HTMLElement): void {
+  selected?.classList.remove('rv-selected');
+  selected = li;
+  li.classList.add('rv-selected');
+  li.tabIndex = -1;
+  li.focus({ preventScroll: true });
+}
+function lastTaskOf(list: Element): HTMLElement | null {
+  const tasks = Array.from(list.querySelectorAll<HTMLElement>(':scope > li.tfm-task'));
+  return tasks[tasks.length - 1] ?? null;
+}
+function bodyRow(line: number): HTMLElement | null {
+  return Array.from(content.querySelectorAll<HTMLElement>(`li.tfm-task[data-tfm-line="${line}"]`)).find((li) => li.dataset.tfmPath === undefined) ?? null;
+}
+/** An input right below the row (after its nested items); Enter writes `- [ ] …` there and opens the next one. */
+function openTaskForm(li: HTMLElement, value = ''): void {
+  content.querySelector('li.rv-task-form')?.remove();
+  const line = Number(li.dataset.tfmLine);
+  formLine = line;
+  const form = document.createElement('li');
+  form.className = 'rv-task-form';
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.placeholder = document.body.dataset.lTaskPlaceholder ?? 'New task — Enter to add, Esc to stop';
+  input.value = value;
+  form.appendChild(input);
+  li.after(form);
+  const close = (refocus: boolean) => { formLine = null; form.remove(); if (refocus && li.isConnected) selectRow(li); };
+  input.addEventListener('keydown', (e) => {
+    // Korean (and other IME) input: Enter that ends a composition is not "add".
+    if (e.isComposing || e.keyCode === 229) return;
+    if (e.key === 'Escape') { e.preventDefault(); close(true); return; }
+    if (e.key !== 'Enter') return;
+    e.preventDefault();
+    const text = input.value.trim();
+    if (!text) { close(true); return; }
+    input.disabled = true;
+    formLine = null;
+    chainLine = -1; // waiting for doc/inserted
+    awaitingRender = true; // and for the note to re-render
+    post({ type: 'doc/insertTask', line, text });
+  });
+  input.addEventListener('blur', () => { if (rerendering || input.disabled || input.value.trim()) return; formLine = null; form.remove(); });
+  input.focus();
+}
+/** After a re-render (or the host's reply), continue below the task just added. */
+function continueChain(): void {
+  if (chainLine === null || chainLine < 0 || awaitingRender) return;
+  const li = bodyRow(chainLine);
+  if (!li) return;
+  chainLine = null;
+  selectRow(li);
+  openTaskForm(li);
+}
+/** A quiet "＋ Add task" row at the end of each top-level note list that has tasks. */
+function addTaskRows(): void {
+  const label = document.body.dataset.lAddTask ?? 'Add task';
+  for (const list of Array.from(content.querySelectorAll<HTMLElement>('ul, ol'))) {
+    if (list.closest('.tfm-query') || list.parentElement?.closest('li')) continue;
+    const last = lastTaskOf(list);
+    if (!last || last.dataset.tfmPath !== undefined) continue;
+    const row = document.createElement('li');
+    row.className = 'rv-addrow';
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = `＋ ${label}`;
+    row.appendChild(b);
+    list.appendChild(row);
+  }
+}
+content.addEventListener('keydown', (e) => {
+  const li = (e.target as Element).closest?.('li.tfm-task') as HTMLElement | null;
+  if (!li || li !== selected || e.target !== li) return;
+  if (e.isComposing || e.keyCode === 229) return;
+  if (e.key === 'Enter') { e.preventDefault(); openTaskForm(li); }
+  else if (e.key === 'Escape') { li.classList.remove('rv-selected'); selected = null; li.blur(); }
 });
 
 /** Input under the task row; Enter adds the note (an indented bullet) to the file, Esc/blur closes it. */

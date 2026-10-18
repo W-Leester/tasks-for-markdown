@@ -59,6 +59,8 @@ export type ToWebview =
   | { type: 'doc/html'; html: string; fontSize: number; lineHeight: number; fieldsAlign: 'columns' | 'right' | 'inline'; maxWidth: number; today: string; view: { sort: string; scope: string }; hiddenColumns?: string[]; columnWidths?: Record<string, number> }
   /** Rendered view: the hidden columns changed in another rendered view (M14). */
   | { type: 'doc/columns'; hidden: string[] }
+  /** M27: where the new task landed, so the next input opens below it. */
+  | { type: 'doc/inserted'; line: number }
   /** Rendered view: column widths (em) changed in another rendered view (M16). */
   | { type: 'doc/columnWidths'; widths: Record<string, number> }
   | { type: 'stats/result'; requestId: number; stats: StatsDto }
@@ -92,6 +94,8 @@ export type FromWebview =
   | { type: 'doc/postpone'; path: string | null; line: number }
   /** Add a note (indented bullet) under the task. */
   | { type: 'doc/addNote'; path: string | null; line: number; text: string }
+  /** M27: a new task line below this body task (note body only — no path). */
+  | { type: 'doc/insertTask'; line: number; text: string }
   | { type: 'doc/link'; href: string }
   | { type: 'doc/openSource' }
   /** Rendered view: remember the sort/scope the user picked for this note. */

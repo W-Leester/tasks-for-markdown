@@ -419,5 +419,9 @@
   "Installed the \"tasksmd\" command. New terminals in this editor can use it right away; other terminals can once you open them again (the folder was added to your user Path).": "\"tasksmd\" 명령을 설치했습니다. 이 에디터에서 새로 여는 터미널에서는 바로 쓸 수 있고, 다른 터미널은 새로 열면 됩니다(폴더를 사용자 Path에 추가했습니다).",
   "Installed the \"tasksmd\" command in {0}. New terminals in this editor can use it right away. For other terminals, add that folder to your user Path (Start → \"Edit environment variables for your account\" → Path → New) or run this line in PowerShell: {1}": "\"tasksmd\" 명령을 {0}에 설치했습니다. 이 에디터에서 새로 여는 터미널에서는 바로 쓸 수 있습니다. 다른 터미널에서도 쓰려면 이 폴더를 사용자 Path에 추가하거나(시작 → \"계정의 환경 변수 편집\" → Path → 새로 만들기) PowerShell에서 이 줄을 실행하세요: {1}",
   "Installed the \"tasksmd\" command in {0}. New terminals in this editor can use it right away. For other terminals, add this line to your shell profile (for example ~/.zshrc): {1}": "\"tasksmd\" 명령을 {0}에 설치했습니다. 이 에디터에서 새로 여는 터미널에서는 바로 쓸 수 있습니다. 다른 터미널에서도 쓰려면 셸 설정 파일(예: ~/.zshrc)에 이 줄을 넣으세요: {1}",
-  "Makes the \"tasksmd\" command available in the terminal": "터미널에서 \"tasksmd\" 명령을 쓸 수 있게 합니다"
+  "Makes the \"tasksmd\" command available in the terminal": "터미널에서 \"tasksmd\" 명령을 쓸 수 있게 합니다",
+  "Add a task below": "아래에 태스크 추가",
+  "Add task": "태스크 추가",
+  "New task — Enter to add, Esc to stop": "새 태스크 — Enter로 추가, Esc로 끝",
+  "Empty task": "빈 태스크"
 }

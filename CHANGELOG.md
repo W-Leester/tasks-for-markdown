@@ -2,9 +2,11 @@
 
 ## Unreleased (1.1.5)
 
+- **Add tasks in the rendered view.** Click a task row and press `Enter` (or ＋ on the row, or "＋ Add task" at the end of a list): an input opens right below it, at the same depth. `Enter` writes `- [ ] …` there and opens the next input, so you can add several in a row; `Esc` or an empty `Enter` stops. One line per task, so Undo takes it back. Not in query results.
 - The `Ctrl+Shift+C` command is now called **Tasks: Add or remove checkbox** (Korean: **체크박스 만들기/지우기**). "Toggle checkbox" read like checking a task off, which is `Ctrl+Shift+Enter` (**Toggle task done**). The key and what it does are unchanged.
 
 ### 한국어 요약
+- **렌더 보기에서 태스크 넣기:** 줄을 클릭하고 `Enter`(또는 줄의 ＋, 목록 끝 "＋ 태스크 추가") → 바로 아래 입력칸, `Enter`로 넣고 다음 칸이 이어서 열림. `Esc`로 끝. 쿼리 결과 안은 제외.
 - `Ctrl+Shift+C` 명령 이름을 **체크박스 만들기/지우기**(영어 Add or remove checkbox)로 바꿈 — "체크박스 토글"이 완료 전환(`Ctrl+Shift+Enter`)처럼 읽혀서. 키와 동작은 그대로.
 
 ## 1.1.4 — 2026-10-16

@@ -71,7 +71,7 @@ group by filename
 
 ![Ctrl+Shift+Enter completes a weekly task and inserts the next occurrence](docs/images/demo-recurring.gif)
 
-**Work in the rendered view.** Tick checkboxes, add notes with 💬, and show or hide columns. Query blocks update live.
+**Work in the rendered view.** Tick checkboxes, add notes with 💬, add tasks below a row with `Enter` or ＋ (one after another), and show or hide columns. Query blocks update live.
 
 ![Rendered view: adding a note, ticking a task, hiding and restoring a column](docs/images/demo-rendered.gif)
 

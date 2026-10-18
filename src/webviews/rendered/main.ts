@@ -230,10 +230,16 @@ window.addEventListener('message', (e: MessageEvent<ToWebview>) => {
   addTaskRows();
   refreshView();
   window.scrollTo(0, y);
-  if (selected) post({ type: 'doc/select', line: null });
+  // Keep the row selected across re-renders (toggling done rewrites the file and re-renders the note).
+  const keep = selected ? Number(selected.dataset.tfmLine) : null;
   selected = null;
   awaitingRender = false;
   // An open new-task input survives re-renders (an insert re-renders twice: the edit, then the save).
+  if (keep !== null) {
+    const li = bodyRow(keep);
+    if (li) selectRow(li);
+    else post({ type: 'doc/select', line: null });
+  }
   if (formLine !== null && chainLine === null) { const li = bodyRow(formLine); if (li) openTaskForm(li, formText); else formLine = null; }
   continueChain();
 });

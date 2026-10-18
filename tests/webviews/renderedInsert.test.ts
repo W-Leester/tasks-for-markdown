@@ -30,15 +30,21 @@ describe('rendered view: new task lines (M27)', () => {
     key(li, 'Enter', { ctrlKey: true, shiftKey: true });
     expect(posted).toEqual([{ type: 'doc/toggle', path: null, line: 2 }]);
     expect(document.querySelector('li.rv-task-form')).toBeNull();
-    key(li, 'Enter', { metaKey: true });
-    key(li, 'Enter', { shiftKey: true });
+    // The file changes and the note re-renders: the same row stays selected and focused (10-18).
+    send(row(2, 'a ✅') + row(3, 'b'));
+    const again = document.querySelector<HTMLElement>('li.tfm-task[data-tfm-line="2"]')!;
+    expect(again).not.toBe(li); // a new element
+    expect(again.classList.contains('rv-selected')).toBe(true);
+    expect(document.activeElement).toBe(again);
+    key(again, 'Enter', { metaKey: true });
+    key(again, 'Enter', { shiftKey: true });
     expect(document.querySelector('li.rv-task-form')).toBeNull();
-    expect(posted).toHaveLength(1);
+    expect(posted.filter((m: FromWebview) => m.type === 'doc/toggle')).toHaveLength(1);
 
-    key(li, 'Enter');
+    key(again, 'Enter');
     const input = document.querySelector<HTMLInputElement>('li.rv-task-form input')!;
     expect(input).not.toBeNull();
-    expect(input.closest('li')!.previousElementSibling).toBe(li); // right below the row
+    expect(input.closest('li')!.previousElementSibling).toBe(again); // right below the row
     expect(document.activeElement).toBe(input);
 
     // Korean IME: the Enter that ends a composition must not add.

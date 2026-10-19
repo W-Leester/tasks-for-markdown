@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased (1.1.5)
+## 1.1.5 — 2026-10-19
 
 - **Fixed: adding 🔁, 🔺, 🔼, 🔽 or 🛫 in front of 📅 broke both emoji** in a file open in the editor (since 1.0; through the buttons, menus and the dialog). The editor shrank the edit by UTF-16 units and cut emoji that share their first unit in half. The CLI and MCP were not affected.
 - **The task buttons' choices open right below the line** instead of at the top of the window: Priority ▾, 📅 Due ▾ and 🔁 Repeat ▾ show a drop-down there. Pick one, or type a date or rule (`next fri`, `3일 후`, `every 2 weeks`) and it appears first. From the menus and the command palette the picker stays at the top.

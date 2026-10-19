@@ -1,24 +1,12 @@
 import * as vscode from 'vscode';
-import { describeRelative, systemClock, type Clock } from '../core/dates';
-import { PRIORITY_EMOJI, Priority, type StatusRegistry, type Task, isTaskLine, parseTaskLine } from '../core/task';
+import { Priority, type StatusRegistry, type Task, isTaskLine, parseTaskLine } from '../core/task';
 import type { Settings } from '../settings/Settings';
-import { relativeText } from './relativeText';
 import { t } from '../l10n';
 
 export interface CodeLensDeps {
   settings: Settings;
   getStatusRegistry(): StatusRegistry;
-  clock?: Clock;
 }
-
-const PRIORITY_LABEL: Record<Priority, string> = {
-  [Priority.Highest]: 'Highest',
-  [Priority.High]: 'High',
-  [Priority.Medium]: 'Medium',
-  [Priority.None]: 'Priority',
-  [Priority.Low]: 'Low',
-  [Priority.Lowest]: 'Lowest',
-};
 
 /** One button: `icon` is a codicon for CodeLens, `glyph` the plain-text stand-in for an inlay hint (which cannot draw codicons). */
 interface TaskAction {
@@ -28,12 +16,12 @@ interface TaskAction {
   command: string;
   tooltip?: string;
   /** Opens a drop-down on the line (M31) instead of running `command` on the task. */
-  pick?: 'priority' | 'due' | 'scheduled' | 'recurrence' | 'postpone';
+  pick?: 'priority' | 'due' | 'recurrence';
 }
 
 /**
  * Clickable actions on task lines (FR-3.7 / FR-3.8):
- *   ✔ Done · ⏫ High ▾ · 📅 Sep 25 ▾ · 🔁 weekly ▾ · ✎ Edit
+ *   ✔ Done · Priority ▾ · 📅 Due ▾ · 🔁 Repeat ▾ · ✎ Edit   (only fields not set yet)
  * At the end of the line as inlay hints (`codeLens.position: lineEnd`, default since M30) or above it as
  * CodeLens (`above`). Mode `cursorLine` (default) shows them only for the line with the cursor, `all` for
  * every task line in view, `off` disables both.
@@ -63,9 +51,9 @@ export class TaskCodeLensProvider implements vscode.CodeLensProvider, vscode.Inl
   provideCodeLenses(document: vscode.TextDocument): vscode.CodeLens[] {
     const out: vscode.CodeLens[] = this.queryBlockLenses(document);
     if (this.deps.settings.get('codeLens.position') !== 'above') return out;
-    for (const { task, line, today } of this.taskLines(document)) {
+    for (const { task, line } of this.taskLines(document)) {
       const range = new vscode.Range(line, 0, line, 0);
-      for (const a of this.actionsFor(task, today)) {
+      for (const a of this.actionsFor(task)) {
         out.push(new vscode.CodeLens(range, { title: a.icon ? `$(${a.icon}) ${a.label}` : a.label, ...this.invocation(a, task), tooltip: a.tooltip }));
       }
     }
@@ -79,9 +67,9 @@ export class TaskCodeLensProvider implements vscode.CodeLensProvider, vscode.Inl
   provideInlayHints(document: vscode.TextDocument): vscode.InlayHint[] {
     if (this.deps.settings.get('codeLens.position') === 'above') return [];
     const out: vscode.InlayHint[] = [];
-    for (const { task, line, today } of this.taskLines(document)) {
+    for (const { task, line } of this.taskLines(document)) {
       const at = new vscode.Position(line, document.lineAt(line).text.length);
-      for (const a of this.actionsFor(task, today)) {
+      for (const a of this.actionsFor(task)) {
         const part = new vscode.InlayHintLabelPart(a.glyph ? `${a.glyph} ${a.label}` : a.label);
         part.command = { title: a.label, ...this.invocation(a, task) };
         // The editor runs an inlay hint's command on Cmd/Ctrl+click only (a plain click just places the cursor).
@@ -95,7 +83,7 @@ export class TaskCodeLensProvider implements vscode.CodeLensProvider, vscode.Inl
   }
 
   /** Task lines that get buttons under the current mode, parsed. */
-  private taskLines(document: vscode.TextDocument): { task: Task; line: number; today: import('dayjs').Dayjs }[] {
+  private taskLines(document: vscode.TextDocument): { task: Task; line: number }[] {
     const mode = this.deps.settings.get('codeLens.mode');
     if (mode === 'off') return [];
     const editor = vscode.window.visibleTextEditors.find((e) => e.document === document);
@@ -111,14 +99,13 @@ export class TaskCodeLensProvider implements vscode.CodeLensProvider, vscode.Inl
 
     const registry = this.deps.getStatusRegistry();
     const globalFilter = this.deps.settings.get('globalFilter') || undefined;
-    const today = (this.deps.clock ?? systemClock).now().startOf('day');
-    const out: { task: Task; line: number; today: import('dayjs').Dayjs }[] = [];
+    const out: { task: Task; line: number }[] = [];
     for (const line of lines) {
       if (line >= document.lineCount) continue;
       const text = document.lineAt(line).text;
       if (!isTaskLine(text)) continue;
       const task = parseTaskLine(text, { statusRegistry: registry, globalFilter, location: { key: document.uri.toString(), path: '', line, heading: null, frontmatterTags: [], depth: 0, parentLine: null } });
-      if (task) out.push({ task, line, today });
+      if (task) out.push({ task, line });
     }
     return out;
   }
@@ -143,24 +130,18 @@ export class TaskCodeLensProvider implements vscode.CodeLensProvider, vscode.Inl
     return a.pick ? { command: 'tasksmd.inlinePick', arguments: [{ kind: a.pick, task }] } : { command: a.command, arguments: [task] };
   }
 
-  private actionsFor(task: Task, today: import('dayjs').Dayjs): TaskAction[] {
+  private actionsFor(task: Task): TaskAction[] {
     const out: TaskAction[] = [];
     out.push(
       task.isCompleted
         ? { label: t('Reopen'), icon: 'debug-restart', glyph: '↺', command: 'tasksmd.reopen' }
         : { label: t('Done'), icon: 'check', glyph: '✓', command: 'tasksmd.markDone', tooltip: t('Mark as done') },
     );
+    // Only what is not set yet: a value already on the line needs no button (✎ Edit and the hover change it).
     if (!task.isCompleted) {
-      const p = task.priority;
-      out.push({ label: `${PRIORITY_EMOJI[p] ? PRIORITY_EMOJI[p] + ' ' : ''}${t(PRIORITY_LABEL[p])} ▾`, command: 'tasksmd.setPriority', pick: 'priority' });
-      const dueTitle = task.due?.date
-        ? `📅 ${task.due.date.format('MMM D')} · ${relativeText(describeRelative(task.due.date, today))} ▾`
-        : `📅 ${t('Due')} ▾`;
-      out.push({ label: dueTitle, command: 'tasksmd.setDueDate', pick: 'due' });
-      if (task.scheduled?.date) out.push({ label: `⏳ ${task.scheduled.date.format('MMM D')} ▾`, command: 'tasksmd.setScheduledDate', pick: 'scheduled' });
-      if (task.recurrenceText) out.push({ label: `🔁 ${task.recurrenceText} ▾`, command: 'tasksmd.setRecurrence', pick: 'recurrence' });
-      else if (task.due || task.scheduled || task.start) out.push({ label: `🔁 ${t('Repeat')} ▾`, command: 'tasksmd.setRecurrence', pick: 'recurrence' });
-      if (task.due || task.scheduled) out.push({ label: t('Postpone'), icon: 'watch', glyph: '⏱', command: 'tasksmd.postpone', pick: 'postpone' });
+      if (task.priority === Priority.None) out.push({ label: `${t('Priority')} ▾`, command: 'tasksmd.setPriority', pick: 'priority' });
+      if (!task.due) out.push({ label: `📅 ${t('Due')} ▾`, command: 'tasksmd.setDueDate', pick: 'due' });
+      if (!task.recurrenceText && (task.due || task.scheduled || task.start)) out.push({ label: `🔁 ${t('Repeat')} ▾`, command: 'tasksmd.setRecurrence', pick: 'recurrence' });
     }
     out.push({ label: t('Edit'), icon: 'edit', glyph: '✎', command: 'tasksmd.createOrEdit' });
     return out;

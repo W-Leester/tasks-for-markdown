@@ -21,6 +21,16 @@ suite('task line actions (M30)', () => {
     ((await vscode.commands.executeCommand<vscode.CodeLens[]>('vscode.executeCodeLensProvider', doc.uri)) ?? []).map((l) => l.command?.command);
   const labelText = (h: vscode.InlayHint) => (typeof h.label === 'string' ? h.label : h.label.map((p) => p.value).join(''));
   const labelLength = (h: vscode.InlayHint) => [...labelText(h)].length;
+  const picksOf = (hs: vscode.InlayHint[]) => hs.flatMap((h) => (typeof h.label === 'string' ? [] : h.label)).filter((p) => p.command?.command === 'tasksmd.inlinePick').map((p) => (p.command!.arguments![0] as { kind: string }).kind);
+  async function buttonsFor(line: string): Promise<{ picks: string[]; cmds: (string | undefined)[] }> {
+    await getApi();
+    const doc = await vscode.workspace.openTextDocument({ language: 'markdown', content: `# N\n${line}\n` });
+    const editor = await vscode.window.showTextDocument(doc);
+    editor.selection = new vscode.Selection(1, 3, 1, 3);
+    await sleep(300);
+    const hs = await hints(doc);
+    return { picks: picksOf(hs), cmds: hs.flatMap(partCommands) };
+  }
   const partCommands = (h: vscode.InlayHint) => (typeof h.label === 'string' ? [] : h.label.map((p) => p.command?.command).filter(Boolean));
 
   teardown(async () => {
@@ -36,9 +46,9 @@ suite('task line actions (M30)', () => {
     const cmds = ours.flatMap(partCommands);
     assert.equal(cmds.filter((c) => c === 'tasksmd.markDone').length, 1, 'one set of buttons');
     for (const c of ['tasksmd.markDone', 'tasksmd.createOrEdit']) assert.ok(cmds.includes(c), c);
-    // Priority and due open a drop-down on the line (M31).
-    const picks = ours.flatMap((h) => (typeof h.label === 'string' ? [] : h.label)).filter((p) => p.command?.command === 'tasksmd.inlinePick').map((p) => (p.command!.arguments![0] as { kind: string }).kind);
-    for (const k of ['priority', 'due']) assert.ok(picks.includes(k), k);
+    // Fields not set yet open a drop-down on the line (M31); the due date is set, so no due button, and no postpone.
+    assert.deepEqual(picksOf(ours), ['priority', 'recurrence']);
+    assert.ok(!cmds.includes('tasksmd.postpone'));
     // The editor cuts a line's hints off after editor.inlayHints.maximumLength (43 by default, all hints of the line
     // together): Edit was hidden behind "…". In Markdown we lift the limit.
     const total = ours.reduce((n, h) => n + labelLength(h), 0);
@@ -63,5 +73,11 @@ suite('task line actions (M30)', () => {
     } finally {
       await config().update('codeLens.mode', undefined, vscode.ConfigurationTarget.Global);
     }
+  });
+  test('only fields that are not set yet get a button (10-19)', async () => {
+    assert.deepEqual((await buttonsFor('- [ ] plain')).picks, ['priority', 'due']);
+    const full = await buttonsFor('- [ ] all set ⏫ 🔁 every week ⏳ 2026-10-19 📅 2026-10-20');
+    assert.deepEqual(full.picks, []);
+    assert.deepEqual(full.cmds, ['tasksmd.markDone', 'tasksmd.createOrEdit']);
   });
 });

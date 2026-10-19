@@ -47,8 +47,7 @@ suite('task button pickers on the line (M31)', () => {
     assert.equal(await pick('- [ ] 보고서', 'due', '3일 후'), `- [ ] 보고서 📅 ${iso(in3)}`);
   });
 
-  test('recurrence and postpone', async () => {
+  test('recurrence', async () => {
     assert.equal(await pick('- [ ] gym 📅 2026-10-20', 'recurrence'), '- [ ] gym 🔁 every day 📅 2026-10-20');
-    assert.equal(await pick('- [ ] gym 📅 2020-01-01', 'postpone'), `- [ ] gym 📅 ${tomorrow()}`);
   });
 });

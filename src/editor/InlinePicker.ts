@@ -1,12 +1,12 @@
 import * as vscode from 'vscode';
 import { type Clock, type Dayjs, describeRelative, parseNaturalDate, systemClock } from '../core/dates';
 import { isValidRecurrenceText } from '../core/recurrence';
-import { DateField, type DateFieldName, PRIORITY_EMOJI, PRIORITY_NAME, Priority, type Task } from '../core/task';
+import { DateField, PRIORITY_EMOJI, PRIORITY_NAME, Priority, type Task } from '../core/task';
 import { type CommandDeps, resolveTargetTasks, runEdit, tasksAtCursors } from '../commands/registerCommands';
 import { relativeText } from './relativeText';
 import { t } from '../l10n';
 
-export type InlinePickKind = 'priority' | 'due' | 'scheduled' | 'start' | 'recurrence' | 'postpone';
+export type InlinePickKind = 'priority' | 'due' | 'scheduled' | 'start' | 'recurrence';
 
 /** One choice of the drop-down; `value` goes to `apply` unchanged. */
 interface Choice {
@@ -90,7 +90,7 @@ export class InlinePicker {
     const needle = typed.toLowerCase();
     const choices = this.choices(p.kind, task, typed).filter((c) => !needle || c.typed || c.filter.toLowerCase().split(' ').some((w) => w.startsWith(needle)) || c.filter.toLowerCase().includes(needle));
     // Half-typed ("next f"): an empty list would close for good, so say it is not a date yet and keep it open.
-    if (!choices.length && typed && p.kind !== 'priority' && p.kind !== 'postpone') {
+    if (!choices.length && typed && p.kind !== 'priority') {
       choices.push({ label: `⚠ ${typed}`, description: t(p.kind === 'recurrence' ? 'not a recognised rule' : 'not a recognised date'), filter: typed, value: undefined, typed: true });
     }
     const items = choices.map((c, i) => {
@@ -146,24 +146,11 @@ export class InlinePicker {
         if (task?.recurrenceText) out.push({ label: `🗑 ${t('Remove recurrence')}`, filter: `remove ${t('Remove recurrence')}`, value: null });
         return out;
       }
-      case 'postpone': {
-        const from = (task?.due ?? task?.scheduled)?.date ?? today;
-        const base = from.isBefore(today) ? today : from; // never postpone into the past
-        const monday = base.add((8 - base.day()) % 7 || 7, 'day');
-        const choices: [string, Dayjs][] = [
-          ['Tomorrow', today.add(1, 'day')], ['+2 days', base.add(2, 'day')], ['Next Monday', monday],
-          ['+1 week', base.add(1, 'week')], ['+2 weeks', base.add(2, 'week')], ['+1 month', base.add(1, 'month')],
-        ];
-        return choices.map(([name, d]) => ({ label: `⏱ ${t(name)}`, description: fmt(d), filter: `${name} ${t(name)}`, value: d }));
-      }
     }
   }
 
-  private async apply(kind: InlinePickKind, value: unknown): Promise<void> {
+  private apply(kind: InlinePickKind, value: unknown): Promise<void> {
     this.pending = null;
-    // Let the suggestion widget finish accepting first: editing the line from inside its command split the 🔁 and 📅
-    // emoji (both start with the same UTF-16 unit) in the middle.
-    await new Promise((r) => setTimeout(r, 0));
     return runEdit(this.deps, async () => {
       const editor = vscode.window.activeTextEditor;
       // Re-read the line: the typed filter text was just removed, the index may not know yet.
@@ -172,10 +159,7 @@ export class InlinePicker {
       const edit = this.deps.editService;
       if (kind === 'priority') await edit.update(task, { priority: value as Priority });
       else if (kind === 'recurrence') await edit.update(task, { recurrenceText: value as string | null });
-      else if (kind === 'postpone') {
-        const field: DateFieldName = task.due ? 'due' : task.scheduled ? 'scheduled' : 'due';
-        await edit.update(task, { [field]: DateField.fromDate(value as Dayjs) });
-      } else await edit.update(task, { [kind]: value === null ? null : DateField.fromDate(value as Dayjs) });
+      else await edit.update(task, { [kind]: value === null ? null : DateField.fromDate(value as Dayjs) });
     });
   }
 }
@@ -186,5 +170,4 @@ const FALLBACK: Record<InlinePickKind, string> = {
   scheduled: 'tasksmd.setScheduledDate',
   start: 'tasksmd.setStartDate',
   recurrence: 'tasksmd.setRecurrence',
-  postpone: 'tasksmd.postpone',
 };

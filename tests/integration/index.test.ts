@@ -119,10 +119,11 @@ suite('editor providers', () => {
     await sleep(150);
     const hints = await vscode.commands.executeCommand<vscode.InlayHint[]>('vscode.executeInlayHintProvider', doc.uri, new vscode.Range(0, 0, doc.lineCount, 0));
     const ours = hints.flatMap((h) => (typeof h.label === 'string' ? [] : h.label.filter((p) => p.command?.command.startsWith('tasksmd.')).map((p) => ({ line: h.position.line, part: p }))));
-    assert.ok(ours.length >= 4, `expected buttons, got ${ours.length}`);
+    assert.ok(ours.length >= 3, `expected buttons, got ${ours.length}`); // done · repeat · edit (priority and due are set)
     assert.ok(ours.every((o) => o.line === 6), 'buttons only on cursor line');
     assert.ok(ours.some((o) => o.part.command!.command === 'tasksmd.markDone'));
-    assert.ok(ours.some((o) => o.part.command!.command === 'tasksmd.inlinePick' && (o.part.command!.arguments![0] as { kind: string }).kind === 'due' && o.part.value.includes('Sep 25')));
+    // The due date (Sep 25) is already on the line: no due button (10-19).
+    assert.ok(!ours.some((o) => (o.part.command!.arguments?.[0] as { kind?: string } | undefined)?.kind === 'due'));
     await vscode.commands.executeCommand('workbench.action.closeAllEditors');
   });
 

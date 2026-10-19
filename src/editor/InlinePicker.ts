@@ -43,6 +43,10 @@ const MAX_TYPED = 60;
  * only the suggestion list opens where the cursor is. The button puts the cursor at the end of the line, remembers
  * what is being picked and opens the suggestion list, which `TaskCompletionProvider` fills from `items`. A choice
  * inserts nothing (the typed filter text is removed) and runs `tasksmd.inlinePick.apply`.
+ *
+ * The pick must end when the list closes any other way, or plain writing on that line keeps getting the drop-down
+ * back and Enter picks from it (10-19, incident #45): Esc runs `tasksmd.inlinePick.cancel` while
+ * `tasksmd.inlinePicking`; leaving the spot, another editor or losing window focus end it as well.
  */
 export class InlinePicker {
   private pending: Pending | null = null;
@@ -53,7 +57,30 @@ export class InlinePicker {
     context.subscriptions.push(
       vscode.commands.registerCommand('tasksmd.inlinePick', (arg: { kind: InlinePickKind; task: Task }) => this.open(arg.kind, arg.task)),
       vscode.commands.registerCommand('tasksmd.inlinePick.apply', (arg: { kind: InlinePickKind; value: unknown }) => this.apply(arg.kind, arg.value)),
+      vscode.commands.registerCommand('tasksmd.inlinePick.cancel', () => {
+        this.set(null);
+        return vscode.commands.executeCommand('hideSuggestWidget');
+      }),
+      vscode.window.onDidChangeTextEditorSelection((e) => {
+        const p = this.pending;
+        if (!p) return;
+        const at = e.selections[0];
+        const away = e.textEditor.document.uri.toString() !== p.key || e.selections.length !== 1 || !at!.isEmpty || at!.active.line !== p.line || at!.active.isBefore(p.start);
+        if (away) this.set(null);
+      }),
+      vscode.window.onDidChangeActiveTextEditor((e) => {
+        if (this.pending && e?.document.uri.toString() !== this.pending.key) this.set(null);
+      }),
+      vscode.window.onDidChangeWindowState((s) => {
+        if (!s.focused) this.set(null);
+      }),
     );
+  }
+
+  private set(pending: Pending | null): void {
+    if (!pending && !this.pending) return;
+    this.pending = pending;
+    void vscode.commands.executeCommand('setContext', 'tasksmd.inlinePicking', pending !== null);
   }
 
   private async open(kind: InlinePickKind, task: Task): Promise<void> {
@@ -70,7 +97,7 @@ export class InlinePicker {
     const line = task.location.line;
     const end = editor.document.lineAt(line).range.end;
     editor.selection = new vscode.Selection(end, end);
-    this.pending = { kind, key, line, start: end };
+    this.set({ kind, key, line, start: end });
     await vscode.commands.executeCommand('editor.action.triggerSuggest');
   }
 
@@ -79,7 +106,7 @@ export class InlinePicker {
     const p = this.pending;
     if (!p) return undefined;
     if (document.uri.toString() !== p.key || position.line !== p.line || position.isBefore(p.start) || position.character - p.start.character > MAX_TYPED) {
-      this.pending = null;
+      this.set(null);
       return undefined;
     }
     const range = new vscode.Range(p.start, position);
@@ -93,13 +120,18 @@ export class InlinePicker {
     if (!choices.length && typed && p.kind !== 'priority') {
       choices.push({ label: `⚠ ${typed}`, description: t(p.kind === 'recurrence' ? 'not a recognised rule' : 'not a recognised date'), filter: typed, value: undefined, typed: true });
     }
+    if (!choices.length) {
+      this.set(null); // nothing left: the list closes, and so does the pick
+      return new vscode.CompletionList([], false);
+    }
     const items = choices.map((c, i) => {
       const item = new vscode.CompletionItem({ label: c.label, description: c.description }, vscode.CompletionItemKind.Value);
       item.range = range;
       item.filterText = document.getText(range);
       item.sortText = String(i).padStart(3, '0');
       if (c.value === undefined) {
-        item.insertText = document.getText(range); // picking it leaves what was typed
+        item.insertText = document.getText(range); // picking it leaves what was typed, and ends the pick
+        item.command = { command: 'tasksmd.inlinePick.cancel', title: c.label };
       } else {
         item.insertText = '';
         item.command = { command: 'tasksmd.inlinePick.apply', title: c.label, arguments: [{ kind: p.kind, value: c.value }] };
@@ -150,7 +182,7 @@ export class InlinePicker {
   }
 
   private apply(kind: InlinePickKind, value: unknown): Promise<void> {
-    this.pending = null;
+    this.set(null);
     return runEdit(this.deps, async () => {
       const editor = vscode.window.activeTextEditor;
       // Re-read the line: the typed filter text was just removed, the index may not know yet.

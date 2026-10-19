@@ -985,6 +985,11 @@
     },
     "keybindings": [
       {
+        "command": "tasksmd.inlinePick.cancel",
+        "key": "escape",
+        "when": "tasksmd.inlinePicking && suggestWidgetVisible && editorTextFocus"
+      },
+      {
         "command": "tasksmd.toggleDone",
         "key": "ctrl+shift+enter",
         "mac": "ctrl+shift+enter",

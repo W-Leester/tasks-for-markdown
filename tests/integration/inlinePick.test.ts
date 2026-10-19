@@ -50,4 +50,56 @@ suite('task button pickers on the line (M31)', () => {
   test('recurrence', async () => {
     assert.equal(await pick('- [ ] gym 📅 2026-10-20', 'recurrence'), '- [ ] gym 🔁 every day 📅 2026-10-20');
   });
+
+  /** Picker items (dates, rules, priorities) in what the editor would show at the cursor now. */
+  async function pickerItemsAt(doc: vscode.TextDocument, pos: vscode.Position): Promise<string[]> {
+    const list = await vscode.commands.executeCommand<vscode.CompletionList>('vscode.executeCompletionItemProvider', doc.uri, pos);
+    return list.items.map((i) => (typeof i.label === 'string' ? i.label : i.label.label)).filter((l) => /^(→|📅 |⚠|🗑|🔁 every|🔺|⏫)/.test(l));
+  }
+  async function openDuePicker(): Promise<{ doc: vscode.TextDocument; editor: vscode.TextEditor }> {
+    await getApi();
+    const doc = await vscode.workspace.openTextDocument({ language: 'markdown', content: '# Notes\n- [ ] write report\n' });
+    const editor = await vscode.window.showTextDocument(doc);
+    editor.selection = new vscode.Selection(1, 2, 1, 2);
+    await sleep(300);
+    const hints = await vscode.commands.executeCommand<vscode.InlayHint[]>('vscode.executeInlayHintProvider', doc.uri, new vscode.Range(0, 0, doc.lineCount, 0));
+    const button = hints.flatMap((h) => (typeof h.label === 'string' ? [] : h.label)).map((p) => p.command).find((c) => c?.command === 'tasksmd.inlinePick' && (c.arguments?.[0] as { kind: string }).kind === 'due')!;
+    await vscode.commands.executeCommand(button.command, ...(button.arguments ?? []));
+    await sleep(500);
+    return { doc, editor };
+  }
+  const typeText = async (text: string) => {
+    for (const ch of text) {
+      await vscode.commands.executeCommand('type', { text: ch });
+      await sleep(40);
+    }
+    await sleep(300);
+  };
+
+  // 10-19 user report: after closing the drop-down, plain writing on that line kept getting it back — Enter then picked
+  // a date (taking the typed words) or swallowed the line break.
+  test('Esc ends the pick: writing on that line gets no drop-down items afterwards', async () => {
+    const pkg = vscode.extensions.getExtension('HastyCapybara.tasks-for-markdown')!.packageJSON as { contributes: { keybindings: { key: string; command: string; when?: string }[] } };
+    const esc = pkg.contributes.keybindings.find((k) => k.command === 'tasksmd.inlinePick.cancel');
+    assert.equal(esc?.key, 'escape');
+    assert.match(esc!.when!, /tasksmd\.inlinePicking/);
+    const { doc, editor } = await openDuePicker();
+    assert.ok((await pickerItemsAt(doc, editor.selection.active)).length > 0, 'the drop-down is open');
+    await vscode.commands.executeCommand('tasksmd.inlinePick.cancel'); // what Esc runs
+    await typeText(' and call tomorrow');
+    assert.deepEqual(await pickerItemsAt(doc, editor.selection.active), []);
+    assert.equal(doc.lineAt(1).text, '- [ ] write report and call tomorrow');
+    await vscode.commands.executeCommand('workbench.action.revertAndCloseActiveEditor');
+  });
+
+  test('moving the cursor away ends the pick too', async () => {
+    const { doc, editor } = await openDuePicker();
+    editor.selection = new vscode.Selection(0, 0, 0, 0);
+    await sleep(200);
+    const end = doc.lineAt(1).range.end;
+    editor.selection = new vscode.Selection(end, end);
+    await typeText(' tomorrow');
+    assert.deepEqual(await pickerItemsAt(doc, editor.selection.active), []);
+    await vscode.commands.executeCommand('workbench.action.revertAndCloseActiveEditor');
+  });
 });

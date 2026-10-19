@@ -3,7 +3,8 @@ import * as os from 'node:os';
 import * as path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { run } from '../packages/cli/src/main';
-import { parseJsonc } from '../packages/cli/src/config';
+import { loadConfig, parseJsonc } from '../packages/cli/src/config';
+import { CLI_SETTING_KEYS, SETTINGS_ENV } from '../src/core/cliSettings';
 
 let root: string;
 let out: string[];
@@ -25,6 +26,24 @@ beforeEach(() => {
   fs.writeFileSync(path.join(root, '.gitignore'), 'drafts/\n');
 });
 afterEach(() => fs.rmSync(root, { recursive: true, force: true }));
+
+describe('settings handed over by the editor (M33)', () => {
+  it('the editor\'s values are the base, the folder\'s .vscode/settings.json goes on top', () => {
+    const env = { [SETTINGS_ENV]: JSON.stringify({ 'tasksmd.setCreatedDate': true, 'tasksmd.requireDueDate': false, 'tasksmd.taskFormat': 'dataview' }) };
+    expect(loadConfig(root, env)).toMatchObject({ setCreatedDate: true, requireDueDate: false, taskFormat: 'dataview' });
+    fs.mkdirSync(path.join(root, '.vscode'));
+    fs.writeFileSync(path.join(root, '.vscode', 'settings.json'), '{ "tasksmd.taskFormat": "emoji", // folder\n }');
+    expect(loadConfig(root, env)).toMatchObject({ setCreatedDate: true, requireDueDate: false, taskFormat: 'emoji' });
+    expect(loadConfig(root, { [SETTINGS_ENV]: 'not json' })).toMatchObject({ setCreatedDate: false, requireDueDate: true });
+    expect(loadConfig(root, {})).toMatchObject({ setCreatedDate: false });
+  });
+
+  it('the extension hands over exactly the settings the CLI reads', () => {
+    const src = fs.readFileSync(path.join(__dirname, '..', 'packages', 'cli', 'src', 'config.ts'), 'utf8');
+    const read = new Set([...src.matchAll(/get\('([\w.]+)'/g), ...src.matchAll(/raw\['tasksmd\.([\w.]+)'\]/g)].map((m) => m[1]!));
+    expect([...read].sort()).toEqual([...CLI_SETTING_KEYS].sort());
+  });
+});
 
 describe('tasksmd CLI', () => {
   it('query: scans the folder (gitignore, node_modules excluded) and prints markdown or json', async () => {

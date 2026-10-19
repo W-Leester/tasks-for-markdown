@@ -6,6 +6,8 @@ import type { Settings } from '../settings/Settings';
 import { StaleLineError, type TaskEditService } from '../services/TaskEditService';
 import { t } from '../l10n';
 import { checkboxMode, toggleCheckboxLine } from '../core/task/toggleCheckbox';
+import { appendCreated } from '../core/task/createdField';
+import { systemClock } from '../core/dates';
 
 export const VIEW_CONTAINER_ID = 'tasksmd';
 
@@ -105,10 +107,14 @@ export function registerCommands(context: vscode.ExtensionContext, deps: Command
       }
       const ordered = [...lines].sort((a, b) => a - b);
       const mode = checkboxMode(doc.lineAt(ordered[0]!).text);
+      const wasBlank = ordered.length === 1 && !doc.lineAt(ordered[0]!).text.trim();
+      // A new box is a new task: it gets the created date like the dialog does (M33).
+      const created = mode === 'add' && deps.settings.get('setCreatedDate') ? systemClock.now().format('YYYY-MM-DD') : null;
       await editor.edit((eb) => {
         for (const l of ordered) {
           const line = doc.lineAt(l);
-          const next = toggleCheckboxLine(line.text, mode);
+          let next = toggleCheckboxLine(line.text, mode);
+          if (created && next !== line.text) next = appendCreated(next, created, deps.settings.get('taskFormat'));
           if (next !== line.text) eb.replace(line.range, next);
         }
       });
@@ -116,7 +122,8 @@ export function registerCommands(context: vscode.ExtensionContext, deps: Command
       if (ordered.length === 1 && editor.selection.isEmpty) {
         const l = ordered[0]!;
         const col = mode === 'add' ? Math.min(doc.lineAt(l).text.length, doc.lineAt(l).text.indexOf('[ ] ') + 4) : editor.selection.active.character;
-        if (mode === 'add' && col > 0 && editor.selection.active.character < col) editor.selection = new vscode.Selection(l, col, l, col);
+        // A blank line that also got the created date: the cursor would sit after the date — put it after the box.
+        if (mode === 'add' && col > 0 && (editor.selection.active.character < col || (created && wasBlank))) editor.selection = new vscode.Selection(l, col, l, col);
       }
     }),
   );

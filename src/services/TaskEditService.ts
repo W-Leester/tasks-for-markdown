@@ -4,6 +4,7 @@ import { StatusType, type StatusRegistry, type Status, type Task, type TaskField
 import type { TaskIndex } from '../core/index';
 import { cleanNoteTexts, insertAfterTask, insertUnderTask, newTaskLine, noteBlock, placeTaskLine } from '../core/file';
 import { t } from '../l10n';
+import { appendCreated } from '../core/task/createdField';
 import type { IndexService } from '../index/IndexService';
 import type { Settings } from '../settings/Settings';
 
@@ -152,7 +153,9 @@ export class TaskEditService {
     return this.withLine(uri, line, task.originalMarkdown, (doc, edit, eol) => {
       const at = insertAfterTask(docLines(doc), line);
       if (!at) throw new Error(t('That task is no longer at line {0}; the view has been refreshed.', line + 1));
-      edit.insert(uri, doc.lineAt(at.after).range.end, eol + newTaskLine(at, typed));
+      let text = newTaskLine(at, typed);
+      if (this.deps.settings.get('setCreatedDate')) text = appendCreated(text, this.today().format('YYYY-MM-DD'), this.deps.settings.get('taskFormat'));
+      edit.insert(uri, doc.lineAt(at.after).range.end, eol + text);
       return at.after + 1;
     });
   }

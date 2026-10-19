@@ -11,6 +11,7 @@ import {
 import { resolveWindowsCommand } from './winCommand';
 import type { TaskIndex } from '../core/index';
 import { onboardingDay, mcpWanted, shouldPrompt } from './onboardingDays';
+import { CLI_SETTING_KEYS } from '../core/cliSettings';
 
 /**
  * M21 (design.md 7.16): AI agents and the terminal without npm.
@@ -89,13 +90,23 @@ export function registerAi(context: vscode.ExtensionContext, deps: AiDeps): AiIn
   /** No index (this module tested alone): behave as before. */
   const hasTasks = () => (deps.index ? deps.index.taskCount() > 0 : true);
   const enabled = () => mcpWanted({ enabled: deps.settings.get('mcp.autoRegister'), trusted: vscode.workspace.isTrusted, hasTasks: hasTasks() });
+  /** The editor's values for the folder (user and workspace settings), for the server it runs itself (M33). */
+  const editorSettings = (uri: vscode.Uri): Record<string, unknown> => {
+    const c = vscode.workspace.getConfiguration('tasksmd', uri);
+    const out: Record<string, unknown> = {};
+    for (const k of CLI_SETTING_KEYS) {
+      const v = c.get(k);
+      if (v !== undefined) out[`tasksmd.${k}`] = v;
+    }
+    return out;
+  };
   const wanted = () => {
     if (!enabled()) return [];
     const folders = localFolders();
     return folders.map((f) => ({
       name: serverName(f.name, folders.length),
       label: folders.length > 1 ? `Tasks for Markdown (${f.name})` : 'Tasks for Markdown',
-      spec: serverSpec(process.execPath, bundledCli, folderPathFor(process.platform, f.uri.fsPath)),
+      spec: serverSpec(process.execPath, bundledCli, folderPathFor(process.platform, f.uri.fsPath), editorSettings(f.uri)),
     }));
   };
 
@@ -144,6 +155,10 @@ export function registerAi(context: vscode.ExtensionContext, deps: AiDeps): AiIn
     vscode.workspace.onDidChangeWorkspaceFolders(() => sync()),
     vscode.workspace.onDidGrantWorkspaceTrust(() => sync()),
     deps.settings.onDidChange(() => sync(), ['mcp.autoRegister']),
+    // The server gets the editor's settings when it starts: tell the editor its definition changed.
+    vscode.workspace.onDidChangeConfiguration((e) => {
+      if (CLI_SETTING_KEYS.some((k) => e.affectsConfiguration(`tasksmd.${k}`))) sync();
+    }),
   );
   // M29: register once the folder turns out to have tasks (after indexing, or when the first task is written).
   if (deps.index) {

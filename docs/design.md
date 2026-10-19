@@ -1077,6 +1077,7 @@ GitHub Actions: PR마다 `typecheck + lint + test`, 태그 `v*` 푸시 시 패�
 
 | 날짜 | 버전 | 내용 |
 |---|---|---|
+| 2026-10-19 | 1.16 | M33: `appendCreated`(줄 끝에 ➕/`[created::]`, 이미 있으면 그대로) — 체크박스 만들기(빈 줄이면 커서를 `[ ] ` 뒤로)·`insertTaskBelow`. `src/core/cliSettings.ts`의 `CLI_SETTING_KEYS`·`TASKSMD_SETTINGS`: 자동 등록 서버의 `serverSpec`에 편집기 값(`getConfiguration('tasksmd', folder)`), 그 키가 바뀌면 다시 알림(`onDidChangeConfiguration`); CLI `loadConfig`는 그 값 위에 `.vscode/settings.json`. 키 목록과 CLI가 읽는 키가 같은지 테스트. `InlinePicker`: 창 포커스 대신 무입력 15초(`idleMs`)로 끝냄 — 포커스 이벤트가 창을 떠나지 않아도 와서 도중에 끊겼음(테스트 4번 중 2번 실패 → 빼니 4번 모두 통과) |
 | 2026-10-19 | 1.15 | `InlinePicker`의 끝: 컨텍스트 `tasksmd.inlinePicking`, Esc 키(`when: tasksmd.inlinePicking && suggestWidgetVisible && editorTextFocus`) → `tasksmd.inlinePick.cancel`; 선택 이동(다른 줄·시작 앞·영역)·다른 편집기·창 포커스 잃음·결과 0개·"⚠" 항목 선택에서도 끝냄(incidents #45) |
 | 2026-10-19 | 1.14 | M32: 태스크 아래에 넣기 — `insertUnderTask`(하위 위치: 블록 끝, 기존 자식의 들여쓰기·기호, 없으면 태스크 글자 아래)·`placeTaskLine`(직렬화된 줄에 위치의 들여쓰기·기호, 상태 유지)을 `src/core/file`에. CLI `addTask`의 `below`(store `insertPlaced`, 줄 확인), MCP `tasks_create`의 `below`·`asSubtask`·`expectedText`, 확장 API `CreateTarget.below`(`TaskEditService.insertTaskUnder`). 기능 `insert.below`. `afterLine`·`line`은 그대로 |
 | 2026-10-19 | 1.13 | 태스크 버튼은 아직 없는 항목만(`actionsFor`: 우선순위 None일 때, 📅 없을 때, 🔁 없고 날짜 있을 때) + 완료/다시 열기·편집. ⏳·⏱ 미루기 버튼과 드롭다운의 미루기 종류 제거 |

@@ -213,7 +213,7 @@ tasksmd info                                           # version, features, sett
 ```
 
 - Target folder: `--root` (default: current directory). `.gitignore`, `tasksmd.exclude`, `node_modules` and `.git` are skipped.
-- Settings come from `<root>/.vscode/settings.json` (`tasksmd.*`): `globalFilter`, `taskFormat`, `setDoneDate`, `setCancelledDate`, `setCreatedDate`, `requireDueDate` (on by default — `add` without 📅 is refused), `recurrence.*`, `statuses`, `savedQueries`, `include`, `exclude`, `query.allowFunctions`, `query.showTree`. Comments and trailing commas are fine.
+- Settings come from `<root>/.vscode/settings.json` (`tasksmd.*`; the MCP server the extension registers in VS Code and Cursor also gets the editor's values, user settings included, in `TASKSMD_SETTINGS` and reads this file on top, 1.1.5): `globalFilter`, `taskFormat`, `setDoneDate`, `setCancelledDate`, `setCreatedDate`, `requireDueDate` (on by default — `add` without 📅 is refused), `recurrence.*`, `statuses`, `savedQueries`, `include`, `exclude`, `query.allowFunctions`, `query.showTree`. Comments and trailing commas are fine.
 - Line numbers are 1-based on the command line. `--today YYYY-MM-DD` changes the reference date (tests, reports).
 - Output: Markdown (`line  (path:line)`) on a terminal, JSON when piped; force with `--json` / `--md`. Errors in JSON mode are `{ "error": { code, message } }`; exit code 1 (runtime error) or 2 (usage error).
 - Files are edited directly. Save files that are open in an editor first. `--expect` with the exact line refuses to overwrite a changed line (`STALE_LINE`). Completion uses the same code as the extension, so done dates, next occurrences and field order are identical.

@@ -143,3 +143,12 @@ describe('M21 MCP config helpers', () => {
     expect(claudeDesktopRunningFrom('linux', 'anything')).toBe(false);
   });
 });
+
+describe('serverSpec with the editor\'s settings (M33)', () => {
+  it('passes them as TASKSMD_SETTINGS next to the Node switch', () => {
+    const s = serverSpec('/node', '/cli.cjs', '/notes', { 'tasksmd.setCreatedDate': true });
+    expect(s.env).toEqual({ ELECTRON_RUN_AS_NODE: '1', TASKSMD_SETTINGS: '{"tasksmd.setCreatedDate":true}' });
+    expect(serverSpec('/node', '/cli.cjs', '/notes').env).toEqual({ ELECTRON_RUN_AS_NODE: '1' });
+  });
+});
+

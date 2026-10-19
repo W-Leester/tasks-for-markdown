@@ -50,6 +50,7 @@ export interface ExtensionApi {
   extendMarkdownIt(md: import('markdown-it').MarkdownIt): import('markdown-it').MarkdownIt;
   links: { handle: (uri: vscode.Uri) => Promise<void> };
   ai: AiInternals;
+  picker: InlinePicker;
   webviews: { openEdit: (target: { key: string | null; line: number | null }) => WebviewHost; openKanban: () => WebviewHost; openQueryBuilder: (id: string | null) => WebviewHost; openStats: () => WebviewHost; openCalendar: () => WebviewHost; openQueryResults: (target: { text: string; source: string; label: string } | null) => WebviewHost };
 }
 
@@ -137,7 +138,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<Extens
   if (context.extensionMode !== vscode.ExtensionMode.Test) void updates.checkOnStartup();
 
   void indexService.start();
-  const internal: ExtensionApi = { index, indexService, editService, queries, savedQueries, settings, archive, preview, extendMarkdownIt: (md) => preview.extendMarkdownIt(md), webviews, links, ai };
+  const internal: ExtensionApi = { index, indexService, editService, queries, savedQueries, settings, archive, preview, extendMarkdownIt: (md) => preview.extendMarkdownIt(md), webviews, links, ai, picker };
   const apiDeps = { index, indexService, editService, queries, savedQueries, settings, getStatusRegistry, log, extensionVersion: String((context.extension.packageJSON as { version?: string }).version ?? '0.0.0'), ui: { openEdit: webviews.openEdit, openKanban: webviews.openKanban, openCalendar: webviews.openCalendar, openQueryResults: webviews.openQueryResults } };
   registerApiCommands(context, createTasksApi(apiDeps, { extensionId: 'command' }));
   return {

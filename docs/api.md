@@ -211,7 +211,7 @@ tasksmd info                                        # 버전, 기능 목록, req
 ```
 
 - 대상 폴더는 `--root`(기본 현재 폴더). `.gitignore`, `tasksmd.exclude`, `node_modules`, `.git`을 건너뜁니다.
-- 설정은 `<root>/.vscode/settings.json`의 `tasksmd.*`를 읽습니다: `globalFilter`, `taskFormat`, `setDoneDate`, `setCancelledDate`, `setCreatedDate`, `requireDueDate`(기본 켜짐 — `add`에 📅가 없으면 거부), `recurrence.*`, `statuses`, `include`, `exclude`, `query.allowFunctions`, `query.showTree`. 주석과 뒤따르는 쉼표가 있어도 됩니다.
+- 설정은 `<root>/.vscode/settings.json`의 `tasksmd.*`를 읽습니다(확장이 VS Code·Cursor에 자동 등록한 MCP 서버는 편집기의 설정 값(사용자 설정 포함)을 환경 변수 `TASKSMD_SETTINGS`로 받아 그 위에 이 파일을 덮어 읽음, 1.1.5): `globalFilter`, `taskFormat`, `setDoneDate`, `setCancelledDate`, `setCreatedDate`, `requireDueDate`(기본 켜짐 — `add`에 📅가 없으면 거부), `recurrence.*`, `statuses`, `include`, `exclude`, `query.allowFunctions`, `query.showTree`. 주석과 뒤따르는 쉼표가 있어도 됩니다.
 - 줄 번호는 1부터. `--today YYYY-MM-DD`로 기준일을 바꿀 수 있습니다(테스트·리포트용). `tasksmd --version`(`-v`)은 버전만 출력합니다(1.1.3).
 - 출력: 터미널이면 마크다운(`원문 줄  (경로:줄)`, 메모는 그 아래 들여쓴 `- …`), 파이프면 JSON(`notes`, `isBlocking` 포함). `--json`/`--md`로 고정. 오류는 JSON 모드에서 `{ "error": { code, message } }`, 종료 코드 1(실행 오류)·2(인자 오류).
 - 파일을 직접 고칩니다. 편집기에 저장 안 된 변경이 있는 파일은 저장 후 쓰세요. `--expect`에 줄 원문을 주면 그사이 바뀐 줄은 `STALE_LINE`으로 거부합니다. 완료 처리는 확장과 같은 코드라 완료일·반복 다음 회차·필드 순서가 동일합니다.

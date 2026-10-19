@@ -4,8 +4,10 @@
 
 **API · CLI · MCP**
 - **Add a task below another one** without taking its notes and subtasks: `below` (that task's line) in MCP `tasks_create`, `--below N` in `tasksmd add`, `target.below` in the extension API's `create`. The new task goes after the task's whole block at the same depth and with the same bullet; `asSubtask` / `--subtask` adds it as the task's last subtask, and `expectedText` / `--expect` refuses if the line changed. Inserting with `afterLine` / `--line` / `target.line` right after a task line handed its notes and subtasks to the new task; those options are unchanged (they insert after that exact line). Feature `insert.below`.
+- **The editor's AI follows the editor's settings.** The MCP server registered in VS Code and Cursor now gets the `tasksmd.*` settings in effect for the folder, user settings included (created date, required due date, task format, statuses, …). Before, it read only the folder's `.vscode/settings.json`. The terminal `tasksmd` and the Claude Code / Claude Desktop connections still read that file.
 
 **Editor**
+- **New checkboxes get the created date** when `tasksmd.setCreatedDate` is on: `Ctrl+Shift+C` and Enter in the rendered view add `➕ today`, like the create dialog does.
 - **Fixed: adding 🔁, 🔺, 🔼, 🔽 or 🛫 in front of 📅 broke both emoji** in a file open in the editor (since 1.0; through the buttons, menus and the dialog). The editor shrank the edit by UTF-16 units and cut emoji that share their first unit in half. The CLI and MCP were not affected.
 - **The task buttons' choices open right below the line** instead of at the top of the window: Priority ▾, 📅 Due ▾ and 🔁 Repeat ▾ show a drop-down there. Pick one, or type a date or rule (`next fri`, `3일 후`, `every 2 weeks`) and it appears first. From the menus and the command palette the picker stays at the top.
 - **Task suggestions open as you type a keyword, not on every space.** Type `d` (due), `pr` (priority), `ev` (every …) and the list appears; a bare space or Korean text never opens it — the list popping up on each space interrupted typing in Korean and turned `space → Enter` into picking a suggestion. `Ctrl+Space` still opens it anytime. The extension opens the list itself when a typed letter starts a keyword; no editor settings are changed. Set `tasksmd.autoSuggest.minMatch` to `0` to also open it right after a space.
@@ -19,6 +21,8 @@
 - The `Ctrl+Shift+C` command is now called **Tasks: Add or remove checkbox** (Korean: **체크박스 만들기/지우기**). "Toggle checkbox" read like checking a task off, which is `Ctrl+Shift+Enter` (**Toggle task done**). The key and what it does are unchanged.
 
 ### 한국어 요약
+- **에디터 안 AI가 편집기 설정을 따름:** VS Code·Cursor에 자동 등록된 MCP 서버가 그 폴더에 적용 중인 `tasksmd.*` 설정(사용자 설정 포함)을 받음 — 만든 날짜·마감일 필수·포맷 등. 예전에는 `.vscode/settings.json`만 읽었음. 터미널 `tasksmd`·Claude Code·Desktop 연결은 그대로 그 파일.
+- **새 체크박스에도 만든 날짜:** `tasksmd.setCreatedDate`가 켜져 있으면 `Ctrl+Shift+C`·렌더 보기 Enter에서도 `➕ 오늘`.
 - **API·CLI·MCP — 태스크 아래에 넣기:** MCP `tasks_create`의 `below`, `tasksmd add --below N`, 확장 API `create`의 `target.below`. 그 태스크의 메모·하위 항목 뒤에 같은 깊이로(`asSubtask`/`--subtask`면 하위 태스크로, `expectedText`/`--expect`로 줄 확인). 예전처럼 `afterLine`/`--line`으로 태스크 줄 바로 뒤에 넣으면 그 태스크의 메모·하위 태스크가 새 태스크 밑으로 넘어갔음(옵션 자체는 그대로). 기능 `insert.below`.
 - **수정: 📅 앞에 🔁·🔺·🔼·🔽·🛫를 넣으면 두 이모지가 깨지던 문제**(1.0부터, 편집기에 열린 파일에서 버튼·메뉴·대화상자로 고칠 때). 편집기가 편집을 UTF-16 단위로 줄이며 첫 단위가 같은 이모지를 반으로 자름. CLI·MCP는 영향 없음.
 - **태스크 버튼의 선택창이 그 줄 바로 아래 드롭다운으로:** 우선순위 ▾·📅 마감 ▾·🔁 반복 ▾. 고르거나 날짜·규칙을 그대로 치면(`next fri`, `3일 후`) 맨 위에. 메뉴·명령 팔레트에서는 예전처럼 위쪽.

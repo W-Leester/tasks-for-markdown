@@ -3,6 +3,7 @@
  * what goes into other tools' MCP configs, and the `tasksmd` launcher script. No vscode import.
  */
 import * as path from 'node:path';
+import { SETTINGS_ENV } from '../core/cliSettings';
 
 /** A stdio MCP server: the same shape VS Code, Cursor, Claude Code and Claude Desktop use. */
 export interface McpServerSpec {
@@ -12,8 +13,11 @@ export interface McpServerSpec {
 }
 
 /** Run `cliPath` (dist/tasksmd.cjs) as an MCP server for `root` on the editor's Node (no npm needed). */
-export function serverSpec(execPath: string, cliPath: string, root: string): McpServerSpec {
-  return { command: execPath, args: [cliPath, 'mcp', '--root', root], env: { ELECTRON_RUN_AS_NODE: '1' } };
+/** `settings`: the editor's `tasksmd.*` values for the folder, for a server the editor itself runs (M33). */
+export function serverSpec(execPath: string, cliPath: string, root: string, settings?: Record<string, unknown>): McpServerSpec {
+  const env: Record<string, string> = { ELECTRON_RUN_AS_NODE: '1' };
+  if (settings) env[SETTINGS_ENV] = JSON.stringify(settings);
+  return { command: execPath, args: [cliPath, 'mcp', '--root', root], env };
 }
 
 /** `tasks` for a single folder; `tasks-<folder>` when several are open, so each gets its own server. */

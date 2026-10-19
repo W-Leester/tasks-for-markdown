@@ -46,10 +46,14 @@ const MAX_TYPED = 60;
  *
  * The pick must end when the list closes any other way, or plain writing on that line keeps getting the drop-down
  * back and Enter picks from it (10-19, incident #45): Esc runs `tasksmd.inlinePick.cancel` while
- * `tasksmd.inlinePicking`; leaving the spot, another editor or losing window focus end it as well.
+ * `tasksmd.inlinePicking`; leaving the spot, another editor, or `idleMs` without a key in the drop-down end it as well.
+ * (Not window focus: it also changes without leaving the window and cut picks short in the middle of typing.)
  */
 export class InlinePicker {
   private pending: Pending | null = null;
+  /** No key in the drop-down for this long: the list is gone (switched away and back), so is the pick. */
+  idleMs = 15_000;
+  private lastSeen = 0;
 
   constructor(private readonly deps: CommandDeps & { clock?: Clock }) {}
 
@@ -71,13 +75,11 @@ export class InlinePicker {
       vscode.window.onDidChangeActiveTextEditor((e) => {
         if (this.pending && e?.document.uri.toString() !== this.pending.key) this.set(null);
       }),
-      vscode.window.onDidChangeWindowState((s) => {
-        if (!s.focused) this.set(null);
-      }),
     );
   }
 
   private set(pending: Pending | null): void {
+    this.lastSeen = Date.now();
     if (!pending && !this.pending) return;
     this.pending = pending;
     void vscode.commands.executeCommand('setContext', 'tasksmd.inlinePicking', pending !== null);
@@ -105,10 +107,12 @@ export class InlinePicker {
   items(document: vscode.TextDocument, position: vscode.Position): vscode.CompletionList | undefined {
     const p = this.pending;
     if (!p) return undefined;
-    if (document.uri.toString() !== p.key || position.line !== p.line || position.isBefore(p.start) || position.character - p.start.character > MAX_TYPED) {
+    const idle = Date.now() - this.lastSeen > this.idleMs;
+    if (idle || document.uri.toString() !== p.key || position.line !== p.line || position.isBefore(p.start) || position.character - p.start.character > MAX_TYPED) {
       this.set(null);
       return undefined;
     }
+    this.lastSeen = Date.now();
     const range = new vscode.Range(p.start, position);
     const typed = document.getText(range).trim();
     const task = resolveTargetTasks({ key: p.key, line: p.line }, this.deps)[0]; // for ✓ on the current value

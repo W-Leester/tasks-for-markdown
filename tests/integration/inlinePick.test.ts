@@ -102,4 +102,21 @@ suite('task button pickers on the line (M31)', () => {
     assert.deepEqual(await pickerItemsAt(doc, editor.selection.active), []);
     await vscode.commands.executeCommand('workbench.action.revertAndCloseActiveEditor');
   });
+
+  test('a pick left alone for a while ends by itself (window switched away and back)', async () => {
+    const api = await getApi();
+    const picker = api.picker;
+    const before = picker.idleMs;
+    picker.idleMs = 300;
+    try {
+      const { doc, editor } = await openDuePicker();
+      await sleep(600);
+      await typeText(' tomorrow');
+      assert.deepEqual(await pickerItemsAt(doc, editor.selection.active), []);
+      await vscode.commands.executeCommand('workbench.action.revertAndCloseActiveEditor');
+    } finally {
+      picker.idleMs = before;
+    }
+  });
 });
+

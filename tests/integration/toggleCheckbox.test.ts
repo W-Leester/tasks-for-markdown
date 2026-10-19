@@ -1,6 +1,7 @@
 import * as assert from 'node:assert/strict';
 import * as vscode from 'vscode';
 import { getApi, sleep } from './helpers';
+import { StatusRegistry, parseTaskLine } from '../../src/core/task';
 
 suite('add or remove checkbox (M26)', () => {
   test('Ctrl+Shift+C adds/removes a checkbox; the dialog is Cmd+Shift+C on macOS and Alt+Shift+C elsewhere, only in Markdown, the rendered view and our sidebar (10-18)', () => {
@@ -51,4 +52,37 @@ suite('add or remove checkbox (M26)', () => {
     assert.deepEqual([doc.lineAt(0).text, doc.lineAt(1).text, doc.lineAt(2).text], ['- plain', '- bullet', '- task']);
     await vscode.commands.executeCommand('workbench.action.revertAndCloseActiveEditor');
   });
+
+  test('with setCreatedDate on, a new box and a rendered-view insert get ➕ today; removing a box does not (M33)', async () => {
+    const api = await getApi();
+    const d = new Date();
+    const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    await api.settings.update('setCreatedDate', true, vscode.ConfigurationTarget.Global);
+    try {
+      const doc = await vscode.workspace.openTextDocument({ language: 'markdown', content: 'buy milk\n\n- [ ] parent\n  - note\n' });
+      const editor = await vscode.window.showTextDocument(doc);
+      editor.selection = new vscode.Selection(0, 0, 0, 0);
+      await vscode.commands.executeCommand('tasksmd.toggleCheckbox');
+      assert.equal(doc.lineAt(0).text, `- [ ] buy milk ➕ ${today}`);
+      // An empty line: the box and the date, cursor right after the box so the text goes before the date.
+      editor.selection = new vscode.Selection(1, 0, 1, 0);
+      await vscode.commands.executeCommand('tasksmd.toggleCheckbox');
+      await sleep(50);
+      assert.equal(doc.lineAt(1).text, `- [ ]  ➕ ${today}`);
+      assert.deepEqual([editor.selection.active.line, editor.selection.active.character], [1, 6]);
+      // Removing the box leaves the date alone.
+      editor.selection = new vscode.Selection(0, 0, 0, 0);
+      await vscode.commands.executeCommand('tasksmd.toggleCheckbox');
+      assert.equal(doc.lineAt(0).text, `- buy milk ➕ ${today}`);
+      // Enter in the rendered view: insertTaskBelow.
+      // An unsaved document is not indexed: read the line the way the rendered view's row does.
+      const parent = parseTaskLine(doc.lineAt(2).text, { statusRegistry: new StatusRegistry(), location: { key: doc.uri.toString(), path: '', line: 2, heading: null, frontmatterTags: [], depth: 0, parentLine: null } })!;
+      const at = await api.editService.insertTaskBelow(parent, 'call bob');
+      assert.equal(doc.lineAt(at).text, `- [ ] call bob ➕ ${today}`);
+      await vscode.commands.executeCommand('workbench.action.revertAndCloseActiveEditor');
+    } finally {
+      await api.settings.update('setCreatedDate', undefined, vscode.ConfigurationTarget.Global);
+    }
+  });
 });
+

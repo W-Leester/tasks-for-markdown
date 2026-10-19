@@ -1,6 +1,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { DEFAULT_STATUSES, StatusRegistry, isStatusType, type StatusConfig, type TaskFormat } from '../../../src/core/task';
+import { SETTINGS_ENV } from '../../../src/core/cliSettings';
 
 /** The subset of `tasksmd.*` settings the CLI honours, read from `<root>/.vscode/settings.json` when present. */
 export interface CliConfig {
@@ -59,15 +60,26 @@ export function parseJsonc(text: string): unknown {
   return JSON.parse(out.replace(/,\s*([}\]])/g, '$1'));
 }
 
-export function loadConfig(root: string): CliConfig {
+/**
+ * Settings: the editor's values when it started this process (`TASKSMD_SETTINGS`, M33 — user settings included), then
+ * `<root>/.vscode/settings.json` on top.
+ */
+export function loadConfig(root: string, env: Record<string, string | undefined> = process.env): CliConfig {
   const cfg: CliConfig = { root, ...DEFAULTS, recurrence: { ...DEFAULTS.recurrence }, statuses: [...DEFAULTS.statuses], savedQueries: [] };
-  const file = path.join(root, '.vscode', 'settings.json');
-  if (!fs.existsSync(file)) return cfg;
-  let raw: Record<string, unknown>;
+  let raw: Record<string, unknown> = {};
   try {
-    raw = parseJsonc(fs.readFileSync(file, 'utf8')) as Record<string, unknown>;
+    const handed = JSON.parse(env[SETTINGS_ENV] ?? '{}') as unknown;
+    if (handed && typeof handed === 'object' && !Array.isArray(handed)) raw = handed as Record<string, unknown>;
   } catch {
-    return cfg;
+    // not ours or broken: the folder's file still applies
+  }
+  const file = path.join(root, '.vscode', 'settings.json');
+  if (fs.existsSync(file)) {
+    try {
+      raw = { ...raw, ...(parseJsonc(fs.readFileSync(file, 'utf8')) as Record<string, unknown>) };
+    } catch {
+      // a broken settings file is ignored, as before
+    }
   }
   const get = <T>(key: string, check: (v: unknown) => v is T): T | undefined => {
     const v = raw[`tasksmd.${key}`];

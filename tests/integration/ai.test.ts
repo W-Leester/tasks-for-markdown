@@ -3,8 +3,8 @@ import { spawn } from 'node:child_process';
 import * as vscode from 'vscode';
 import { fixtureUri, getApi } from './helpers';
 
-/** Start the server exactly as registered, initialize, call tasks_query, return its result. */
-function callServer(spec: { command: string; args: string[]; env: Record<string, string> }): Promise<{ matched: number }> {
+/** Start the server exactly as registered, initialize, call a tool (tasks_query by default), return its result. */
+function callServer<T = { matched: number }>(spec: { command: string; args: string[]; env: Record<string, string> }, tool = 'tasks_query', args: Record<string, unknown> = { query: 'not done' }): Promise<T> {
   return new Promise((resolve, reject) => {
     const child = spawn(spec.command, spec.args, { env: { ...process.env, ...spec.env }, stdio: ['pipe', 'pipe', 'pipe'] });
     let buf = '';
@@ -16,7 +16,7 @@ function callServer(spec: { command: string; args: string[]; env: Record<string,
         clearTimeout(timer);
         child.kill();
         const msg = JSON.parse(line) as { result: { content: { text: string }[] } };
-        resolve(JSON.parse(msg.result.content[0]!.text) as { matched: number });
+        resolve(JSON.parse(msg.result.content[0]!.text) as T);
         return;
       }
     });
@@ -24,7 +24,7 @@ function callServer(spec: { command: string; args: string[]; env: Record<string,
     const send = (m: unknown) => child.stdin.write(JSON.stringify(m) + '\n');
     send({ jsonrpc: '2.0', id: 1, method: 'initialize', params: { protocolVersion: '2025-06-18', capabilities: {}, clientInfo: { name: 'test', version: '1' } } });
     send({ jsonrpc: '2.0', method: 'notifications/initialized' });
-    send({ jsonrpc: '2.0', id: 2, method: 'tools/call', params: { name: 'tasks_query', arguments: { query: 'not done' } } });
+    send({ jsonrpc: '2.0', id: 2, method: 'tools/call', params: { name: tool, arguments: args } });
   });
 }
 
@@ -43,6 +43,23 @@ suite('AI connection (M21)', () => {
     assert.equal(s!.spec.args.at(-1), fixtureUri('').fsPath.replace(/[\\/]$/, ''));
     const result = await callServer(s!.spec);
     assert.ok(result.matched > 0, `matched ${result.matched}`);
+  });
+
+  test("the registered server follows the editor's settings, user settings included (M33)", async function () {
+    this.timeout(30000);
+    const api = await getApi();
+    if (api.ai.mode !== 'vscode') this.skip();
+    // Only in the user settings: the folder's .vscode/settings.json does not say it, so the CLI alone would not know.
+    await api.settings.update('requireDueDate', false, vscode.ConfigurationTarget.Global);
+    try {
+      const [s] = api.ai.current();
+      assert.equal(JSON.parse(s!.spec.env.TASKSMD_SETTINGS!)['tasksmd.requireDueDate'], false);
+      const info = await callServer<{ settings: { requireDueDate: boolean } }>(s!.spec, 'tasks_info', {});
+      assert.equal(info.settings.requireDueDate, false);
+    } finally {
+      await api.settings.update('requireDueDate', undefined, vscode.ConfigurationTarget.Global);
+    }
+    assert.equal(JSON.parse(api.ai.current()[0]!.spec.env.TASKSMD_SETTINGS!)['tasksmd.requireDueDate'], true);
   });
 
   test('turning tasksmd.mcp.autoRegister off removes the server', async () => {

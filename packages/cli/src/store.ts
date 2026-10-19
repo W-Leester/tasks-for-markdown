@@ -50,6 +50,20 @@ export function replaceLine(abs: string, line: number, expected: string, newText
   return insert?.position === 'above' && !deleteOriginal ? line + extra.length : line;
 }
 
+/**
+ * Insert a line where `place` says, relative to the task at `line` (M32: below its notes and subtasks). Checks the
+ * task line's text first when `expected` is given. Returns the new line's index, or undefined when `place` finds no task.
+ */
+export function insertPlaced(abs: string, line: number, expected: string | undefined, place: (lines: readonly string[]) => { after: number; text: string } | undefined): number | undefined {
+  const doc = read(abs);
+  if (expected !== undefined) check(abs, doc, line, expected);
+  const at = place(doc.lines);
+  if (!at) return undefined;
+  doc.lines.splice(at.after + 1, 0, at.text);
+  write(abs, doc);
+  return at.after + 1;
+}
+
 /** Insert a new line after `line` (a blank line is replaced; `Infinity` appends). Returns the new line's index. */
 export function insertLine(abs: string, line: number, text: string): number {
   const doc = read(abs);

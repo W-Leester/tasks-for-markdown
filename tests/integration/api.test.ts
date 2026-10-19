@@ -22,6 +22,27 @@ suite('public API (getAPI(1))', () => {
     internal.index.removeFile(uri.toString());
   });
 
+  test('create below a task (M32): after its notes and subtasks, or as its last subtask', async () => {
+    const BELOW = 'api-below.md';
+    const uri = fixtureUri(BELOW);
+    fs.writeFileSync(uri.fsPath, ['- [ ] 보고서 작성 📅 2026-10-25', '  - 메모: 3장까지', '  - [ ] 자료 조사', '    - 출처 정리', '- [ ] 발표 준비', ''].join('\n'));
+    try {
+      const lines = () => fs.readFileSync(uri.fsPath, 'utf8').split('\n');
+      const after = await api.edit.create({ description: '후속: 검토 요청', due: '2026-10-26' }, { path: BELOW, below: 0, expectedText: '- [ ] 보고서 작성 📅 2026-10-25' });
+      assert.strictEqual(after.line, 4);
+      assert.deepStrictEqual(lines().slice(0, 6), ['- [ ] 보고서 작성 📅 2026-10-25', '  - 메모: 3장까지', '  - [ ] 자료 조사', '    - 출처 정리', '- [ ] 후속: 검토 요청 📅 2026-10-26', '- [ ] 발표 준비']);
+      await api.edit.create({ description: '표 정리', due: '2026-10-24', notes: ['2장 표'] }, { path: BELOW, below: 0, asSubtask: true });
+      assert.deepStrictEqual(lines().slice(3, 7), ['    - 출처 정리', '  - [ ] 표 정리 📅 2026-10-24', '    - 2장 표', '- [ ] 후속: 검토 요청 📅 2026-10-26']);
+      await assert.rejects(api.edit.create({ description: 'x', due: '2026-10-24' }, { path: BELOW, below: 0, expectedText: 'nope' }), (e: { code: string }) => e.code === 'STALE_LINE');
+      await assert.rejects(api.edit.create({ description: 'x', due: '2026-10-24' }, { path: BELOW, below: 1 }), (e: { code: string }) => e.code === 'INVALID_ARGUMENT');
+      await assert.rejects(api.edit.create({ description: 'x', due: '2026-10-24' }, { path: BELOW, below: 0, line: 0 }), (e: { code: string }) => e.code === 'INVALID_ARGUMENT');
+      assert.ok(api.features.includes('insert.below'));
+    } finally {
+      fs.unlinkSync(uri.fsPath);
+      internal.index.removeFile(uri.toString());
+    }
+  });
+
   test('version check and read-only calls', async () => {
     assert.strictEqual(api.version, 1);
     const ex = await getExports();

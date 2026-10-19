@@ -132,14 +132,24 @@ export function createMcpServer(opts: McpOptions): McpServer {
   server.registerTool('tasks_create', {
     annotations: EDIT,
     title: 'Create a task',
-    description: 'Append a task to a file (or insert after a 0-based line). Give the description without field emojis and use the typed fields; the line is written in canonical field order. The file is created if missing.',
-    inputSchema: { ...fields, description: z.string().describe('Task text, may contain #tags'), tags: z.array(z.string()).optional().describe('Tags to append to the description, with or without #'), file: z.string().describe('Workspace-relative Markdown file'), afterLine: z.number().int().min(0).optional() },
-  }, async ({ file, afterLine, description, tags, notes, status, ...rest }) => guard(() => {
+    description: 'Append a task to a file, or put it below an existing task with "below" (its 0-based line): after that task\'s notes and subtasks at the same depth, or as its last subtask with asSubtask. Use "below" — not afterLine — to add a task after another one: afterLine inserts right after that exact line, so a task with notes or subtasks would hand them to the new task. Give the description without field emojis and use the typed fields; the line is written in canonical field order. The file is created if missing.',
+    inputSchema: {
+      ...fields,
+      description: z.string().describe('Task text, may contain #tags'),
+      tags: z.array(z.string()).optional().describe('Tags to append to the description, with or without #'),
+      file: z.string().describe('Workspace-relative Markdown file'),
+      below: z.number().int().min(0).optional().describe('0-based line of a task in `file`: the new task goes after its notes and subtasks, at the same depth'),
+      asSubtask: z.boolean().optional().describe('With below: add it as that task\'s last subtask instead'),
+      expectedText: z.string().optional().describe('With below: the task line\'s current text; refused if it changed'),
+      afterLine: z.number().int().min(0).optional().describe('Insert right after this exact 0-based line (a blank line is replaced)'),
+    },
+  }, async ({ file, afterLine, below, asSubtask, expectedText, description, tags, notes, status, ...rest }) => guard(() => {
     const w = ws();
     if (w.cfg.requireDueDate && !rest.due) throw new CliError('INVALID_ARGUMENT', 'A due date is required (tasksmd.requireDueDate): pass "due"');
     const tagText = (tags ?? []).map((x) => (x.startsWith('#') ? x : `#${x}`)).filter((x) => !description.includes(x));
     // The due date arrives as a typed field and is applied right after; it was checked above.
-    const created = addTask(w, [description.trim(), ...tagText].join(' '), file, afterLine, { dueChecked: true, notes });
+    if (below === undefined && (asSubtask !== undefined || expectedText !== undefined)) throw new CliError('INVALID_ARGUMENT', 'asSubtask and expectedText go with "below"');
+    const created = addTask(w, [description.trim(), ...tagText].join(' '), file, afterLine, { dueChecked: true, notes, ...(below !== undefined ? { below: { line: below, expected: expectedText, asSubtask } } : {}) });
     const values: Record<string, string | string[] | null> = {};
     for (const [k, v] of Object.entries(rest)) if (v !== undefined) values[k] = v as string | string[] | null;
     if (!Object.keys(values).length && status === undefined) return created;

@@ -107,6 +107,25 @@ describe('MCP server', () => {
     expect(missing.data.error.code).toBe('NOT_FOUND');
   });
 
+  it('tasks_create below (M32): after the task\'s notes and subtasks, or as its last subtask', async () => {
+    fs.writeFileSync(path.join(root, 'notes', 'proj.md'), ['- [ ] 보고서 작성 📅 2026-10-25', '  - 메모: 3장까지', '  - [ ] 자료 조사', '    - 출처 정리', '- [ ] 발표 준비', ''].join('\n'));
+    const after = await call('tasks_create', { file: 'notes/proj.md', description: '후속: 검토 요청', due: '2026-10-26', below: 0, expectedText: '- [ ] 보고서 작성 📅 2026-10-25' });
+    expect(after.isError).toBe(false);
+    expect(after.data).toMatchObject({ line: 4, description: '후속: 검토 요청' });
+    expect(read('notes/proj.md').split('\n').slice(0, 6)).toEqual(['- [ ] 보고서 작성 📅 2026-10-25', '  - 메모: 3장까지', '  - [ ] 자료 조사', '    - 출처 정리', '- [ ] 후속: 검토 요청 📅 2026-10-26', '- [ ] 발표 준비']);
+    // Its notes still belong to it.
+    const first = await call('tasks_get', { path: 'notes/proj.md', line: 0 });
+    expect(first.data.notes.map((n: { text: string }) => n.text)).toEqual(['메모: 3장까지']);
+    const sub = await call('tasks_create', { file: 'notes/proj.md', description: '표 정리', due: '2026-10-24', below: 0, asSubtask: true, notes: ['2장 표'] });
+    expect(sub.isError).toBe(false);
+    expect(read('notes/proj.md').split('\n').slice(3, 7)).toEqual(['    - 출처 정리', '  - [ ] 표 정리 📅 2026-10-24', '    - 2장 표', '- [ ] 후속: 검토 요청 📅 2026-10-26']);
+    const stale = await call('tasks_create', { file: 'notes/proj.md', description: 'x', due: '2026-10-24', below: 0, expectedText: 'nope' });
+    expect(stale.isError).toBe(true);
+    expect((await call('tasks_create', { file: 'notes/proj.md', description: 'x', due: '2026-10-24', below: 1 })).isError).toBe(true);
+    expect((await call('tasks_create', { file: 'notes/proj.md', description: 'x', due: '2026-10-24', below: 0, afterLine: 0 })).isError).toBe(true);
+    expect((await call('tasks_info')).data.features).toContain('insert.below');
+  });
+
   it('notes (M17): create with notes and tags, add one, replace all; info reports settings; syntax mentions notes', async () => {
     const created = await call('tasks_create', { file: 'notes/todo.md', description: 'contract review', tags: ['work', '#legal'], due: '2026-10-01', notes: ['clause 3'], created: '2026-09-20' });
     expect(created.isError).toBe(false);

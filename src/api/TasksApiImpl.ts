@@ -58,7 +58,7 @@ export interface TasksApiDeps {
 const MAX_LINE = Number.MAX_SAFE_INTEGER;
 
 /** Optional capabilities of this build (docs/api.md "Feature list"). Add a name whenever an additive API feature ships. */
-export const API_FEATURES: readonly ApiFeature[] = ['tree', 'notes', 'notes.add', 'info', 'events.status', 'isBlocking', 'links'];
+export const API_FEATURES: readonly ApiFeature[] = ['tree', 'notes', 'notes.add', 'info', 'events.status', 'isBlocking', 'links', 'insert.below'];
 
 /**
  * The public API (docs/api-plan.md §4). One instance per caller so the write-confirmation
@@ -186,6 +186,23 @@ export function createTasksApi(deps: TasksApiDeps, caller: ApiCaller = {}): Task
     const path = target?.path ?? deps.settings.get('calendar.newTaskFile');
     if (!path) fail('INVALID_ARGUMENT', 'target.path is required (or set tasksmd.calendar.newTaskFile)');
     const uri = uriForPath(path);
+    const below = target?.below;
+    if (below === undefined && (target?.asSubtask !== undefined || target?.expectedText !== undefined)) fail('INVALID_ARGUMENT', 'target.asSubtask and target.expectedText go with target.below');
+    if (below !== undefined) {
+      // Below a task (M32): past its notes and subtasks, so they stay with it.
+      if (target?.line !== undefined) fail('INVALID_ARGUMENT', 'Give target.line or target.below, not both');
+      if (!Number.isInteger(below) || below < 0) fail('INVALID_ARGUMENT', 'target.below must be a non-negative integer');
+      try {
+        await vscode.workspace.fs.stat(uri);
+      } catch {
+        fail('NOT_FOUND', `No such file: ${path}`);
+      }
+      logWrite('edit.create', `${path}: below ${below + 1}`);
+      const at = await deps.editService.insertTaskUnder(uri, below, task, { expected: target?.expectedText, asSubtask: target?.asSubtask === true, notes: notesOf(input) });
+      if (at === undefined) fail('INVALID_ARGUMENT', `Line ${below + 1} of ${path} is not a task`);
+      const written = deps.index.taskAt(uri.toString(), at);
+      return dto(written ?? task.with({ location: { ...task.location, key: uri.toString(), path: deps.indexService.displayPath(uri), line: at } } as Partial<Task>));
+    }
     try {
       await vscode.workspace.fs.stat(uri);
     } catch {

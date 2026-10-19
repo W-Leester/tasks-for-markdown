@@ -150,8 +150,17 @@ export interface NewTask extends TaskFieldChanges {
 export interface CreateTarget {
   /** Workspace-relative Markdown file. Created if it does not exist. Defaults to `tasksmd.calendar.newTaskFile`. */
   path?: string;
-  /** Insert after this 0-based line (a blank line is replaced). Omit to append at the end of the file. */
+  /** Insert right after this exact 0-based line (a blank line is replaced). Omit to append at the end of the file. To add a task after another task, use `below`. */
   line?: number;
+  /**
+   * 0-based line of a task in `path` (feature `insert.below`): the new task goes after that task's notes and subtasks,
+   * at the same depth and with the same bullet. `line` would put it right after the task line and hand them to it.
+   */
+  below?: number;
+  /** With `below`: add it as that task's last subtask instead. */
+  asSubtask?: boolean;
+  /** With `below`: the task line's current text; `STALE_LINE` if it changed. */
+  expectedText?: string;
 }
 
 export interface QueryRunOptions {
@@ -225,7 +234,7 @@ export interface TaskStatusChangeEvent {
  * Names of optional capabilities, so a caller can check what the installed extension supports
  * (all within API version 1). See docs/api.md "Feature list" for the version each was added in.
  */
-export type ApiFeature = 'tree' | 'notes' | 'notes.add' | 'info' | 'events.status' | 'isBlocking' | 'links';
+export type ApiFeature = 'tree' | 'notes' | 'notes.add' | 'info' | 'events.status' | 'isBlocking' | 'links' | 'insert.below';
 
 export interface ApiInfo {
   /** Version of the installed extension, e.g. `1.0.0`. */

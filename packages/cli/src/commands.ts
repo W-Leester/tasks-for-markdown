@@ -9,8 +9,8 @@ import { applyFieldValues, type FieldValues } from '../../../src/services/taskFi
 import type { CliConfig } from './config';
 import { registryFrom } from './config';
 import { buildIndex, indexFile, relPath } from './scan';
-import { StaleLineError, deleteLine, insertLine, readLine, replaceLine, rewriteAround } from './store';
-import { addNoteLines, cleanNoteTexts, setNoteLines } from '../../../src/core/file';
+import { StaleLineError, deleteLine, insertLine, insertPlaced, readLine, replaceLine, rewriteAround } from './store';
+import { addNoteLines, cleanNoteTexts, insertAfterTask, insertUnderTask, placeTaskLine, setNoteLines } from '../../../src/core/file';
 
 export class CliError extends Error {
   constructor(readonly code: string, message: string, readonly details?: unknown) {
@@ -94,14 +94,33 @@ function afterWrite(ws: Workspace, abs: string, line: number): TaskDto {
 }
 
 /** `add`: a task line (with or without the `- [ ] ` prefix) appended to a file or inserted after a line. */
-export function addTask(ws: Workspace, lineText: string, file: string, line?: number, opts: { dueChecked?: boolean; notes?: readonly string[] } = {}): TaskDto {
+/** Where `add` puts the task relative to an existing one (M32): after its whole block, or as its last subtask. */
+export interface BelowTask {
+  /** 0-based line of the task. */
+  line: number;
+  expected?: string;
+  asSubtask?: boolean;
+}
+
+export function addTask(ws: Workspace, lineText: string, file: string, line?: number, opts: { dueChecked?: boolean; notes?: readonly string[]; below?: BelowTask } = {}): TaskDto {
   const raw = /^\s*[-*+]\s+\[.\]/.test(lineText) ? lineText : `- [ ] ${lineText.trim()}`;
   let task = parseTaskLine(raw, { statusRegistry: ws.registry, globalFilter: ws.cfg.globalFilter || undefined });
   if (!task) throw new CliError('INVALID_ARGUMENT', `Not a task line: ${raw}`);
   if (ws.cfg.setCreatedDate && !task.created) task = task.with({ created: DateField.fromDate(ws.today) });
   if (ws.cfg.requireDueDate && !opts.dueChecked && !task.due) throw new CliError('INVALID_ARGUMENT', 'A due date is required (tasksmd.requireDueDate)');
   const abs = absOf(ws, file);
-  const at = insertLine(abs, line ?? Number.POSITIVE_INFINITY, serializeTask(task.with({ indentation: '' }), ws.cfg.taskFormat));
+  const written = serializeTask(task.with({ indentation: '' }), ws.cfg.taskFormat);
+  const below = opts.below;
+  if (below && line !== undefined) throw new CliError('INVALID_ARGUMENT', 'Give a line or a task to go below, not both');
+  if (below && !fs.existsSync(abs)) throw new CliError('NOT_FOUND', `No such file: ${file}`);
+  // Below a task: past its notes and subtasks, so they stay with it (a plain line insert handed them to the new task).
+  const at = below
+    ? insertPlaced(abs, below.line, below.expected, (lines) => {
+        const place = (below.asSubtask ? insertUnderTask : insertAfterTask)(lines, below.line);
+        return place && { after: place.after, text: placeTaskLine(place, written) };
+      })
+    : insertLine(abs, line ?? Number.POSITIVE_INFINITY, written);
+  if (at === undefined) throw new CliError('INVALID_ARGUMENT', `Line ${below!.line + 1} of ${file} is not a task`);
   const notes = cleanNoteTexts(opts.notes ?? []);
   if (notes.length) {
     const written = afterWrite(ws, abs, at);
@@ -163,7 +182,7 @@ export function postpone(ws: Workspace, ref: { path: string; line: number }, to:
 }
 
 /** Optional capabilities of the CLI/MCP (same names as the extension API's `features`, minus editor-only events). */
-export const CLI_FEATURES = ['tree', 'notes', 'notes.add', 'info', 'isBlocking'] as const;
+export const CLI_FEATURES = ['tree', 'notes', 'notes.add', 'info', 'isBlocking', 'insert.below'] as const;
 
 /** `info` / tasks_info: version, capabilities and the settings that change what edits are accepted. */
 export function info(ws: Workspace, version: string): { version: string; features: string[]; settings: { requireDueDate: boolean; taskFormat: string; globalFilter: string } } {

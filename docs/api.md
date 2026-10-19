@@ -49,6 +49,7 @@ if (info.settings.requireDueDate) { /* 만들기 화면에서 마감일을 필�
 | `events.status` | 1.0.0 | `events.onDidChangeStatus` |
 | `isBlocking` | 1.0.0 | `TaskDto.isBlocking` |
 | `links` | 1.1.0 | `ui.link`, 태스크 링크(8a절) |
+| `insert.below` | 1.1.5 | `create`의 `target.below`(태스크의 메모·하위 항목 뒤, 같은 깊이)·`asSubtask`·`expectedText`. CLI `add --below`, MCP `tasks_create`의 `below` |
 
 ## 2. 메서드
 
@@ -66,7 +67,7 @@ if (info.settings.requireDueDate) { /* 만들기 화면에서 마감일을 필�
 
 | 메서드 | 설명 |
 |---|---|
-| `create(input, target?)` | 새 태스크. `input`: `description`(필수), `tags`, `priority`('0'~'5'), 날짜들, `recurrence`, `onCompletion`, `id`, `dependsOn`, `status`, `notes`. `target.path`(없으면 `tasksmd.calendar.newTaskFile`), `target.line`(없으면 파일 끝). 파일이 없으면 만듭니다. **마감일 필수:** 설정 `tasksmd.requireDueDate`가 켜져 있으면(기본값) `due`가 없을 때 `INVALID_ARGUMENT`. 현재 값은 `info().settings.requireDueDate` |
+| `create(input, target?)` | 새 태스크. `input`: `description`(필수), `tags`, `priority`('0'~'5'), 날짜들, `recurrence`, `onCompletion`, `id`, `dependsOn`, `status`, `notes`. `target.path`(없으면 `tasksmd.calendar.newTaskFile`), `target.line`(그 줄 **바로** 다음, 없으면 파일 끝). 파일이 없으면 만듭니다. **다른 태스크 다음에 넣을 때는 `target.below`**(그 태스크의 0부터 센 줄): 메모·하위 항목을 건너뛰어 그 뒤에 같은 깊이·같은 글머리 기호로 넣습니다. `line`으로 넣으면 그 태스크의 메모·하위 태스크가 새 태스크 밑으로 넘어갑니다. `target.asSubtask: true`면 그 태스크의 마지막 하위 태스크로, `target.expectedText`가 다르면 `STALE_LINE`, 태스크 줄이 아니거나 `line`과 함께 주면 `INVALID_ARGUMENT`(1.1.5, 기능 `insert.below`). **마감일 필수:** 설정 `tasksmd.requireDueDate`가 켜져 있으면(기본값) `due`가 없을 때 `INVALID_ARGUMENT`. 현재 값은 `info().settings.requireDueDate` |
 | `update(ref, changes)` | 필드 변경. `null`은 그 필드 제거. `status`가 있으면 마지막에 상태 변경으로 적용 |
 | `setStatus(ref, symbol)` | 상태 기호(`x`, `/`, `-` …). 완료·취소 날짜와 반복 다음 회차는 UI에서 클릭한 것과 똑같이 처리 |
 | `toggle(ref)` | 상태의 다음 기호로 |
@@ -203,6 +204,8 @@ tasksmd list --file notes/todo.md --json
 tasksmd explain "priority is above none"
 tasksmd note notes/todo.md:12 "법무팀 회신 받음"        # 메모 한 줄 추가
 tasksmd add "계약서 검토 📅 2026-10-01" --file notes/todo.md --note "3조 확인"
+tasksmd add "후속: 검토 요청 📅 2026-10-26" --file notes/todo.md --below 12          # 12번 줄 태스크의 메모·하위 뒤에
+tasksmd add "표 정리 📅 2026-10-24" --file notes/todo.md --below 12 --subtask    # 그 태스크의 하위 태스크로
 tasksmd set notes/todo.md:12 --notes "첫 메모\n둘째 메모"  # 메모 전체 교체(--notes none 이면 삭제)
 tasksmd info                                        # 버전, 기능 목록, requireDueDate 등 설정
 ```
@@ -245,7 +248,7 @@ VS Code는 `.vscode/mcp.json`(맨 위 키가 `servers`):
 | `tasks_explain_query { query }` | 쿼리 해석과 문법 오류(실행 안 함) |
 | `tasks_get { path, line }` | 태스크 하나 |
 | `tasks_list_saved_queries` | 저장된 쿼리 목록 |
-| `tasks_create { file, description, afterLine?, due?, priority?, tags?, notes?, created?, … }` | 생성(파일 끝 또는 지정 줄 뒤). `tags`는 설명 끝에 붙이고, `notes`는 태스크 아래 메모로. 마감일 필수 설정이 켜져 있으면 `due` 필요 |
+| `tasks_create { file, description, below?, asSubtask?, expectedText?, afterLine?, due?, priority?, tags?, notes?, created?, … }` | 생성(파일 끝, `below`면 그 태스크의 메모·하위 항목 뒤 같은 깊이, `asSubtask`면 그 태스크의 하위로, `afterLine`은 그 줄 바로 뒤). `tags`는 설명 끝에 붙이고, `notes`는 태스크 아래 메모로. 마감일 필수 설정이 켜져 있으면 `due` 필요 |
 | `tasks_update { path, line, expectedText?, …fields, notes? }` | 필드 변경(`null`은 제거), `notes`는 메모 전체 교체, `status`는 마지막에. 날짜 필드는 `due`·`scheduled`·`start`·`created`·`done`·`cancelled` |
 | `tasks_add_note { path, line, expectedText?, text }` | 메모 한 줄 추가 |
 | `tasks_info` | 버전, 기능 목록, `requireDueDate` 등 쓰기에 영향을 주는 설정 |

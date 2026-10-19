@@ -49,6 +49,7 @@ if (info.settings.requireDueDate) { /* make the due date mandatory in your creat
 | `events.status` | 1.0.0 | `events.onDidChangeStatus` |
 | `isBlocking` | 1.0.0 | `TaskDto.isBlocking` |
 | `links` | 1.1.0 | `ui.link`, task links (§8a) |
+| `insert.below` | 1.1.5 | `create`'s `target.below` (after a task's notes and subtasks, same depth), `asSubtask`, `expectedText`. CLI `add --below`, MCP `tasks_create`'s `below` |
 - Requirements: the extension is installed and activated in the same VS Code/Cursor window, and a workspace folder is open. Outside the editor use the library, the CLI or the MCP server (§6–8).
 
 ## 2. Methods
@@ -67,7 +68,7 @@ if (info.settings.requireDueDate) { /* make the due date mandatory in your creat
 
 | Method | What it does |
 |---|---|
-| `create(input, target?)` | New task. `input`: `description` (required), `tags`, `priority` ('0'–'5'), dates, `recurrence`, `onCompletion`, `id`, `dependsOn`, `status`, `notes`. `target.path` (defaults to `tasksmd.calendar.newTaskFile`), `target.line` (defaults to end of file). The file is created if missing. **Due date required:** with `tasksmd.requireDueDate` on (the default), a missing `due` fails with `INVALID_ARGUMENT`; the current value is `info().settings.requireDueDate` |
+| `create(input, target?)` | New task. `input`: `description` (required), `tags`, `priority` ('0'–'5'), dates, `recurrence`, `onCompletion`, `id`, `dependsOn`, `status`, `notes`. `target.path` (defaults to `tasksmd.calendar.newTaskFile`), `target.line` (right after that exact line; defaults to end of file). The file is created if missing. **To add a task after another task use `target.below`** (that task's 0-based line): it skips the task's notes and subtasks and inserts at the same depth with the same bullet — with `line` the task's notes and subtasks would move under the new task. `target.asSubtask: true` makes it the task's last subtask; a changed `target.expectedText` fails with `STALE_LINE`; a line that is not a task, or both `line` and `below`, fail with `INVALID_ARGUMENT` (1.1.5, feature `insert.below`). **Due date required:** with `tasksmd.requireDueDate` on (the default), a missing `due` fails with `INVALID_ARGUMENT`; the current value is `info().settings.requireDueDate` |
 | `update(ref, changes)` | Change fields; `null` removes a field. `status`, if present, is applied last |
 | `setStatus(ref, symbol)` | Status symbol (`x`, `/`, `-` …). Done/cancelled dates and the next recurrence behave exactly like a click in the UI |
 | `toggle(ref)` | Move to the status' next symbol |
@@ -205,6 +206,8 @@ tasksmd saved
 tasksmd explain "priority is above none"
 tasksmd note notes/todo.md:12 "Reply received"          # add one note
 tasksmd add "Contract review 📅 2026-10-01" --file notes/todo.md --note "Check clause 3"
+tasksmd add "Follow-up: ask for review 📅 2026-10-26" --file notes/todo.md --below 12   # after line 12's notes and subtasks
+tasksmd add "Tidy the tables 📅 2026-10-24" --file notes/todo.md --below 12 --subtask    # as its subtask
 tasksmd set notes/todo.md:12 --notes "first\nsecond"      # replace all notes (--notes none removes them)
 tasksmd info                                           # version, features, settings such as requireDueDate
 ```
@@ -247,7 +250,7 @@ VS Code: `.vscode/mcp.json` (the top-level key is `servers`):
 | `tasks_explain_query { query }` | Explanation and syntax errors, without running |
 | `tasks_get { path, line }` | One task |
 | `tasks_list_saved_queries` | Saved queries |
-| `tasks_create { file, description, afterLine?, due?, priority?, tags?, notes?, created?, … }` | Create (end of file, or after a line). `tags` are appended to the description, `notes` become notes under the task. Needs `due` when the due-date requirement is on |
+| `tasks_create { file, description, below?, asSubtask?, expectedText?, afterLine?, due?, priority?, tags?, notes?, created?, … }` | Create (end of file; `below`: after that task's notes and subtasks at the same depth, `asSubtask`: as its subtask; `afterLine`: right after that exact line). `tags` are appended to the description, `notes` become notes under the task. Needs `due` when the due-date requirement is on |
 | `tasks_update { path, line, expectedText?, …fields, notes? }` | Change fields (`null` removes); `notes` replaces all notes; `status` last. Date fields: `due`, `scheduled`, `start`, `created`, `done`, `cancelled` |
 | `tasks_add_note { path, line, expectedText?, text }` | Add one note |
 | `tasks_info` | Version, features and the settings that affect writes, such as `requireDueDate` |

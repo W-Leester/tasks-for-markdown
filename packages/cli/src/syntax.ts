@@ -17,6 +17,7 @@ Notes are plain bullets (no checkbox) indented one level directly under the task
     - Clause 3 penalty: check with legal      ← note
     - [ ] Email legal                         ← sub-task, not a note
 Use tasks_add_note (one note) or the \`notes\` argument of tasks_create/tasks_update (replace all). Returned tasks carry \`notes: [{ line, text }]\`.
+To add a task after another one, pass that task's line as \`below\` to tasks_create (not afterLine): it goes after the task's notes and sub-tasks at the same depth, so they stay with their task. \`asSubtask: true\` adds it as the task's last sub-task.
 
 ## Rules the workspace may enforce
 - A due date is required by default (setting tasksmd.requireDueDate): tasks_create without \`due\` fails with INVALID_ARGUMENT. Call tasks_info to see the current settings.

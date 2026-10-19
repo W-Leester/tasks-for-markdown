@@ -19,6 +19,9 @@ Usage:
   tasksmd explain <query text>                        show how the query is understood
   tasksmd add <task line> --file <path> [--line N] [--note <text>]
                                                       append (or insert after line N) a task, optionally with a note
+             [--below N [--subtask] [--expect <text>]]
+                                                      below the task on line N, after its notes and subtasks
+                                                      (--subtask: as its last subtask)
   tasksmd done <path:line> [--expect <text>]          mark done (dates + recurrence like the editor)
   tasksmd status <path:line> <symbol> [--expect]      set the status symbol (x, /, -, space…)
   tasksmd set <path:line> [--due D] [--scheduled D] [--start D] [--priority 0-5]
@@ -67,7 +70,7 @@ function parseArgs(argv: string[]): Parsed {
   }
   return { positional, flags };
 }
-const BOOLEAN_FLAGS = new Set(['json', 'md', 'help', 'version']);
+const BOOLEAN_FLAGS = new Set(['json', 'md', 'help', 'version', 'subtask']);
 /** Flags any invocation may carry; anything else without a command is a typo, not a request for the help page. */
 const GLOBAL_FLAGS = new Set(['root', 'json', 'md', 'today', 'help', 'version']);
 
@@ -160,8 +163,11 @@ export async function run(argv: string[], io: Io, isTTY = false): Promise<number
         const file = str(flags, 'file');
         if (!file) throw new CliError('INVALID_ARGUMENT', '--file <path> is required');
         const lineFlag = str(flags, 'line');
+        const belowFlag = str(flags, 'below');
         const note = str(flags, 'note');
-        const t = addTask(ws, rest.join(' '), file, lineFlag ? Number(lineFlag) - 1 : undefined, note ? { notes: [note] } : {});
+        if (belowFlag !== undefined && !/^[1-9]\d*$/.test(belowFlag)) throw new CliError('INVALID_ARGUMENT', '--below needs a line number (1-based)');
+        const below = belowFlag ? { line: Number(belowFlag) - 1, expected, asSubtask: flags.subtask === true } : undefined;
+        const t = addTask(ws, rest.join(' '), file, lineFlag ? Number(lineFlag) - 1 : undefined, { ...(note ? { notes: [note] } : {}), ...(below ? { below } : {}) });
         emit(t, () => [`added ${fmtTask(t)}`]);
         return 0;
       }

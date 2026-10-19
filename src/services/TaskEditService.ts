@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { dayjs, type Dayjs } from '../core/dates/dayjs';
 import { StatusType, type StatusRegistry, type Status, type Task, type TaskFields, applyStatusChange, generateTaskId, serializeTask } from '../core/task';
 import type { TaskIndex } from '../core/index';
-import { cleanNoteTexts, insertAfterTask, newTaskLine, noteBlock } from '../core/file';
+import { cleanNoteTexts, insertAfterTask, insertUnderTask, newTaskLine, noteBlock, placeTaskLine } from '../core/file';
 import { t } from '../l10n';
 import type { IndexService } from '../index/IndexService';
 import type { Settings } from '../settings/Settings';
@@ -154,6 +154,25 @@ export class TaskEditService {
       if (!at) throw new Error(t('That task is no longer at line {0}; the view has been refreshed.', line + 1));
       edit.insert(uri, doc.lineAt(at.after).range.end, eol + newTaskLine(at, typed));
       return at.after + 1;
+    });
+  }
+
+  /**
+   * Write `task` below the task on `line` (M32): after its notes and subtasks at the same depth, or as its last
+   * subtask. Checks the line's text when `expected` is given. Returns the new line, or undefined if `line` is no task.
+   */
+  async insertTaskUnder(uri: vscode.Uri, line: number, task: Task, opts: { expected?: string; asSubtask?: boolean; notes?: readonly string[] } = {}): Promise<number | undefined> {
+    const doc = await vscode.workspace.openTextDocument(uri);
+    const expected = opts.expected ?? (line < doc.lineCount ? doc.lineAt(line).text : '');
+    const written = serializeTask(task.with({ indentation: '' }), this.deps.settings.get('taskFormat'));
+    return this.withLine(uri, line, expected, (d, edit, eol) => {
+      const place = (opts.asSubtask ? insertUnderTask : insertAfterTask)(docLines(d), line);
+      if (!place) return undefined;
+      const text = placeTaskLine(place, written);
+      const indent = /^[ \t]*/.exec(text)![0];
+      const notes = cleanNotes(opts.notes ?? []).map((n) => `${indent}  - ${n}`);
+      edit.insert(uri, d.lineAt(place.after).range.end, eol + [text, ...notes].join(eol));
+      return place.after + 1;
     });
   }
 

@@ -133,6 +133,29 @@ describe('tasksmd CLI', () => {
     expect(JSON.parse(out.join('\n'))).toMatchObject({ features: expect.arrayContaining(['notes', 'notes.add', 'isBlocking']), settings: { requireDueDate: true } });
   });
 
+  it('add --below (M32): after the task\'s notes and subtasks, same depth; --subtask as its last child', async () => {
+    const proj = ['# 프로젝트', '', '- [ ] 보고서 작성 📅 2026-10-25', '  - 메모: 3장까지', '  - [ ] 자료 조사', '    - 출처 정리', '- [ ] 발표 준비', ''];
+    fs.writeFileSync(path.join(root, 'notes', 'proj.md'), proj.join('\n'));
+    // --line puts it right after the line, which hands the notes and the subtask to the new task: --below does not.
+    expect(await cli('add', '후속: 검토 요청 📅 2026-10-26', '--file', 'notes/proj.md', '--below', '3', '--json')).toBe(0);
+    expect(JSON.parse(out.join('\n'))).toMatchObject({ line: 6, description: '후속: 검토 요청' });
+    expect(read('notes/proj.md').split('\n').slice(2, 8)).toEqual(['- [ ] 보고서 작성 📅 2026-10-25', '  - 메모: 3장까지', '  - [ ] 자료 조사', '    - 출처 정리', '- [ ] 후속: 검토 요청 📅 2026-10-26', '- [ ] 발표 준비']);
+    expect(await cli('add', '초안 쓰기 📅 2026-10-24', '--file', 'notes/proj.md', '--below', '5', '--expect', '  - [ ] 자료 조사', '--json')).toBe(0);
+    expect(read('notes/proj.md').split('\n').slice(4, 8)).toEqual(['  - [ ] 자료 조사', '    - 출처 정리', '  - [ ] 초안 쓰기 📅 2026-10-24', '- [ ] 후속: 검토 요청 📅 2026-10-26']);
+    expect(await cli('add', '표 정리 📅 2026-10-24', '--file', 'notes/proj.md', '--below', '3', '--subtask', '--json')).toBe(0);
+    expect(read('notes/proj.md').split('\n').slice(2, 9)).toEqual(['- [ ] 보고서 작성 📅 2026-10-25', '  - 메모: 3장까지', '  - [ ] 자료 조사', '    - 출처 정리', '  - [ ] 초안 쓰기 📅 2026-10-24', '  - [ ] 표 정리 📅 2026-10-24', '- [ ] 후속: 검토 요청 📅 2026-10-26']);
+    // The line changed, is not a task, or both --line and --below: refused, nothing written.
+    const before = read('notes/proj.md');
+    err = [];
+    expect(await cli('add', 'x 📅 2026-10-24', '--file', 'notes/proj.md', '--below', '3', '--expect', '- [ ] something else')).toBe(1);
+    expect(await cli('add', 'x 📅 2026-10-24', '--file', 'notes/proj.md', '--below', '4')).toBe(2); // not a task: invalid argument
+    expect(await cli('add', 'x 📅 2026-10-24', '--file', 'notes/proj.md', '--below', '3', '--line', '3')).toBe(2);
+    expect(read('notes/proj.md')).toBe(before);
+    out = [];
+    expect(await cli('info', '--json')).toBe(0);
+    expect(JSON.parse(out.join('\n')).features).toContain('insert.below');
+  });
+
   it('help and unknown command', async () => {
     expect(await cli('--help')).toBe(2);
     expect(out[0]).toContain('Usage');

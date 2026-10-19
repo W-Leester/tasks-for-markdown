@@ -127,7 +127,7 @@
   "tasksmd.config.rendered.fieldsAlign.columns": "Columns: status | description + priority + tags | due | created | everything else, aligned from row to row.",
   "tasksmd.config.rendered.fieldsAlign.right": "Description on the left, fields pushed to the right edge of the column.",
   "tasksmd.config.rendered.fieldsAlign.inline": "Fields directly after the description, like the source line.",
-  "tasksmd.config.requireDueDate": "Require a due date: the create dialog, the API, the CLI and the MCP server refuse a new task without 📅, and the editor warns on open tasks that have none.",
+  "tasksmd.config.requireDueDate": "Require a due date: the create dialog, the API, the CLI and the MCP server refuse a new task without 📅, and the editor marks open tasks that have none with faint dots under their first letters (not listed in Problems).",
   "tasksmd.config.rendered.sourceWhenNoTasks": "When the rendered view is the default editor for Markdown, open notes that contain no tasks in the text editor instead.",
   "tasksmd.renderedAsDefault.title": "Rendered view as default editor",
   "tasksmd.config.rendered.maxWidth": "Maximum width (px) of the rendered view's text column, including query result boxes. 0 = full editor width.",

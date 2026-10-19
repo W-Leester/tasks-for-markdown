@@ -101,7 +101,9 @@ export class TaskDiagnostics implements vscode.CodeActionProvider, vscode.Dispos
         }
       }
       if (this.deps.settings.get('requireDueDate') && !task.isCompleted && !task.due) {
-        const d = new vscode.Diagnostic(rangeOf(doc, line, task.description || text.trim()), t('Open task without a due date (tasksmd.requireDueDate).'), vscode.DiagnosticSeverity.Warning);
+        // A hint (faint dots under the first letters, not in Problems): a missing date is a reminder, not a mistake —
+        // as a warning it underlined every line of a checklist (10-19).
+        const d = new vscode.Diagnostic(rangeOf(doc, line, task.description || text.trim()), t('Open task without a due date (tasksmd.requireDueDate).'), vscode.DiagnosticSeverity.Hint);
         d.code = CODE_MISSING_DUE;
         d.source = DIAG_SOURCE;
         diags.push(d);

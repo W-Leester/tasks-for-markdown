@@ -43,7 +43,7 @@ export class TaskDiagnostics implements vscode.CodeActionProvider, vscode.Dispos
       vscode.workspace.onDidOpenTextDocument((d) => this.schedule(d)),
       vscode.workspace.onDidChangeTextDocument((e) => this.schedule(e.document)),
       vscode.workspace.onDidCloseTextDocument((d) => this.collection.delete(d.uri)),
-      deps.settings.onDidChange(() => this.refreshAll(), ['globalFilter', 'requireDueDate']),
+      deps.settings.onDidChange(() => this.refreshAll(), ['globalFilter', 'decorations.missingDueDate']),
     );
     const sub = deps.index.onDidChange(() => this.refreshAll());
     this.disposables.push({ dispose: () => sub.dispose() });
@@ -100,10 +100,11 @@ export class TaskDiagnostics implements vscode.CodeActionProvider, vscode.Dispos
           diags.push(d);
         }
       }
-      if (this.deps.settings.get('requireDueDate') && !task.isCompleted && !task.due) {
+      // Its own switch, off by default (10-20): requireDueDate only refuses new tasks without 📅.
+      if (this.deps.settings.get('decorations.missingDueDate') && !task.isCompleted && !task.due) {
         // A hint (faint dots under the first letters, not in Problems): a missing date is a reminder, not a mistake —
         // as a warning it underlined every line of a checklist (10-19).
-        const d = new vscode.Diagnostic(rangeOf(doc, line, task.description || text.trim()), t('Open task without a due date (tasksmd.requireDueDate).'), vscode.DiagnosticSeverity.Hint);
+        const d = new vscode.Diagnostic(rangeOf(doc, line, task.description || text.trim()), t('Open task without a due date (tasksmd.decorations.missingDueDate).'), vscode.DiagnosticSeverity.Hint);
         d.code = CODE_MISSING_DUE;
         d.source = DIAG_SOURCE;
         diags.push(d);

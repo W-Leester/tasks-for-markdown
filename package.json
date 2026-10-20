@@ -587,6 +587,11 @@
           "default": true,
           "description": "%tasksmd.config.decorations.gutterIcons%"
         },
+        "tasksmd.decorations.missingDueDate": {
+          "type": "boolean",
+          "default": false,
+          "description": "%tasksmd.config.decorations.missingDueDate%"
+        },
         "tasksmd.codeLens.mode": {
           "type": "string",
           "enum": [

@@ -312,7 +312,7 @@
   "\"{0}\" wants to modify tasks in this workspace through the Tasks API ({1}).": "\"{0}\"이(가) Tasks API로 이 워크스페이스의 태스크를 수정하려고 합니다({1}).",
   "API query": "API 쿼리",
   "A due date is required (tasksmd.requireDueDate).": "마감일이 필요합니다(tasksmd.requireDueDate).",
-  "Open task without a due date (tasksmd.requireDueDate).": "마감일이 없는 미완료 태스크입니다(tasksmd.requireDueDate).",
+  "Open task without a due date (tasksmd.decorations.missingDueDate).": "마감일이 없는 미완료 태스크입니다(tasksmd.decorations.missingDueDate).",
   "Set due date…": "마감일 설정…",
   "Sort": "정렬",
   "Document order": "문서 순",

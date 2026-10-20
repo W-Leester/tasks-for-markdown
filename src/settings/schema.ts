@@ -25,6 +25,7 @@ export interface SettingsSchema {
   'decorations.strikeCancelled': boolean;
   'decorations.dimFields': boolean;
   'decorations.gutterIcons': boolean;
+  'decorations.missingDueDate': boolean;
   'codeLens.mode': 'off' | 'cursorLine' | 'all';
   'codeLens.position': 'lineEnd' | 'above';
   'autoSuggest.enabled': boolean;
@@ -90,6 +91,7 @@ export const SETTINGS_DEFAULTS: Readonly<SettingsSchema> = {
   'decorations.strikeCancelled': true,
   'decorations.dimFields': true,
   'decorations.gutterIcons': true,
+  'decorations.missingDueDate': false,
   'codeLens.mode': 'cursorLine',
   'codeLens.position': 'lineEnd',
   'autoSuggest.enabled': true,

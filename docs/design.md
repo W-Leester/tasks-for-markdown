@@ -1077,6 +1077,7 @@ GitHub Actions: PR마다 `typecheck + lint + test`, 태그 `v*` 푸시 시 패�
 
 | 날짜 | 버전 | 내용 |
 |---|---|---|
+| 2026-10-20 | 1.18 | `missing-due-date` 진단은 새 설정 `decorations.missingDueDate`(기본 false)만 따름; `requireDueDate`는 새 태스크 거부만 |
 | 2026-10-19 | 1.17 | 마감일 없음 진단(`missing-due-date`)을 `Warning` → `Hint`(첫 글자 밑 옅은 점, Problems에 안 나옴). M33의 체크박스·렌더 보기 넣기 ➕(`appendCreated`)는 사용자 판단으로 뺌 |
 | 2026-10-19 | 1.16 | M33: `src/core/cliSettings.ts`의 `CLI_SETTING_KEYS`·`TASKSMD_SETTINGS`: 자동 등록 서버의 `serverSpec`에 편집기 값(`getConfiguration('tasksmd', folder)`), 그 키가 바뀌면 다시 알림(`onDidChangeConfiguration`); CLI `loadConfig`는 그 값 위에 `.vscode/settings.json`. 키 목록과 CLI가 읽는 키가 같은지 테스트. `InlinePicker`: 창 포커스 대신 무입력 15초(`idleMs`)로 끝냄 — 포커스 이벤트가 창을 떠나지 않아도 와서 도중에 끊겼음(테스트 4번 중 2번 실패 → 빼니 4번 모두 통과) |
 | 2026-10-19 | 1.15 | `InlinePicker`의 끝: 컨텍스트 `tasksmd.inlinePicking`, Esc 키(`when: tasksmd.inlinePicking && suggestWidgetVisible && editorTextFocus`) → `tasksmd.inlinePick.cancel`; 선택 이동(다른 줄·시작 앞·영역)·다른 편집기·창 포커스 잃음·결과 0개·"⚠" 항목 선택에서도 끝냄(incidents #45) |

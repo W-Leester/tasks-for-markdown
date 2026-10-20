@@ -211,14 +211,21 @@ suite('diagnostics', () => {
     await waitFor(() => vscode.languages.getDiagnostics(doc.uri).filter((d) => d.source === 'Tasks' && d.code !== 'missing-due-date').length === 3, 3000, 'three diagnostics');
     const diags = vscode.languages.getDiagnostics(doc.uri).filter((d) => d.source === 'Tasks' && d.code !== 'missing-due-date');
     assert.deepEqual(diags.map((d) => d.code).sort(), ['invalid-date', 'recurring-without-date', 'unknown-dependency']);
-    // requireDueDate is on by default: the two new lines without 📅 are also flagged — as a faint hint, not a warning
-    // squiggle (10-19: a checklist without dates was underlined on every line); real mistakes stay warnings.
-    const missing = vscode.languages.getDiagnostics(doc.uri).filter((d) => d.code === 'missing-due-date');
-    assert.ok(missing.length > 0);
-    assert.ok(missing.every((d) => d.severity === vscode.DiagnosticSeverity.Hint), 'missing due date is a hint');
     assert.ok(diags.every((d) => d.severity === vscode.DiagnosticSeverity.Warning), 'invalid date, unknown id, rule: warnings');
-    const fixes = await vscode.commands.executeCommand<vscode.CodeAction[]>('vscode.executeCodeActionProvider', doc.uri, missing[0]!.range);
-    assert.ok(fixes.length > 0, 'the quick fix for a due date is still offered');
+    // Lines without 📅 are not marked by default (10-20: tasksmd.decorations.missingDueDate, off) …
+    assert.ok(!vscode.languages.getDiagnostics(doc.uri).some((d) => d.code === 'missing-due-date'), 'no dots by default');
+    // … and when it is on, as a faint hint, not a warning squiggle (10-19: a checklist was underlined on every line).
+    const api = await getApi();
+    await api.settings.update('decorations.missingDueDate', true, vscode.ConfigurationTarget.Workspace);
+    try {
+      await waitFor(() => vscode.languages.getDiagnostics(doc.uri).some((d) => d.code === 'missing-due-date'), 3000, 'missing due date marked');
+      const missing = vscode.languages.getDiagnostics(doc.uri).filter((d) => d.code === 'missing-due-date');
+      assert.ok(missing.every((d) => d.severity === vscode.DiagnosticSeverity.Hint), 'missing due date is a hint');
+      const fixes = await vscode.commands.executeCommand<vscode.CodeAction[]>('vscode.executeCodeActionProvider', doc.uri, missing[0]!.range);
+      assert.ok(fixes.length > 0, 'the quick fix for a due date is offered');
+    } finally {
+      await api.settings.update('decorations.missingDueDate', undefined, vscode.ConfigurationTarget.Workspace);
+    }
     const bad = diags.find((d) => d.code === 'invalid-date')!;
     assert.equal(doc.getText(bad.range), '2026-13-40');
     const actions = await vscode.commands.executeCommand<vscode.CodeAction[]>('vscode.executeCodeActionProvider', doc.uri, bad.range);

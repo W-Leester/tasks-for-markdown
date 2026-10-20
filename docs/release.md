@@ -62,8 +62,8 @@ for p in tasks-core tasks-cli tasks-api; do pnpm --filter @hastycapybara/$p publ
 - [x] M32(태스크 아래에 넣기) 추가 후 다시 검증: typecheck·lint, 단위 843, 웹뷰 36, 통합 80, `build:packages`(`insert.below` 타입), 번들 CLI `add --below`·`--subtask` 실행 확인
 - [x] 처음 검증: typecheck·lint, 단위 836, 웹뷰 36, 통합 79, `build:packages`, `pnpm package`(35 files, 타입 파일·`tasksmd.cjs` 포함, 번들 CLI `tasksmd 1.1.5`). **통합 테스트가 13번 중 1번 실패(어느 테스트인지 재현 못 함 — 이후 연속 통과)** → CI에서 실패하면 `gh run rerun --failed`(#37과 같은 대응)
 - [x] 수동(사용자, Mac Cursor): 빠른 검색 키 범위, 태스크 없는 폴더에서 조용히, 자동완성(키워드 글자·한글 안 끊김), 줄 끝 버튼(Cmd+클릭)·없는 항목만, 줄 아래 드롭다운(우선순위·마감 `3일 후`·반복), 📅 앞 🔁 이모지
-- [ ] Marketplace 업로드(사용자, 10-20 13:16 빌드 `3f696c92…`; 그 전 빌드는 쓰지 않음) → 공개 확인 → `releases/`
-- [ ] 태그 `v1.1.5` → Release → Open VSX·npm 3개 확인 → GitHub Release 파일 `releases/`
+- [x] Marketplace 업로드(사용자, 10-20 13:16 빌드 `3f696c92…`) → 16:40 KST 공개(약 8분). 마켓 사본은 gzip으로 내려옴 — 풀면 업로드본과 지문까지 같음 → `releases/`
+- [x] 태그 `v1.1.5` → Release 성공(첫 시도, 통합 84 passing). Open VSX 토큰 없이(`🔐 → 🚀 v1.1.5`), npm 3개 provenance. 확인: Open VSX 1.1.5(`verified=true`), npm `tasks-core`·`tasks-cli`·`tasks-api` 1.1.5(조회 반영까지 약 2분). GitHub Release 파일 `releases/`(`.github.vsix` `e82668fe…`, tgz 3개)
 
 ## 1.1.4 게시 (2026-10-16)
 - [x] 검증: typecheck·lint, 단위 830, 웹뷰 34, 통합 63, `build:packages`, `pnpm package`(35 files)
@@ -100,6 +100,8 @@ for p in tasks-core tasks-cli tasks-api; do pnpm --filter @hastycapybara/$p publ
 
 | 버전 | 파일 | 출처 | SHA-256 |
 |---|---|---|---|
+| 1.1.5 | `tasks-for-markdown-1.1.5.marketplace.vsix` | VS Code Marketplace에 올린 파일(마켓에서 다시 받음, gzip을 풀면 업로드본과 같음) | `3f696c928e1e34fa…` |
+| 1.1.5 | `tasks-for-markdown-1.1.5.github.vsix` | GitHub Release·Open VSX(Actions 빌드) | `e82668fee4ebbc5d…` |
 | 1.1.4 | `tasks-for-markdown-1.1.4.marketplace.vsix` | VS Code Marketplace에 올린 파일(마켓에서 다시 받음, 업로드본과 같음) | `eb8d6474007d4efc…` |
 | 1.1.4 | `tasks-for-markdown-1.1.4.github.vsix` | GitHub Release·Open VSX(Actions 빌드) | `783e8188cb319c07…` |
 | 1.1.3 | `tasks-for-markdown-1.1.3.marketplace.vsix` | VS Code Marketplace에 올린 파일(마켓에서 다시 받음, 업로드본과 같음) | `8c9b00c5fa8f0fa5…` |
@@ -116,7 +118,7 @@ for p in tasks-core tasks-cli tasks-api; do pnpm --filter @hastycapybara/$p publ
 | 1.0.0 | `tasks-for-markdown-1.0.0.github.vsix` | GitHub Release·Open VSX(Actions 빌드) | `944bec251653fba4…` |
 | 1.0.0–1.1.0 | `hastycapybara-tasks-{core,cli,api}-<버전>.tgz` | npm에 올라간 것과 같은 GitHub Release 첨부본 | — |
 
-- Marketplace 사본은 `https://marketplace.visualstudio.com/_apis/public/gallery/publishers/HastyCapybara/vsextensions/tasks-for-markdown/<버전>/vspackage`로 다시 받을 수 있다(1.1.0: 받은 파일 크기 865,206바이트 = 업로드한 로컬 파일과 같음). 지문 전체는 `shasum -a 256 releases/*.vsix`.
+- Marketplace 사본은 `https://marketplace.visualstudio.com/_apis/public/gallery/publishers/HastyCapybara/vsextensions/tasks-for-markdown/<버전>/vspackage`로 다시 받을 수 있다(1.1.5부터 gzip으로 내려올 때가 있음: `file`이 gzip이면 `gunzip -c`로 푼 뒤 지문 비교)(1.1.0: 받은 파일 크기 865,206바이트 = 업로드한 로컬 파일과 같음). 지문 전체는 `shasum -a 256 releases/*.vsix`.
 - 보관 규칙: 게시한 `.vsix`는 지우지 않고 `releases/tasks-for-markdown-<버전>.marketplace.vsix`로 옮기고, 태그 뒤 GitHub Release 파일은 `gh release download v<버전> -D releases --pattern '*.vsix' --pattern '*.tgz'`(`.github.vsix`로 이름 변경).
 
 ## 공개 직후 할 일 (토큰 정리)

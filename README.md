@@ -243,6 +243,7 @@ You don't have to write queries by hand. `Tasks: Open query builder` assembles o
 | `api.allowedWriters` / `api.batchLimit` | `[]` / `200` | Extensions allowed to write without asking (filled in by the confirmation dialog); most operations in one API batch call |
 | `rendered.maxWidth` | `0` | Max width (px) of the rendered column; 0 = full editor width (default) |
 | `rendered.sourceWhenNoTasks` | `true` | With the rendered view as default editor, notes without tasks open in the text editor |
+| `rendered.markdownExtensions` | `true` | Use what other extensions add to the built-in Markdown preview (Mermaid, math…) in the rendered view too |
 | `rendered.fieldsAlign` | `columns` | Rendered view: fields in aligned columns (`columns`: status, description+priority+tags, due, created, everything else), at the right edge (`right`) or after the description (`inline`) |
 | `rendered.fontSize` / `rendered.lineHeight` | `14.5` / `1.6` | Rendered view body font size (px) and line height |
 | `rendered.fieldStyle` | `plain` | Task-line fields in the rendered view: as in the source (`plain`) or pill badges (`badges`) |

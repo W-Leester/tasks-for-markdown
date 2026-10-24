@@ -130,6 +130,7 @@
   "tasksmd.config.rendered.fieldsAlign.inline": "원문처럼 설명 바로 뒤에.",
   "tasksmd.config.requireDueDate": "마감일 필수: 만들기 대화상자·API·CLI·MCP가 📅 없는 새 태스크를 거부합니다. (마감일 없는 태스크 표시는 tasksmd.decorations.missingDueDate)",
   "tasksmd.config.rendered.sourceWhenNoTasks": "렌더 보기가 마크다운 기본 편집기일 때, 태스크가 없는 노트는 텍스트 편집기로 엽니다.",
+  "tasksmd.config.rendered.markdownExtensions": "다른 확장이 기본 마크다운 미리보기에 붙인 기능(머메이드 다이어그램, 수식 등)을 렌더 보기에서도 씁니다. 그중 하나가 렌더 보기에서 문제를 일으키면 끄세요.",
   "tasksmd.renderedAsDefault.title": "렌더 보기를 기본 편집기로",
   "tasksmd.config.rendered.maxWidth": "렌더 보기 본문 열(쿼리 결과 상자 포함)의 최대 폭(px). 0이면 편집기 전체 폭.",
   "tasksmd.config.query.showTree": "쿼리 결과를 트리로 표시: 하위 태스크를 부모 밑에 두고, 필터에 맞지 않는 하위는 맥락으로 흐리게 보여 줍니다. 쿼리마다 `show tree` / `hide tree`로 덮어씁니다.",

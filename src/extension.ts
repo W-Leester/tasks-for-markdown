@@ -14,7 +14,7 @@ import { TaskHoverProvider } from './editor/TaskHoverProvider';
 import { TaskLineContext } from './editor/TaskLineContext';
 import { IndexService } from './index/IndexService';
 import { PreviewIntegration } from './preview/PreviewIntegration';
-import { registerRenderedView } from './preview/RenderedView';
+import { type RenderedViewProvider, registerRenderedView } from './preview/RenderedView';
 import { TasksApiError, createTasksApi, registerApiCommands, type ApiCaller, type TasksApi } from './api';
 import { ArchiveService } from './services/ArchiveService';
 import { NotificationService } from './services/NotificationService';
@@ -51,6 +51,7 @@ export interface ExtensionApi {
   links: { handle: (uri: vscode.Uri) => Promise<void> };
   ai: AiInternals;
   picker: InlinePicker;
+  rendered: RenderedViewProvider;
   webviews: { openEdit: (target: { key: string | null; line: number | null }) => WebviewHost; openKanban: () => WebviewHost; openQueryBuilder: (id: string | null) => WebviewHost; openStats: () => WebviewHost; openCalendar: () => WebviewHost; openQueryResults: (target: { text: string; source: string; label: string } | null) => WebviewHost };
 }
 
@@ -123,7 +124,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<Extens
   index.onDidChangeProgress(updateEmpty);
 
   const preview = new PreviewIntegration({ index, queries, settings, getStatusRegistry, log });
-  registerRenderedView(context, { context, index, indexService, editService, settings, preview, getStatusRegistry, log });
+  const rendered = registerRenderedView(context, { context, index, indexService, editService, settings, preview, getStatusRegistry, log });
   context.subscriptions.push(preview);
 
   const archive = new ArchiveService({ index, indexService, settings, log });
@@ -138,7 +139,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<Extens
   if (context.extensionMode !== vscode.ExtensionMode.Test) void updates.checkOnStartup();
 
   void indexService.start();
-  const internal: ExtensionApi = { index, indexService, editService, queries, savedQueries, settings, archive, preview, extendMarkdownIt: (md) => preview.extendMarkdownIt(md), webviews, links, ai, picker };
+  const internal: ExtensionApi = { index, indexService, editService, queries, savedQueries, settings, archive, preview, extendMarkdownIt: (md) => preview.extendMarkdownIt(md), webviews, links, ai, picker, rendered };
   const apiDeps = { index, indexService, editService, queries, savedQueries, settings, getStatusRegistry, log, extensionVersion: String((context.extension.packageJSON as { version?: string }).version ?? '0.0.0'), ui: { openEdit: webviews.openEdit, openKanban: webviews.openKanban, openCalendar: webviews.openCalendar, openQueryResults: webviews.openQueryResults } };
   registerApiCommands(context, createTasksApi(apiDeps, { extensionId: 'command' }));
   return {

@@ -10,6 +10,8 @@ import { recentMarkdownDocument } from '../commands/recentMarkdown';
 import { t } from '../l10n';
 import { systemClock, type Clock } from '../core/dates';
 import { clampWidth, HIDEABLE_COLUMNS } from '../webviews/rendered/columns';
+import { findMarkdownContributions } from './markdownContributions';
+import type { MarkdownIt } from 'markdown-it';
 
 export const RENDERED_VIEW_TYPE = 'tasksmd.rendered';
 const VIEW_STATE_KEY = 'rendered.viewState';
@@ -67,6 +69,14 @@ const INDEX_DEBOUNCE_MS = 400;
  * checkbox toggles the task, double-clicking opens the edit dialog, links open their target. It is
  * the stand-in for editors whose own preview cannot run extension renderers (Cursor's WYSIWYG mode).
  */
+/** Other extensions' preview contributions in use (M34). Their scripts load after ours, which takes the webview API. */
+interface Borrowed {
+  plugins: { id: string; apply: (md: MarkdownIt) => unknown }[];
+  scripts: { uri: vscode.Uri; module: boolean }[];
+  styles: vscode.Uri[];
+  roots: vscode.Uri[];
+}
+
 export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vscode.Disposable {
   private readonly panels = new Map<string, vscode.WebviewPanel>();
   private activeDocument: vscode.Uri | null = null;
@@ -74,8 +84,49 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
   private readonly selection = new Map<string, number>();
   /** Set by the open commands so an explicit open never bounces to the source editor. */
   explicitOpen = new Set<string>();
+  /** Other extensions' preview contributions (M34), gathered once; reset when extensions or the setting change. */
+  private borrowedLoad: Promise<Borrowed> | null = null;
 
-  constructor(private readonly deps: RenderedViewDeps) {}
+  private readonly subscriptions: vscode.Disposable[];
+
+  constructor(private readonly deps: RenderedViewDeps) {
+    // Newly opened rendered views pick up an installed or removed extension, or the setting.
+    const reset = () => { this.borrowedLoad = null; };
+    this.subscriptions = [vscode.extensions.onDidChange(reset), deps.settings.onDidChange(reset, ['rendered.markdownExtensions'])];
+  }
+
+  /**
+   * What other extensions add to the built-in Markdown preview, for the rendered view too (M34): their markdown-it
+   * plugins (activating them, like the preview does) and their preview scripts and styles. Nothing when
+   * `rendered.markdownExtensions` is off.
+   */
+  borrowed(): Promise<Borrowed> {
+    this.borrowedLoad ??= (async () => {
+      const none: Borrowed = { plugins: [], scripts: [], styles: [], roots: [] };
+      if (!this.deps.settings.get('rendered.markdownExtensions')) return none;
+      const selfId = this.deps.context.extension.id;
+      const found = findMarkdownContributions(vscode.extensions.all, selfId);
+      const out: Borrowed = { ...none, plugins: [], scripts: [], styles: [], roots: [] };
+      for (const c of found) {
+        const ext = vscode.extensions.getExtension(c.id);
+        if (!ext) continue;
+        out.roots.push(ext.extensionUri);
+        out.scripts.push(...c.scripts.map((s) => ({ uri: vscode.Uri.joinPath(ext.extensionUri, s.path), module: s.module })));
+        out.styles.push(...c.styles.map((s) => vscode.Uri.joinPath(ext.extensionUri, s)));
+        if (!c.plugin) continue;
+        try {
+          const api = (await ext.activate()) as { extendMarkdownIt?: (md: unknown) => unknown } | undefined;
+          const extend = api?.extendMarkdownIt;
+          if (typeof extend === 'function') out.plugins.push({ id: c.id, apply: (md: MarkdownIt) => extend.call(api, md) });
+        } catch (err) {
+          this.deps.log(`rendered view: ${c.id} did not activate: ${String(err)}`);
+        }
+      }
+      if (found.length) this.deps.log(`rendered view: using ${found.map((c) => c.id).join(', ')}`);
+      return out;
+    })();
+    return this.borrowedLoad;
+  }
 
   /** The note shown in the focused rendered view, if any. */
   get active(): vscode.Uri | null {
@@ -101,9 +152,10 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
       return;
     }
     const { webview } = panel;
-    const roots = [this.deps.context.extensionUri, vscode.Uri.joinPath(document.uri, '..'), ...(vscode.workspace.workspaceFolders ?? []).map((f) => f.uri)];
+    const borrowed = await this.borrowed();
+    const roots = [this.deps.context.extensionUri, vscode.Uri.joinPath(document.uri, '..'), ...(vscode.workspace.workspaceFolders ?? []).map((f) => f.uri), ...borrowed.roots];
     webview.options = { enableScripts: true, localResourceRoots: roots };
-    webview.html = this.shell(webview);
+    webview.html = this.shell(webview, borrowed);
     this.panels.set(document.uri.toString(), panel);
     this.activeDocument = document.uri;
 
@@ -111,7 +163,7 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
     let indexTimer: ReturnType<typeof setTimeout> | undefined;
     const render = () => {
       try {
-        void webview.postMessage({ type: 'doc/html', html: this.renderHtml(document, webview), fontSize: this.deps.settings.get('rendered.fontSize'), lineHeight: this.deps.settings.get('rendered.lineHeight'), fieldsAlign: this.deps.settings.get('rendered.fieldsAlign'), maxWidth: this.deps.settings.get('rendered.maxWidth'), today: (this.deps.clock ?? systemClock).now().startOf('day').format('YYYY-MM-DD'), view: this.viewState(document.uri), hiddenColumns: this.hiddenColumns(), columnWidths: this.columnWidths() });
+        void webview.postMessage({ type: 'doc/html', html: this.renderHtml(document, webview, borrowed), fontSize: this.deps.settings.get('rendered.fontSize'), lineHeight: this.deps.settings.get('rendered.lineHeight'), fieldsAlign: this.deps.settings.get('rendered.fieldsAlign'), maxWidth: this.deps.settings.get('rendered.maxWidth'), today: (this.deps.clock ?? systemClock).now().startOf('day').format('YYYY-MM-DD'), view: this.viewState(document.uri), hiddenColumns: this.hiddenColumns(), columnWidths: this.columnWidths() });
       } catch (err) {
         this.deps.log(`rendered view: ${err instanceof Error ? err.stack ?? err.message : String(err)}`);
       }
@@ -274,7 +326,7 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
     if (choice === yes) await setRenderedDefault(true);
   }
 
-  renderHtml(document: vscode.TextDocument, webview: vscode.Webview): string {
+  renderHtml(document: vscode.TextDocument, webview: vscode.Webview, borrowed?: Borrowed): string {
     const base = this.deps.preview.pluginDeps();
     const fieldStyle = this.deps.settings.get('rendered.fieldStyle');
     const columns = this.deps.settings.get('rendered.fieldsAlign') === 'columns';
@@ -288,10 +340,12 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
       frontMatter: true,
       env: { currentDocument: document.uri },
       resolveImage: (src) => webview.asWebviewUri(vscode.Uri.joinPath(document.uri, '..', src)).toString(),
+      plugins: borrowed?.plugins.map((p) => p.apply),
+      onPluginError: (which, err) => this.deps.log(`rendered view: ${which === 'render' ? 'rendering with other extensions failed, shown without them' : `${borrowed?.plugins[which]?.id} failed`}: ${String(err)}`),
     });
   }
 
-  private shell(webview: vscode.Webview): string {
+  private shell(webview: vscode.Webview, borrowed: Borrowed): string {
     const nonce = Array.from({ length: 32 }, () => 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'[Math.floor(Math.random() * 62)]).join('');
     const script = webview.asWebviewUri(vscode.Uri.joinPath(this.deps.context.extensionUri, 'dist', 'webviews', 'rendered.js'));
     const css = webview.asWebviewUri(vscode.Uri.joinPath(this.deps.context.extensionUri, 'media', 'preview.css'));
@@ -302,6 +356,7 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}'; img-src ${webview.cspSource} https: data:; font-src ${webview.cspSource};">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="${css}">
+${borrowed.styles.map((u) => `<link rel="stylesheet" href="${webview.asWebviewUri(u)}">`).join('\n')}
 <style>
   /* Typography and spacing follow Cursor's rich Markdown editor tokens (14px/1.42 base, 1.75/1.5/1.25em
      headings, 0.9em code, 800px column) translated to VS Code theme variables. */
@@ -483,6 +538,7 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
 </div>
 <div id="content"></div>
 <script nonce="${nonce}" src="${script}"></script>
+${borrowed.scripts.map((s) => `<script nonce="${nonce}"${s.module ? ' type="module"' : ''} src="${webview.asWebviewUri(s.uri)}"></script>`).join('\n')}
 </body>
 </html>`;
   }
@@ -490,6 +546,7 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
   dispose(): void {
     for (const p of this.panels.values()) p.dispose();
     this.panels.clear();
+    for (const s of this.subscriptions) s.dispose();
   }
 }
 

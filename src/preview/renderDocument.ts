@@ -1,4 +1,5 @@
-import MarkdownIt from 'markdown-it';
+import MarkdownItCtor from 'markdown-it';
+import type { MarkdownIt } from 'markdown-it';
 import { type PluginDeps, tasksMarkdownItPlugin } from './markdownItPlugin';
 
 const escape = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -10,6 +11,10 @@ export interface RenderDocumentOptions {
   env?: Record<string, unknown>;
   /** Show YAML front matter as a muted key/value block at the top (like Cursor's editor). */
   frontMatter?: boolean;
+  /** Other extensions' `extendMarkdownIt` (M34), applied after ours. */
+  plugins?: readonly ((md: MarkdownIt) => unknown)[];
+  /** A borrowed plugin failed (its index, or 'render' when rendering with them failed and we rendered without). */
+  onPluginError?(which: number | 'render', err: unknown): void;
 }
 
 /**
@@ -19,15 +24,34 @@ export interface RenderDocumentOptions {
  * relative image paths are resolved for the webview. No vscode imports so it is unit-testable.
  */
 export function renderDocumentHtml(text: string, deps: PluginDeps, options: RenderDocumentOptions = {}): string {
-  const md = new MarkdownIt({ html: false, linkify: true });
-  tasksMarkdownItPlugin(md, deps);
+  const build = (borrowed: boolean): MarkdownIt => {
+    const md = new MarkdownItCtor({ html: false, linkify: true });
+    tasksMarkdownItPlugin(md, deps);
+    if (borrowed) {
+      (options.plugins ?? []).forEach((plugin, i) => {
+        try {
+          plugin(md);
+        } catch (err) {
+          options.onPluginError?.(i, err); // left out; the others still apply
+        }
+      });
+    }
+    return md;
+  };
   // Keep the line count: replace every non-newline character of the front matter with nothing.
   let frontMatter = '';
   const source = text.replace(/^---\r?\n([\s\S]*?)\r?\n---[ \t]*(?:\r?\n|$)/, (m, body: string) => {
     frontMatter = body;
     return m.replace(/[^\n]/g, '');
   });
-  let html = md.render(source, options.env);
+  let html: string;
+  try {
+    html = build(true).render(source, options.env);
+  } catch (err) {
+    if (!options.plugins?.length) throw err;
+    options.onPluginError?.('render', err); // a borrowed plugin broke rendering: the note without them
+    html = build(false).render(source, options.env);
+  }
   if (options.frontMatter && frontMatter.trim()) {
     const rows = frontMatter.split(/\r?\n/).filter((l) => l.trim()).map((l) => {
       const m = /^([^:]+):\s*(.*)$/.exec(l);

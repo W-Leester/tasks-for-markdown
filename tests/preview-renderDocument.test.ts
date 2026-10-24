@@ -62,3 +62,32 @@ describe('renderDocumentHtml (rendered view)', () => {
     expect(html).toContain('&lt;script&gt;');
   });
 });
+
+describe('other Markdown extensions in the rendered view (M34)', () => {
+  // What bierner.markdown-mermaid does: a fence for "mermaid" becomes <pre class="mermaid"> through options.highlight.
+  const mermaidLike = (md: import('markdown-it').MarkdownIt) => {
+    const prev = md.options.highlight;
+    md.options.highlight = (code: string, lang: string, attrs: string) => (lang === 'mermaid' ? `<pre class="mermaid">${code.replace(/>/g, '&gt;')}</pre>` : prev?.(code, lang, attrs) ?? '');
+    return md;
+  };
+  const doc = '# Notes\n\n```mermaid\ngraph TD; A-->B\n```\n\n- [ ] task 📅 2026-10-25\n';
+
+  it('applies their markdown-it plugins after ours', () => {
+    const html = renderDocumentHtml(doc, deps, { plugins: [mermaidLike] });
+    expect(html).toContain('<pre class="mermaid">graph TD; A--&gt;B');
+    expect(html).toContain('tfm-check'); // our tasks still render
+  });
+
+  it('a plugin that throws is left out, the note still renders and the error is reported', () => {
+    const errors: string[] = [];
+    const broken = () => { throw new Error('boom'); };
+    const html = renderDocumentHtml(doc, deps, { plugins: [broken, mermaidLike], onPluginError: (i, e) => errors.push(`${i}: ${(e as Error).message}`) });
+    expect(html).toContain('<pre class="mermaid">');
+    expect(errors).toEqual(['0: boom']);
+    // One that breaks rendering itself: the note renders without the borrowed plugins.
+    const badRender = (md: import('markdown-it').MarkdownIt) => { md.renderer.render = () => { throw new Error('render boom'); }; return md; };
+    const fallback = renderDocumentHtml(doc, deps, { plugins: [badRender], onPluginError: (i, e) => errors.push(`${i}: ${(e as Error).message}`) });
+    expect(fallback).toContain('tfm-check');
+    expect(errors.at(-1)).toBe('render: render boom');
+  });
+});

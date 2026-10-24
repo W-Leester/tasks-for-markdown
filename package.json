@@ -7,7 +7,7 @@
     "color": "#171d35",
     "theme": "dark"
   },
-  "version": "1.1.5",
+  "version": "1.1.6",
   "publisher": "HastyCapybara",
   "license": "MIT",
   "repository": {
@@ -916,6 +916,11 @@
           "type": "boolean",
           "default": true,
           "description": "%tasksmd.config.rendered.sourceWhenNoTasks%"
+        },
+        "tasksmd.rendered.markdownExtensions": {
+          "type": "boolean",
+          "default": true,
+          "description": "%tasksmd.config.rendered.markdownExtensions%"
         },
         "tasksmd.rendered.maxWidth": {
           "type": "number",

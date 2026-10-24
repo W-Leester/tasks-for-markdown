@@ -130,6 +130,7 @@
   "tasksmd.config.rendered.fieldsAlign.inline": "Fields directly after the description, like the source line.",
   "tasksmd.config.requireDueDate": "Require a due date: the create dialog, the API, the CLI and the MCP server refuse a new task without 📅. (To mark open tasks that have none, see tasksmd.decorations.missingDueDate.)",
   "tasksmd.config.rendered.sourceWhenNoTasks": "When the rendered view is the default editor for Markdown, open notes that contain no tasks in the text editor instead.",
+  "tasksmd.config.rendered.markdownExtensions": "Use what other installed extensions add to the built-in Markdown preview (Mermaid diagrams, math…) in the rendered view too. Turn off if one of them misbehaves there.",
   "tasksmd.renderedAsDefault.title": "Rendered view as default editor",
   "tasksmd.config.rendered.maxWidth": "Maximum width (px) of the rendered view's text column, including query result boxes. 0 = full editor width.",
   "tasksmd.config.query.showTree": "Show query results as a tree: sub-tasks under their parent task, with non-matching sub-tasks faded as context. Override per query with `show tree` / `hide tree`.",

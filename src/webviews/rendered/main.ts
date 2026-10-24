@@ -230,6 +230,8 @@ window.addEventListener('message', (e: MessageEvent<ToWebview>) => {
   addTaskRows();
   refreshView();
   window.scrollTo(0, y);
+  // Other extensions' preview scripts (Mermaid…, M34) redraw on the event the built-in preview sends after an update.
+  window.dispatchEvent(new CustomEvent('vscode.markdown.updateContent'));
   // Keep the row selected across re-renders (toggling done rewrites the file and re-renders the note).
   const keep = selected ? Number(selected.dataset.tfmLine) : null;
   selected = null;

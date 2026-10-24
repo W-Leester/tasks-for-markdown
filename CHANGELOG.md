@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased (1.1.6)
+
+- **The rendered view shows what other Markdown extensions add to the preview** — Mermaid diagrams, math and the like now draw there as they do in the built-in preview (`Cmd/Ctrl+Shift+V`). Nothing is bundled: the rendered view uses the same extensions, through the same contributions the built-in preview uses. VS Code has Mermaid and math built in; in Cursor, install a Mermaid extension (e.g. Markdown Preview Mermaid Support). Turn off with `tasksmd.rendered.markdownExtensions`.
+
+### 한국어 요약
+- **렌더 보기에서 다른 마크다운 확장의 기능도:** 머메이드 다이어그램·수식 등이 기본 미리보기처럼 렌더 보기에서도 그려짐. 우리 확장에 넣지 않고 그 확장을 같은 통로로 빌려 씀. VS Code는 머메이드·수식 내장, Cursor는 머메이드 확장(Markdown Preview Mermaid Support 등) 설치 필요. 끄려면 `tasksmd.rendered.markdownExtensions`.
+
 ## 1.1.5 — 2026-10-19
 
 **API · CLI · MCP**

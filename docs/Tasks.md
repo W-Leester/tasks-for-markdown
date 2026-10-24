@@ -1142,10 +1142,11 @@
 - 한계(문서): 기본 미리보기에만 있는 것(스크롤 동기화용 줄 번호, 미리보기 설정 요소 등)에 기대는 확장은 일부만 될 수 있음. `[[위키 링크]]`는 그대로 미지원.
 
 ### 할 일
-- [ ] 찾기 순수 함수·플러그인 적용(오류 격리) 단위 테스트(먼저 실패) → 구현
-- [ ] 렌더 보기 연결(활성화·스크립트·이벤트·설정) → 통합 테스트(가짜 확장 대신 찾기 결과로) 
-- [ ] 실제 확인: 브라우저 VS Code에 `bierner.markdown-mermaid`를 설치하고 렌더 보기에서 다이어그램이 그려지는지 화면으로
-- [ ] 문서(user-guide·README 설정 표·CHANGELOG·design)
+- [x] 찾기 순수 함수·플러그인 적용(오류 격리) 단위 테스트(먼저 실패) → 구현. 하는 중 발견: 스크립트 항목이 `{ path, type: 'module' }`일 수 있음(VS Code 내장 머메이드), 기본 미리보기 자체(`vscode.markdown-language-features`)도 같은 통로로 자기 런타임을 넣음 → 제외
+- [x] 렌더 보기 연결(활성화·스크립트·이벤트·설정) → 통합 테스트: VS Code 내장 `vscode.markdown-math`를 실제로 빌려 `$x^2$`가 KaTeX로 그려짐, 기본 미리보기 런타임은 빠짐, 설정 끄면 없음(구현 뒤 작성)
+- [x] 실제 확인(브라우저 VS Code): 렌더 보기에서 머메이드 다이어그램·수식이 그려짐 — 그린 것은 **VS Code 내장** `vscode.mermaid-markdown-features`·`markdown-math`(로그 "using vscode.github, vscode.markdown-math, vscode.mermaid-markdown-features"). 함께 설치한 `bierner.markdown-mermaid`는 그 환경에서 목록에 안 잡힘(원인 미확인). **Cursor는 내장 머메이드가 없어 bierner가 그려야 함 → 사용자 확인 필요**
+- [x] 문서(user-guide·README 설정 표·CHANGELOG(1.1.6 미배포)·design). 버전 1.1.6으로 올림(package.json·packages 3개)
+- [ ] 사용자 확인(Cursor + bierner.markdown-mermaid)
 
 ## M33. 만든 날짜(➕)를 빠짐없이 — 편집기 설정을 AI도 따르게 (1.1.5, 계획 2026-10-19, 사용자 요청)
 

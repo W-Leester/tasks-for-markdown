@@ -49,6 +49,7 @@
 | M21 | 확장 안에서 AI 연결 제공(VS Code·Cursor MCP 자동 등록, 터미널 명령, AI 연결 명령, 시작 안내) | ✅ 완료(1.1.0 공개 2026-10-08) · 원격·Windows 확인은 배포 후 | 이 문서 M21, design.md 7.16 |
 | M22 | README 개편: 강점(AI·API) 강조, 움직이는 예시 GIF, 사이트 연결 | ✅ 1.0.1(2026-10-05) | 이 문서 M22 |
 | M24 | 렌더 보기 열 제목 항상 표시, 끈 경계만 움직이는 너비 조절, 더블클릭 자동 맞춤 | ✅ 완료(1.1.1, 2026-10-12) | 이 문서 M24, design.md 7.14·7.15 |
+| M34 | 렌더 보기가 다른 마크다운 확장(머메이드 등)의 미리보기 기능을 빌려 씀 | 🟡 진행 중(1.1.6, 2026-10-24) | 이 문서 M34 |
 | M33 | 만든 날짜(➕)를 빠짐없이: 체크박스 만들기·렌더 보기 Enter, 에디터 안 AI(MCP)가 편집기 설정을 따름 | ✅ 완료(1.1.5 공개 2026-10-20) | 이 문서 M33 |
 | M32 | 태스크 아래에 넣기(API·CLI·MCP): 메모·하위 항목을 건너뛰고 같은 깊이 또는 하위 태스크로 | ✅ 완료(1.1.5, 2026-10-19) | 이 문서 M32 |
 | M31 | 태스크 버튼의 선택창을 그 줄에 드롭다운으로(자동완성 목록) | ✅ 완료(1.1.5, 2026-10-19) | 이 문서 M31 |
@@ -1121,6 +1122,30 @@
 - **2 세 번째(10-19):** 편집기 기본값에 기대지 않음 — 영문 글자 한 개가 입력되고 그 단어(앞 단어 포함 최대 3개)가 키워드 단어의 앞부분과 맞으면(`due`의 `d`, `every w`) 확장이 직접 `editor.action.triggerSuggest`. 기준 길이는 `max(1, minMatch)`, 그 길이가 되는 순간 한 번만. 한글·숫자·기호는 안 염(맞는 키워드가 없음 → "No suggestions" 창도 안 뜸). `configurationDefaults`의 quickSuggestions·wordBasedSuggestions는 뺌.
 - [x] 2 세 번째: 테스트(먼저 실패 — `du` 실패 확인) → 구현 → 문서
 - [x] 2 세 번째: 사용자 확인(Cursor, 10-19) ✅
+
+## M34. 렌더 보기에서 다른 마크다운 확장의 기능 쓰기 (1.1.6, 계획 2026-10-24, 사용자 요청)
+
+사용자: "`Cmd+Shift+V`(기본 미리보기)에서는 머메이드가 그림으로 나오는데 `Ctrl+Shift+R`(렌더 보기)에서는 코드 그대로." 원인: 머메이드는 Cursor에 설치된 `bierner.markdown-mermaid`가 기본 미리보기에 붙인 기능이고, 렌더 보기는 자체 변환이라 적용되지 않음. 사용자 방향: "기능을 우리 확장에 다 넣지 말고 모듈화" → 머메이드를 넣지 않고, **기본 미리보기의 확장 규칙을 렌더 보기도 따른다.**
+
+기본 미리보기의 공개 규칙(다른 확장이 쓰는 통로):
+- `contributes.markdown.markdownItPlugins: true` + `activate()`가 돌려주는 `extendMarkdownIt(md)` — 변환 단계
+- `contributes.markdown.previewScripts` / `previewStyles` — 화면에 넣는 스크립트·스타일
+- 내용이 바뀔 때 화면에 `vscode.markdown.updateContent` 이벤트
+
+머메이드 확장 확인(설치본 1.32.1): 변환은 `md.options.highlight`로 ```` ```mermaid ````를 `<pre class="mermaid">`로 바꾸고, 설정을 `<span id="markdown-mermaid" data-config>`로 앞에 붙임. 화면 스크립트(17MB)는 `.mermaid`를 그리고 `vscode.markdown.updateContent`에서 다시 그림 — 모두 위 규칙만 씀.
+
+설계:
+- 설치된 확장 중(우리 제외) 위 통로를 쓰는 것을 찾는 **순수 함수**(package.json만 봄) + 렌더 보기를 열 때 그 확장을 활성화해 `extendMarkdownIt`를 모음. 확장이 설치·제거되면 다시 모음.
+- `renderDocumentHtml`에 빌린 플러그인을 우리 플러그인 다음에 적용. 하나가 오류를 내도 문서는 그려지고 로그만(그 플러그인만 빼고 다시).
+- 화면: 빌린 스타일·스크립트를 우리 스크립트 **다음에** nonce로 넣음(우리가 먼저 `acquireVsCodeApi`를 가져가 다른 스크립트는 확장과의 통신 통로를 못 얻음). 그 확장 폴더를 `localResourceRoots`에. 다시 그릴 때마다 `vscode.markdown.updateContent`.
+- 설정 `tasksmd.rendered.markdownExtensions`(기본 켬): 끄면 지금처럼 우리 변환만.
+- 한계(문서): 기본 미리보기에만 있는 것(스크롤 동기화용 줄 번호, 미리보기 설정 요소 등)에 기대는 확장은 일부만 될 수 있음. `[[위키 링크]]`는 그대로 미지원.
+
+### 할 일
+- [ ] 찾기 순수 함수·플러그인 적용(오류 격리) 단위 테스트(먼저 실패) → 구현
+- [ ] 렌더 보기 연결(활성화·스크립트·이벤트·설정) → 통합 테스트(가짜 확장 대신 찾기 결과로) 
+- [ ] 실제 확인: 브라우저 VS Code에 `bierner.markdown-mermaid`를 설치하고 렌더 보기에서 다이어그램이 그려지는지 화면으로
+- [ ] 문서(user-guide·README 설정 표·CHANGELOG·design)
 
 ## M33. 만든 날짜(➕)를 빠짐없이 — 편집기 설정을 AI도 따르게 (1.1.5, 계획 2026-10-19, 사용자 요청)
 

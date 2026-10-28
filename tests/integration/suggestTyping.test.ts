@@ -1,6 +1,6 @@
 import * as assert from 'node:assert/strict';
 import * as vscode from 'vscode';
-import { getApi, sleep } from './helpers';
+import { getApi, showFocused, sleep } from './helpers';
 
 /**
  * Real typing into the editor (the `type` command, as the keyboard does), not a direct provider call: whether the
@@ -13,7 +13,7 @@ suite('auto-suggest while typing (incident #42)', () => {
     await getApi();
     const start = '- [ ] write report';
     const doc = await vscode.workspace.openTextDocument({ language: 'markdown', content: `# Notes\n${start}\n` });
-    const editor = await vscode.window.showTextDocument(doc);
+    const editor = await showFocused(doc);
     editor.selection = new vscode.Selection(1, start.length, 1, start.length);
     await sleep(300);
     for (const ch of text) {

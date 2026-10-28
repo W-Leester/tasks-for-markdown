@@ -80,3 +80,16 @@ export function localToday(offsetDays = 0): string {
   d.setDate(d.getDate() + offsetDays);
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
+
+/**
+ * Show `doc` and wait until its editor really has the keyboard: tests that type (the `type` command) right after a
+ * previous suite closed its editors sometimes typed into nothing (10-28, the first test of a suite failed at random).
+ */
+export async function showFocused(doc: vscode.TextDocument): Promise<vscode.TextEditor> {
+  const editor = await vscode.window.showTextDocument(doc, { preserveFocus: false });
+  await vscode.commands.executeCommand('workbench.action.focusActiveEditorGroup');
+  await waitFor(() => vscode.window.activeTextEditor?.document === doc, 5000, 'the editor to have focus');
+  await sleep(100);
+  return editor;
+}
+

@@ -25,9 +25,10 @@ describe('rendered view: new task lines (M27)', () => {
     // The host learns the selection, so Cmd/Alt+Shift+C edits this task instead of asking which one.
     expect(posted.filter((m: FromWebview) => m.type === 'doc/select').at(-1)).toEqual({ type: 'doc/select', line: 2 });
 
-    // Ctrl+Shift+Enter on the selected row toggles done (as in the editor) and does not open an input; other modifiers do nothing.
+    // Option/Alt+C on the selected row toggles done (as in the editor, 10-28) and does not open an input; on macOS the
+    // key reads "ç", so the physical key decides. Other modifiers on Enter do nothing.
     posted.length = 0;
-    key(li, 'Enter', { ctrlKey: true, shiftKey: true });
+    key(li, 'ç', { altKey: true, code: 'KeyC' });
     expect(posted).toEqual([{ type: 'doc/toggle', path: null, line: 2 }]);
     expect(document.querySelector('li.rv-task-form')).toBeNull();
     // The file changes and the note re-renders: the same row stays selected and focused (10-18).
@@ -38,6 +39,7 @@ describe('rendered view: new task lines (M27)', () => {
     expect(document.activeElement).toBe(again);
     key(again, 'Enter', { metaKey: true });
     key(again, 'Enter', { shiftKey: true });
+    key(again, 'Enter', { ctrlKey: true, shiftKey: true }); // the old key no longer toggles
     expect(document.querySelector('li.rv-task-form')).toBeNull();
     expect(posted.filter((m: FromWebview) => m.type === 'doc/toggle')).toHaveLength(1);
 

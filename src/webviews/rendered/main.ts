@@ -408,9 +408,11 @@ content.addEventListener('keydown', (e) => {
   const li = (e.target as Element).closest?.('li.tfm-task') as HTMLElement | null;
   if (!li || li !== selected || e.target !== li) return;
   if (e.isComposing || e.keyCode === 229) return;
+  // Option/Alt+C is "toggle done" in the editor (10-28); on a selected row it is too. The physical key decides: on
+  // macOS Option+C types "ç".
+  if (e.code === 'KeyC' && e.altKey && !e.ctrlKey && !e.metaKey && !e.shiftKey) { e.preventDefault(); post({ type: 'doc/toggle', path: null, line: Number(li.dataset.tfmLine) }); return; }
   if (e.key === 'Enter') {
-    // Ctrl+Shift+Enter is "toggle done" in the editor; on a selected row it is too. Only a plain Enter adds a line.
-    if (e.ctrlKey && e.shiftKey && !e.altKey && !e.metaKey) { e.preventDefault(); post({ type: 'doc/toggle', path: null, line: Number(li.dataset.tfmLine) }); return; }
+    // Only a plain Enter adds a line.
     if (e.ctrlKey || e.shiftKey || e.altKey || e.metaKey) return;
     e.preventDefault();
     openTaskForm(li);

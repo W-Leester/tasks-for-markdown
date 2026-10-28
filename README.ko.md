@@ -45,7 +45,7 @@
 처음이라면 [VS Code에서 시작 안내 열기](https://vscode.dev/redirect?url=vscode://hastycapybara.tasks-for-markdown/guide)(Cursor는 명령 팔레트에서 **Tasks: 시작 안내 열기**). 시작 안내는 처음 실행할 때 저절로도 열립니다.
 
 1. **마크다운 파일이 있는 폴더를 엽니다.** 그 안의 모든 `- [ ]` 줄이 태스크가 되고, 액티비티 바에 **Tasks** 아이콘이 생깁니다.
-2. **태스크를 만듭니다.** `- [ ] 보고서 작성 📅 2026-09-25`처럼 체크리스트 줄을 쓰거나, `Ctrl+Shift+C`로 현재 줄을 체크박스로 바꾸거나, `Cmd+Shift+C`(macOS) / `Alt+Shift+C`(Windows·Linux)로 만들기/편집 대화상자를 엽니다. 태스크 줄에서 `Ctrl+Shift+Enter`를 누르면 완료됩니다.
+2. **태스크를 만듭니다.** `- [ ] 보고서 작성 📅 2026-09-25`처럼 체크리스트 줄을 쓰거나, `Cmd+Shift+C`(macOS) / `Ctrl+Shift+C`(Windows·Linux)로 현재 줄을 체크박스로 바꾸거나, `Option+Shift+C`(macOS) / `Alt+Shift+C`(Windows·Linux)로 만들기/편집 대화상자를 엽니다. 태스크 줄에서 `Option/Alt+C`를 누르면 완료됩니다.
 3. **쿼리 블록으로 거르고, 노트를 렌더링해 봅니다.** ` ```tasks ` 블록은 조건에 맞는 태스크를 목록으로 보여 줍니다. `Ctrl+Shift+R`을 누르면 노트가 렌더 보기로 열리고 그 자리에 결과가 나옵니다. (VS Code 기본 마크다운 미리보기에도 결과가 보이지만 체크박스는 표시 전용입니다.) 자주 쓰는 쿼리 줄: [쿼리 문법](#쿼리-문법).
 
 ````markdown
@@ -63,13 +63,13 @@ group by filename
 
 ![태스크 입력: 마감일 자동완성, "다음 금요일"이 2026-10-09로](docs/images/demo-editing-ko.gif)
 
-**대화상자로 만들고 고치기.** 빈 줄에서 `Cmd+Shift+C`(macOS) / `Alt+Shift+C`(Windows·Linux)를 누르면 새 태스크 입력 창이 열립니다. 기존 태스크 위에서 누르면 같은 창으로 그 태스크를 고칩니다. 우선순위, 말로 쓰는 날짜, 태그, 반복을 한 번에 정합니다.
+**대화상자로 만들고 고치기.** 빈 줄에서 `Option+Shift+C`(macOS) / `Alt+Shift+C`(Windows·Linux)를 누르면 새 태스크 입력 창이 열립니다. 기존 태스크 위에서 누르면 같은 창으로 그 태스크를 고칩니다. 우선순위, 말로 쓰는 날짜, 태그, 반복을 한 번에 정합니다.
 
-![Cmd+Shift+C / Alt+Shift+C: 새 태스크를 입력해 만들고, 기존 태스크를 열어 수정](docs/images/demo-dialog-ko.gif)
+![Option+Shift+C / Alt+Shift+C: 새 태스크를 입력해 만들고, 기존 태스크를 열어 수정](docs/images/demo-dialog-ko.gif)
 
-**키 하나로 완료.** `Ctrl+Shift+Enter`로 완료합니다. 반복 태스크는 다음 회차가 자동으로 생깁니다.
+**키 하나로 완료.** `Option/Alt+C`로 완료합니다. 반복 태스크는 다음 회차가 자동으로 생깁니다.
 
-![Ctrl+Shift+Enter로 매주 반복 태스크를 완료하자 다음 회차가 추가됨](docs/images/demo-recurring-ko.gif)
+![Option/Alt+C로 매주 반복 태스크를 완료하자 다음 회차가 추가됨](docs/images/demo-recurring-ko.gif)
 
 **렌더 보기에서 작업.** 체크박스를 누르고, 💬로 메모를 남기고, 줄을 고른 뒤 `Enter`나 ＋로 바로 아래에 태스크를 연달아 넣고, 열을 숨기거나 다시 보입니다. 쿼리 블록이 바로 갱신됩니다.
 
@@ -200,10 +200,10 @@ if (tasks.features?.includes('notes.add')) await tasks.edit.addNote(r.tasks[0], 
 
 | 명령 | 단축키 |
 |---|---|
-| 태스크 완료 토글 | `Ctrl+Shift+Enter` (태스크 줄에서, macOS에서도 Ctrl) |
-| 체크박스 만들기/지우기 | `Ctrl+Shift+C` — 줄을 `- [ ] …`로(글머리 기호는 유지), 태스크 줄이면 체크박스를 뺌 |
+| 태스크 완료 토글 | `Option+C`(macOS) / `Alt+C`(Windows·Linux), 태스크 줄에서 |
+| 체크박스 만들기/지우기 | `Cmd+Shift+C`(macOS) / `Ctrl+Shift+C`(Windows·Linux) — 줄을 `- [ ] …`로(글머리 기호는 유지), 태스크 줄이면 체크박스를 뺌 |
 | 단축키 바꾸기 | **Tasks: 단축키 설정 열기** — 키보드 단축키 편집기를 이 확장 명령만 보이게 엶 |
-| 태스크 만들기 / 편집 | `Cmd+Shift+C`(macOS) / `Alt+Shift+C`(Windows·Linux) |
+| 태스크 만들기 / 편집 | `Option+Shift+C`(macOS) / `Alt+Shift+C`(Windows·Linux) |
 | 렌더 보기로 열기 / 마크다운 소스 편집 (전환) | `Ctrl+Shift+R` |
 | 렌더 보기를 기본 편집기로 (설정/해제) | — |
 | 태스크 빠른 검색 | `Cmd/Ctrl+Shift+;` |

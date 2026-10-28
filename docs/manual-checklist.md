@@ -17,21 +17,21 @@ docs/Tasks.md에 남아 있는 미체크 항목 중 자동 테스트로 대신�
 3. 볼 것:
    - 줄 끝 상대 날짜 장식("4일 지남" 등)과 기한 초과 줄 배경이 **읽히는지** (글자가 배경에 묻히지 않아야 함).
    - 명령 팔레트 → `Markdown: Open Preview to the Side`로 미리보기를 옆에 열어 뱃지·체크박스·쿼리 결과 카드가 보이는지.
-   - `Ctrl+Shift+R` 렌더 보기, `Tasks: 칸반 보드 열기`, `Tasks: 캘린더 열기`, `Cmd+Shift+C`(macOS) / `Alt+Shift+C`(Windows·Linux) 편집 대화상자 순서로 열어 테두리·포커스 링·버튼이 보이는지. 하이 컨트라스트에서는 테두리가 두껍고 뚜렷해야 정상입니다.
+   - `Ctrl+Shift+R` 렌더 보기, `Tasks: 칸반 보드 열기`, `Tasks: 캘린더 열기`, `Option+Shift+C`(macOS) / `Alt+Shift+C`(Windows·Linux) 편집 대화상자 순서로 열어 테두리·포커스 링·버튼이 보이는지. 하이 컨트라스트에서는 테두리가 두껍고 뚜렷해야 정상입니다.
 4. 문제가 보이면 어느 화면의 어떤 요소인지 스크린샷을 남겨 주세요. 색은 모두 `--vscode-*` 변수라 `package.json`의 `contributes.colors` hc 기본값만 고치면 됩니다.
 
 ### 2-2. Remote SSH / WSL / Codespaces
 
 가진 환경 하나만 해도 됩니다.
 1. 원격에 저장소(또는 아무 마크다운 폴더)를 두고 원격 창으로 엽니다. 확장은 **원격 쪽**에 설치되어야 합니다(확장 뷰에서 "Install in SSH: …" 버튼).
-2. 볼 것: 사이드바 TASKS에 개수가 뜨는지(인덱싱), `Ctrl+Shift+Enter`로 완료 토글 시 파일이 실제로 바뀌는지, 렌더 보기와 칸반이 열리는지, 파일을 바깥에서 고쳤을 때(원격 셸에서 `echo "- [ ] new" >> 파일`) 사이드바가 갱신되는지.
+2. 볼 것: 사이드바 TASKS에 개수가 뜨는지(인덱싱), `Option/Alt+C`로 완료 토글 시 파일이 실제로 바뀌는지, 렌더 보기와 칸반이 열리는지, 파일을 바깥에서 고쳤을 때(원격 셸에서 `echo "- [ ] new" >> 파일`) 사이드바가 갱신되는지.
 3. 코드는 `workspace.fs`와 `Uri`만 쓰므로 원격에서도 같아야 합니다. 다르면 로그(`Tasks: 로그 보기`)를 붙여 주세요.
 
 ### 2-3. VS Code macOS / Windows / Linux 전 기능
 
 한 플랫폼당 10분 정도의 훑기입니다. 순서대로:
 1. `.vsix` 설치 → 창 리로드 → 사이드바 TASKS에 예시 태스크 개수가 뜨는지.
-2. 에디터: 태스크 줄에서 `Ctrl+Shift+Enter` 완료 → `✅ 날짜`가 붙는지 → **`Cmd/Ctrl+Z`를 한 번** 눌러 원래 줄로 **한 번에** 돌아오는지(두 번 눌러야 하면 버그). 반복 태스크(`운동 #건강 🔁 every day when done`)에서도 완료 → 새 줄이 위에 생기고 `Cmd/Ctrl+Z` 한 번에 둘 다 사라지는지.
+2. 에디터: 태스크 줄에서 `Option/Alt+C` 완료 → `✅ 날짜`가 붙는지 → **`Cmd/Ctrl+Z`를 한 번** 눌러 원래 줄로 **한 번에** 돌아오는지(두 번 눌러야 하면 버그). 반복 태스크(`운동 #건강 🔁 every day when done`)에서도 완료 → 새 줄이 위에 생기고 `Cmd/Ctrl+Z` 한 번에 둘 다 사라지는지.
 3. 태스크 버튼: 커서 줄 **끝에** `✓ 완료 · 우선순위 ▾ · 📅 … · ✎ 편집`이 잘리지 않고 다 보이는지, **Cmd/Ctrl+클릭**으로 동작하는지(1.1.5, M30). 설정 `tasksmd.codeLens.position` = `above`면 줄 위 CodeLens가 그냥 클릭으로 동작하는지.
    - **드롭다운(M31):** `우선순위 ▾`·`📅 마감 ▾`·`🔁 반복 ▾`가 위쪽 선택창이 아니라 그 줄 아래 목록으로 열리는지, 고르면 바로 바뀌는지. 마감에서 `next fri`·`3일 후`를 치면 맨 위에 날짜. 📅가 있는 줄에 🔁·🔺를 넣어도 이모지가 깨지지 않는지(#44). 이미 있는 항목(우선순위·마감·반복)은 버튼이 안 보이는지, 미루기 버튼이 없는지.
 4. 자동완성: `- [ ] 테스트 ` (스페이스) → **안 뜸**, 이어서 `d` → 📅 항목이 뜸, `due tom` 입력 시 내일 날짜 제안. `- [ ] 보고서 사과 사기`처럼 한글을 쭉 쳐도 목록이 안 뜨고 끊기지 않음(1.1.5, #42). 빈 `- [ ] ` 줄에서는 저절로 안 뜸(#41).
@@ -43,12 +43,12 @@ docs/Tasks.md에 남아 있는 미체크 항목 중 자동 테스트로 대신�
 8. 알림: 설정 `tasksmd.notifications.dailyTime`을 현재 시각 +1분으로 바꾸고 기다렸다가 토스트와 OS 알림이 오는지. Windows/Linux에서는 OS 알림(PowerShell 토스트 / `notify-send`)이 특히 확인 대상입니다.
 9. 아카이브: `Tasks: 완료 태스크 아카이브…` → 미리보기 → 확인 → `Archive.md` 생성.
 10. 업데이트 확인: `tasksmd.updateCheckUrl`에 `dist/latest.json`을 로컬 HTTP나 파일 경로로 주고 `Tasks: 업데이트 확인` 실행.
-Windows에서는 키 표기가 `Cmd+Shift+C`(macOS) / `Alt+Shift+C`(Windows·Linux), `Ctrl+Shift+R`로 같고, 경로 구분자가 `\`라도 쿼리의 `path includes`가 `/`로 동작해야 합니다(내부에서 변환).
+Windows에서는 키 표기가 `Option+Shift+C`(macOS) / `Alt+Shift+C`(Windows·Linux), `Ctrl+Shift+R`로 같고, 경로 구분자가 `\`라도 쿼리의 `path includes`가 `/`로 동작해야 합니다(내부에서 변환).
 
 ### 2-4. Cursor macOS / Windows
 
 VS Code와 다른 부분만 봅니다.
-1. `Cmd+Shift+C`(macOS) / `Alt+Shift+C`(Windows·Linux), `Ctrl+Shift+R`, `Ctrl+Shift+Enter`가 **Cursor의 기본 키와 충돌하지 않는지**: 텍스트 편집기, 렌더 보기, Cursor Preview 모드, 채팅 패널에 포커스가 있을 때 각각 눌러 엉뚱한 동작(다른 편집기 닫힘 등)이 없는지.
+1. `Option+Shift+C`(macOS) / `Alt+Shift+C`(Windows·Linux), `Ctrl+Shift+R`, `Option/Alt+C`가 **Cursor의 기본 키와 충돌하지 않는지**: 텍스트 편집기, 렌더 보기, Cursor Preview 모드, 채팅 패널에 포커스가 있을 때 각각 눌러 엉뚱한 동작(다른 편집기 닫힘 등)이 없는지.
    - **Markdown All in One과 함께(10-18 추가):** 체크박스 줄 끝 `Enter` → 다음 줄에 `- [ ] `, 이어서 `Tab` → 들여쓰기. 제안 창이 끼어들지 않아야 함(incidents #41).
 2. Cursor Preview 토글은 결과가 안 나오는 것이 정상입니다(설계상 불가). 대신 `Ctrl+Shift+R` 렌더 보기와 CodeLens `▷ 결과 보기`가 되는지.
 3. 명령 팔레트 → `Markdown: Open Preview to the Side`로 연 표준 미리보기가 **빈 화면이 아닌지**. 예전에 비어 보이던 증상이 1.0.1 이후 사라졌는지 확인이 필요한 항목입니다. 비어 있으면 `Help: Toggle Developer Tools` 콘솔의 빨간 줄을 붙여 주세요.

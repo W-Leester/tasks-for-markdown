@@ -6,9 +6,10 @@ suite('add or remove checkbox (M26)', () => {
   test('Ctrl+Shift+C adds/removes a checkbox; the dialog is Cmd+Shift+C on macOS and Alt+Shift+C elsewhere, only in Markdown, the rendered view and our sidebar (10-18)', () => {
     const pkg = vscode.extensions.getExtension('HastyCapybara.tasks-for-markdown')!.packageJSON as { contributes: { keybindings: { command: string; key: string; mac?: string; when?: string }[] } };
     const kb = pkg.contributes.keybindings.filter((k) => k.command === 'tasksmd.toggleCheckbox');
-    assert.deepEqual(kb.map((k) => [k.key, k.mac, k.when]), [['ctrl+shift+c', 'ctrl+shift+c', 'editorTextFocus && editorLangId == markdown']]);
+    // 10-28: Cmd+Shift+C on macOS, Ctrl+Shift+C elsewhere; the dialog is Option/Alt+Shift+C on both.
+    assert.deepEqual(kb.map((k) => [k.key, k.mac, k.when]), [['ctrl+shift+c', 'cmd+shift+c', 'editorTextFocus && editorLangId == markdown']]);
     const dialog = pkg.contributes.keybindings.filter((k) => k.command === 'tasksmd.createOrEdit');
-    assert.deepEqual(dialog.map((k) => [k.key, k.mac]), [['alt+shift+c', 'cmd+shift+c']]);
+    assert.deepEqual(dialog.map((k) => [k.key, k.mac ?? k.key]), [['alt+shift+c', 'alt+shift+c']]);
     // Cmd+Shift+C is VS Code's "new external terminal" on macOS: only take it where it is ours.
     assert.match(dialog[0]!.when!, /editorLangId == markdown/);
     assert.match(dialog[0]!.when!, /activeCustomEditorId == tasksmd\.rendered/);

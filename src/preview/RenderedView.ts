@@ -132,7 +132,7 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
   get active(): vscode.Uri | null {
     return this.activeDocument;
   }
-  /** The task row selected in the rendered view that is in front, if any (for Cmd/Alt+Shift+C). */
+  /** The task row selected in the rendered view that is in front, if any (for Option/Alt+Shift+C). */
   selectedInActive(): { key: string; line: number } | undefined {
     const doc = this.activeDocument;
     if (!doc) return undefined;

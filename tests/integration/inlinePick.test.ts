@@ -1,6 +1,6 @@
 import * as assert from 'node:assert/strict';
 import * as vscode from 'vscode';
-import { getApi, sleep } from './helpers';
+import { getApi, showFocused, sleep } from './helpers';
 
 /**
  * The task buttons' pickers open as a drop-down on the line (the suggestion list) instead of the QuickPick at the top
@@ -13,7 +13,7 @@ suite('task button pickers on the line (M31)', () => {
   async function pick(line: string, kind: string, typed = ''): Promise<string> {
     await getApi();
     const doc = await vscode.workspace.openTextDocument({ language: 'markdown', content: `# Notes\n${line}\n\nplain\n` });
-    const editor = await vscode.window.showTextDocument(doc);
+    const editor = await showFocused(doc);
     editor.selection = new vscode.Selection(1, 2, 1, 2);
     await sleep(300);
     const hints = await vscode.commands.executeCommand<vscode.InlayHint[]>('vscode.executeInlayHintProvider', doc.uri, new vscode.Range(0, 0, doc.lineCount, 0));
@@ -59,7 +59,7 @@ suite('task button pickers on the line (M31)', () => {
   async function openDuePicker(): Promise<{ doc: vscode.TextDocument; editor: vscode.TextEditor }> {
     await getApi();
     const doc = await vscode.workspace.openTextDocument({ language: 'markdown', content: '# Notes\n- [ ] write report\n' });
-    const editor = await vscode.window.showTextDocument(doc);
+    const editor = await showFocused(doc);
     editor.selection = new vscode.Selection(1, 2, 1, 2);
     await sleep(300);
     const hints = await vscode.commands.executeCommand<vscode.InlayHint[]>('vscode.executeInlayHintProvider', doc.uri, new vscode.Range(0, 0, doc.lineCount, 0));

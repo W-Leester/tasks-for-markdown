@@ -1001,20 +1001,18 @@
       },
       {
         "command": "tasksmd.toggleDone",
-        "key": "ctrl+shift+enter",
-        "mac": "ctrl+shift+enter",
+        "key": "alt+c",
         "when": "editorTextFocus && editorLangId == markdown && tasksmd.onTaskLine"
       },
       {
         "command": "tasksmd.toggleCheckbox",
         "key": "ctrl+shift+c",
-        "mac": "ctrl+shift+c",
+        "mac": "cmd+shift+c",
         "when": "editorTextFocus && editorLangId == markdown"
       },
       {
         "command": "tasksmd.createOrEdit",
         "key": "alt+shift+c",
-        "mac": "cmd+shift+c",
         "when": "!terminalFocus && (editorTextFocus && editorLangId == markdown || activeCustomEditorId == tasksmd.rendered || focusedView =~ /^tasksmd\\./)"
       },
       {

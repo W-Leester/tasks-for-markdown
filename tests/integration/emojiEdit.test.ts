@@ -1,6 +1,6 @@
 import * as assert from 'node:assert/strict';
 import * as vscode from 'vscode';
-import { getApi, sleep } from './helpers';
+import { getApi, showFocused, sleep } from './helpers';
 
 /**
  * Editing a task shown in an editor next to an emoji that shares its first UTF-16 unit (🔁 📅 🔺 🔼 🔽 🛫 …) must keep
@@ -10,7 +10,7 @@ suite('edits next to emoji (incident #44)', () => {
   async function apply(line: string, kind: string, value: unknown): Promise<string> {
     await getApi();
     const doc = await vscode.workspace.openTextDocument({ language: 'markdown', content: `# N\n${line}\n` });
-    const editor = await vscode.window.showTextDocument(doc);
+    const editor = await showFocused(doc);
     editor.selection = new vscode.Selection(1, 3, 1, 3);
     await sleep(300);
     await vscode.commands.executeCommand('tasksmd.inlinePick.apply', { kind, value });

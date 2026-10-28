@@ -45,7 +45,7 @@ The extension indexes every `- [ ]` line in the workspace. You can see, query an
 New here? [Open the Get Started guide in VS Code](https://vscode.dev/redirect?url=vscode://hastycapybara.tasks-for-markdown/guide) (in Cursor: **Tasks: Open Get Started guide** from the Command Palette). The guide also opens by itself the first time.
 
 1. **Open a folder with Markdown files.** Every `- [ ]` line in it becomes a task, and the **Tasks** icon appears in the Activity Bar.
-2. **Create tasks.** Write a checklist line such as `- [ ] Write the report 📅 2026-09-25`, or press `Ctrl+Shift+C` to turn the current line into a checkbox, or `Cmd+Shift+C` (macOS) / `Alt+Shift+C` (Windows, Linux) (the Ctrl key on macOS too) to open the create/edit dialog. `Ctrl+Shift+Enter` on a task line marks it done.
+2. **Create tasks.** Write a checklist line such as `- [ ] Write the report 📅 2026-09-25`, or press `Cmd+Shift+C` (macOS) / `Ctrl+Shift+C` (Windows, Linux) to turn the current line into a checkbox, or `Option+Shift+C` (macOS) / `Alt+Shift+C` (Windows, Linux) (the Ctrl key on macOS too) to open the create/edit dialog. `Option/Alt+C` on a task line marks it done.
 3. **Filter with a query block, then view the note.** A ` ```tasks ` block lists the tasks that match its lines; `Ctrl+Shift+R` opens the note in the rendered view with the results in place. (VS Code's own Markdown preview shows the results too, but its checkboxes are display-only.) Common query lines: [Query syntax](#query-syntax).
 
 ````markdown
@@ -63,13 +63,13 @@ group by filename
 
 ![Typing a task: auto-suggest for the due date, "next fri" becomes 2026-10-09](docs/images/demo-editing.gif)
 
-**Create and edit in a dialog.** `Cmd+Shift+C` (macOS) / `Alt+Shift+C` (Windows, Linux) on an empty line opens a form for a new task. On an existing task it opens the same form to edit it, with priority, dates in plain words, tags and repeat presets.
+**Create and edit in a dialog.** `Option+Shift+C` (macOS) / `Alt+Shift+C` (Windows, Linux) on an empty line opens a form for a new task. On an existing task it opens the same form to edit it, with priority, dates in plain words, tags and repeat presets.
 
-![Cmd+Shift+C / Alt+Shift+C: a new task is filled in and created, then an existing task is opened and changed](docs/images/demo-dialog.gif)
+![Option+Shift+C / Alt+Shift+C: a new task is filled in and created, then an existing task is opened and changed](docs/images/demo-dialog.gif)
 
-**Complete with one key.** `Ctrl+Shift+Enter` marks a task done. A recurring task gets its next occurrence automatically.
+**Complete with one key.** `Option/Alt+C` marks a task done. A recurring task gets its next occurrence automatically.
 
-![Ctrl+Shift+Enter completes a weekly task and inserts the next occurrence](docs/images/demo-recurring.gif)
+![Option/Alt+C completes a weekly task and inserts the next occurrence](docs/images/demo-recurring.gif)
 
 **Work in the rendered view.** Tick checkboxes, add notes with 💬, add tasks below a row with `Enter` or ＋ (one after another), and show or hide columns. Query blocks update live.
 
@@ -200,10 +200,10 @@ You don't have to write queries by hand. `Tasks: Open query builder` assembles o
 
 | Command | Shortcut |
 |---|---|
-| Toggle task done | `Ctrl+Shift+Enter` (on a task line; Ctrl on macOS too) |
-| Add or remove checkbox | `Ctrl+Shift+C` — turns the line into `- [ ] …` (a bullet keeps its marker); on a task line it removes the box |
+| Toggle task done | `Option+C` (macOS) / `Alt+C` (Windows, Linux), on a task line |
+| Add or remove checkbox | `Cmd+Shift+C` (macOS) / `Ctrl+Shift+C` (Windows, Linux) — turns the line into `- [ ] …` (a bullet keeps its marker); on a task line it removes the box |
 | Keyboard shortcuts (change any key) | **Tasks: Keyboard shortcuts** opens the Keyboard Shortcuts editor filtered to this extension |
-| Create or edit task | `Cmd+Shift+C` (macOS) / `Alt+Shift+C` (Windows, Linux) |
+| Create or edit task | `Option+Shift+C` (macOS) / `Alt+Shift+C` (Windows, Linux) |
 | Quick search tasks | `Cmd/Ctrl+Shift+;` |
 | Set status / priority / due / scheduled / start / recurrence / dependencies, Postpone | — |
 | Open rendered view / edit Markdown source (toggle) — interactive preview with live ```tasks results | `Ctrl+Shift+R` |

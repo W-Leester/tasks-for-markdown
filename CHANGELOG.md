@@ -2,9 +2,11 @@
 
 ## Unreleased (1.1.6)
 
+- **New keys.** Add or remove checkbox: `Cmd+Shift+C` (macOS) / `Ctrl+Shift+C` (Windows, Linux). Toggle done: `Option+C` / `Alt+C` (also on the selected row of the rendered view). Create or edit task: `Option+Shift+C` / `Alt+Shift+C`. Before: `Ctrl+Shift+C`, `Ctrl+Shift+Enter`, and `Cmd+Shift+C` on macOS for the dialog. On macOS `Option+C` and `Option+Shift+C` normally type `ç` and `Ç`; in Markdown editors they are the extension's keys now. Change any of them with **Tasks: Keyboard shortcuts**.
 - **The rendered view shows what other Markdown extensions add to the preview** — Mermaid diagrams, math and the like now draw there as they do in the built-in preview (`Cmd/Ctrl+Shift+V`). Nothing is bundled: the rendered view uses the same extensions, through the same contributions the built-in preview uses. VS Code has Mermaid and math built in; in Cursor, install a Mermaid extension (e.g. Markdown Preview Mermaid Support). Turn off with `tasksmd.rendered.markdownExtensions`.
 
 ### 한국어 요약
+- **단축키 변경:** 체크박스 만들기/지우기 `Cmd+Shift+C`(macOS) / `Ctrl+Shift+C`(Windows·Linux), 완료 표시 `Option+C` / `Alt+C`(렌더 보기에서 고른 줄도), 태스크 만들기/편집 `Option+Shift+C` / `Alt+Shift+C`. 예전: `Ctrl+Shift+C`, `Ctrl+Shift+Enter`, macOS 대화상자 `Cmd+Shift+C`. macOS의 `Option+C`·`Option+Shift+C`는 원래 `ç`·`Ç` 입력 — 마크다운 편집기에서는 확장 키. 바꾸려면 `Tasks: 단축키 설정 열기`.
 - **렌더 보기에서 다른 마크다운 확장의 기능도:** 머메이드 다이어그램·수식 등이 기본 미리보기처럼 렌더 보기에서도 그려짐. 우리 확장에 넣지 않고 그 확장을 같은 통로로 빌려 씀. VS Code는 머메이드·수식 내장, Cursor는 머메이드 확장(Markdown Preview Mermaid Support 등) 설치 필요. 끄려면 `tasksmd.rendered.markdownExtensions`.
 
 ## 1.1.5 — 2026-10-19

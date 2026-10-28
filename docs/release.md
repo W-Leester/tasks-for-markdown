@@ -58,7 +58,7 @@ for p in tasks-core tasks-cli tasks-api; do pnpm --filter @hastycapybara/$p publ
 ## 1.1.6 게시 (2026-10-29)
 - 내용: M34(렌더 보기가 다른 마크다운 확장의 미리보기 기능을 씀 — 머메이드·수식), M35(단축키: 체크박스 `Cmd/Ctrl+Shift+C`, 완료 `Option/Alt+C`, 만들기 `Option/Alt+Shift+C`, 렌더 보기 macOS `Cmd+Shift+R`), M36(줄 버튼 기본 꺼짐 + TASKS 제목 줄 스위치), 통합 테스트 포커스 흔들림 수정(#46)
 - [x] 검증: typecheck·lint, 단위 851, 웹뷰 36, 통합 90(두 번 연속), `build:packages`, `pnpm package`(35 files, 타입 파일·`tasksmd.cjs`), 번들 CLI `tasksmd 1.1.6`
-- [ ] 수동(사용자, Cursor): 세 단축키·렌더 보기 `Option+C` ✅(10-28). **배포 전 확인 못 함:** 렌더 보기 `Cmd+Shift+R`, 줄 버튼 스위치, Cursor + bierner 머메이드 — 배포 후 확인
+- [ ] 수동(사용자, Cursor): 세 단축키·렌더 보기 `Option+C` ✅(10-28). 배포 전 확인 못 한 렌더 보기 `Cmd+Shift+R`, 줄 버튼 스위치, Cursor + bierner 머메이드는 **배포 후 사용자 확인 ✅(10-29)**
 - [x] Marketplace 업로드(사용자, 10-29 06:03 빌드 `3443384b…`) → 06:27 KST 공개(약 7분). 마켓 사본(gzip을 풀어) = 업로드본 → `releases/`
 - [x] 태그 `v1.1.6` → Release 성공(첫 시도, 통합 90 passing). Open VSX 토큰 없이(`🔐 → 🚀 v1.1.6`), npm 3개 provenance. 확인: Open VSX 1.1.6(`verified=true`), npm `tasks-core`·`tasks-cli`·`tasks-api` 1.1.6. GitHub Release 파일 `releases/`(`.github.vsix` `c0646d2e…`, tgz 3개)
 

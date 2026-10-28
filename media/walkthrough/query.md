@@ -11,4 +11,4 @@ group by filename
 ```
 ````
 
-`Ctrl+Shift+R` opens the note in the rendered view: query results appear in place, and you can tick, edit and postpone tasks there.
+`Cmd+Shift+R` (macOS) / `Ctrl+Shift+R` (Windows, Linux) opens the note in the rendered view: query results appear in place, and you can tick, edit and postpone tasks there.

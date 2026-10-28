@@ -17,7 +17,7 @@ docs/Tasks.md에 남아 있는 미체크 항목 중 자동 테스트로 대신�
 3. 볼 것:
    - 줄 끝 상대 날짜 장식("4일 지남" 등)과 기한 초과 줄 배경이 **읽히는지** (글자가 배경에 묻히지 않아야 함).
    - 명령 팔레트 → `Markdown: Open Preview to the Side`로 미리보기를 옆에 열어 뱃지·체크박스·쿼리 결과 카드가 보이는지.
-   - `Ctrl+Shift+R` 렌더 보기, `Tasks: 칸반 보드 열기`, `Tasks: 캘린더 열기`, `Option+Shift+C`(macOS) / `Alt+Shift+C`(Windows·Linux) 편집 대화상자 순서로 열어 테두리·포커스 링·버튼이 보이는지. 하이 컨트라스트에서는 테두리가 두껍고 뚜렷해야 정상입니다.
+   - `Cmd/Ctrl+Shift+R` 렌더 보기, `Tasks: 칸반 보드 열기`, `Tasks: 캘린더 열기`, `Option+Shift+C`(macOS) / `Alt+Shift+C`(Windows·Linux) 편집 대화상자 순서로 열어 테두리·포커스 링·버튼이 보이는지. 하이 컨트라스트에서는 테두리가 두껍고 뚜렷해야 정상입니다.
 4. 문제가 보이면 어느 화면의 어떤 요소인지 스크린샷을 남겨 주세요. 색은 모두 `--vscode-*` 변수라 `package.json`의 `contributes.colors` hc 기본값만 고치면 됩니다.
 
 ### 2-2. Remote SSH / WSL / Codespaces
@@ -43,14 +43,14 @@ docs/Tasks.md에 남아 있는 미체크 항목 중 자동 테스트로 대신�
 8. 알림: 설정 `tasksmd.notifications.dailyTime`을 현재 시각 +1분으로 바꾸고 기다렸다가 토스트와 OS 알림이 오는지. Windows/Linux에서는 OS 알림(PowerShell 토스트 / `notify-send`)이 특히 확인 대상입니다.
 9. 아카이브: `Tasks: 완료 태스크 아카이브…` → 미리보기 → 확인 → `Archive.md` 생성.
 10. 업데이트 확인: `tasksmd.updateCheckUrl`에 `dist/latest.json`을 로컬 HTTP나 파일 경로로 주고 `Tasks: 업데이트 확인` 실행.
-Windows에서는 키 표기가 `Option+Shift+C`(macOS) / `Alt+Shift+C`(Windows·Linux), `Ctrl+Shift+R`로 같고, 경로 구분자가 `\`라도 쿼리의 `path includes`가 `/`로 동작해야 합니다(내부에서 변환).
+Windows에서는 키 표기가 `Option+Shift+C`(macOS) / `Alt+Shift+C`(Windows·Linux), `Cmd/Ctrl+Shift+R`로 같고, 경로 구분자가 `\`라도 쿼리의 `path includes`가 `/`로 동작해야 합니다(내부에서 변환).
 
 ### 2-4. Cursor macOS / Windows
 
 VS Code와 다른 부분만 봅니다.
-1. `Option+Shift+C`(macOS) / `Alt+Shift+C`(Windows·Linux), `Ctrl+Shift+R`, `Option/Alt+C`가 **Cursor의 기본 키와 충돌하지 않는지**: 텍스트 편집기, 렌더 보기, Cursor Preview 모드, 채팅 패널에 포커스가 있을 때 각각 눌러 엉뚱한 동작(다른 편집기 닫힘 등)이 없는지.
+1. `Option+Shift+C`(macOS) / `Alt+Shift+C`(Windows·Linux), `Cmd/Ctrl+Shift+R`, `Option/Alt+C`가 **Cursor의 기본 키와 충돌하지 않는지**: 텍스트 편집기, 렌더 보기, Cursor Preview 모드, 채팅 패널에 포커스가 있을 때 각각 눌러 엉뚱한 동작(다른 편집기 닫힘 등)이 없는지.
    - **Markdown All in One과 함께(10-18 추가):** 체크박스 줄 끝 `Enter` → 다음 줄에 `- [ ] `, 이어서 `Tab` → 들여쓰기. 제안 창이 끼어들지 않아야 함(incidents #41).
-2. Cursor Preview 토글은 결과가 안 나오는 것이 정상입니다(설계상 불가). 대신 `Ctrl+Shift+R` 렌더 보기와 CodeLens `▷ 결과 보기`가 되는지.
+2. Cursor Preview 토글은 결과가 안 나오는 것이 정상입니다(설계상 불가). 대신 `Cmd/Ctrl+Shift+R` 렌더 보기와 CodeLens `▷ 결과 보기`가 되는지.
 3. 명령 팔레트 → `Markdown: Open Preview to the Side`로 연 표준 미리보기가 **빈 화면이 아닌지**. 예전에 비어 보이던 증상이 1.0.1 이후 사라졌는지 확인이 필요한 항목입니다. 비어 있으면 `Help: Toggle Developer Tools` 콘솔의 빨간 줄을 붙여 주세요.
 4. Markdown All in One을 켠 상태와 끈 상태 모두에서 미리보기 뱃지가 보이는지.
 
@@ -66,7 +66,7 @@ VS Code와 다른 부분만 봅니다.
 ### 2-7. Obsidian 볼트 샘플과 파싱 대조
 
 1. 실제로 쓰는 Obsidian 볼트가 있으면 그 폴더를 VS Code로 엽니다(없으면 `examples/`로 대신).
-2. Obsidian에서 ```tasks 블록이 있는 노트를 하나 골라, 같은 노트를 여기서 `Markdown: Open Preview to the Side`(명령 팔레트)나 `Ctrl+Shift+R`로 봅니다.
+2. Obsidian에서 ```tasks 블록이 있는 노트를 하나 골라, 같은 노트를 여기서 `Markdown: Open Preview to the Side`(명령 팔레트)나 `Cmd/Ctrl+Shift+R`로 봅니다.
 3. 대조할 것: 블록의 **일치 개수**("N of M tasks")와 **순서**가 Obsidian과 같은지, 각 태스크의 날짜·우선순위·반복 배지가 같은지, 여기서 완료 토글한 줄을 Obsidian에서 열었을 때 필드 순서(`🆔 ⛔ 우선순위 🔁 🏁 ➕ 🛫 ⏳ 📅 ❌ ✅`)가 Obsidian이 쓴 것과 같은지.
 4. 다르면 그 태스크 줄 원문과 쿼리 텍스트를 그대로 붙여 주세요. `tests/core/query/obsidian-compat.test.ts`에 케이스로 추가해 고칩니다.
 

@@ -25,6 +25,12 @@ suite('add or remove checkbox (M26)', () => {
     assert.match(kb.when!, /focusedView =~ \/\^tasksmd/);
   });
 
+  test('the rendered view is Cmd+Shift+R on macOS, Ctrl+Shift+R elsewhere (10-28)', () => {
+    const pkg = vscode.extensions.getExtension('HastyCapybara.tasks-for-markdown')!.packageJSON as { contributes: { keybindings: { command: string; key: string; mac?: string }[] } };
+    const kb = pkg.contributes.keybindings.filter((k) => k.command === 'tasksmd.openRendered');
+    assert.deepEqual(kb.map((k) => [k.key, k.mac]), [['ctrl+shift+r', 'cmd+shift+r']]);
+  });
+
   test('no rendered view in front → no rendered selection; the shortcuts command exists', async () => {
     assert.equal(await vscode.commands.executeCommand('tasksmd.rendered.selection'), undefined);
     assert.ok((await vscode.commands.getCommands(true)).includes('tasksmd.openKeybindings'));

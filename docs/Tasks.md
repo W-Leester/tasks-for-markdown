@@ -1143,7 +1143,8 @@
 - [x] 하는 중: 통합 테스트가 4번 중 3번 실패(매번 다른 타이핑 테스트, 묶음의 첫 테스트에서 친 글자가 안 들어감) → 타이핑 테스트가 편집기 포커스를 기다리게(`showFocused`) → 4번 모두 통과(incidents #46)
 - [x] 사용자 확인(Cursor: 세 키, 렌더 보기 Option+C, 10-28) ✅
 - **추가(사용자 요청 10-28): 렌더 보기 키 macOS `Cmd+Shift+R`**("맥 사용자는 Ctrl을 생각보다 안 쓴다"), Windows·Linux는 `Ctrl+Shift+R` 그대로. 겹침 확인: VS Code 기본 키 목록(`vscode://defaultsettings/keybindings.json`, macOS)에서 `shift+cmd+r`은 검색 편집기 안·문제 보고 창·내장 브라우저 창에서만 — 마크다운 편집기·렌더 보기와 안 겹침. 화면 문구(소스 버튼 설명, 기본 편집기 안내, 시작 안내)의 키도 OS에 맞게.
-- [ ] 렌더 보기 키: 테스트(먼저 실패) → package.json·문구 → 문서
+- [x] 렌더 보기 키: 테스트(먼저 실패) → package.json·문구(소스 버튼 설명·기본 편집기 안내 `{0}`·시작 안내) → 문서(README 한·영, user-guide, 점검표, requirements, CHANGELOG, design)
+- [ ] 사용자 확인(Cursor: `Cmd+Shift+R`)
 
 ## M34. 렌더 보기에서 다른 마크다운 확장의 기능 쓰기 (1.1.6, 계획 2026-10-24, 사용자 요청)
 

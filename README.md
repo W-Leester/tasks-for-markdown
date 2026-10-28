@@ -35,7 +35,7 @@ The extension indexes every `- [ ]` line in the workspace. You can see, query an
 - **Sidebar** — Today, Next 7 days, Overdue, In progress, Blocked, All open, Done; saved queries with grouped results.
 - **Query language** — the Obsidian Tasks query language in ` ```tasks ` blocks, saved queries and a visual query builder.
 - **Recurrence, statuses, dependencies** — `🔁 every month on the last`, custom statuses with presets, `🆔`/`⛔` dependencies with blocked detection, urgency score.
-- **Rendered view** — an interactive preview: tick, edit, postpone, add notes, show or hide columns, live query results (`Ctrl+Shift+R`).
+- **Rendered view** — an interactive preview: tick, edit, postpone, add notes, show or hide columns, live query results (`Cmd/Ctrl+Shift+R`).
 - **Notes** — indented bullets under a task are its notes; add them from the rendered view with 💬.
 - **More views** — create/edit dialog, kanban, calendar, weekly statistics, archive, daily notifications.
 - **AI and automation** — MCP server for AI agents, public extension API, commands, CLI and library (see [Use it with AI](#use-it-with-ai) and [Extend it](#extend-it)).
@@ -46,7 +46,7 @@ New here? [Open the Get Started guide in VS Code](https://vscode.dev/redirect?ur
 
 1. **Open a folder with Markdown files.** Every `- [ ]` line in it becomes a task, and the **Tasks** icon appears in the Activity Bar.
 2. **Create tasks.** Write a checklist line such as `- [ ] Write the report 📅 2026-09-25`, or press `Cmd+Shift+C` (macOS) / `Ctrl+Shift+C` (Windows, Linux) to turn the current line into a checkbox, or `Option+Shift+C` (macOS) / `Alt+Shift+C` (Windows, Linux) (the Ctrl key on macOS too) to open the create/edit dialog. `Option/Alt+C` on a task line marks it done.
-3. **Filter with a query block, then view the note.** A ` ```tasks ` block lists the tasks that match its lines; `Ctrl+Shift+R` opens the note in the rendered view with the results in place. (VS Code's own Markdown preview shows the results too, but its checkboxes are display-only.) Common query lines: [Query syntax](#query-syntax).
+3. **Filter with a query block, then view the note.** A ` ```tasks ` block lists the tasks that match its lines; `Cmd/Ctrl+Shift+R` opens the note in the rendered view with the results in place. (VS Code's own Markdown preview shows the results too, but its checkboxes are display-only.) Common query lines: [Query syntax](#query-syntax).
 
 ````markdown
 ```tasks
@@ -206,7 +206,7 @@ You don't have to write queries by hand. `Tasks: Open query builder` assembles o
 | Create or edit task | `Option+Shift+C` (macOS) / `Alt+Shift+C` (Windows, Linux) |
 | Quick search tasks | `Cmd/Ctrl+Shift+;` |
 | Set status / priority / due / scheduled / start / recurrence / dependencies, Postpone | — |
-| Open rendered view / edit Markdown source (toggle) — interactive preview with live ```tasks results | `Ctrl+Shift+R` |
+| Open rendered view / edit Markdown source (toggle) — interactive preview with live ```tasks results | `Cmd+Shift+R` (macOS) / `Ctrl+Shift+R` (Windows, Linux) |
 | Rendered view as default editor (on/off) | — |
 | Open kanban board / calendar / statistics / query builder / query results (beside the editor, follows the cursor) | — |
 | Archive completed tasks… | — |

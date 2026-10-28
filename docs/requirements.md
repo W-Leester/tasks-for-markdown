@@ -290,6 +290,7 @@ Obsidian Tasks 쿼리 문법과 호환되는 텍스트 기반 엔진. 한 줄 = 
 | `tasksmd.toggleDone` | macOS `Option+C`, Windows·Linux `Alt+C` (1.1.6부터, 마크다운 파일의 태스크 줄에서; 렌더 보기에서 고른 줄도). 1.1.5까지 `Ctrl+Shift+Enter`, 2026-10-01 전에는 `Ctrl/Cmd+Enter` | 상태 순환(FR-1.18) |
 | `tasksmd.setStatus` | — | 상태 선택 QuickPick |
 | `tasksmd.toggleCheckbox` | macOS `Cmd+Shift+C`, Windows·Linux `Ctrl+Shift+C` (1.1.6부터, 마크다운 편집기에서만 — 기본 "외부 터미널 열기"는 다른 곳에서 그대로). 1.1.4~1.1.5는 모든 OS `Ctrl+Shift+C` |
+| `tasksmd.openRendered` | macOS `Cmd+Shift+R`, Windows·Linux `Ctrl+Shift+R` (1.1.6부터 macOS Cmd; 1.1.5까지 macOS도 `Ctrl+Shift+R`) | 렌더 보기 ↔ 소스 |
 | `tasksmd.createOrEdit` | macOS `Option+Shift+C`, Windows·Linux `Alt+Shift+C` (1.1.6부터; 마크다운 편집기·렌더 보기·Tasks 사이드바에서만). 1.1.5: macOS `Cmd+Shift+C`. 1.1.4: `Ctrl+Shift+/` |
 | `tasksmd.setPriority` / `setDueDate` / `setScheduledDate` / `setStartDate` / `setRecurrence` / `setDependencies` | — | 개별 QuickPick |
 | `tasksmd.postpone` | — | 마감/예정일을 N일 미룸(내일/다음주/… 선택) |

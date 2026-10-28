@@ -1024,7 +1024,7 @@
       {
         "command": "tasksmd.openRendered",
         "key": "ctrl+shift+r",
-        "mac": "ctrl+shift+r",
+        "mac": "cmd+shift+r",
         "when": "!terminalFocus && (editorTextFocus && editorLangId == markdown || activeCustomEditorId == tasksmd.rendered || !inputFocus && resourceExtname =~ /\\.(md|markdown)$/)"
       }
     ],

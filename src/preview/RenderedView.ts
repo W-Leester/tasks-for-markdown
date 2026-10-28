@@ -69,6 +69,9 @@ const INDEX_DEBOUNCE_MS = 400;
  * checkbox toggles the task, double-clicking opens the edit dialog, links open their target. It is
  * the stand-in for editors whose own preview cannot run extension renderers (Cursor's WYSIWYG mode).
  */
+/** The rendered view ↔ source key as this OS shows it (package.json: `cmd+shift+r` on macOS, `ctrl+shift+r` elsewhere). */
+const RENDERED_KEY = process.platform === 'darwin' ? 'Cmd+Shift+R' : 'Ctrl+Shift+R';
+
 /** Other extensions' preview contributions in use (M34). Their scripts load after ours, which takes the webview API. */
 interface Borrowed {
   plugins: { id: string; apply: (md: MarkdownIt) => unknown }[];
@@ -534,7 +537,7 @@ ${borrowed.styles.map((u) => `<link rel="stylesheet" href="${webview.asWebviewUr
 </div>
 <div class="rv-toggle" role="group" aria-label="${t('Editor mode')}">
   <button id="mode-rendered" aria-pressed="true">${t('Rendered')}</button>
-  <button id="mode-source" title="${t('Open the Markdown source in the text editor')} (Ctrl+Shift+R)">${t('Source')}</button>
+  <button id="mode-source" title="${t('Open the Markdown source in the text editor')} (${RENDERED_KEY})">${t('Source')}</button>
 </div>
 <div id="content"></div>
 <script nonce="${nonce}" src="${script}"></script>
@@ -563,7 +566,7 @@ export async function setRenderedDefault(on: boolean): Promise<void> {
   if (on) current['*.md'] = RENDERED_VIEW_TYPE;
   else if (current['*.md'] === RENDERED_VIEW_TYPE) delete current['*.md'];
   await config.update('editorAssociations', current, vscode.ConfigurationTarget.Global);
-  void vscode.window.showInformationMessage(on ? t('Markdown notes now open in the rendered view. Source: the Source button or Ctrl+Shift+R.') : t('Markdown notes open in the text editor again.'));
+  void vscode.window.showInformationMessage(on ? t('Markdown notes now open in the rendered view. Source: the Source button or {0}.', RENDERED_KEY) : t('Markdown notes open in the text editor again.'));
 }
 
 /** Registers the custom editor and the commands that open it. */

@@ -155,7 +155,7 @@
   "tasksmd.walkthrough.firstTask.title": "태스크 만들기",
   "tasksmd.walkthrough.firstTask.description": "마크다운 파일에 `- [ ] 보고서 작성 📅 2026-09-25` 같은 체크리스트 줄을 쓰거나 대화상자를 엽니다.\n[태스크 만들기](command:tasksmd.createOrEdit)",
   "tasksmd.walkthrough.query.title": "쿼리로 거르고 노트 보기",
-  "tasksmd.walkthrough.query.description": "```tasks 블록은 조건에 맞는 태스크를 목록으로 보여 줍니다. 렌더 보기(Ctrl+Shift+R)는 그 자리에 결과와 체크박스를 보여 줍니다.\n[쿼리 블록 넣기](command:tasksmd.insertQueryBlock)\n[렌더 보기 열기](command:tasksmd.openRendered)",
+  "tasksmd.walkthrough.query.description": "```tasks 블록은 조건에 맞는 태스크를 목록으로 보여 줍니다. 렌더 보기(macOS `Cmd+Shift+R`, Windows·Linux `Ctrl+Shift+R`)는 그 자리에 결과와 체크박스를 보여 줍니다.\n[쿼리 블록 넣기](command:tasksmd.insertQueryBlock)\n[렌더 보기 열기](command:tasksmd.openRendered)",
   "tasksmd.walkthrough.ai.title": "AI 에이전트 연결",
   "tasksmd.walkthrough.ai.description": "이 에디터의 AI 에이전트는 자동으로 연결됩니다. Claude Code나 Claude Desktop이 설치돼 있으면 연결할지 물어봅니다(npm 불필요). MCP로 연결하면 AI가 같은 쿼리 엔진으로 정확하게 답하고, 에디터와 똑같이 태스크를 고치며, 사용자의 편집을 덮어쓰지 않습니다.\n[AI 에이전트 연결](command:tasksmd.connectAi)",
   "tasksmd.walkthrough.cli.title": "터미널에서 태스크 쓰기",

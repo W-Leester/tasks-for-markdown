@@ -24,6 +24,8 @@
   "tasksmd.markDone.title": "완료로 표시",
   "tasksmd.markCancelled.title": "취소로 표시",
   "tasksmd.reopen.title": "태스크 다시 열기",
+  "tasksmd.lineButtons.show.title": "줄 버튼 보이기",
+  "tasksmd.lineButtons.hide.title": "줄 버튼 숨기기",
   "tasksmd.tree.refresh.title": "새로 고침",
   "tasksmd.tree.groupBy.title": "그룹 기준…",
   "tasksmd.tree.filter.title": "태스크 필터",

@@ -7,6 +7,9 @@ import { getApi, showFocused, sleep } from './helpers';
  * (M31). Each test runs the real button's command, types like the keyboard, then accepts what the list selected.
  */
 suite('task button pickers on the line (M31)', () => {
+  // Line buttons are off by default since 10-28 (M36): this suite turns them on.
+  suiteSetup(() => vscode.workspace.getConfiguration('tasksmd').update('codeLens.mode', 'cursorLine', vscode.ConfigurationTarget.Global));
+  suiteTeardown(() => vscode.workspace.getConfiguration('tasksmd').update('codeLens.mode', undefined, vscode.ConfigurationTarget.Global));
   const iso = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   const tomorrow = () => { const d = new Date(); d.setDate(d.getDate() + 1); return iso(d); };
 

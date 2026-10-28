@@ -111,6 +111,9 @@ suite('smoke', () => {
 });
 
 suite('editor providers', () => {
+  // Line buttons are off by default since 10-28 (M36): this suite turns them on.
+  suiteSetup(() => vscode.workspace.getConfiguration('tasksmd').update('codeLens.mode', 'cursorLine', vscode.ConfigurationTarget.Global));
+  suiteTeardown(() => vscode.workspace.getConfiguration('tasksmd').update('codeLens.mode', undefined, vscode.ConfigurationTarget.Global));
   test('task buttons appear for the cursor line only (default mode, at the end of the line since M30)', async () => {
     await getApi();
     const doc = await vscode.workspace.openTextDocument(fixtureUri('notes/week-38.md'));

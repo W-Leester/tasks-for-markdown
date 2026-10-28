@@ -108,6 +108,18 @@
         "icon": "$(debug-restart)"
       },
       {
+        "command": "tasksmd.lineButtons.show",
+        "title": "%tasksmd.lineButtons.show.title%",
+        "category": "Tasks",
+        "icon": "$(eye-closed)"
+      },
+      {
+        "command": "tasksmd.lineButtons.hide",
+        "title": "%tasksmd.lineButtons.hide.title%",
+        "category": "Tasks",
+        "icon": "$(eye)"
+      },
+      {
         "command": "tasksmd.tree.refresh",
         "title": "%tasksmd.tree.refresh.title%",
         "category": "Tasks",
@@ -599,7 +611,7 @@
             "cursorLine",
             "all"
           ],
-          "default": "cursorLine",
+          "default": "off",
           "enumDescriptions": [
             "%tasksmd.config.codeLens.mode.off%",
             "%tasksmd.config.codeLens.mode.cursorLine%",
@@ -1031,6 +1043,14 @@
     "menus": {
       "commandPalette": [
         {
+          "command": "tasksmd.lineButtons.show",
+          "when": "config.tasksmd.codeLens.mode == 'off'"
+        },
+        {
+          "command": "tasksmd.lineButtons.hide",
+          "when": "config.tasksmd.codeLens.mode != 'off'"
+        },
+        {
           "command": "tasksmd.openTask",
           "when": "false"
         },
@@ -1225,6 +1245,16 @@
         }
       ],
       "view/title": [
+        {
+          "command": "tasksmd.lineButtons.show",
+          "when": "view == tasksmd.tasks && config.tasksmd.codeLens.mode == 'off'",
+          "group": "navigation@-1"
+        },
+        {
+          "command": "tasksmd.lineButtons.hide",
+          "when": "view == tasksmd.tasks && config.tasksmd.codeLens.mode != 'off'",
+          "group": "navigation@-1"
+        },
         {
           "command": "tasksmd.quickSearch",
           "when": "view == tasksmd.tasks",

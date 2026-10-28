@@ -424,5 +424,7 @@
   "Add task": "태스크 추가",
   "New task — Enter to add, Esc to stop": "새 태스크 — Enter로 추가, Esc로 끝",
   "Empty task": "빈 태스크",
-  "{0} ({1}+click)": "{0} ({1}+클릭)"
+  "{0} ({1}+click)": "{0} ({1}+클릭)",
+  "Line buttons on": "줄 버튼 켬",
+  "Line buttons off": "줄 버튼 끔"
 }

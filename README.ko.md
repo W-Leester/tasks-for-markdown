@@ -228,7 +228,7 @@ if (tasks.features?.includes('notes.add')) await tasks.edit.addNote(r.tasks[0], 
 | `setDoneDate` / `setCancelledDate` / `setCreatedDate` | `true` / `true` / `false` | ✅ ❌ ➕ 자동 날짜 |
 | `statuses` | 기본 4종 | 커스텀 체크박스 심볼·이름·다음 심볼·타입 |
 | `recurrence.insertPosition` / `idHandling` / `copyDependsOn` / `removeScheduledDate` | `above` / `keep` / `true` / `false` | 다음 회차 생성 규칙 |
-| `decorations.*`, `codeLens.mode` / `codeLens.position`, `autoSuggest.*` | `cursorLine` / `lineEnd` | 에디터 보조; 태스크 버튼은 줄 끝에(`above` = 줄 위 CodeLens) |
+| `decorations.*`, `codeLens.mode` / `codeLens.position`, `autoSuggest.*` | `off` / `lineEnd` | 에디터 보조; 태스크 버튼은 줄 끝에(`above` = 줄 위 CodeLens), 기본 꺼짐 — TASKS 제목 줄의 눈 아이콘으로 켬 |
 | `preview.enabled` / `preview.renderBadges` | `true` | 마크다운 미리보기 렌더링 |
 | `savedQueries` | `[]` | 저장된 쿼리 (`.tasks/queries/*.md`도 함께 읽음) |
 | `query.allowFunctions` | `false` | 쿼리의 `by function` JavaScript 허용 (신뢰된 워크스페이스만) |

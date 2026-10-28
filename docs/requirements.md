@@ -327,7 +327,7 @@ Obsidian Tasks 쿼리 문법과 호환되는 텍스트 기반 엔진. 한 줄 = 
 | `recurrence.removeScheduledOnRecur` | `false` | |
 | `statuses` | 기본 4종 | 커스텀 상태 배열 |
 | `decorations.*` | 각종 on/off | 5.1 |
-| `codeLens.mode` | `cursorLine` | `off` / `cursorLine` / `all` |
+| `codeLens.mode` | `off` | `off` / `cursorLine` / `all`. 1.1.6에서 기본 `cursorLine` → `off`, TASKS 제목 줄 눈 아이콘으로 프로젝트마다 켬(M36) |
 | `decorations.missingDueDate` | `false` | 마감일 없는 미완료 태스크에 옅은 점(힌트). 1.1.5에서 `requireDueDate`와 분리 |
 | `codeLens.position` | `lineEnd` | `lineEnd`(인레이 힌트) / `above`(CodeLens), 1.1.5 M30 |
 | `autoSuggest.enabled` / `minMatch` / `maxItems` | `true` / `1` / `6` | 1.1.5에서 `minMatch` 0 → 1: 스페이스만으로는 안 뜨고 키워드 글자에서(마크다운 빠른 제안, #42) |

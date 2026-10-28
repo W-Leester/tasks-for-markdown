@@ -18,6 +18,12 @@ export function registerTreeView(context: vscode.ExtensionContext, deps: TaskTre
   const provider = new TaskTreeProvider(deps);
   const view = vscode.window.createTreeView(TREE_VIEW_ID, { treeDataProvider: provider, showCollapseAll: true, manageCheckboxStateManually: true });
   context.subscriptions.push(provider, view);
+  // Next to the TASKS title: whether the line buttons are on (the eye icon in the title bar switches them).
+  const lineButtonsOn = () => vscode.workspace.getConfiguration('tasksmd').get<string>('codeLens.mode') !== 'off';
+  const describe = () => { view.description = lineButtonsOn() ? t('Line buttons on') : t('Line buttons off'); };
+  const setLineButtons = (mode: 'cursorLine' | 'off') =>
+    vscode.workspace.getConfiguration('tasksmd').update('codeLens.mode', mode, vscode.workspace.workspaceFolders?.length ? vscode.ConfigurationTarget.Workspace : vscode.ConfigurationTarget.Global);
+  describe();
 
   context.subscriptions.push(
     view.onDidChangeCheckboxState(async (e) => {
@@ -33,6 +39,12 @@ export function registerTreeView(context: vscode.ExtensionContext, deps: TaskTre
       }
     }),
     vscode.commands.registerCommand('tasksmd.tree.refresh', () => provider.refresh()),
+    // The line buttons switch (M36): this project's setting, or the user's when no folder is open.
+    vscode.commands.registerCommand('tasksmd.lineButtons.show', () => setLineButtons('cursorLine')),
+    vscode.commands.registerCommand('tasksmd.lineButtons.hide', () => setLineButtons('off')),
+    vscode.workspace.onDidChangeConfiguration((e) => {
+      if (e.affectsConfiguration('tasksmd.codeLens.mode')) describe();
+    }),
     vscode.commands.registerCommand('tasksmd.tree.groupBy', async () => {
       const picked = await vscode.window.showQuickPick(
         GROUP_MODES.map((m) => ({ label: t(GROUP_LABELS[m]), mode: m, picked: m === provider.grouping })),

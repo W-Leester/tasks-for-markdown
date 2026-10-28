@@ -93,7 +93,7 @@ export const SETTINGS_DEFAULTS: Readonly<SettingsSchema> = {
   'decorations.dimFields': true,
   'decorations.gutterIcons': true,
   'decorations.missingDueDate': false,
-  'codeLens.mode': 'cursorLine',
+  'codeLens.mode': 'off',
   'codeLens.position': 'lineEnd',
   'autoSuggest.enabled': true,
   'autoSuggest.minMatch': 1,

@@ -4,6 +4,9 @@ import { getApi, sleep } from './helpers';
 
 /** The ✓ Done · Priority ▾ · 📅 Due ▾ · ✎ Edit buttons of the cursor line (M30). */
 suite('task line actions (M30)', () => {
+  // Line buttons are off by default since 10-28 (M36): this suite turns them on.
+  suiteSetup(() => vscode.workspace.getConfiguration('tasksmd').update('codeLens.mode', 'cursorLine', vscode.ConfigurationTarget.Global));
+  suiteTeardown(() => vscode.workspace.getConfiguration('tasksmd').update('codeLens.mode', undefined, vscode.ConfigurationTarget.Global));
   const config = () => vscode.workspace.getConfiguration('tasksmd');
 
   async function open(): Promise<{ doc: vscode.TextDocument; line: string }> {
@@ -71,7 +74,7 @@ suite('task line actions (M30)', () => {
       assert.equal((await hints(doc)).filter((h) => partCommands(h).includes('tasksmd.markDone')).length, 0);
       assert.ok(!(await lensCommands(doc)).includes('tasksmd.markDone'));
     } finally {
-      await config().update('codeLens.mode', undefined, vscode.ConfigurationTarget.Global);
+      await config().update('codeLens.mode', 'cursorLine', vscode.ConfigurationTarget.Global);
     }
   });
   test('only fields that are not set yet get a button (10-19)', async () => {

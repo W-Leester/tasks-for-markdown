@@ -49,6 +49,7 @@
 | M21 | 확장 안에서 AI 연결 제공(VS Code·Cursor MCP 자동 등록, 터미널 명령, AI 연결 명령, 시작 안내) | ✅ 완료(1.1.0 공개 2026-10-08) · 원격·Windows 확인은 배포 후 | 이 문서 M21, design.md 7.16 |
 | M22 | README 개편: 강점(AI·API) 강조, 움직이는 예시 GIF, 사이트 연결 | ✅ 1.0.1(2026-10-05) | 이 문서 M22 |
 | M24 | 렌더 보기 열 제목 항상 표시, 끈 경계만 움직이는 너비 조절, 더블클릭 자동 맞춤 | ✅ 완료(1.1.1, 2026-10-12) | 이 문서 M24, design.md 7.14·7.15 |
+| M35 | 단축키 바꾸기: 체크박스 `Cmd/Ctrl+Shift+C`, 완료 `Option/Alt+C`, 만들기 `Option/Alt+Shift+C` | 🟡 진행 중(1.1.6, 2026-10-28) | 이 문서 M35 |
 | M34 | 렌더 보기가 다른 마크다운 확장(머메이드 등)의 미리보기 기능을 빌려 씀 | 🟡 진행 중(1.1.6, 2026-10-24) | 이 문서 M34 |
 | M33 | 만든 날짜(➕)를 빠짐없이: 체크박스 만들기·렌더 보기 Enter, 에디터 안 AI(MCP)가 편집기 설정을 따름 | ✅ 완료(1.1.5 공개 2026-10-20) | 이 문서 M33 |
 | M32 | 태스크 아래에 넣기(API·CLI·MCP): 메모·하위 항목을 건너뛰고 같은 깊이 또는 하위 태스크로 | ✅ 완료(1.1.5, 2026-10-19) | 이 문서 M32 |
@@ -1122,6 +1123,23 @@
 - **2 세 번째(10-19):** 편집기 기본값에 기대지 않음 — 영문 글자 한 개가 입력되고 그 단어(앞 단어 포함 최대 3개)가 키워드 단어의 앞부분과 맞으면(`due`의 `d`, `every w`) 확장이 직접 `editor.action.triggerSuggest`. 기준 길이는 `max(1, minMatch)`, 그 길이가 되는 순간 한 번만. 한글·숫자·기호는 안 염(맞는 키워드가 없음 → "No suggestions" 창도 안 뜸). `configurationDefaults`의 quickSuggestions·wordBasedSuggestions는 뺌.
 - [x] 2 세 번째: 테스트(먼저 실패 — `du` 실패 확인) → 구현 → 문서
 - [x] 2 세 번째: 사용자 확인(Cursor, 10-19) ✅
+
+## M35. 단축키 바꾸기 (1.1.6, 계획 2026-10-28, 사용자 요청)
+
+| 기능 | macOS | Windows·Linux | 전 (1.1.5) |
+|---|---|---|---|
+| 체크박스 만들기/지우기 `tasksmd.toggleCheckbox` | `Cmd+Shift+C` | `Ctrl+Shift+C` | 둘 다 `Ctrl+Shift+C` |
+| 완료 표시 `tasksmd.toggleDone` (렌더 보기에서 고른 줄도) | `Option+C` | `Alt+C` | 둘 다 `Ctrl+Shift+Enter` |
+| 태스크 만들기/편집 `tasksmd.createOrEdit` | `Option+Shift+C` | `Alt+Shift+C` | 맥 `Cmd+Shift+C` |
+
+- 맥 `Cmd+Shift+C`를 체크박스와 만들기가 같이 쓰게 되는 걸 피해 만들기는 `Option+Shift+C`(사용자 결정). 맥 Cmd ↔ 윈도우 Ctrl, Alt는 같은 자리.
+- 겹침 확인: 맥 `Cmd+Shift+C`는 VS Code 기본 "새 외부 터미널" — 마크다운 편집기에서만 받으므로 다른 곳에서는 그대로. `Option+C`·`Option+Shift+C`는 원래 `ç`·`Ç` 입력 — 마크다운 편집기에서 그 글자를 못 침(사용자 확인). 윈도우 `Alt+C`는 찾기 창의 대소문자 구분(찾기 창에 포커스일 때만) — 겹치지 않음. 윈도우 `Alt+Shift+C`는 1.1.5와 같음.
+- 렌더 보기: 고른 줄에서 `Option/Alt+C`로 완료(`KeyC` 코드로 판단 — 맥에서 Option+C의 글자는 `ç`).
+- 문서는 현재 설명만 고침(과거 기록·사고 기록은 그대로).
+
+### 할 일
+- [ ] 키 테스트·렌더 보기 키 테스트를 새 키로(먼저 실패) → package.json·렌더 보기
+- [ ] 문서(README 한·영, user-guide, 시작 안내 `firstTask.md`, requirements, 점검표, CHANGELOG, design), 코드 주석
 
 ## M34. 렌더 보기에서 다른 마크다운 확장의 기능 쓰기 (1.1.6, 계획 2026-10-24, 사용자 요청)
 

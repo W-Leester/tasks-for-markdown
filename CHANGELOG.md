@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased (1.1.6)
+## 1.1.6 — 2026-10-29
 
 - **Task buttons on lines are off by default, with a switch in the sidebar.** The eye icon in the TASKS title bar shows or hides `✓ Done · Priority ▾ · 📅 Due ▾ · ✎ Edit` at the end of the cursor's task line, for this project (next to the title: "Line buttons on/off"). Also **Tasks: Show/Hide task buttons on lines**; the setting is `tasksmd.codeLens.mode` (default now `off`, was `cursorLine`). The query blocks' Show results · Explain stay.
 - **New keys.** Add or remove checkbox: `Cmd+Shift+C` (macOS) / `Ctrl+Shift+C` (Windows, Linux). Toggle done: `Option+C` / `Alt+C` (also on the selected row of the rendered view). Create or edit task: `Option+Shift+C` / `Alt+Shift+C`. Rendered view ↔ source: `Cmd+Shift+R` on macOS (`Ctrl+Shift+R` on Windows and Linux, as before). Before: `Ctrl+Shift+C`, `Ctrl+Shift+Enter`, and `Cmd+Shift+C` on macOS for the dialog. On macOS `Option+C` and `Option+Shift+C` normally type `ç` and `Ç`; in Markdown editors they are the extension's keys now. Change any of them with **Tasks: Keyboard shortcuts**.

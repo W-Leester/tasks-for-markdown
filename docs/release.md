@@ -55,6 +55,13 @@ for p in tasks-core tasks-cli tasks-api; do pnpm --filter @hastycapybara/$p publ
 - [x] 확인: Open VSX 1.1.0(`verified=true`), npm `tasks-core`·`tasks-cli`·`tasks-api` 1.1.0(provenance 모두 있음), `tasks-cli`에 THIRD_PARTY_NOTICES. **`tasks-api`만 레지스트리 반영이 약 4분 늦음**(로그는 09:47 Published, 목록은 09:52) — 기다리면 됨
 - [x] 설치본 교체: 개발용 vsix 대신 마켓 설치본(VS Code는 Marketplace, Cursor는 Open VSX) — 2026-10-09 사용자
 
+## 1.1.6 게시 (2026-10-29)
+- 내용: M34(렌더 보기가 다른 마크다운 확장의 미리보기 기능을 씀 — 머메이드·수식), M35(단축키: 체크박스 `Cmd/Ctrl+Shift+C`, 완료 `Option/Alt+C`, 만들기 `Option/Alt+Shift+C`, 렌더 보기 macOS `Cmd+Shift+R`), M36(줄 버튼 기본 꺼짐 + TASKS 제목 줄 스위치), 통합 테스트 포커스 흔들림 수정(#46)
+- [x] 검증: typecheck·lint, 단위 851, 웹뷰 36, 통합 90(두 번 연속), `build:packages`, `pnpm package`(35 files, 타입 파일·`tasksmd.cjs`), 번들 CLI `tasksmd 1.1.6`
+- [ ] 수동(사용자, Cursor): 세 단축키·렌더 보기 `Option+C` ✅(10-28). **배포 전 확인 못 함:** 렌더 보기 `Cmd+Shift+R`, 줄 버튼 스위치, Cursor + bierner 머메이드 — 배포 후 확인
+- [ ] Marketplace 업로드(사용자, 10-29 06:03 빌드 `3443384b…`) → 공개 확인 → `releases/`
+- [ ] 태그 `v1.1.6` → Release → Open VSX·npm 3개 확인 → GitHub Release 파일 `releases/`
+
 ## 1.1.5 게시 (2026-10-19)
 - [x] 마감일 없음 표시를 별도 설정(기본 꺼짐)으로 나눈 뒤 다시 검증: typecheck·lint, 단위 846, 통합 84(두 번 연속), `pnpm package`(35 files)
 - [x] 체크박스 ➕ 되돌림·마감일 없음 힌트 후 다시 검증: typecheck·lint, 단위 846, 웹뷰 36, 통합 84(두 번 연속), `build:packages`, `pnpm package`(35 files)

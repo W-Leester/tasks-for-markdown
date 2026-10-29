@@ -47,6 +47,11 @@ You don't have to type the boxes and dates by hand. In any Markdown file:
 
 ![Option+Shift+C opens the form; a task with priority, due date and tag is created](docs/images/key-dialog.gif)
 
+**Switch to the rendered view**\
+`Cmd+Shift+R` (macOS) / `Ctrl+Shift+R` (Windows, Linux) shows the note as a page with clickable checkboxes and live query results; press it again to go back to the source.
+
+![Cmd+Shift+R opens the rendered view, a task is ticked there, and Cmd+Shift+R returns to the source with the line marked done](docs/images/key-rendered.gif)
+
 All keys can be changed with **Tasks: Keyboard shortcuts**; the full list is under [Commands](#commands-command-palette--tasks).
 
 ## Highlights
@@ -66,7 +71,7 @@ All keys can be changed with **Tasks: Keyboard shortcuts**; the full list is und
 New here? [Open the Get Started guide in VS Code](https://vscode.dev/redirect?url=vscode://hastycapybara.tasks-for-markdown/guide) (in Cursor: **Tasks: Open Get Started guide** from the Command Palette). The guide also opens by itself the first time.
 
 1. **Open a folder with Markdown files.** Every `- [ ]` line in it becomes a task, and the **Tasks** icon appears in the Activity Bar.
-2. **Create tasks.** Write a checklist line such as `- [ ] Write the report 📅 2026-09-25`, or use the [three keys](#three-keys): checkbox, done, create/edit.
+2. **Create tasks.** Write a checklist line such as `- [ ] Write the report 📅 2026-09-25`, or use the [four shortcuts](#four-shortcuts): checkbox, done, create/edit, rendered view.
 3. **Filter with a query block, then view the note.** A ` ```tasks ` block lists the tasks that match its lines; `Cmd/Ctrl+Shift+R` opens the note in the rendered view with the results in place. (VS Code's own Markdown preview shows the results too, but its checkboxes are display-only.) Common query lines: [Query syntax](#query-syntax).
 
 ````markdown

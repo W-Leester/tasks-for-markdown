@@ -4,10 +4,10 @@
 
 Documentation only; the extension is the same as 1.1.6.
 
-- **README: "Three keys" near the top** — make a checkbox (`Cmd/Ctrl+Shift+C`), mark it done (`Option/Alt+C`), create or edit in a form (`Option/Alt+Shift+C`), each with a short GIF. The older dialog and recurring-completion GIFs, which showed the previous keys, are no longer on the page.
+- **README: "Four Shortcuts" near the top** — make a checkbox (`Cmd/Ctrl+Shift+C`), mark it done (`Option/Alt+C`), create or edit in a form (`Option/Alt+Shift+C`), switch to the rendered view (`Cmd/Ctrl+Shift+R`), each with a short GIF. The older dialog and recurring-completion GIFs, which showed the previous keys, are no longer on the page.
 
 ### 한국어 요약
-- 문서만 바뀜(확장은 1.1.6과 같음). README 위쪽에 **키 세 개**(체크박스 `Cmd/Ctrl+Shift+C`, 완료 `Option/Alt+C`, 만들기/편집 `Option/Alt+Shift+C`)와 짧은 GIF 세 개. 예전 키가 찍힌 대화상자·반복 완료 GIF는 README에서 뺌.
+- 문서만 바뀜(확장은 1.1.6과 같음). README 위쪽에 **단축키**(체크박스 `Cmd/Ctrl+Shift+C`, 완료 `Option/Alt+C`, 만들기/편집 `Option/Alt+Shift+C`, 렌더 보기 `Cmd/Ctrl+Shift+R`)와 짧은 GIF 네 개. 예전 키가 찍힌 대화상자·반복 완료 GIF는 README에서 뺌.
 
 ## 1.1.6 — 2026-10-29
 

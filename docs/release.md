@@ -56,7 +56,7 @@ for p in tasks-core tasks-cli tasks-api; do pnpm --filter @hastycapybara/$p publ
 - [x] 설치본 교체: 개발용 vsix 대신 마켓 설치본(VS Code는 Marketplace, Cursor는 Open VSX) — 2026-10-09 사용자
 
 ## 1.1.7 게시 (2026-10-29)
-- 내용: M37(README 위쪽 "키 세 개" + GIF 세 개, 영·한) — **문서만**, 확장 코드는 1.1.6과 같음. 마켓 Details는 vsix 안의 README라 새 버전으로 게시(사용자 결정). 그림은 `raw/HEAD` 링크라 예전 GIF 파일은 지우지 않음(1.1.6 이하 페이지가 씀)
+- 내용: M37(README 위쪽 "Four Shortcuts / 단축키" + GIF 네 개, 영·한) — **문서만**, 확장 코드는 1.1.6과 같음. 마켓 Details는 vsix 안의 README라 새 버전으로 게시(사용자 결정). 그림은 `raw/HEAD` 링크라 예전 GIF 파일은 지우지 않음(1.1.6 이하 페이지가 씀)
 - [ ] 검증: typecheck·lint, 단위, README 테스트, `pnpm package`
 - [ ] Marketplace 업로드(사용자) → 마켓 사본 = 업로드본 → `releases/`
 - [ ] 태그 `v1.1.7` → Release(Open VSX, npm 3개) → `releases/`

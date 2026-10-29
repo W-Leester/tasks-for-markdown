@@ -28,7 +28,7 @@ Obsidian Tasks-compatible task management for Markdown files in **VS Code** and 
 
 The extension indexes every `- [ ]` line in the workspace. You can see, query and complete tasks wherever you are: the editor, a sidebar, a kanban board, a calendar or the Markdown preview. Completing a task rewrites the line in the file. It adds a done date, and for a recurring task it adds the next instance.
 
-## Three keys
+## Four Shortcuts
 
 You don't have to type the boxes and dates by hand. In any Markdown file:
 

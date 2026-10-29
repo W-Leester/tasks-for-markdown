@@ -55,6 +55,13 @@ for p in tasks-core tasks-cli tasks-api; do pnpm --filter @hastycapybara/$p publ
 - [x] 확인: Open VSX 1.1.0(`verified=true`), npm `tasks-core`·`tasks-cli`·`tasks-api` 1.1.0(provenance 모두 있음), `tasks-cli`에 THIRD_PARTY_NOTICES. **`tasks-api`만 레지스트리 반영이 약 4분 늦음**(로그는 09:47 Published, 목록은 09:52) — 기다리면 됨
 - [x] 설치본 교체: 개발용 vsix 대신 마켓 설치본(VS Code는 Marketplace, Cursor는 Open VSX) — 2026-10-09 사용자
 
+## 1.1.7 게시 (2026-10-29)
+- 내용: M37(README 위쪽 "키 세 개" + GIF 세 개, 영·한) — **문서만**, 확장 코드는 1.1.6과 같음. 마켓 Details는 vsix 안의 README라 새 버전으로 게시(사용자 결정). 그림은 `raw/HEAD` 링크라 예전 GIF 파일은 지우지 않음(1.1.6 이하 페이지가 씀)
+- [ ] 검증: typecheck·lint, 단위, README 테스트, `pnpm package`
+- [ ] Marketplace 업로드(사용자) → 마켓 사본 = 업로드본 → `releases/`
+- [ ] 태그 `v1.1.7` → Release(Open VSX, npm 3개) → `releases/`
+- [ ] 사용자 확인: 마켓 Details에 새 절과 GIF
+
 ## 1.1.6 게시 (2026-10-29)
 - 내용: M34(렌더 보기가 다른 마크다운 확장의 미리보기 기능을 씀 — 머메이드·수식), M35(단축키: 체크박스 `Cmd/Ctrl+Shift+C`, 완료 `Option/Alt+C`, 만들기 `Option/Alt+Shift+C`, 렌더 보기 macOS `Cmd+Shift+R`), M36(줄 버튼 기본 꺼짐 + TASKS 제목 줄 스위치), 통합 테스트 포커스 흔들림 수정(#46)
 - [x] 검증: typecheck·lint, 단위 851, 웹뷰 36, 통합 90(두 번 연속), `build:packages`, `pnpm package`(35 files, 타입 파일·`tasksmd.cjs`), 번들 CLI `tasksmd 1.1.6`

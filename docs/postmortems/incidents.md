@@ -338,3 +338,10 @@ Tasks for Markdown을 만들며(2026-09-21 ~) 겪은 실패를 모아 둔 문서
 - **해결:** `helpers.showFocused(doc)` — 보여 주고, 편집기 그룹에 포커스를 주고, `activeTextEditor`가 그 문서가 될 때까지 기다림. 타이핑 테스트(suggestTyping·inlinePick·emojiEdit)가 이것을 씀 → 4번 모두 86 통과.
 - **재발 방지:** 키보드를 흉내 내는 통합 테스트는 `showFocused`로 시작한다.
 
+
+## 47. README GIF 다시 찍기 — 한글·이모지에 주황 상자, 흐린 화면, 회색 버튼 (10-29, 촬영만)
+
+- **증상:** M37 GIF를 브라우저 VS Code(`code serve-web`)로 찍는데 ① 한국어 낱말과 이모지마다 주황 테두리 상자가 그려짐(영어판의 📅·🔁에도), ② 화면 녹화(CDP `Page.startScreencast`) 프레임이 화면 배율 2를 무시하고 1배라 글자가 흐림, ③ 대화상자의 파란 버튼·칩이 GIF에서 회색, ④ 설정을 바꾼 뒤 맨 윗줄이 잘림. 또 scratchpad가 정리되며 puppeteer 설치가 반쯤 지워져 처음엔 스크립트가 안 돎.
+- **원인:** ① 브라우저 VS Code는 폴더를 늘 "신뢰하지 않음"으로 열고, 그때 `editor.unicodeHighlight.nonBasicASCII` 기본값이 켜짐. 폴더의 `.vscode/settings.json`에 꺼도 신뢰하지 않은 폴더라 무시됨. ② 화면 녹화는 기본으로 CSS 크기 프레임. ③ GIF 색표를 첫·마지막 프레임으로만 만들어, 중간에만 나오는 대화상자 색이 없었음. ④ 신뢰 경고 줄이 사라져 화면이 위로 올라감.
+- **해결:** ① **사용자 설정**에 `security.workspace.trust.enabled: false`와 `editor.unicodeHighlight.*: false`(브라우저 VS Code의 사용자 설정은 브라우저 저장소에 있으므로 "Preferences: Open User Settings (JSON)"에 입력, 녹화용 크롬 프로필마다 한 번). ② 녹화를 `page.screenshot` 반복(2배)으로. ③ 색표를 고르게 뽑은 프레임 6장으로. ④ 자를 영역을 전체 화면 한 장에서 다시 잼. puppeteer는 다시 설치.
+- **재발 방지:** GIF는 만든 뒤 **프레임 묶음을 한 장으로 펼쳐 보고**(색·잘림·상자) 넣는다. 촬영 요령은 [Tasks.md](../Tasks.md) M37 "다시 찍을 때"에.

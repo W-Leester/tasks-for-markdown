@@ -28,6 +28,24 @@ Obsidian Tasks-compatible task management for Markdown files in **VS Code** and 
 
 The extension indexes every `- [ ]` line in the workspace. You can see, query and complete tasks wherever you are: the editor, a sidebar, a kanban board, a calendar or the Markdown preview. Completing a task rewrites the line in the file. It adds a done date, and for a recurring task it adds the next instance.
 
+## Three keys
+
+You don't have to type the boxes and dates by hand. In any Markdown file:
+
+**Make a checkbox** — `Cmd+Shift+C` (macOS) / `Ctrl+Shift+C` (Windows, Linux) turns the current line into `- [ ] …`. A bullet keeps its marker; on a task line it removes the box.
+
+![Cmd+Shift+C turns a plain line and then a bullet into tasks](docs/images/key-checkbox.gif)
+
+**Mark it done** — `Option+C` (macOS) / `Alt+C` (Windows, Linux) on a task line adds ✅ and today's date. A recurring task gets its next occurrence.
+
+![Option+C completes a task, then a weekly task, which gets its next date](docs/images/key-done.gif)
+
+**Create or edit in a form** — `Option+Shift+C` (macOS) / `Alt+Shift+C` (Windows, Linux). On an empty line it starts a new task; on a task line it edits that task. Priority, dates in plain words (`next fri`), tags and repeat in one place.
+
+![Option+Shift+C opens the form; a task with priority, due date and tag is created](docs/images/key-dialog.gif)
+
+All keys can be changed with **Tasks: Keyboard shortcuts**; the full list is under [Commands](#commands-command-palette--tasks).
+
 ## Highlights
 
 - **Same syntax as [Obsidian Tasks](https://publish.obsidian.md/tasks/)** — emoji and Dataview fields, written in Obsidian's field order, so files stay interchangeable.
@@ -45,7 +63,7 @@ The extension indexes every `- [ ]` line in the workspace. You can see, query an
 New here? [Open the Get Started guide in VS Code](https://vscode.dev/redirect?url=vscode://hastycapybara.tasks-for-markdown/guide) (in Cursor: **Tasks: Open Get Started guide** from the Command Palette). The guide also opens by itself the first time.
 
 1. **Open a folder with Markdown files.** Every `- [ ]` line in it becomes a task, and the **Tasks** icon appears in the Activity Bar.
-2. **Create tasks.** Write a checklist line such as `- [ ] Write the report 📅 2026-09-25`, or press `Cmd+Shift+C` (macOS) / `Ctrl+Shift+C` (Windows, Linux) to turn the current line into a checkbox, or `Option+Shift+C` (macOS) / `Alt+Shift+C` (Windows, Linux) (the Ctrl key on macOS too) to open the create/edit dialog. `Option/Alt+C` on a task line marks it done.
+2. **Create tasks.** Write a checklist line such as `- [ ] Write the report 📅 2026-09-25`, or use the [three keys](#three-keys): checkbox, done, create/edit.
 3. **Filter with a query block, then view the note.** A ` ```tasks ` block lists the tasks that match its lines; `Cmd/Ctrl+Shift+R` opens the note in the rendered view with the results in place. (VS Code's own Markdown preview shows the results too, but its checkboxes are display-only.) Common query lines: [Query syntax](#query-syntax).
 
 ````markdown
@@ -62,14 +80,6 @@ group by filename
 **Write tasks with help.** Auto-suggest offers fields as you type, and natural-language dates like `next fri` become real dates.
 
 ![Typing a task: auto-suggest for the due date, "next fri" becomes 2026-10-09](docs/images/demo-editing.gif)
-
-**Create and edit in a dialog.** `Option+Shift+C` (macOS) / `Alt+Shift+C` (Windows, Linux) on an empty line opens a form for a new task. On an existing task it opens the same form to edit it, with priority, dates in plain words, tags and repeat presets.
-
-![Option+Shift+C / Alt+Shift+C: a new task is filled in and created, then an existing task is opened and changed](docs/images/demo-dialog.gif)
-
-**Complete with one key.** `Option/Alt+C` marks a task done. A recurring task gets its next occurrence automatically.
-
-![Option/Alt+C completes a weekly task and inserts the next occurrence](docs/images/demo-recurring.gif)
 
 **Work in the rendered view.** Tick checkboxes, add notes with 💬, add tasks below a row with `Enter` or ＋ (one after another), and show or hide columns. Query blocks update live.
 

@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.1.7 — 2026-10-29
+
+Documentation only; the extension is the same as 1.1.6.
+
+- **README: "Three keys" near the top** — make a checkbox (`Cmd/Ctrl+Shift+C`), mark it done (`Option/Alt+C`), create or edit in a form (`Option/Alt+Shift+C`), each with a short GIF. The older dialog and recurring-completion GIFs, which showed the previous keys, are no longer on the page.
+
+### 한국어 요약
+- 문서만 바뀜(확장은 1.1.6과 같음). README 위쪽에 **키 세 개**(체크박스 `Cmd/Ctrl+Shift+C`, 완료 `Option/Alt+C`, 만들기/편집 `Option/Alt+Shift+C`)와 짧은 GIF 세 개. 예전 키가 찍힌 대화상자·반복 완료 GIF는 README에서 뺌.
+
 ## 1.1.6 — 2026-10-29
 
 - **Task buttons on lines are off by default, with a switch in the sidebar.** The eye icon in the TASKS title bar shows or hides `✓ Done · Priority ▾ · 📅 Due ▾ · ✎ Edit` at the end of the cursor's task line, for this project (next to the title: "Line buttons on/off"). Also **Tasks: Show/Hide task buttons on lines**; the setting is `tasksmd.codeLens.mode` (default now `off`, was `cursorLine`). The query blocks' Show results · Explain stay.

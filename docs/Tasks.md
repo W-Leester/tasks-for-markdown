@@ -49,7 +49,7 @@
 | M21 | 확장 안에서 AI 연결 제공(VS Code·Cursor MCP 자동 등록, 터미널 명령, AI 연결 명령, 시작 안내) | ✅ 완료(1.1.0 공개 2026-10-08) · 원격·Windows 확인은 배포 후 | 이 문서 M21, design.md 7.16 |
 | M22 | README 개편: 강점(AI·API) 강조, 움직이는 예시 GIF, 사이트 연결 | ✅ 1.0.1(2026-10-05) | 이 문서 M22 |
 | M24 | 렌더 보기 열 제목 항상 표시, 끈 경계만 움직이는 너비 조절, 더블클릭 자동 맞춤 | ✅ 완료(1.1.1, 2026-10-12) | 이 문서 M24, design.md 7.14·7.15 |
-| M37 | README 위쪽에 "키 세 개"(체크박스·완료·만들기) 절과 GIF 세 개 — 문서만 바뀐 1.1.7 | 🚧 진행 중(계획 2026-10-29) | 이 문서 M37 |
+| M37 | README 위쪽에 "키 세 개"(체크박스·완료·만들기) 절과 GIF 세 개 — 문서만 바뀐 1.1.7 | 🚧 게시 준비(2026-10-29) | 이 문서 M37 |
 | M36 | 줄 버튼 켜고 끄기를 TASKS 제목 줄에서, 기본은 꺼짐 | ✅ 완료(1.1.6, 2026-10-29) | 이 문서 M36 |
 | M35 | 단축키 바꾸기: 체크박스 `Cmd/Ctrl+Shift+C`, 완료 `Option/Alt+C`, 만들기 `Option/Alt+Shift+C`, 렌더 보기 `Cmd/Ctrl+Shift+R` | ✅ 완료(1.1.6, 2026-10-29) | 이 문서 M35 |
 | M34 | 렌더 보기가 다른 마크다운 확장(머메이드 등)의 미리보기 기능을 빌려 씀 | ✅ 완료(1.1.6, 2026-10-29) | 이 문서 M34 |
@@ -1139,10 +1139,12 @@
 - "See it in action": 새 절과 겹치는 대화상자·반복 완료 GIF(화면 속 키도 예전 키)는 README에서 뺌. 파일은 그대로 둠(위 이유).
 - 촬영은 전처럼 `code serve-web` + puppeteer(브라우저 VS Code, Cursor는 띄우지 않음). 맥 키로 찍음.
 
+**다시 찍을 때.** 스크립트는 scratchpad `pp/keys/`(`lib.mjs`, `scenes.mjs checkbox|done|dialog`, `DEMO_LANG=ko`, `makegif.py <프레임> <출력> <폭> <x0,y0,x1,y1>`). 브라우저 VS Code는 폴더를 늘 신뢰하지 않음으로 열어 한글·이모지에 상자를 그림 → 녹화용 크롬 프로필의 **사용자 설정**에 `security.workspace.trust.enabled: false`, `editor.unicodeHighlight.nonBasicASCII/ambiguousCharacters: false`(폴더 설정은 무시됨). 2배로 찍으려면 화면 녹화 말고 `page.screenshot` 반복. 키 자막은 페이지에 넣은 `div`. 자를 영역(CSS px): 체크박스 `54,68,820,322`, 완료 `54,68,820,334`, 대화상자 `54,68,1195,585`.
+
 ### 할 일
-- [ ] 버전 1.1.7(package.json, packages/*)
-- [ ] GIF 여섯 개(영 3, 한 3) 찍기 → 크기·글자 확인
-- [ ] README.md·README.ko.md 고치기, `tests/readme.test.ts` 통과(README.md 한글 없음, 로컬 이미지 있음)
+- [x] 버전 1.1.7(package.json, packages/*)
+- [x] GIF 여섯 개 — `docs/images/key-{checkbox,done,dialog}[-ko].gif`(720·800·960px, 각 9~14초, 36~160KB). 처음 찍은 것은 한글·이모지에 주황 상자, 흐림, 회색 버튼 → 다시 찍음([incidents #47](postmortems/incidents.md))
+- [x] README.md·README.ko.md 고치기(새 절 끝에 단축키 바꾸는 명령과 명령 표 링크), `tests/readme.test.ts` 통과
 - [ ] CHANGELOG 1.1.7(문서만), release.md 1.1.7 절 → 패키지 → 사용자 웹 업로드 → 태그 푸시 → `releases/` 보관
 - [ ] 사용자 확인(마켓 Details에 새 절과 GIF)
 

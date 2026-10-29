@@ -32,15 +32,18 @@
 
 상자와 날짜를 손으로 칠 필요가 없습니다. 마크다운 파일 어디서든:
 
-**체크박스 만들기** — `Cmd+Shift+C`(macOS) / `Ctrl+Shift+C`(Windows·Linux)로 현재 줄이 `- [ ] …`가 됩니다. 글머리표 줄은 기호를 그대로 두고, 태스크 줄에서 누르면 상자를 지웁니다.
+**체크박스 만들기**\
+`Cmd+Shift+C`(macOS) / `Ctrl+Shift+C`(Windows·Linux)로 현재 줄이 `- [ ] …`가 됩니다. 글머리표 줄은 기호를 그대로 두고, 태스크 줄에서 누르면 상자를 지웁니다.
 
 ![Cmd+Shift+C로 그냥 줄과 글머리표 줄이 태스크로 바뀜](docs/images/key-checkbox-ko.gif)
 
-**완료 표시** — 태스크 줄에서 `Option+C`(macOS) / `Alt+C`(Windows·Linux)를 누르면 ✅와 오늘 날짜가 붙습니다. 반복 태스크는 다음 회차가 생깁니다.
+**완료 표시**\
+태스크 줄에서 `Option+C`(macOS) / `Alt+C`(Windows·Linux)를 누르면 ✅와 오늘 날짜가 붙습니다. 반복 태스크는 다음 회차가 생깁니다.
 
 ![Option+C로 태스크를 완료하고, 매주 반복 태스크는 다음 날짜가 생김](docs/images/key-done-ko.gif)
 
-**입력 창으로 만들고 고치기** — `Option+Shift+C`(macOS) / `Alt+Shift+C`(Windows·Linux). 빈 줄에서는 새 태스크를, 태스크 줄에서는 그 태스크를 고칩니다. 우선순위, 말로 쓰는 날짜(`다음 금요일`), 태그, 반복을 한 번에 정합니다.
+**입력 창으로 만들고 고치기**\
+`Option+Shift+C`(macOS) / `Alt+Shift+C`(Windows·Linux). 빈 줄에서는 새 태스크를, 태스크 줄에서는 그 태스크를 고칩니다. 우선순위, 말로 쓰는 날짜(`다음 금요일`), 태그, 반복을 한 번에 정합니다.
 
 ![Option+Shift+C로 입력 창을 열어 우선순위·마감일·태그가 있는 태스크를 만듦](docs/images/key-dialog-ko.gif)
 

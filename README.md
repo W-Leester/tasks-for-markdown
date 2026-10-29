@@ -32,15 +32,18 @@ The extension indexes every `- [ ]` line in the workspace. You can see, query an
 
 You don't have to type the boxes and dates by hand. In any Markdown file:
 
-**Make a checkbox** — `Cmd+Shift+C` (macOS) / `Ctrl+Shift+C` (Windows, Linux) turns the current line into `- [ ] …`. A bullet keeps its marker; on a task line it removes the box.
+**Make a checkbox**\
+`Cmd+Shift+C` (macOS) / `Ctrl+Shift+C` (Windows, Linux) turns the current line into `- [ ] …`. A bullet keeps its marker; on a task line it removes the box.
 
 ![Cmd+Shift+C turns a plain line and then a bullet into tasks](docs/images/key-checkbox.gif)
 
-**Mark it done** — `Option+C` (macOS) / `Alt+C` (Windows, Linux) on a task line adds ✅ and today's date. A recurring task gets its next occurrence.
+**Mark it done**\
+`Option+C` (macOS) / `Alt+C` (Windows, Linux) on a task line adds ✅ and today's date. A recurring task gets its next occurrence.
 
 ![Option+C completes a task, then a weekly task, which gets its next date](docs/images/key-done.gif)
 
-**Create or edit in a form** — `Option+Shift+C` (macOS) / `Alt+Shift+C` (Windows, Linux). On an empty line it starts a new task; on a task line it edits that task. Priority, dates in plain words (`next fri`), tags and repeat in one place.
+**Create or edit in a form**\
+`Option+Shift+C` (macOS) / `Alt+Shift+C` (Windows, Linux). On an empty line it starts a new task; on a task line it edits that task. Priority, dates in plain words (`next fri`), tags and repeat in one place.
 
 ![Option+Shift+C opens the form; a task with priority, due date and tag is created](docs/images/key-dialog.gif)
 

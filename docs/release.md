@@ -57,9 +57,9 @@ for p in tasks-core tasks-cli tasks-api; do pnpm --filter @hastycapybara/$p publ
 
 ## 1.1.7 게시 (2026-10-29)
 - 내용: M37(README 위쪽 "Four Shortcuts / 단축키" + GIF 네 개, 영·한) — **문서만**, 확장 코드는 1.1.6과 같음. 마켓 Details는 vsix 안의 README라 새 버전으로 게시(사용자 결정). 그림은 `raw/HEAD` 링크라 예전 GIF 파일은 지우지 않음(1.1.6 이하 페이지가 씀)
-- [ ] 검증: typecheck·lint, 단위, README 테스트, `pnpm package`
-- [ ] Marketplace 업로드(사용자) → 마켓 사본 = 업로드본 → `releases/`
-- [ ] 태그 `v1.1.7` → Release(Open VSX, npm 3개) → `releases/`
+- [x] 검증: typecheck·lint, 단위 851, README 테스트, `pnpm package`(35 files, GIF는 들어가지 않음 — README가 `raw/HEAD`로 링크). README를 두 번 더 고쳐 vsix를 세 번 만듦; 올린 것은 마지막(`8002b61a…`)
+- [x] Marketplace 업로드(사용자, 10-29) → 마켓 사본(gzip을 풀어) = 업로드본 → `releases/`
+- [x] 태그 `v1.1.7` → Release 성공(첫 시도). Open VSX `🚀 v1.1.7`(`verified=true`), npm `tasks-core`·`tasks-cli`·`tasks-api` 1.1.7(조회에 1~2분 걸림). GitHub Release 파일 `releases/`(`.github.vsix` `38a5acc5…`, tgz 3개)
 - [ ] 사용자 확인: 마켓 Details에 새 절과 GIF
 
 ## 1.1.6 게시 (2026-10-29)
@@ -114,6 +114,8 @@ for p in tasks-core tasks-cli tasks-api; do pnpm --filter @hastycapybara/$p publ
 
 | 버전 | 파일 | 출처 | SHA-256 |
 |---|---|---|---|
+| 1.1.7 | `tasks-for-markdown-1.1.7.marketplace.vsix` | VS Code Marketplace에 올린 파일(마켓에서 다시 받음, gzip을 풀면 업로드본과 같음) | `8002b61a8f9ae22c…` |
+| 1.1.7 | `tasks-for-markdown-1.1.7.github.vsix` | GitHub Release·Open VSX(Actions 빌드) | `38a5acc53fd9d3ee…` |
 | 1.1.6 | `tasks-for-markdown-1.1.6.marketplace.vsix` | VS Code Marketplace에 올린 파일(마켓에서 다시 받음, gzip을 풀면 업로드본과 같음) | `3443384bf12ffa8f…` |
 | 1.1.6 | `tasks-for-markdown-1.1.6.github.vsix` | GitHub Release·Open VSX(Actions 빌드) | `c0646d2e614a3e52…` |
 | 1.1.5 | `tasks-for-markdown-1.1.5.marketplace.vsix` | VS Code Marketplace에 올린 파일(마켓에서 다시 받음, gzip을 풀면 업로드본과 같음) | `3f696c928e1e34fa…` |

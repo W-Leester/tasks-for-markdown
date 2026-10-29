@@ -1145,7 +1145,7 @@
 - [x] 버전 1.1.7(package.json, packages/*)
 - [x] GIF 여섯 개 — `docs/images/key-{checkbox,done,dialog}[-ko].gif`(720·800·960px, 각 9~14초, 36~160KB). 처음 찍은 것은 한글·이모지에 주황 상자, 흐림, 회색 버튼 → 다시 찍음([incidents #47](postmortems/incidents.md))
 - [x] README.md·README.ko.md 고치기(새 절 끝에 단축키 바꾸는 명령과 명령 표 링크), `tests/readme.test.ts` 통과
-- [x] **추가(사용자, 10-29):** 절 이름을 사용자가 **Four Shortcuts / 단축키**로 바꿈 → 네 번째로 **렌더 보기** `Cmd/Ctrl+Shift+R` 추가. GIF `key-rendered[-ko].gif`: 소스에서 `Cmd+Shift+R` → 렌더 보기에서 체크박스 하나 누름 → 다시 `Cmd+Shift+R`로 소스(그 줄이 `[x]`). "Getting started" 링크도 새 이름으로 — 렌더 보기는 표가 넓어 자를 영역 `54,68,1195,420`(960px)
+- [x] **추가(사용자, 10-29):** 절 이름을 사용자가 **Four Shortcuts / 단축키**로 바꿈 → 네 번째로 **렌더 보기** `Cmd/Ctrl+Shift+R` 추가. GIF `key-rendered[-ko].gif`: 소스에서 `Cmd+Shift+R` → 렌더 보기에서 체크박스 하나 누름 → 다시 `Cmd+Shift+R`로 소스(그 줄이 `[x]`). "Getting started" 링크도 새 이름으로 — 렌더 보기는 표가 넓어 자를 영역 `54,68,1195,420`(960px). 사용자 요청(10-29)으로 넘어가는 사이의 빈 화면 프레임을 빼고(`DROP_BLANK=1 makegif.py`: 앞뒤보다 글자가 훨씬 적은 프레임), 렌더 보기에서 체크까지 2.4초 → 1.1초
 - [ ] CHANGELOG 1.1.7(문서만), release.md 1.1.7 절 → 패키지 → 사용자 웹 업로드 → 태그 푸시 → `releases/` 보관
 - [ ] 사용자 확인(마켓 Details에 새 절과 GIF)
 

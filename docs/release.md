@@ -60,7 +60,7 @@ for p in tasks-core tasks-cli tasks-api; do pnpm --filter @hastycapybara/$p publ
 - [x] 검증: typecheck·lint, 단위 851, README 테스트, `pnpm package`(35 files, GIF는 들어가지 않음 — README가 `raw/HEAD`로 링크). README를 두 번 더 고쳐 vsix를 세 번 만듦; 올린 것은 마지막(`8002b61a…`)
 - [x] Marketplace 업로드(사용자, 10-29) → 마켓 사본(gzip을 풀어) = 업로드본 → `releases/`
 - [x] 태그 `v1.1.7` → Release 성공(첫 시도). Open VSX `🚀 v1.1.7`(`verified=true`), npm `tasks-core`·`tasks-cli`·`tasks-api` 1.1.7(조회에 1~2분 걸림). GitHub Release 파일 `releases/`(`.github.vsix` `38a5acc5…`, tgz 3개)
-- [ ] 사용자 확인: 마켓 Details에 새 절과 GIF
+- [x] 사용자 확인: 마켓 Details에 새 절과 GIF, 제목 다음 줄 설명(`\` 줄바꿈) 모두 잘 보임 ✅(10-30)
 
 ## 1.1.6 게시 (2026-10-29)
 - 내용: M34(렌더 보기가 다른 마크다운 확장의 미리보기 기능을 씀 — 머메이드·수식), M35(단축키: 체크박스 `Cmd/Ctrl+Shift+C`, 완료 `Option/Alt+C`, 만들기 `Option/Alt+Shift+C`, 렌더 보기 macOS `Cmd+Shift+R`), M36(줄 버튼 기본 꺼짐 + TASKS 제목 줄 스위치), 통합 테스트 포커스 흔들림 수정(#46)

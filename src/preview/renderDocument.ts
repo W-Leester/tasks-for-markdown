@@ -1,6 +1,7 @@
 import MarkdownItCtor from 'markdown-it';
 import type { MarkdownIt } from 'markdown-it';
 import { quoteText } from '../core/file';
+import { headingAnchors } from '../core/file/headingAnchor';
 import { type PluginDeps, tasksMarkdownItPlugin } from './markdownItPlugin';
 
 const escape = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -29,6 +30,7 @@ export function renderDocumentHtml(text: string, deps: PluginDeps, options: Rend
     const md = new MarkdownItCtor({ html: false, linkify: true });
     tasksMarkdownItPlugin(md, deps);
     md.core.ruler.push('tfm_quotes', markQuotes);
+    md.core.ruler.push('tfm_headings', markHeadings);
     if (borrowed) {
       (options.plugins ?? []).forEach((plugin, i) => {
         try {
@@ -98,4 +100,21 @@ function markQuotes(state: { src: string; tokens: QuoteToken[] }): void {
     token.attrSet('data-tfm-quote', `${start}-${end}`);
     token.attrSet('data-tfm-quote-text', quote.text);
   }
+}
+
+interface HeadingToken { type: string; content: string; children: { type: string; content: string }[] | null; attrSet(name: string, value: string): void }
+
+/** Headings get their GitHub-style anchor, `data-tfm-anchor`, so `[목차](#1-비전)` links scroll to them. */
+function markHeadings(state: { tokens: HeadingToken[] }): void {
+  const opens: HeadingToken[] = [];
+  const texts: string[] = [];
+  state.tokens.forEach((token, i) => {
+    if (token.type !== 'heading_open') return;
+    const inline = state.tokens[i + 1];
+    // The text as shown: `**굵게**` counts as `굵게`, as on GitHub.
+    const text = inline?.children ? inline.children.filter((c) => c.type === 'text' || c.type === 'code_inline').map((c) => c.content).join('') : inline?.content ?? '';
+    opens.push(token);
+    texts.push(text);
+  });
+  headingAnchors(texts).forEach((anchor, i) => opens[i]!.attrSet('data-tfm-anchor', anchor));
 }

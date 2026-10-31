@@ -6,6 +6,7 @@ import type { TaskEditService } from '../services/TaskEditService';
 import type { Settings } from '../settings/Settings';
 import type { PreviewIntegration } from './PreviewIntegration';
 import { renderDocumentHtml } from './renderDocument';
+import { findHeadingLine } from '../core/file/headingAnchor';
 import { recentMarkdownDocument } from '../commands/recentMarkdown';
 import { t } from '../l10n';
 import { systemClock, type Clock } from '../core/dates';
@@ -303,8 +304,10 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
     const lineMatch = /^L(\d+)$/.exec(fragment);
     const doc = await vscode.workspace.openTextDocument(target);
     const editor = await vscode.window.showTextDocument(doc, { preserveFocus: false });
-    if (lineMatch) {
-      const line = Math.min(Number(lineMatch[1]) - 1, doc.lineCount - 1);
+    // `other.md#제목`: that heading's line (same-note `#제목` scrolls in the view).
+    const headingLine = !lineMatch && fragment && doc.languageId === 'markdown' ? findHeadingLine(doc.getText(), fragment) : -1;
+    if (lineMatch || headingLine >= 0) {
+      const line = lineMatch ? Math.min(Number(lineMatch[1]) - 1, doc.lineCount - 1) : headingLine;
       const range = doc.lineAt(Math.max(0, line)).range;
       editor.selection = new vscode.Selection(range.end, range.end);
       editor.revealRange(range, vscode.TextEditorRevealType.InCenterIfOutsideViewport);
@@ -477,6 +480,7 @@ ${borrowed.styles.map((u) => `<link rel="stylesheet" href="${webview.asWebviewUr
   .tfm-task-count { color: var(--rv-muted); }
 
   /* Sort / scope tools (view only) — top-left of the column, opposite the mode toggle. */
+  [data-tfm-anchor] { scroll-margin-top: 48px; } /* a #heading link lands below the sticky toolbar */
   .rv-tools { position: sticky; top: 0; z-index: 2; display: flex; gap: 12px; align-items: center; padding-top: 6px; padding-bottom: 4px; margin-bottom: 8px; background: var(--rv-bg); font-size: 12px; color: var(--rv-muted); }
   .rv-select { display: inline-flex; gap: 6px; align-items: center; }
   /* Column menu (M14): only in the column layout. */

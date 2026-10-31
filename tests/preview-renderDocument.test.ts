@@ -29,7 +29,7 @@ describe('renderDocumentHtml (rendered view)', () => {
     const html = renderDocumentHtml(note, deps);
     expect(html).not.toContain('tags: [x]');
     expect(html).not.toContain('rv-frontmatter');
-    expect(html).toContain('<h1>Title</h1>');
+    expect(html).toContain('<h1 data-tfm-anchor="title">Title</h1>');
     expect(html).toContain('data-tfm-line="6"'); // the task is on line 6 (0-based) of the original text
     expect(html).toContain('class="tfm-check"');
     expect(html).not.toContain('class="tfm-check" disabled');
@@ -107,6 +107,13 @@ describe('renderDocumentHtml: blockquotes the user can type into (M38)', () => {
     expect(html).toContain('답변: 네<br>\n둘째 줄');
     expect(html).toContain('안쪽<br>\n둘');
     expect(html).toContain('<p>밖 첫 줄\n밖 둘째 줄</p>');
+  });
+
+  it('gives headings their GitHub-style anchor (repeats numbered, formatting ignored)', () => {
+    const html = renderDocumentHtml('# 1. 비전\n\n## **굵게** `코드`\n\n## 1. 비전\n', deps);
+    expect(html).toContain('<h1 data-tfm-anchor="1-비전">');
+    expect(html).toContain('<h2 data-tfm-anchor="굵게-코드">');
+    expect(html).toContain('<h2 data-tfm-anchor="1-비전-1">');
   });
 
   it('marks an empty quote (">" alone) too, with empty text', () => {

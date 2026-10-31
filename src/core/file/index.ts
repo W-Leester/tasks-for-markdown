@@ -2,3 +2,4 @@ export { parseFile, type FileParseOptions, type FileParseResult, type Heading } 
 export { insertAfterTask, insertUnderTask, newTaskLine, placeTaskLine, type TaskInsertion } from './insertAfterTask';
 export { addNoteLines, cleanNoteTexts, noteBlock, setNoteLines, type ChildItem, type NoteBlock } from './notes';
 export { quoteLines, quoteText, type QuoteText } from './quoteBlock';
+export { findHeadingLine, headingAnchors, headingSlug, matchAnchor } from './headingAnchor';

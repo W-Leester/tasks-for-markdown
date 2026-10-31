@@ -3,6 +3,7 @@
  * task rows and links go back as messages. Plain DOM — no framework needed here.
  */
 import type { FromWebview, ToWebview, WebviewApi } from '../shared/protocol';
+import { matchAnchor } from '../../core/file/headingAnchor';
 import { applyView, clampWidth, type ColumnWidths, columnTracks, fitWidth, HIDEABLE_COLUMNS, type HideableColumn, moveBoundary, MAX_WIDTH, widthOf, SCOPE_MODES, SORT_MODES, type ScopeMode, type SortMode, type ViewState } from './view';
 
 declare function acquireVsCodeApi(): WebviewApi;
@@ -320,6 +321,13 @@ content.addEventListener('click', (e) => {
   const a = target.closest<HTMLAnchorElement>('a[href]');
   if (a) {
     e.preventDefault();
+    // `#제목` (a table of contents): scroll to that heading here, not open the source. `#L12` still goes to the line.
+    const href = a.getAttribute('href')!;
+    if (href.startsWith('#') && !/^#L\d+$/.test(href)) {
+      const heads = Array.from(content.querySelectorAll<HTMLElement>('[data-tfm-anchor]'));
+      heads[matchAnchor(heads.map((h) => h.dataset.tfmAnchor!), href.slice(1))]?.scrollIntoView({ block: 'start' });
+      return;
+    }
     post({ type: 'doc/link', href: a.getAttribute('href')! });
     return;
   }
@@ -391,6 +399,11 @@ function openQuote(bq: HTMLElement, keep?: { expected: string; value: string; se
     const clipboardKey = (e.metaKey || e.ctrlKey) && !e.shiftKey && !e.altKey && [67, 86, 88].includes(e.keyCode);
     if (!clipboardKey) e.stopPropagation();
     if (e.isComposing || e.keyCode === 229) return;
+    // Undo/redo of what was typed here, done in the box: passed on, VS Code would undo the note instead (11-01).
+    const mod = (e.metaKey || e.ctrlKey) && !e.altKey;
+    const redo = mod && ((e.keyCode === 90 && e.shiftKey) || (e.keyCode === 89 && e.ctrlKey && !e.shiftKey));
+    if (redo || (mod && e.keyCode === 90 && !e.shiftKey)) { e.preventDefault(); document.execCommand(redo ? 'redo' : 'undo'); return; }
+    if (mod && e.keyCode === 65 && !e.shiftKey) { e.preventDefault(); area.select(); return; }
     if (e.key === 'Escape') { e.preventDefault(); state.finish(false); }
     else if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); state.finish(true); }
   });

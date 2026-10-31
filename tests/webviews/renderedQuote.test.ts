@@ -13,6 +13,9 @@ const note = () =>
   quote(3, 4, '정의 **굵게**', '<p>정의 <strong>굵게</strong> <a href="x.md">링크</a></p>') +
   quote(5, 8, '답변:&#10;&#10;', '<p>답변:</p>');
 
+// jsdom has no execCommand; the box's undo/redo calls it.
+if (!document.execCommand) document.execCommand = () => true;
+
 describe('rendered view: typing into a blockquote (M38)', () => {
   it('click opens the quote as a text area with its source, the cursor after the last character', async () => {
     document.body.innerHTML = '<div id="content"></div>';
@@ -105,6 +108,44 @@ describe('rendered view: typing into a blockquote (M38)', () => {
     window.removeEventListener('keydown', spy);
     expect(seen).toEqual(['Cmd+v', 'Ctrl+c', 'Cmd+x']);
     key(ta, 'Escape');
+  });
+
+  it('Cmd/Ctrl+Z and Cmd+Shift+Z / Ctrl+Y undo and redo in the box (not passed on); Cmd+A selects it all', () => {
+    send(note());
+    document.querySelectorAll<HTMLElement>('blockquote')[0]!.click();
+    const ta = area()!;
+    const ran: string[] = [];
+    const real = document.execCommand;
+    document.execCommand = ((cmd: string) => { ran.push(cmd); return true; }) as typeof document.execCommand;
+    const seen: string[] = [];
+    const spy = () => seen.push('x');
+    window.addEventListener('keydown', spy);
+    key(ta, 'z', { metaKey: true, keyCode: 90 });
+    key(ta, 'z', { metaKey: true, shiftKey: true, keyCode: 90 });
+    key(ta, 'y', { ctrlKey: true, keyCode: 89 });
+    key(ta, 'z', { ctrlKey: true, keyCode: 90 });
+    key(ta, 'a', { metaKey: true, keyCode: 65 });
+    window.removeEventListener('keydown', spy);
+    document.execCommand = real;
+    expect(ran).toEqual(['undo', 'redo', 'redo', 'undo']);
+    expect(seen).toEqual([]);
+    expect([ta.selectionStart, ta.selectionEnd]).toEqual([0, ta.value.length]);
+    key(ta, 'Escape');
+  });
+
+  it('a "#heading" link scrolls to that heading in the view; "#L12" and other links go to the host', () => {
+    send('<h2 data-tfm-anchor="1-비전">1. 비전</h2><p><a href="#1-%EB%B9%84%EC%A0%84">목차</a> <a href="#L3">줄</a> <a href="#없음">없음</a></p>');
+    posted.length = 0;
+    const h = document.querySelector<HTMLElement>('h2')!;
+    let scrolled = 0;
+    h.scrollIntoView = () => { scrolled++; };
+    const [toc, line, missing] = Array.from(document.querySelectorAll<HTMLAnchorElement>('a'));
+    toc!.click();
+    missing!.click();
+    expect(scrolled).toBe(1);
+    expect(posted.filter((m: FromWebview) => m.type === 'doc/link')).toEqual([]);
+    line!.click();
+    expect(posted.filter((m: FromWebview) => m.type === 'doc/link')).toEqual([{ type: 'doc/link', href: '#L3' }]);
   });
 
   it('an empty quote (">" alone) shows a faint "Type here", hidden while typing; the empty area shows it too', () => {

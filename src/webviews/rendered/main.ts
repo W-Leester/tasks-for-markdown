@@ -396,11 +396,13 @@ function openQuote(bq: HTMLElement, keep?: { expected: string; value: string; se
   quoteEdit = state;
   const fit = () => { area.style.height = 'auto'; area.style.height = `${area.scrollHeight}px`; };
   area.addEventListener('input', fit);
+  const history = boxHistory(area, fit);
   area.addEventListener('keydown', (e) => {
     // In the desktop app the edit-menu keys never reach a webview's text box by themselves (11-01): the box does undo,
     // redo, select all and save; copy/paste/cut and the editor's other shortcuts (Cmd+P, Cmd+Shift+P, Cmd+W, …) go on to
     // VS Code. Keys without Cmd stay here (typing, and not the selected-row keys). On macOS Ctrl+A/E/K… are text keys.
-    const k = e.keyCode;
+    // The physical key too: with a Korean input source a key pressed mid-syllable can come as keyCode 229.
+    const k = e.keyCode === 229 && /^Key[A-Z]$/.test(e.code) ? e.code.charCodeAt(3) : e.keyCode;
     const cmd = (e.metaKey || (e.ctrlKey && !IS_MAC)) && !e.altKey;
     const undo = cmd && k === 90 && !e.shiftKey;
     const redo = cmd && ((k === 90 && e.shiftKey) || (k === 89 && !IS_MAC && !e.shiftKey));
@@ -409,9 +411,9 @@ function openQuote(bq: HTMLElement, keep?: { expected: string; value: string; se
     const done = e.key === 'Enter' && (e.metaKey || e.ctrlKey);
     // Cmd+Shift+V (paste as plain text) stays here as before (10-31: it pasted); the box is plain text anyway.
     if (!cmd || undo || redo || selectAll || save || done || (k === 86 && e.shiftKey)) e.stopPropagation();
+    if (undo || redo) { e.preventDefault(); if (redo) history.redo(); else history.undo(); return; }
     if (e.isComposing || k === 229) return;
-    if (undo || redo) { e.preventDefault(); document.execCommand(redo ? 'redo' : 'undo'); }
-    else if (selectAll) { e.preventDefault(); area.select(); }
+    if (selectAll) { e.preventDefault(); area.select(); }
     else if (save) { e.preventDefault(); state.finish(true, true); }
     else if (done) { e.preventDefault(); state.finish(true); }
     else if (e.key === 'Escape') { e.preventDefault(); state.finish(false); }
@@ -423,6 +425,65 @@ function openQuote(bq: HTMLElement, keep?: { expected: string; value: string; se
   // After the last character, not on the quote's trailing blank lines.
   const [from, to] = keep?.selection ?? [area.value.trimEnd().length, area.value.trimEnd().length];
   area.setSelectionRange(from, to);
+  history.reset();
+}
+
+/**
+ * The box's own undo/redo (11-01). Chromium's undo stack in a webview text box only picked up pastes in Cursor, not
+ * typing (Korean input especially), so the box keeps its text after each burst of typing, deleting or pasting.
+ */
+function boxHistory(area: HTMLTextAreaElement, after: () => void): { undo(): void; redo(): void; reset(): void } {
+  type Snap = { value: string; from: number; to: number };
+  const snap = (): Snap => ({ value: area.value, from: area.selectionStart, to: area.selectionEnd });
+  let steps: Snap[] = [snap()];
+  let at = 0;
+  let lastKind = '';
+  let lastTime = 0;
+  let wordEnded = false;
+  let composing = false;
+  let pending: 'undo' | 'redo' | null = null;
+  const MERGE_MS = 1000;
+  const record = (kind: string, data: string | null) => {
+    const now = Date.now();
+    const typing = kind === 'insertText' || kind.startsWith('deleteContent');
+    // A run of typing (or of deleting) is one step, until a pause, a new line or a space ends it.
+    const merge = typing && kind === lastKind && now - lastTime < MERGE_MS && at > 0 && !wordEnded;
+    wordEnded = /\s/.test(data ?? '');
+    steps = steps.slice(0, at + 1);
+    if (merge) steps[at] = snap();
+    else { steps.push(snap()); at = steps.length - 1; }
+    if (steps.length > 200) { steps.shift(); at--; }
+    lastKind = kind;
+    lastTime = now;
+  };
+  const show = (to: number) => {
+    at = to;
+    const s = steps[at]!;
+    area.value = s.value;
+    area.setSelectionRange(s.from, s.to);
+    lastKind = '';
+    after();
+  };
+  const run = (what: 'undo' | 'redo') => {
+    // Mid-syllable: once the syllable is done (it is part of the text by then).
+    if (composing) { pending = what; return; }
+    if (what === 'undo' && at > 0) show(at - 1);
+    else if (what === 'redo' && at < steps.length - 1) show(at + 1);
+  };
+  area.addEventListener('input', (e) => {
+    const ie = e as InputEvent;
+    if (ie.isComposing || composing) return;
+    record(ie.inputType || 'insertText', ie.data);
+  });
+  area.addEventListener('compositionstart', () => { composing = true; });
+  area.addEventListener('compositionend', (e) => {
+    composing = false;
+    record('insertText', e.data);
+    const p = pending;
+    pending = null;
+    if (p) run(p);
+  });
+  return { undo: () => run('undo'), redo: () => run('redo'), reset: () => { steps = [snap()]; at = 0; lastKind = ''; } };
 }
 
 // ---- M27: new task lines from the rendered view ----

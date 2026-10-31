@@ -13,9 +13,6 @@ const note = () =>
   quote(3, 4, '정의 **굵게**', '<p>정의 <strong>굵게</strong> <a href="x.md">링크</a></p>') +
   quote(5, 8, '답변:&#10;&#10;', '<p>답변:</p>');
 
-// jsdom has no execCommand; the box's undo/redo calls it.
-if (!document.execCommand) document.execCommand = () => true;
-
 describe('rendered view: typing into a blockquote (M38)', () => {
   it('click opens the quote as a text area with its source, the cursor after the last character', async () => {
     document.body.innerHTML = '<div id="content"></div>';
@@ -133,24 +130,49 @@ describe('rendered view: typing into a blockquote (M38)', () => {
     expect(posted.filter((m: FromWebview) => m.type === 'doc/editQuote' || m.type === 'doc/save')).toEqual([{ type: 'doc/save' }]);
   });
 
-  it('Cmd/Ctrl+Z and Cmd+Shift+Z / Ctrl+Y undo and redo in the box (not passed on); Cmd+A selects it all', () => {
+  it('Cmd/Ctrl+Z and Cmd+Shift+Z / Ctrl+Y undo and redo typing, Korean syllables and pastes in the box (not passed on); Cmd+A selects it all', () => {
     send(note());
     document.querySelectorAll<HTMLElement>('blockquote')[0]!.click();
     const ta = area()!;
-    const ran: string[] = [];
-    const real = document.execCommand;
-    document.execCommand = ((cmd: string) => { ran.push(cmd); return true; }) as typeof document.execCommand;
+    const start = ta.value;
+    const type = (text: string, inputType = 'insertText') => {
+      const at = ta.selectionStart;
+      ta.value = ta.value.slice(0, at) + text + ta.value.slice(ta.selectionEnd);
+      ta.setSelectionRange(at + text.length, at + text.length);
+      ta.dispatchEvent(new InputEvent('input', { inputType, data: inputType === 'insertFromPaste' ? null : text }));
+    };
     const seen: string[] = [];
     const spy = () => seen.push('x');
     window.addEventListener('keydown', spy);
+    type('a'); type('b'); type(' '); // one step, ended by the space
+    type('c');
+    type('붙인 글', 'insertFromPaste');
+    // A Korean syllable: input events while composing are not steps; the finished syllable is.
+    ta.dispatchEvent(new CompositionEvent('compositionstart'));
+    type('ㅎ'); ta.dispatchEvent(new InputEvent('input', { inputType: 'insertCompositionText', isComposing: true }));
+    ta.value = ta.value.slice(0, -1) + '한';
+    ta.dispatchEvent(new CompositionEvent('compositionend', { data: '한' }));
+    expect(ta.value).toBe(`${start}ab c붙인 글한`);
     key(ta, 'z', { metaKey: true, keyCode: 90 });
-    key(ta, 'z', { metaKey: true, shiftKey: true, keyCode: 90 });
-    key(ta, 'y', { ctrlKey: true, keyCode: 89 });
+    expect(ta.value).toBe(`${start}ab c붙인 글`);
+    key(ta, 'z', { metaKey: true, keyCode: 90 });
+    expect(ta.value).toBe(`${start}ab c`);
     key(ta, 'z', { ctrlKey: true, keyCode: 90 });
+    expect(ta.value).toBe(`${start}ab `);
+    key(ta, 'z', { metaKey: true, shiftKey: true, keyCode: 90 });
+    expect(ta.value).toBe(`${start}ab c`);
+    key(ta, 'y', { ctrlKey: true, keyCode: 89 });
+    expect(ta.value).toBe(`${start}ab c붙인 글`);
+    // Cmd+Z with a Korean input source mid-syllable (keyCode 229): waits for the syllable, then undoes it.
+    ta.dispatchEvent(new CompositionEvent('compositionstart'));
+    ta.value += 'ㄱ';
+    key(ta, 'z', { metaKey: true, keyCode: 229, code: 'KeyZ' });
+    ta.dispatchEvent(new CompositionEvent('compositionend', { data: 'ㄱ' }));
+    expect(ta.value).toBe(`${start}ab c붙인 글`);
+    for (let i = 0; i < 10; i++) key(ta, 'z', { metaKey: true, keyCode: 90 });
+    expect(ta.value).toBe(start); // not past where the box opened
     key(ta, 'a', { metaKey: true, keyCode: 65 });
     window.removeEventListener('keydown', spy);
-    document.execCommand = real;
-    expect(ran).toEqual(['undo', 'redo', 'redo', 'undo']);
     expect(seen).toEqual([]);
     expect([ta.selectionStart, ta.selectionEnd]).toEqual([0, ta.value.length]);
     key(ta, 'Escape');

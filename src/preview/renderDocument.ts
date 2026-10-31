@@ -1,5 +1,6 @@
 import MarkdownItCtor from 'markdown-it';
 import type { MarkdownIt } from 'markdown-it';
+import { quoteText } from '../core/file';
 import { type PluginDeps, tasksMarkdownItPlugin } from './markdownItPlugin';
 
 const escape = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -27,6 +28,7 @@ export function renderDocumentHtml(text: string, deps: PluginDeps, options: Rend
   const build = (borrowed: boolean): MarkdownIt => {
     const md = new MarkdownItCtor({ html: false, linkify: true });
     tasksMarkdownItPlugin(md, deps);
+    md.core.ruler.push('tfm_quotes', markQuotes);
     if (borrowed) {
       (options.plugins ?? []).forEach((plugin, i) => {
         try {
@@ -69,4 +71,26 @@ export function renderDocumentHtml(text: string, deps: PluginDeps, options: Rend
     });
   }
   return html;
+}
+
+/**
+ * Outermost blockquotes get their line range and text (M38) so the rendered view can turn one into an input and the
+ * host can write it back: `data-tfm-quote="<start>-<end>"` (end exclusive) and `data-tfm-quote-text`.
+ */
+function markQuotes(state: { src: string; tokens: { type: string; map: [number, number] | null; attrSet(name: string, value: string): void }[] }): void {
+  const lines = state.src.split('\n');
+  let depth = 0;
+  for (const token of state.tokens) {
+    if (token.type === 'blockquote_close') depth--;
+    if (token.type !== 'blockquote_open') continue;
+    if (depth++ > 0 || !token.map) continue;
+    const [start] = token.map;
+    // markdown-it's range takes in the blank line that ends the quote.
+    let end = token.map[1];
+    while (end > start && !lines[end - 1]!.trim()) end--;
+    const quote = quoteText(lines.slice(start, end));
+    if (!quote) continue;
+    token.attrSet('data-tfm-quote', `${start}-${end}`);
+    token.attrSet('data-tfm-quote-text', quote.text);
+  }
 }

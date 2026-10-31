@@ -61,7 +61,7 @@ All keys can be changed with **Tasks: Keyboard shortcuts**; the full list is und
 - **Sidebar** — Today, Next 7 days, Overdue, In progress, Blocked, All open, Done; saved queries with grouped results.
 - **Query language** — the Obsidian Tasks query language in ` ```tasks ` blocks, saved queries and a visual query builder.
 - **Recurrence, statuses, dependencies** — `🔁 every month on the last`, custom statuses with presets, `🆔`/`⛔` dependencies with blocked detection, urgency score.
-- **Rendered view** — an interactive preview: tick, edit, postpone, add notes, show or hide columns, live query results (`Cmd/Ctrl+Shift+R`).
+- **Rendered view** — an interactive preview: tick, edit, postpone, add notes, type into quotes, show or hide columns, live query results (`Cmd/Ctrl+Shift+R`).
 - **Notes** — indented bullets under a task are its notes; add them from the rendered view with 💬.
 - **More views** — create/edit dialog, kanban, calendar, weekly statistics, archive, daily notifications.
 - **AI and automation** — MCP server for AI agents, public extension API, commands, CLI and library (see [Use it with AI](#use-it-with-ai) and [Extend it](#extend-it)).
@@ -89,7 +89,7 @@ group by filename
 
 ![Typing a task: auto-suggest for the due date, "next fri" becomes 2026-10-09](docs/images/demo-editing.gif)
 
-**Work in the rendered view.** Tick checkboxes, add notes with 💬, add tasks below a row with `Enter` or ＋ (one after another), and show or hide columns. Query blocks update live.
+**Work in the rendered view.** Tick checkboxes, add notes with 💬, add tasks below a row with `Enter` or ＋ (one after another), type into a blockquote by clicking it, and show or hide columns. Query blocks update live.
 
 ![Rendered view: adding a note, ticking a task, hiding and restoring a column](docs/images/demo-rendered.gif)
 

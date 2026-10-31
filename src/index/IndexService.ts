@@ -181,10 +181,7 @@ export class IndexService implements vscode.Disposable {
   }
 
   private excludeGlob(): string | undefined {
-    const patterns = [...this.deps.settings.get('exclude')];
-    const filesExclude = vscode.workspace.getConfiguration('files').get<Record<string, boolean>>('exclude') ?? {};
-    for (const [glob, on] of Object.entries(filesExclude)) if (on) patterns.push(glob);
-    return patterns.length ? `{${patterns.join(',')}}` : undefined;
+    return excludeGlob(this.deps.settings);
   }
 
   private includeMatchers(): RegExp[] {
@@ -202,6 +199,14 @@ export class IndexService implements vscode.Disposable {
     for (const t of this.pendingFiles.values()) clearTimeout(t);
     for (const d of this.disposables) d.dispose();
   }
+}
+
+/** `tasksmd.exclude` plus the editor's `files.exclude`, as one glob for `findFiles` (also used for saved queries). */
+export function excludeGlob(settings: Settings): string | undefined {
+  const patterns = [...settings.get('exclude')];
+  const filesExclude = vscode.workspace.getConfiguration('files').get<Record<string, boolean>>('exclude') ?? {};
+  for (const [glob, on] of Object.entries(filesExclude)) if (on) patterns.push(glob);
+  return patterns.length ? `{${patterns.join(',')}}` : undefined;
 }
 
 /** Small glob → RegExp for `**`, `*`, `?` and `{a,b}` — enough for include/exclude patterns. */

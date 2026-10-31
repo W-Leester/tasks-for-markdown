@@ -1,4 +1,6 @@
 import * as vscode from 'vscode';
+import { GitignoreFilter } from '../index/GitignoreFilter';
+import { excludeGlob } from '../index/IndexService';
 import type { Settings } from '../settings/Settings';
 
 export interface SavedQuery {
@@ -37,6 +39,7 @@ export class SavedQueryStore implements vscode.Disposable {
       watcher,
       this.emitter,
       settings.onDidChange(() => this.emitter.fire(), ['savedQueries']),
+      settings.onDidChange(reload, ['exclude', 'respectGitignore']),
       vscode.workspace.onDidChangeWorkspaceFolders(reload),
       vscode.workspace.onDidChangeTextDocument((e) => {
         if (e.document.uri.path.includes(`/${QUERIES_DIR}/`)) reload();
@@ -57,7 +60,12 @@ export class SavedQueryStore implements vscode.Disposable {
   async reload(): Promise<void> {
     if (this.loading) return this.loading;
     this.loading = (async () => {
-      const files = await vscode.workspace.findFiles(`**/${QUERIES_DIR}/*.md`, '**/node_modules/**');
+      // The same folders as the index: tasksmd.exclude, files.exclude and .gitignore (M38 — excluded ones showed up).
+      const gitignore = new GitignoreFilter();
+      if (this.settings.get('respectGitignore')) await gitignore.load();
+      const files = (await vscode.workspace.findFiles(`**/${QUERIES_DIR}/*.md`, excludeGlob(this.settings) ?? '**/node_modules/**')).filter(
+        (u) => !this.settings.get('respectGitignore') || !gitignore.isIgnored(u),
+      );
       const out: SavedQuery[] = [];
       for (const uri of files.sort((a, b) => a.path.localeCompare(b.path))) {
         const open = vscode.workspace.textDocuments.find((d) => d.uri.toString() === uri.toString());

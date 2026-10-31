@@ -54,6 +54,7 @@ type Incoming =
   | { type: 'doc/insertTask'; line: number; text: string }
   | { type: 'doc/select'; line: number | null }
   | { type: 'doc/addNote'; path: string | null; line: number; text: string }
+  | { type: 'doc/editQuote'; start: number; end: number; expected: string; text: string }
   | { type: 'doc/link'; href: string }
   | { type: 'doc/openSource' }
   | { type: 'doc/view'; sort: string; scope: string }
@@ -237,6 +238,9 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
           void panel.webview.postMessage({ type: 'doc/inserted', line });
           break;
         }
+        case 'doc/editQuote':
+          await this.deps.editService.replaceQuote(document.uri, msg.start, msg.end, msg.expected, msg.text);
+          break;
         case 'doc/link':
           await this.openLink(msg.href, document);
           break;
@@ -378,6 +382,9 @@ ${borrowed.styles.map((u) => `<link rel="stylesheet" href="${webview.asWebviewUr
   pre { font-family: var(--rv-mono); font-size: .9em; line-height: 1.5; background: var(--rv-bg-2); border-radius: 6px; padding: 12px 16px; margin: 0 0 .75em; overflow: auto; white-space: pre-wrap; }
   pre code { background: none; border: none; padding: 0; font-size: 1em; }
   blockquote { margin: 0 0 .75em; padding: 2px 0 2px 14px; border-left: 3px solid var(--rv-stroke-2); color: var(--rv-muted); } blockquote > :last-child { margin-bottom: 0; }
+  blockquote.rv-quote { cursor: text; border-radius: 0 4px 4px 0; } blockquote.rv-quote:hover { background: var(--rv-bg-2); }
+  blockquote.rv-quote-editing { border-left-color: var(--rv-accent); padding-right: 0; } blockquote.rv-quote-editing:hover { background: none; }
+  .rv-quote-input { display: block; width: 100%; box-sizing: border-box; min-height: 2.4em; resize: none; overflow: hidden; background: var(--rv-bg-2); color: var(--rv-fg); border: 1px solid var(--rv-accent); border-radius: 4px; padding: 4px 8px; font: inherit; line-height: inherit; outline: none; }
   table { border-collapse: collapse; margin: 0 0 .75em; } th, td { border: 1px solid var(--rv-stroke); padding: 4px 10px; } th { background: var(--rv-bg-2); }
   img { max-width: 100%; border-radius: 4px; }
   hr { border: none; border-top: 1px solid var(--rv-stroke); margin: 1.5em 0; }
@@ -517,7 +524,7 @@ ${borrowed.styles.map((u) => `<link rel="stylesheet" href="${webview.asWebviewUr
 </style>
 <title>${t('Tasks: Rendered view')}</title>
 </head>
-<body data-l-col-width="${t('Column width')}" data-l-col-width-hint="${t('Drag to resize, double-click to fit the content')}" data-l-col-desc="${t('Description')}" data-l-col-due="${t('Due date')}" data-l-col-created="${t('Created date')}" data-l-col-done="${t('Done date')}" data-l-col-more="${t('Other fields')}" data-l-col-hide="${t('Hide column')}" data-l-col-show="${t('Show column')}" data-l-edit="${t('Edit')}" data-l-postpone="${t('Postpone')}" data-l-note="${t('Add note')}" data-l-note-placeholder="${t('Note — Enter to save, Esc to cancel')}" data-l-add-below="${t('Add a task below')}" data-l-add-task="${t('Add task')}" data-l-task-placeholder="${t('New task — Enter to add, Esc to stop')}" data-l-hidden="${t('{0} hidden')}">
+<body data-l-col-width="${t('Column width')}" data-l-col-width-hint="${t('Drag to resize, double-click to fit the content')}" data-l-col-desc="${t('Description')}" data-l-col-due="${t('Due date')}" data-l-col-created="${t('Created date')}" data-l-col-done="${t('Done date')}" data-l-col-more="${t('Other fields')}" data-l-col-hide="${t('Hide column')}" data-l-col-show="${t('Show column')}" data-l-edit="${t('Edit')}" data-l-postpone="${t('Postpone')}" data-l-note="${t('Add note')}" data-l-note-placeholder="${t('Note — Enter to save, Esc to cancel')}" data-l-add-below="${t('Add a task below')}" data-l-add-task="${t('Add task')}" data-l-task-placeholder="${t('New task — Enter to add, Esc to stop')}" data-l-hidden="${t('{0} hidden')}" data-l-quote-edit="${t('Click to type')}" data-l-quote-hint="${t('Cmd/Ctrl+Enter or click outside to save, Esc to cancel')}">
 <div class="rv-tools">
   <label class="rv-select"><span>${t('Sort')}</span><select id="view-sort">
     <option value="document">${t('Document order')}</option><option value="due">${t('Due date')}</option><option value="created">${t('Created date')}</option><option value="priority">${t('Priority')}</option><option value="urgency">${t('Urgency')}</option>

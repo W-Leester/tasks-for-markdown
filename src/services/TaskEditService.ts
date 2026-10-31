@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { dayjs, type Dayjs } from '../core/dates/dayjs';
 import { StatusType, type StatusRegistry, type Status, type Task, type TaskFields, applyStatusChange, generateTaskId, serializeTask } from '../core/task';
 import type { TaskIndex } from '../core/index';
-import { cleanNoteTexts, insertAfterTask, insertUnderTask, newTaskLine, noteBlock, placeTaskLine } from '../core/file';
+import { cleanNoteTexts, insertAfterTask, insertUnderTask, newTaskLine, noteBlock, placeTaskLine, quoteLines, quoteText } from '../core/file';
 import { t } from '../l10n';
 import type { IndexService } from '../index/IndexService';
 import type { Settings } from '../settings/Settings';
@@ -184,11 +184,7 @@ export class TaskEditService {
   /** Stale-checked, single-WorkspaceEdit write around one line (see replaceLine). */
   private async withLine<T>(uri: vscode.Uri, line: number, expectedOriginal: string, build: (doc: vscode.TextDocument, edit: vscode.WorkspaceEdit, eol: string) => T): Promise<T> {
     const doc = await vscode.workspace.openTextDocument(uri);
-    // Save afterwards only when nobody is editing this file: not shown in any editor and not
-    // dirty. (Closed editors keep their TextDocument around for a while, so "is it in
-    // workspace.textDocuments" is not a reliable signal.)
-    const visible = vscode.window.visibleTextEditors.some((e) => e.document.uri.toString() === uri.toString());
-    const shouldSave = !visible && !doc.isDirty;
+    const shouldSave = nobodyEditing(doc);
     const strip = (s: string) => (s.endsWith('\r') ? s.slice(0, -1) : s);
     const actual = line < doc.lineCount ? doc.lineAt(line).text : '';
     if (strip(actual) !== strip(expectedOriginal)) {
@@ -196,15 +192,35 @@ export class TaskEditService {
       throw new StaleLineError(uri, line, expectedOriginal, actual);
     }
     const edit = new vscode.WorkspaceEdit();
-    const eol = doc.eol === vscode.EndOfLine.CRLF ? '\r\n' : '\n';
-    const result = build(doc, edit, eol);
+    const result = build(doc, edit, eolOf(doc));
     if (edit.size === 0) return result; // nothing to change (e.g. same notes)
-    const ok = await applyToDocument(doc, edit);
-    if (!ok) throw new Error(`Could not edit ${uri.fsPath}`);
-    // Keep the index exact immediately instead of waiting for the debounced document event.
-    this.deps.indexService.indexText(uri, doc.getText());
-    if (shouldSave) await doc.save();
+    await this.commit(doc, edit, shouldSave);
     return result;
+  }
+
+  private async commit(doc: vscode.TextDocument, edit: vscode.WorkspaceEdit, save: boolean): Promise<void> {
+    const ok = await applyToDocument(doc, edit);
+    if (!ok) throw new Error(`Could not edit ${doc.uri.fsPath}`);
+    // Keep the index exact immediately instead of waiting for the debounced document event.
+    this.deps.indexService.indexText(doc.uri, doc.getText());
+    if (save) await doc.save();
+  }
+
+  /**
+   * Write `text` into the blockquote on lines `start`..`end` (exclusive) — typed in the rendered view (M38). Refused
+   * when the quote's text is no longer `expected` (the file changed after the view was drawn).
+   */
+  async replaceQuote(uri: vscode.Uri, start: number, end: number, expected: string, text: string): Promise<void> {
+    const doc = await vscode.workspace.openTextDocument(uri);
+    const shouldSave = nobodyEditing(doc);
+    const lines: string[] = [];
+    for (let i = start; i < end && i < doc.lineCount; i++) lines.push(doc.lineAt(i).text);
+    const quote = end <= doc.lineCount && start < end ? quoteText(lines) : null;
+    if (!quote || quote.text !== expected.replace(/\r\n/g, '\n')) throw new Error(t('That quote has changed since the view was drawn; the view has been refreshed.'));
+    if (quote.text === text.replace(/\r\n/g, '\n')) return;
+    const edit = new vscode.WorkspaceEdit();
+    edit.replace(uri, new vscode.Range(start, 0, end - 1, doc.lineAt(end - 1).text.length), quoteLines(quote.indent, text).join(eolOf(doc)));
+    await this.commit(doc, edit, shouldSave);
   }
 
   /**
@@ -306,6 +322,19 @@ async function applyToDocument(doc: vscode.TextDocument, edit: vscode.WorkspaceE
   return editor.edit((b) => {
     for (const e of edits) b.replace(e.range, e.newText);
   });
+}
+
+/**
+ * Save after an edit only when nobody is editing the file: not shown in any editor and not dirty. (Closed editors
+ * keep their TextDocument around for a while, so "is it in workspace.textDocuments" is not a reliable signal.)
+ */
+function nobodyEditing(doc: vscode.TextDocument): boolean {
+  const visible = vscode.window.visibleTextEditors.some((e) => e.document.uri.toString() === doc.uri.toString());
+  return !visible && !doc.isDirty;
+}
+
+function eolOf(doc: vscode.TextDocument): string {
+  return doc.eol === vscode.EndOfLine.CRLF ? '\r\n' : '\n';
 }
 
 function docLines(doc: vscode.TextDocument): string[] {

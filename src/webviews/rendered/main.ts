@@ -220,6 +220,9 @@ window.addEventListener('message', (e: MessageEvent<ToWebview>) => {
   if (scopeSel) scopeSel.value = view.scope;
   const y = window.scrollY;
   formText = content.querySelector<HTMLInputElement>('li.rv-task-form input')?.value ?? '';
+  const keepQuote = quoteEdit && !quoteEdit.done ? { start: quoteEdit.start, expected: quoteEdit.expected, value: quoteEdit.area.value, selection: [quoteEdit.area.selectionStart, quoteEdit.area.selectionEnd] as [number, number] } : null;
+  if (quoteEdit) quoteEdit.done = true;
+  quoteEdit = null;
   // Removing a focused input fires its blur while it is still attached; that is not the user leaving it.
   rerendering = true;
   content.innerHTML = m.html;
@@ -228,6 +231,7 @@ window.addEventListener('message', (e: MessageEvent<ToWebview>) => {
   applyColumns(m.hiddenColumns ?? []);
   addRowActions();
   addTaskRows();
+  markQuotes();
   refreshView();
   window.scrollTo(0, y);
   // Other extensions' preview scripts (Mermaid…, M34) redraw on the event the built-in preview sends after an update.
@@ -243,6 +247,11 @@ window.addEventListener('message', (e: MessageEvent<ToWebview>) => {
     else post({ type: 'doc/select', line: null });
   }
   if (formLine !== null && chainLine === null) { const li = bodyRow(formLine); if (li) openTaskForm(li, formText); else formLine = null; }
+  // A quote being typed into survives re-renders too (another part of the file changed, the index updated…).
+  if (keepQuote) {
+    const bq = Array.from(content.querySelectorAll<HTMLElement>('blockquote.rv-quote')).find((q) => q.dataset.tfmQuote!.startsWith(`${keepQuote.start}-`));
+    if (bq) openQuote(bq, keepQuote);
+  }
   continueChain();
 });
 
@@ -316,10 +325,74 @@ content.addEventListener('click', (e) => {
   }
   const add = target.closest<HTMLElement>('li.rv-addrow');
   if (add) { e.preventDefault(); const last = lastTaskOf(add.parentElement!); if (last) openTaskForm(last); return; }
+  // M38: clicking a note-body quote turns it into a text area (not on a task row inside it).
+  if (target.closest('textarea.rv-quote-input')) return;
+  const bq = target.closest<HTMLElement>('blockquote.rv-quote');
+  const rowIn = target.closest('li.tfm-task, input, button, details, summary');
+  if (bq && !(rowIn && bq.contains(rowIn))) { e.preventDefault(); openQuote(bq); return; }
   // M27: clicking a note-body task row selects it; Enter then adds a task below it.
   const row = target.closest<HTMLElement>('li.tfm-task');
   if (row && row.dataset.tfmPath === undefined && row.dataset.tfmLine !== undefined && !target.closest('input, button, textarea, details, summary, .tfm-notes')) selectRow(row);
 });
+
+// ---- M38: typing into a blockquote ----
+/** The quote being typed into: its lines, the text it was drawn with, and its text area. */
+let quoteEdit: { start: number; end: number; expected: string; area: HTMLTextAreaElement; done: boolean; finish(save: boolean): void } | null = null;
+/** Note-body quotes the host marked (outermost ones) can be clicked into; not those in query results. */
+function markQuotes(): void {
+  const title = document.body.dataset.lQuoteEdit ?? 'Click to type';
+  for (const bq of Array.from(content.querySelectorAll<HTMLElement>('blockquote[data-tfm-quote]'))) {
+    if (bq.closest('.tfm-query')) continue;
+    bq.classList.add('rv-quote');
+    bq.title = title;
+  }
+}
+/**
+ * The quote's source (one `>` level off) in a text area in its place. Cmd/Ctrl+Enter or leaving it saves (when
+ * changed), Esc puts the quote back. `keep` restores an area that was open before a re-render.
+ */
+function openQuote(bq: HTMLElement, keep?: { expected: string; value: string; selection: [number, number] }): void {
+  quoteEdit?.finish(true);
+  const [start, end] = bq.dataset.tfmQuote!.split('-').map(Number) as [number, number];
+  const expected = keep?.expected ?? bq.dataset.tfmQuoteText ?? '';
+  const rendered = Array.from(bq.childNodes);
+  const area = document.createElement('textarea');
+  area.className = 'rv-quote-input';
+  area.title = document.body.dataset.lQuoteHint ?? 'Cmd/Ctrl+Enter or click outside to save, Esc to cancel';
+  area.value = keep?.value ?? expected;
+  bq.replaceChildren(area);
+  bq.classList.add('rv-quote-editing');
+  bq.removeAttribute('title');
+  const state = {
+    start, end, expected, area, done: false,
+    finish(save: boolean) {
+      if (state.done) return;
+      state.done = true;
+      if (quoteEdit === state) quoteEdit = null;
+      // Saved: the area stays (read-only) until the note re-renders with the new text.
+      if (save && area.value !== expected) { area.readOnly = true; post({ type: 'doc/editQuote', start, end, expected, text: area.value }); return; }
+      bq.replaceChildren(...rendered);
+      bq.classList.remove('rv-quote-editing');
+      bq.title = document.body.dataset.lQuoteEdit ?? 'Click to type';
+    },
+  };
+  quoteEdit = state;
+  const fit = () => { area.style.height = 'auto'; area.style.height = `${area.scrollHeight}px`; };
+  area.addEventListener('input', fit);
+  area.addEventListener('keydown', (e) => {
+    e.stopPropagation(); // not the selected-row keys
+    if (e.isComposing || e.keyCode === 229) return;
+    if (e.key === 'Escape') { e.preventDefault(); state.finish(false); }
+    else if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); state.finish(true); }
+  });
+  // Removing the area in a re-render blurs it; that is not the user leaving it.
+  area.addEventListener('blur', () => { if (!rerendering) state.finish(true); });
+  fit();
+  area.focus({ preventScroll: true });
+  // After the last character, not on the quote's trailing blank lines.
+  const [from, to] = keep?.selection ?? [area.value.trimEnd().length, area.value.trimEnd().length];
+  area.setSelectionRange(from, to);
+}
 
 // ---- M27: new task lines from the rendered view ----
 let selected: HTMLElement | null = null;

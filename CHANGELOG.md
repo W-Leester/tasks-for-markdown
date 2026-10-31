@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.1.8 — unreleased
+
+- **Type into a blockquote in the rendered view.** Click a quote (`> …`) in the note and it becomes a text box with its text; `Cmd/Ctrl+Enter` or clicking outside saves it back as `> ` lines, `Esc` cancels, `Cmd/Ctrl+Z` undoes. Handy for question-and-answer notes: answer under `> Answer:` without switching to the source. Links and tasks inside a quote work as before; quotes in query results are not editable.
+- **Fix: saved queries now follow `tasksmd.exclude`** (and `files.exclude`, `.gitignore`), like the task index. Query files in excluded folders no longer show up under SAVED QUERIES.
+
+### 한국어 요약
+- **렌더 보기에서 인용문에 바로 쓰기:** 노트의 인용문(`> …`)을 클릭하면 그 자리가 입력칸이 되고, `Cmd/Ctrl+Enter`나 바깥 클릭으로 저장(줄마다 `> `), `Esc` 취소, `Cmd/Ctrl+Z` 되돌리기. 질문지의 `> 답변:` 아래에 소스로 넘어가지 않고 답을 씀. 인용문 안의 링크·태스크는 그대로, 쿼리 결과 안의 인용문은 제외.
+- **고침: 저장된 쿼리가 `tasksmd.exclude`를 따름**(`files.exclude`·`.gitignore`도, 인덱스와 같게). 제외한 폴더의 쿼리 파일이 SAVED QUERIES에 나오지 않음.
+
 ## 1.1.7 — 2026-10-29
 
 Documentation only; the extension is the same as 1.1.6.

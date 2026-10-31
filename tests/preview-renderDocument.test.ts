@@ -91,3 +91,24 @@ describe('other Markdown extensions in the rendered view (M34)', () => {
     expect(errors.at(-1)).toBe('render: render boom');
   });
 });
+
+describe('renderDocumentHtml: blockquotes the user can type into (M38)', () => {
+  it('marks each outermost quote with its line range and its text without ">"', () => {
+    const note = ['---', 'a: b', '---', '> 정의 **굵게**', '', '> 답변:', '>', '>', '', '> outer', '> > inner', '', 'text'].join('\n');
+    const html = renderDocumentHtml(note, deps);
+    expect(html).toContain('<blockquote data-tfm-quote="3-4" data-tfm-quote-text="정의 **굵게**">');
+    expect(html).toContain('<blockquote data-tfm-quote="5-8" data-tfm-quote-text="답변:\n\n">');
+    expect(html).toContain('<blockquote data-tfm-quote="9-11" data-tfm-quote-text="outer\n&gt; inner">');
+    expect(html.match(/data-tfm-quote=/g)).toHaveLength(3); // not the inner one
+  });
+
+  it('keeps the indentation of a quote in a list item; skips one that starts on the bullet', () => {
+    const html = renderDocumentHtml('- item\n\n  > in item\n\n- > on bullet\n', deps);
+    expect(html).toContain('data-tfm-quote-text="in item"');
+    expect(html).not.toContain('data-tfm-quote-text="on bullet"');
+  });
+
+  it('CRLF notes give the same text', () => {
+    expect(renderDocumentHtml('> a\r\n> b\r\n', deps)).toContain('data-tfm-quote="0-2" data-tfm-quote-text="a\nb"');
+  });
+});

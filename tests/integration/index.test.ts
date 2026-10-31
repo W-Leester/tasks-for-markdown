@@ -1,7 +1,8 @@
 import * as assert from 'node:assert/strict';
 import * as fs from 'node:fs';
+import * as path from 'node:path';
 import * as vscode from 'vscode';
-import { FixtureGuard, findTask, fixtureUri, getApi, localToday, sleep, waitFor } from './helpers';
+import { FixtureGuard, findTask, fixtureUri, getApi, localToday, sleep, waitFor, workspaceRoot } from './helpers';
 
 suite('index', () => {
   const guard = new FixtureGuard();
@@ -300,6 +301,25 @@ suite('queries', () => {
       assert.ok(r.matched > 0);
     } finally {
       await api.settings.update('savedQueries', undefined, vscode.ConfigurationTarget.Workspace);
+    }
+  });
+
+  test('saved query files follow tasksmd.exclude (M38: they showed up from excluded folders)', async () => {
+    const api = await getApi();
+    const dir = path.join(workspaceRoot(), 'skipme', '.tasks', 'queries');
+    fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(path.join(dir, 'hidden.md'), '# Hidden query\n\n```tasks\nnot done\n```\n', 'utf8');
+    const names = () => api.savedQueries.all().map((q) => q.name);
+    try {
+      await api.savedQueries.reload();
+      assert.ok(names().includes('Hidden query'), 'found while not excluded');
+      await api.settings.update('exclude', ['**/node_modules/**', '**/skipme/**'], vscode.ConfigurationTarget.Workspace);
+      await waitFor(() => !names().includes('Hidden query'), 3000, 'excluded query gone');
+      assert.ok(names().includes('This week'), 'others stay');
+    } finally {
+      await api.settings.update('exclude', undefined, vscode.ConfigurationTarget.Workspace);
+      fs.rmSync(path.join(workspaceRoot(), 'skipme'), { recursive: true, force: true });
+      await api.savedQueries.reload();
     }
   });
 });

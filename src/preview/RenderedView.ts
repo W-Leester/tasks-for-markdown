@@ -527,6 +527,16 @@ ${borrowed.styles.map((u) => `<link rel="stylesheet" href="${webview.asWebviewUr
   li.tfm-task.rv-hidden { display: none !important; }
   li.tfm-task.rv-dim > .tfm-desc, li.tfm-task.rv-dim > p > .tfm-desc, li.tfm-task.rv-dim > .tfm-fields, li.tfm-task.rv-dim > p > .tfm-fields { opacity: .45; }
   /* Mode toggle in the top-right corner, like Cursor's "Preview | Markdown". */
+  .rv-find { position: fixed; top: 34px; right: 14px; z-index: 3; display: flex; gap: 4px; align-items: center; padding: 4px 6px; border-radius: 6px; background: var(--vscode-editorWidget-background, var(--rv-bg)); border: 1px solid var(--vscode-editorWidget-border, var(--vscode-widget-border, transparent)); box-shadow: 0 2px 8px var(--vscode-widget-shadow, rgba(0,0,0,.3)); font-size: 12px; }
+  .rv-find input { width: 180px; padding: 3px 6px; color: var(--vscode-input-foreground); background: var(--vscode-input-background); border: 1px solid var(--vscode-input-border, transparent); border-radius: 3px; outline: none; font: inherit; }
+  .rv-find input:focus { border-color: var(--vscode-focusBorder); }
+  .rv-find.rv-find-none input { border-color: var(--vscode-inputValidation-errorBorder, #be1100); }
+  .rv-find-count { min-width: 52px; color: var(--rv-muted); text-align: center; white-space: nowrap; }
+  .rv-find button { padding: 1px 6px; color: inherit; background: none; border: 0; border-radius: 3px; cursor: pointer; font: inherit; }
+  .rv-find button:hover { background: var(--vscode-toolbar-hoverBackground, rgba(128,128,128,.2)); }
+  /* Fixed colors: the theme's find colors were too faint on quotes and the light theme. */
+  ::highlight(rv-find) { background-color: rgba(255, 200, 0, .4); }
+  ::highlight(rv-find-current) { background-color: rgba(255, 140, 0, .85); color: #000; }
   .rv-toggle { position: fixed; top: 6px; right: 14px; z-index: 2; display: inline-flex; gap: 2px; padding: 2px; border-radius: 6px; background: var(--rv-bg); font-size: 12px; line-height: 1; }
   .rv-toggle button { border: none; background: transparent; color: var(--rv-muted); padding: 4px 8px; border-radius: 4px; cursor: pointer; font: inherit; }
   .rv-toggle button:hover { color: var(--rv-fg); }
@@ -534,7 +544,7 @@ ${borrowed.styles.map((u) => `<link rel="stylesheet" href="${webview.asWebviewUr
 </style>
 <title>${t('Tasks: Rendered view')}</title>
 </head>
-<body data-l-col-width="${t('Column width')}" data-l-col-width-hint="${t('Drag to resize, double-click to fit the content')}" data-l-col-desc="${t('Description')}" data-l-col-due="${t('Due date')}" data-l-col-created="${t('Created date')}" data-l-col-done="${t('Done date')}" data-l-col-more="${t('Other fields')}" data-l-col-hide="${t('Hide column')}" data-l-col-show="${t('Show column')}" data-l-edit="${t('Edit')}" data-l-postpone="${t('Postpone')}" data-l-note="${t('Add note')}" data-l-note-placeholder="${t('Note — Enter to save, Esc to cancel')}" data-l-add-below="${t('Add a task below')}" data-l-add-task="${t('Add task')}" data-l-task-placeholder="${t('New task — Enter to add, Esc to stop')}" data-l-hidden="${t('{0} hidden')}" data-l-quote-edit="${t('Click to type')}" data-l-quote-hint="${t('Cmd/Ctrl+Enter or click outside to save, Esc to cancel')}" data-l-quote-placeholder="${t('Type here')}">
+<body data-l-col-width="${t('Column width')}" data-l-col-width-hint="${t('Drag to resize, double-click to fit the content')}" data-l-col-desc="${t('Description')}" data-l-col-due="${t('Due date')}" data-l-col-created="${t('Created date')}" data-l-col-done="${t('Done date')}" data-l-col-more="${t('Other fields')}" data-l-col-hide="${t('Hide column')}" data-l-col-show="${t('Show column')}" data-l-edit="${t('Edit')}" data-l-postpone="${t('Postpone')}" data-l-note="${t('Add note')}" data-l-note-placeholder="${t('Note — Enter to save, Esc to cancel')}" data-l-add-below="${t('Add a task below')}" data-l-add-task="${t('Add task')}" data-l-task-placeholder="${t('New task — Enter to add, Esc to stop')}" data-l-hidden="${t('{0} hidden')}" data-l-quote-edit="${t('Click to type')}" data-l-quote-hint="${t('Cmd/Ctrl+Enter or click outside to save, Esc to cancel')}" data-l-quote-placeholder="${t('Type here')}" data-l-find="${t('Find')}" data-l-find-none="${t('No results')}">
 <div class="rv-tools">
   <label class="rv-select"><span>${t('Sort')}</span><select id="view-sort">
     <option value="document">${t('Document order')}</option><option value="due">${t('Due date')}</option><option value="created">${t('Created date')}</option><option value="priority">${t('Priority')}</option><option value="urgency">${t('Urgency')}</option>
@@ -633,7 +643,7 @@ export function registerRenderedView(context: vscode.ExtensionContext, deps: Ren
   };
   context.subscriptions.push(
     provider,
-    vscode.window.registerCustomEditorProvider(RENDERED_VIEW_TYPE, provider, { webviewOptions: { retainContextWhenHidden: true, enableFindWidget: true }, supportsMultipleEditorsPerDocument: true }),
+    vscode.window.registerCustomEditorProvider(RENDERED_VIEW_TYPE, provider, { webviewOptions: { retainContextWhenHidden: true }, supportsMultipleEditorsPerDocument: true }),
     vscode.commands.registerCommand('tasksmd.openRendered', (arg?: unknown) => openRendered(arg, vscode.ViewColumn.Active, true)),
     // Text button in the editor title bar (no icon, so the title "Preview 렌더" is shown as the label).
     vscode.commands.registerCommand('tasksmd.previewRender', (arg?: unknown) => openRendered(arg, vscode.ViewColumn.Active, false)),

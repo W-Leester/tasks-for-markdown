@@ -3,12 +3,12 @@
 ## 1.1.9 — unreleased
 
 - **Fix: copy, paste, cut, undo and redo in a quote's text box in the rendered view.** `Cmd/Ctrl+C`, `V`, `X`, `Z`, `Cmd+Shift+Z` / `Ctrl+Y` and `Cmd/Ctrl+A` did nothing in the desktop app (Cursor, VS Code), and neither did the editor's shortcuts (`Cmd+P`, `Cmd+Shift+P`, `Cmd+W`, …) while typing there. `Cmd/Ctrl+S` in the box now saves the quote and the note.
-- **Find in the rendered view:** `Cmd/Ctrl+F` opens the find bar.
+- **Find in the rendered view:** `Cmd/Ctrl+F` opens a find bar; matches are highlighted with a count, `Enter` / `Shift+Enter` go to the next / previous one, `Esc` closes.
 - **`#heading` links in the rendered view go to the heading.** A table of contents like `[1. Vision](#1-vision)` scrolls to that heading in the view (GitHub's anchor rules; the heading text itself works too), and `other.md#heading` opens that note at the heading. Before, the link only opened the file.
 
 ### 한국어 요약
 - **고침: 렌더 보기 인용문 칸의 복사·붙여넣기·잘라내기·되돌리기·다시 하기**(`Cmd/Ctrl+C·V·X·Z`, `Cmd+Shift+Z`/`Ctrl+Y`, `Cmd/Ctrl+A`)와 칸 안에서의 에디터 단축키(`Cmd+P`·`Cmd+Shift+P`·`Cmd+W` 등)가 데스크톱 앱(Cursor·VS Code)에서 안 되던 문제. 칸에서 `Cmd/Ctrl+S`는 인용문과 노트를 저장.
-- **렌더 보기에서 찾기:** `Cmd/Ctrl+F`로 찾기 창.
+- **렌더 보기에서 찾기:** `Cmd/Ctrl+F`로 찾기 칸. 찾은 곳을 칠하고 개수 표시, `Enter`·`Shift+Enter`로 다음·이전, `Esc`로 닫기.
 - **렌더 보기의 `#제목` 링크가 그 제목으로 이동:** 목차 `[1. 비전](#1-비전)`을 누르면 렌더 보기 안에서 그 제목으로 스크롤(GitHub 앵커 규칙, 제목 글자 그대로도 됨), `다른노트.md#제목`은 그 노트의 제목 줄을 엶. 전에는 파일만 열렸음.
 
 ## 1.1.8 — 2026-10-31

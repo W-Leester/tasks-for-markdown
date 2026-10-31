@@ -4,6 +4,7 @@
  */
 import type { FromWebview, ToWebview, WebviewApi } from '../shared/protocol';
 import { matchAnchor } from '../../core/file/headingAnchor';
+import { createFindBar } from './find';
 import { applyView, clampWidth, type ColumnWidths, columnTracks, fitWidth, HIDEABLE_COLUMNS, type HideableColumn, moveBoundary, MAX_WIDTH, widthOf, SCOPE_MODES, SORT_MODES, type ScopeMode, type SortMode, type ViewState } from './view';
 
 declare function acquireVsCodeApi(): WebviewApi;
@@ -11,6 +12,15 @@ declare function acquireVsCodeApi(): WebviewApi;
 const api = acquireVsCodeApi();
 const post = (msg: FromWebview) => api.postMessage(msg);
 const content = document.getElementById('content')!;
+const findBar = createFindBar(content);
+// Cmd/Ctrl+F: the view's own find bar (also from a quote's text box); kept from VS Code, whose webview find did not work.
+document.addEventListener('keydown', (e) => {
+  const cmd = (e.metaKey || e.ctrlKey) && !e.altKey && !e.shiftKey;
+  if (!cmd || (e.keyCode !== 70 && e.code !== 'KeyF')) return;
+  e.preventDefault();
+  e.stopPropagation();
+  findBar.open();
+});
 const sortSel = document.getElementById('view-sort') as HTMLSelectElement | null;
 const scopeSel = document.getElementById('view-scope') as HTMLSelectElement | null;
 const hiddenEl = document.getElementById('view-hidden');
@@ -253,6 +263,7 @@ window.addEventListener('message', (e: MessageEvent<ToWebview>) => {
     const bq = Array.from(content.querySelectorAll<HTMLElement>('blockquote.rv-quote')).find((q) => q.dataset.tfmQuote!.startsWith(`${keepQuote.start}-`));
     if (bq) openQuote(bq, keepQuote);
   }
+  findBar.refresh();
   continueChain();
 });
 

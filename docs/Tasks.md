@@ -1152,8 +1152,9 @@
 - [x] 사용자 확인(11-01): 되돌리기·목차 이동 됨
 - [x] 편집 메뉴 나머지 점검(11-01, 사용자 질문): 칸이 Cmd 없는 키와 칸 전용 키(되돌리기·다시 하기·모두 선택·저장·`Cmd+Enter`·`Cmd+Shift+V`)만 멈추고 **나머지 Cmd 조합은 VS Code로**(그전엔 `Cmd+P`·`Cmd+Shift+P`·`Cmd+W`도 칸 안에서 죽어 있었음). `Cmd+S`는 인용문 저장 + 노트 디스크 저장(`doc/editQuote`의 `save`, `doc/save`). macOS의 `Ctrl+A/E/K`는 글자 이동 키라 그대로
 - [x] 사용자 확인(11-01): `Cmd+S`·`Cmd+P` 됨. 그러나 **타이핑 뒤 `Cmd+Z`는 무반응**(붙여넣기 뒤는 됨) → Chromium의 `execCommand('undo')`가 Cursor 웹뷰에서 타이핑(특히 한글 조합)을 되돌리지 못함. 칸이 **자기 되돌리기 기록**을 갖게 함(`boxHistory`: 낱말·붙여넣기·지우기 단위, 한글은 글자 조합이 끝난 뒤 한 단계, 조합 중 `Cmd+Z`(keyCode 229)는 물리 키로 알아보고 조합이 끝나면 실행). 브라우저 VS Code에서 실제 타이핑으로 확인
-- [x] 렌더 보기 `Cmd+F` 찾기(11-01 사용자 요청): 웹뷰 `enableFindWidget`. 칸 안에서도 됨(Cmd 조합이라 VS Code로 넘어감). 브라우저 VS Code에서 찾기 창 확인
-- [ ] 사용자 확인(Cursor): 타이핑(한글·영문) 뒤 `Cmd+Z`·`Cmd+Shift+Z`, `Cmd+F`, 받아쓰기·이모지(`Ctrl+Cmd+Space`), 그리고 `Cmd+Shift+V`로 넣은 글이 바깥 클릭 뒤 사라지는지(아직 재현 못 함)
+- [x] 렌더 보기 `Cmd+F` 찾기(11-01 사용자 요청): 처음엔 웹뷰 `enableFindWidget` → Cursor에서 찾기 창은 뜨나 **찾지 못함**(브라우저판은 됨; 데스크톱은 Electron `findInFrame` 경로) → 렌더 보기가 **자기 찾기 칸**을 가짐(`webviews/rendered/find.ts`: CSS Custom Highlight로 칠하기, 개수, Enter/Shift+Enter, Esc, 다시 그려도 유지, 보기 필터로 숨은 줄 제외). VS Code 찾기 창은 끔. 브라우저 VS Code에서 확인
+- [x] 사용자 확인(11-01): 타이핑 뒤 되돌리기·다시 하기, 이모지 창 입력 됨
+- [ ] 사용자 확인(Cursor): 새 찾기 칸, 받아쓰기, 그리고 `Cmd+Shift+V`로 넣은 글이 바깥 클릭 뒤 사라지는지(아직 재현 못 함)
 - [ ] 순수 함수: 블록 줄 ↔ 입력칸 글(목록 항목 들여쓰기·글머리, 표, 코드 블록) + 단위 테스트
 - [ ] 렌더: 블록마다 `data-tfm-block="시작-끝"`·원문 + 단위 테스트(태스크·쿼리·front matter 제외)
 - [ ] 호스트 `doc/editBlock` → 편집 서비스(원문 대조) + 통합 테스트. 인용문(`doc/editQuote`)도 같은 길로 합칠지 검토

@@ -386,7 +386,10 @@ function openQuote(bq: HTMLElement, keep?: { expected: string; value: string; se
   const fit = () => { area.style.height = 'auto'; area.style.height = `${area.scrollHeight}px`; };
   area.addEventListener('input', fit);
   area.addEventListener('keydown', (e) => {
-    e.stopPropagation(); // not the selected-row keys
+    // Other keys stay here (not the selected-row keys, not editor shortcuts). Cmd/Ctrl+C/V/X go on: in the desktop app
+    // the webview blocks the browser's own copy/paste and VS Code does it once the key reaches the window (10-31).
+    const clipboardKey = (e.metaKey || e.ctrlKey) && !e.shiftKey && !e.altKey && [67, 86, 88].includes(e.keyCode);
+    if (!clipboardKey) e.stopPropagation();
     if (e.isComposing || e.keyCode === 229) return;
     if (e.key === 'Escape') { e.preventDefault(); state.finish(false); }
     else if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); state.finish(true); }

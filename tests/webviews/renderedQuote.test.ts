@@ -89,6 +89,24 @@ describe('rendered view: typing into a blockquote (M38)', () => {
     expect(inQuery.classList.contains('rv-quote')).toBe(false);
   });
 
+  it('Cmd/Ctrl+C/V/X reach the window (VS Code copies and pastes there in the desktop app); other keys stop at the area', () => {
+    send(note());
+    document.querySelectorAll<HTMLElement>('blockquote')[0]!.click();
+    const ta = area()!;
+    const seen: string[] = [];
+    const spy = (e: KeyboardEvent) => seen.push(`${e.metaKey ? 'Cmd+' : ''}${e.ctrlKey ? 'Ctrl+' : ''}${e.shiftKey ? 'Shift+' : ''}${e.key}`);
+    window.addEventListener('keydown', spy);
+    key(ta, 'v', { metaKey: true, keyCode: 86 });
+    key(ta, 'c', { ctrlKey: true, keyCode: 67 });
+    key(ta, 'x', { metaKey: true, keyCode: 88 });
+    key(ta, 'v', { metaKey: true, shiftKey: true, keyCode: 86 });
+    key(ta, 'z', { metaKey: true, keyCode: 90 });
+    key(ta, 'a', { keyCode: 65 });
+    window.removeEventListener('keydown', spy);
+    expect(seen).toEqual(['Cmd+v', 'Ctrl+c', 'Cmd+x']);
+    key(ta, 'Escape');
+  });
+
   it('an empty quote (">" alone) shows a faint "Type here", hidden while typing; the empty area shows it too', () => {
     send(note() + quote(10, 11, '', '') + quote(12, 14, '&#10;', ''));
     const [, answer, empty, blank] = Array.from(document.querySelectorAll<HTMLElement>('blockquote'));

@@ -345,3 +345,10 @@ Tasks for Markdown을 만들며(2026-09-21 ~) 겪은 실패를 모아 둔 문서
 - **원인:** ① 브라우저 VS Code는 폴더를 늘 "신뢰하지 않음"으로 열고, 그때 `editor.unicodeHighlight.nonBasicASCII` 기본값이 켜짐. 폴더의 `.vscode/settings.json`에 꺼도 신뢰하지 않은 폴더라 무시됨. ② 화면 녹화는 기본으로 CSS 크기 프레임. ③ GIF 색표를 첫·마지막 프레임으로만 만들어, 중간에만 나오는 대화상자 색이 없었음. ④ 신뢰 경고 줄이 사라져 화면이 위로 올라감.
 - **해결:** ① **사용자 설정**에 `security.workspace.trust.enabled: false`와 `editor.unicodeHighlight.*: false`(브라우저 VS Code의 사용자 설정은 브라우저 저장소에 있으므로 "Preferences: Open User Settings (JSON)"에 입력, 녹화용 크롬 프로필마다 한 번). ② 녹화를 `page.screenshot` 반복(2배)으로. ③ 색표를 고르게 뽑은 프레임 6장으로. ④ 자를 영역을 전체 화면 한 장에서 다시 잼. puppeteer는 다시 설치.
 - **재발 방지:** GIF는 만든 뒤 **프레임 묶음을 한 장으로 펼쳐 보고**(색·잘림·상자) 넣는다. 촬영 요령은 [Tasks.md](../Tasks.md) M37 "다시 찍을 때"에.
+
+## 48. Cursor에서 렌더 보기 인용문 칸에 `Cmd+V`가 안 됨 (10-31 사용자 보고, 1.1.8, 1.1.9에서 수정)
+
+- **증상:** 인용문 칸에서 다른 곳(Claude Code 창)의 글을 `Cmd+C` 하고 `Cmd+V` 하면 아무것도 안 들어감. `Cmd+Shift+V`는 들어가는데 바깥을 누르면 사라졌다는 보고도 함께(아직 재현 못 함). 브라우저 VS Code에서는 둘 다 됐음.
+- **원인:** 데스크톱 앱의 웹뷰는 `Cmd/Ctrl+C·V·X` 키를 **브라우저가 처리하지 못하게 막고**, 키가 웹뷰 창(`window`)까지 올라오면 VS Code에 알려 VS Code가 복사·붙여넣기를 대신 함(Cursor 앱의 `webview/browser/pre/index.html`, `handleInnerKeydown`, `onElectron`일 때만). 인용문 칸은 줄 고르기 키를 피하려고 **모든 키에 `stopPropagation()`** 을 해서 그 키가 창까지 못 갔음 → 아무도 붙여넣지 않음. 브라우저판은 막지 않고 브라우저가 붙여넣어 시험에서 못 잡음.
+- **해결:** 칸의 `keydown`에서 `Cmd/Ctrl+C·V·X`(Shift·Option 없이)만 그대로 올려 보냄. 다른 키는 지금처럼 멈춤(되돌리기 `Cmd+Z`는 칸 안에서). 웹뷰 테스트 추가.
+- **재발 방지:** 웹뷰의 입력칸에 키 전파를 막을 때는 복사·붙여넣기 키를 빼 둔다. 붙여넣기는 **브라우저 VS Code로 확인했다고 끝내지 말고** 데스크톱(Cursor)에서 확인.

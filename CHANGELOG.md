@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.9 — unreleased
+
+- **Fix: `Cmd/Ctrl+C`, `V` and `X` in a quote's text box in the rendered view** did nothing in the desktop app (Cursor, VS Code).
+
+### 한국어 요약
+- **고침: 렌더 보기 인용문 칸에서 `Cmd/Ctrl+C·V·X`** 가 데스크톱 앱(Cursor·VS Code)에서 안 되던 문제.
+
 ## 1.1.8 — 2026-10-31
 
 - **Type into a blockquote in the rendered view.** Click a quote (`> …`) in the note and it becomes a text box with its text; `Cmd/Ctrl+Enter` or clicking outside saves it back as `> ` lines, `Esc` cancels, `Cmd/Ctrl+Z` undoes. Handy for question-and-answer notes: answer under `> Answer:` without switching to the source. Links and tasks inside a quote work as before; quotes in query results are not editable. An empty quote (`>` alone) shows a faint "Type here" (not written to the file), and line breaks inside a quote show as line breaks in the rendered view, as in Obsidian.

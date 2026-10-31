@@ -55,6 +55,13 @@ for p in tasks-core tasks-cli tasks-api; do pnpm --filter @hastycapybara/$p publ
 - [x] 확인: Open VSX 1.1.0(`verified=true`), npm `tasks-core`·`tasks-cli`·`tasks-api` 1.1.0(provenance 모두 있음), `tasks-cli`에 THIRD_PARTY_NOTICES. **`tasks-api`만 레지스트리 반영이 약 4분 늦음**(로그는 09:47 Published, 목록은 09:52) — 기다리면 됨
 - [x] 설치본 교체: 개발용 vsix 대신 마켓 설치본(VS Code는 Marketplace, Cursor는 Open VSX) — 2026-10-09 사용자
 
+## 1.1.8 게시 (2026-10-31)
+- 내용: M38(렌더 보기에서 인용문을 클릭해 바로 쓰기, 빈 인용문에 연한 "입력", 인용문 안 줄바꿈을 그대로 보임) + 저장된 쿼리가 `tasksmd.exclude`·`.gitignore`를 따름(버그)
+- [x] 검증: typecheck·lint, 단위 862, 웹뷰 41, `build:packages`, 통합 95, `pnpm package`(35 files, 타입 파일·`tasksmd.cjs`), 번들 CLI `tasksmd info` 1.1.8. vsix `48e4e140…`
+- [x] 수동(사용자, Cursor, 10-31): 인용문 입력·저장, 빈 인용문 "입력", 줄바꿈 표시 ✅
+- [ ] Marketplace 업로드(사용자) → 마켓 사본 = 업로드본 확인 → `releases/`
+- [ ] 태그 `v1.1.8` → Release(Open VSX·npm 3개) → GitHub Release 파일 `releases/`
+
 ## 1.1.7 게시 (2026-10-29)
 - 내용: M37(README 위쪽 "Four Shortcuts / 단축키" + GIF 네 개, 영·한) — **문서만**, 확장 코드는 1.1.6과 같음. 마켓 Details는 vsix 안의 README라 새 버전으로 게시(사용자 결정). 그림은 `raw/HEAD` 링크라 예전 GIF 파일은 지우지 않음(1.1.6 이하 페이지가 씀)
 - [x] 검증: typecheck·lint, 단위 851, README 테스트, `pnpm package`(35 files, GIF는 들어가지 않음 — README가 `raw/HEAD`로 링크). README를 두 번 더 고쳐 vsix를 세 번 만듦; 올린 것은 마지막(`8002b61a…`)

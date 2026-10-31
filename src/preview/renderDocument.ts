@@ -73,15 +73,20 @@ export function renderDocumentHtml(text: string, deps: PluginDeps, options: Rend
   return html;
 }
 
+interface QuoteToken { type: string; map: [number, number] | null; children: { type: string }[] | null; attrSet(name: string, value: string): void }
+
 /**
  * Outermost blockquotes get their line range and text (M38) so the rendered view can turn one into an input and the
- * host can write it back: `data-tfm-quote="<start>-<end>"` (end exclusive) and `data-tfm-quote-text`.
+ * host can write it back: `data-tfm-quote="<start>-<end>"` (end exclusive) and `data-tfm-quote-text`. Line breaks inside
+ * quotes render as `<br>`.
  */
-function markQuotes(state: { src: string; tokens: { type: string; map: [number, number] | null; attrSet(name: string, value: string): void }[] }): void {
+function markQuotes(state: { src: string; tokens: QuoteToken[] }): void {
   const lines = state.src.split('\n');
   let depth = 0;
   for (const token of state.tokens) {
     if (token.type === 'blockquote_close') depth--;
+    // A line break typed in a quote shows as one (as in Obsidian), not joined into the line above.
+    if (token.type === 'inline' && depth > 0) for (const child of token.children ?? []) if (child.type === 'softbreak') child.type = 'hardbreak';
     if (token.type !== 'blockquote_open') continue;
     if (depth++ > 0 || !token.map) continue;
     const [start] = token.map;

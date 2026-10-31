@@ -6,7 +6,7 @@
 - **Fix: saved queries now follow `tasksmd.exclude`** (and `files.exclude`, `.gitignore`), like the task index. Query files in excluded folders no longer show up under SAVED QUERIES.
 
 ### 한국어 요약
-- **렌더 보기에서 인용문에 바로 쓰기:** 노트의 인용문(`> …`)을 클릭하면 그 자리가 입력칸이 되고, `Cmd/Ctrl+Enter`나 바깥 클릭으로 저장(줄마다 `> `), `Esc` 취소, `Cmd/Ctrl+Z` 되돌리기. 질문지의 `> 답변:` 아래에 소스로 넘어가지 않고 답을 씀. 인용문 안의 링크·태스크는 그대로, 쿼리 결과 안의 인용문은 제외. 내용이 없는 인용문(`>`만)에는 연한 "입력"이 보임(파일에는 안 씀).
+- **렌더 보기에서 인용문에 바로 쓰기:** 노트의 인용문(`> …`)을 클릭하면 그 자리가 입력칸이 되고, `Cmd/Ctrl+Enter`나 바깥 클릭으로 저장(줄마다 `> `), `Esc` 취소, `Cmd/Ctrl+Z` 되돌리기. 질문지의 `> 답변:` 아래에 소스로 넘어가지 않고 답을 씀. 인용문 안의 링크·태스크는 그대로, 쿼리 결과 안의 인용문은 제외. 내용이 없는 인용문(`>`만)에는 연한 "입력"이 보임(파일에는 안 씀). 렌더 보기의 인용문 안에서는 줄바꿈이 그대로 보임(Obsidian처럼).
 - **고침: 저장된 쿼리가 `tasksmd.exclude`를 따름**(`files.exclude`·`.gitignore`도, 인덱스와 같게). 제외한 폴더의 쿼리 파일이 SAVED QUERIES에 나오지 않음.
 
 ## 1.1.7 — 2026-10-29

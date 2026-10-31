@@ -102,6 +102,13 @@ describe('renderDocumentHtml: blockquotes the user can type into (M38)', () => {
     expect(html.match(/data-tfm-quote=/g)).toHaveLength(3); // not the inner one
   });
 
+  it('shows a line break inside a quote as one; outside quotes lines still join', () => {
+    const html = renderDocumentHtml('> 답변: 네\n> 둘째 줄\n>\n> > 안쪽\n> > 둘\n\n밖 첫 줄\n밖 둘째 줄\n', deps);
+    expect(html).toContain('답변: 네<br>\n둘째 줄');
+    expect(html).toContain('안쪽<br>\n둘');
+    expect(html).toContain('<p>밖 첫 줄\n밖 둘째 줄</p>');
+  });
+
   it('marks an empty quote (">" alone) too, with empty text', () => {
     const html = renderDocumentHtml('a\n\n>\n\n> \n>\n', deps);
     expect(html).toContain('<blockquote data-tfm-quote="2-3" data-tfm-quote-text="">');

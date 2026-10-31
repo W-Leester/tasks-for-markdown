@@ -97,7 +97,9 @@ export type FromWebview =
   /** M27: a new task line below this body task (note body only — no path). */
   | { type: 'doc/insertTask'; line: number; text: string }
   /** M38: the text typed into the blockquote on lines start..end (exclusive); `expected` is the text it was drawn with. */
-  | { type: 'doc/editQuote'; start: number; end: number; expected: string; text: string }
+  | { type: 'doc/editQuote'; start: number; end: number; expected: string; text: string; save?: boolean }
+  /** Cmd/Ctrl+S in a text box: save the note to disk. */
+  | { type: 'doc/save' }
   /** M27: the row selected in the rendered view (null = none), so the create/edit key edits it. */
   | { type: 'doc/select'; line: number | null }
   | { type: 'doc/link'; href: string }

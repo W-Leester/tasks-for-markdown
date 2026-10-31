@@ -55,7 +55,8 @@ type Incoming =
   | { type: 'doc/insertTask'; line: number; text: string }
   | { type: 'doc/select'; line: number | null }
   | { type: 'doc/addNote'; path: string | null; line: number; text: string }
-  | { type: 'doc/editQuote'; start: number; end: number; expected: string; text: string }
+  | { type: 'doc/editQuote'; start: number; end: number; expected: string; text: string; save?: boolean }
+  | { type: 'doc/save' }
   | { type: 'doc/link'; href: string }
   | { type: 'doc/openSource' }
   | { type: 'doc/view'; sort: string; scope: string }
@@ -241,6 +242,10 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
         }
         case 'doc/editQuote':
           await this.deps.editService.replaceQuote(document.uri, msg.start, msg.end, msg.expected, msg.text);
+          if (msg.save) await document.save();
+          break;
+        case 'doc/save':
+          await document.save();
           break;
         case 'doc/link':
           await this.openLink(msg.href, document);

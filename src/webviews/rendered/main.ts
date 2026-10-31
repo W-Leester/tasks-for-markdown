@@ -344,8 +344,9 @@ content.addEventListener('click', (e) => {
 });
 
 // ---- M38: typing into a blockquote ----
+const IS_MAC = /Mac|iPhone|iPad/.test(navigator.platform);
 /** The quote being typed into: its lines, the text it was drawn with, and its text area. */
-let quoteEdit: { start: number; end: number; expected: string; area: HTMLTextAreaElement; done: boolean; finish(save: boolean): void } | null = null;
+let quoteEdit: { start: number; end: number; expected: string; area: HTMLTextAreaElement; done: boolean; finish(save: boolean, saveFile?: boolean): void } | null = null;
 /**
  * Note-body quotes the host marked (outermost ones) can be clicked into; not those in query results. An empty one
  * (`>` alone) shows a faint "Type here" so it is not a sliver.
@@ -379,12 +380,14 @@ function openQuote(bq: HTMLElement, keep?: { expected: string; value: string; se
   bq.removeAttribute('title');
   const state = {
     start, end, expected, area, done: false,
-    finish(save: boolean) {
+    /** `saveFile` (Cmd/Ctrl+S): the note is saved to disk too, even when it is open in the source editor. */
+    finish(save: boolean, saveFile = false) {
       if (state.done) return;
       state.done = true;
       if (quoteEdit === state) quoteEdit = null;
       // Saved: the area stays (read-only) until the note re-renders with the new text.
-      if (save && area.value !== expected) { area.readOnly = true; post({ type: 'doc/editQuote', start, end, expected, text: area.value }); return; }
+      if (save && area.value !== expected) { area.readOnly = true; post({ type: 'doc/editQuote', start, end, expected, text: area.value, ...(saveFile ? { save: true } : {}) }); return; }
+      if (saveFile) post({ type: 'doc/save' });
       bq.replaceChildren(...rendered);
       bq.classList.remove('rv-quote-editing');
       bq.title = document.body.dataset.lQuoteEdit ?? 'Click to type';
@@ -394,18 +397,24 @@ function openQuote(bq: HTMLElement, keep?: { expected: string; value: string; se
   const fit = () => { area.style.height = 'auto'; area.style.height = `${area.scrollHeight}px`; };
   area.addEventListener('input', fit);
   area.addEventListener('keydown', (e) => {
-    // Other keys stay here (not the selected-row keys, not editor shortcuts). Cmd/Ctrl+C/V/X go on: in the desktop app
-    // the webview blocks the browser's own copy/paste and VS Code does it once the key reaches the window (10-31).
-    const clipboardKey = (e.metaKey || e.ctrlKey) && !e.shiftKey && !e.altKey && [67, 86, 88].includes(e.keyCode);
-    if (!clipboardKey) e.stopPropagation();
-    if (e.isComposing || e.keyCode === 229) return;
-    // Undo/redo of what was typed here, done in the box: passed on, VS Code would undo the note instead (11-01).
-    const mod = (e.metaKey || e.ctrlKey) && !e.altKey;
-    const redo = mod && ((e.keyCode === 90 && e.shiftKey) || (e.keyCode === 89 && e.ctrlKey && !e.shiftKey));
-    if (redo || (mod && e.keyCode === 90 && !e.shiftKey)) { e.preventDefault(); document.execCommand(redo ? 'redo' : 'undo'); return; }
-    if (mod && e.keyCode === 65 && !e.shiftKey) { e.preventDefault(); area.select(); return; }
-    if (e.key === 'Escape') { e.preventDefault(); state.finish(false); }
-    else if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); state.finish(true); }
+    // In the desktop app the edit-menu keys never reach a webview's text box by themselves (11-01): the box does undo,
+    // redo, select all and save; copy/paste/cut and the editor's other shortcuts (Cmd+P, Cmd+Shift+P, Cmd+W, …) go on to
+    // VS Code. Keys without Cmd stay here (typing, and not the selected-row keys). On macOS Ctrl+A/E/K… are text keys.
+    const k = e.keyCode;
+    const cmd = (e.metaKey || (e.ctrlKey && !IS_MAC)) && !e.altKey;
+    const undo = cmd && k === 90 && !e.shiftKey;
+    const redo = cmd && ((k === 90 && e.shiftKey) || (k === 89 && !IS_MAC && !e.shiftKey));
+    const selectAll = cmd && k === 65 && !e.shiftKey;
+    const save = cmd && k === 83 && !e.shiftKey;
+    const done = e.key === 'Enter' && (e.metaKey || e.ctrlKey);
+    // Cmd+Shift+V (paste as plain text) stays here as before (10-31: it pasted); the box is plain text anyway.
+    if (!cmd || undo || redo || selectAll || save || done || (k === 86 && e.shiftKey)) e.stopPropagation();
+    if (e.isComposing || k === 229) return;
+    if (undo || redo) { e.preventDefault(); document.execCommand(redo ? 'redo' : 'undo'); }
+    else if (selectAll) { e.preventDefault(); area.select(); }
+    else if (save) { e.preventDefault(); state.finish(true, true); }
+    else if (done) { e.preventDefault(); state.finish(true); }
+    else if (e.key === 'Escape') { e.preventDefault(); state.finish(false); }
   });
   // Removing the area in a re-render blurs it; that is not the user leaving it.
   area.addEventListener('blur', () => { if (!rerendering) state.finish(true); });

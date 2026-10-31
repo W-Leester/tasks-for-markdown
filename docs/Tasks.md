@@ -1149,7 +1149,9 @@
 ### 할 일
 - [x] 인용문 칸 `Cmd+V`가 Cursor에서 안 됨 → 원인: 칸이 모든 키 전파를 막아, 데스크톱 웹뷰가 VS Code에 넘기는 복사·붙여넣기 키가 못 감. `Cmd/Ctrl+C·V·X`만 통과(11-01, incidents 48)
 - [x] 사용자 확인(11-01): `Cmd+C`·`Cmd+V` 됨. 그러나 `Cmd+Z`·`Cmd+Shift+Z`는 안 됨(같은 이유: 데스크톱 웹뷰는 이 키를 브라우저에 맡기지 않음) → 칸 안에서 `execCommand('undo'/'redo')`로 직접 처리, `Cmd/Ctrl+A`도. VS Code로 넘기면 칸이 아니라 노트 전체를 되돌릴 수 있어 넘기지 않음
-- [ ] 사용자 확인(Cursor): 되돌리기·다시 하기·모두 선택, 그리고 `Cmd+Shift+V`로 넣은 글이 바깥 클릭 뒤 사라지는지(아직 재현 못 함)
+- [x] 사용자 확인(11-01): 되돌리기·목차 이동 됨
+- [x] 편집 메뉴 나머지 점검(11-01, 사용자 질문): 칸이 Cmd 없는 키와 칸 전용 키(되돌리기·다시 하기·모두 선택·저장·`Cmd+Enter`·`Cmd+Shift+V`)만 멈추고 **나머지 Cmd 조합은 VS Code로**(그전엔 `Cmd+P`·`Cmd+Shift+P`·`Cmd+W`도 칸 안에서 죽어 있었음). `Cmd+S`는 인용문 저장 + 노트 디스크 저장(`doc/editQuote`의 `save`, `doc/save`). macOS의 `Ctrl+A/E/K`는 글자 이동 키라 그대로
+- [ ] 사용자 확인(Cursor): `Cmd+S`·`Cmd+P`·`Cmd+A`, 받아쓰기·이모지(`Ctrl+Cmd+Space`), 그리고 `Cmd+Shift+V`로 넣은 글이 바깥 클릭 뒤 사라지는지(아직 재현 못 함)
 - [ ] 순수 함수: 블록 줄 ↔ 입력칸 글(목록 항목 들여쓰기·글머리, 표, 코드 블록) + 단위 테스트
 - [ ] 렌더: 블록마다 `data-tfm-block="시작-끝"`·원문 + 단위 테스트(태스크·쿼리·front matter 제외)
 - [ ] 호스트 `doc/editBlock` → 편집 서비스(원문 대조) + 통합 테스트. 인용문(`doc/editQuote`)도 같은 길로 합칠지 검토

@@ -92,7 +92,7 @@ describe('rendered view: typing into a blockquote (M38)', () => {
     expect(inQuery.classList.contains('rv-quote')).toBe(false);
   });
 
-  it('Cmd/Ctrl+C/V/X reach the window (VS Code copies and pastes there in the desktop app); other keys stop at the area', () => {
+  it('Cmd/Ctrl+C/V/X and the editor’s other shortcuts reach the window (VS Code does them in the desktop app); typing and the box’s own keys stop at the area', () => {
     send(note());
     document.querySelectorAll<HTMLElement>('blockquote')[0]!.click();
     const ta = area()!;
@@ -105,9 +105,32 @@ describe('rendered view: typing into a blockquote (M38)', () => {
     key(ta, 'v', { metaKey: true, shiftKey: true, keyCode: 86 });
     key(ta, 'z', { metaKey: true, keyCode: 90 });
     key(ta, 'a', { keyCode: 65 });
+    key(ta, 'Enter', { keyCode: 13 });
+    key(ta, 'Delete', { keyCode: 46 });
+    key(ta, 'p', { metaKey: true, keyCode: 80 });
+    key(ta, 'p', { metaKey: true, shiftKey: true, keyCode: 80 });
+    key(ta, 'w', { ctrlKey: true, keyCode: 87 });
+    key(ta, 'a', { metaKey: true, keyCode: 65 });
+    key(ta, 's', { metaKey: true, keyCode: 83 }); // saves and leaves the box
     window.removeEventListener('keydown', spy);
-    expect(seen).toEqual(['Cmd+v', 'Ctrl+c', 'Cmd+x']);
-    key(ta, 'Escape');
+    expect(seen).toEqual(['Cmd+v', 'Ctrl+c', 'Cmd+x', 'Cmd+p', 'Cmd+Shift+p', 'Ctrl+w']);
+    expect(area()).toBeNull();
+  });
+
+  it('Cmd/Ctrl+S saves the quote and the note to disk; unchanged, just the note', () => {
+    send(note());
+    posted.length = 0;
+    document.querySelectorAll<HTMLElement>('blockquote')[1]!.click();
+    area()!.value = '답변: 저장';
+    key(area()!, 's', { metaKey: true, keyCode: 83 });
+    expect(posted.filter((m: FromWebview) => m.type === 'doc/editQuote' || m.type === 'doc/save')).toEqual([
+      { type: 'doc/editQuote', start: 5, end: 8, expected: '답변:\n\n', text: '답변: 저장', save: true },
+    ]);
+    send(note());
+    posted.length = 0;
+    document.querySelectorAll<HTMLElement>('blockquote')[1]!.click();
+    key(area()!, 's', { ctrlKey: true, keyCode: 83 });
+    expect(posted.filter((m: FromWebview) => m.type === 'doc/editQuote' || m.type === 'doc/save')).toEqual([{ type: 'doc/save' }]);
   });
 
   it('Cmd/Ctrl+Z and Cmd+Shift+Z / Ctrl+Y undo and redo in the box (not passed on); Cmd+A selects it all', () => {

@@ -338,13 +338,18 @@ content.addEventListener('click', (e) => {
 // ---- M38: typing into a blockquote ----
 /** The quote being typed into: its lines, the text it was drawn with, and its text area. */
 let quoteEdit: { start: number; end: number; expected: string; area: HTMLTextAreaElement; done: boolean; finish(save: boolean): void } | null = null;
-/** Note-body quotes the host marked (outermost ones) can be clicked into; not those in query results. */
+/**
+ * Note-body quotes the host marked (outermost ones) can be clicked into; not those in query results. An empty one
+ * (`>` alone) shows a faint "Type here" so it is not a sliver.
+ */
 function markQuotes(): void {
   const title = document.body.dataset.lQuoteEdit ?? 'Click to type';
+  const placeholder = document.body.dataset.lQuotePlaceholder ?? 'Type here';
   for (const bq of Array.from(content.querySelectorAll<HTMLElement>('blockquote[data-tfm-quote]'))) {
     if (bq.closest('.tfm-query')) continue;
     bq.classList.add('rv-quote');
     bq.title = title;
+    if (!bq.dataset.tfmQuoteText?.trim()) { bq.classList.add('rv-quote-empty'); bq.dataset.placeholder = placeholder; }
   }
 }
 /**
@@ -359,6 +364,7 @@ function openQuote(bq: HTMLElement, keep?: { expected: string; value: string; se
   const area = document.createElement('textarea');
   area.className = 'rv-quote-input';
   area.title = document.body.dataset.lQuoteHint ?? 'Cmd/Ctrl+Enter or click outside to save, Esc to cancel';
+  area.placeholder = document.body.dataset.lQuotePlaceholder ?? 'Type here';
   area.value = keep?.value ?? expected;
   bq.replaceChildren(area);
   bq.classList.add('rv-quote-editing');

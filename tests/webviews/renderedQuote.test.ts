@@ -89,6 +89,22 @@ describe('rendered view: typing into a blockquote (M38)', () => {
     expect(inQuery.classList.contains('rv-quote')).toBe(false);
   });
 
+  it('an empty quote (">" alone) shows a faint "Type here", hidden while typing; the empty area shows it too', () => {
+    send(note() + quote(10, 11, '', '') + quote(12, 14, '&#10;', ''));
+    const [, answer, empty, blank] = Array.from(document.querySelectorAll<HTMLElement>('blockquote'));
+    expect(answer!.classList.contains('rv-quote-empty')).toBe(false);
+    for (const bq of [empty!, blank!]) {
+      expect(bq.classList.contains('rv-quote-empty')).toBe(true);
+      expect(bq.dataset.placeholder).toBe('Type here');
+    }
+    empty!.click();
+    expect(area()!.value).toBe('');
+    expect(area()!.placeholder).toBe('Type here');
+    expect(empty!.classList.contains('rv-quote-editing')).toBe(true); // CSS hides the faint text while editing
+    key(area()!, 'Escape');
+    expect(empty!.classList.contains('rv-quote-empty')).toBe(true);
+  });
+
   it('a re-render while typing keeps the area, what was typed and the text it was drawn with', () => {
     send(note());
     posted.length = 0;

@@ -102,6 +102,12 @@ describe('renderDocumentHtml: blockquotes the user can type into (M38)', () => {
     expect(html.match(/data-tfm-quote=/g)).toHaveLength(3); // not the inner one
   });
 
+  it('marks an empty quote (">" alone) too, with empty text', () => {
+    const html = renderDocumentHtml('a\n\n>\n\n> \n>\n', deps);
+    expect(html).toContain('<blockquote data-tfm-quote="2-3" data-tfm-quote-text="">');
+    expect(html).toContain('<blockquote data-tfm-quote="4-6" data-tfm-quote-text="\n">');
+  });
+
   it('keeps the indentation of a quote in a list item; skips one that starts on the bullet', () => {
     const html = renderDocumentHtml('- item\n\n  > in item\n\n- > on bullet\n', deps);
     expect(html).toContain('data-tfm-quote-text="in item"');

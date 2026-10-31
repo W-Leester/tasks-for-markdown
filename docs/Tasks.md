@@ -1440,6 +1440,7 @@ AI가 "이 태스크 다음에 추가"를 하면 줄 번호를 넘길 수밖에 
 - [ ] **호버 카드에서 메모 속 링크 열기(10-20):** 메일 노트 연동(메모에 `📧 [제목](경로)`)을 쓰게 되면.
 - [ ] **줄 끝 버튼 안내의 클릭 키(10-28):** 안내가 늘 `Cmd/Ctrl+클릭`인데, 편집기는 `editor.multiCursorModifier`가 `ctrlCmd`면 `Option/Alt+클릭`으로 실행 → 그 설정을 읽어 안내 글을 맞춤(`TaskCodeLensProvider.provideInlayHints`).
 - [ ] **M9.6 편집기 위임(선택):** 그대로 남음.
+- [ ] **Cursor 소스 편집기에서 키 입력이 전부 멈춤(사용자 보고, 10-31 밤, 원인 모름):** 줄 앞에 초록 막대(git 새 줄 표시)가 생기며 타이핑·`Cmd+Shift+P`까지 안 먹음. `Esc`·한/영 무관, Cursor `Preview`→`Markdown` 왔다 갔다 하면 한두 번 쳐지다 다시 멈춤. `Reload Window With Extensions Disabled` 뒤와 창을 새로 연 뒤에는 사라짐. 확인한 것: 브라우저 VS Code(1.1.8)에서 같은 파일 끝에 타이핑 재현 안 됨, 우리 확장은 `type` 명령을 잡지 않고 타이핑 중 문서를 고치지 않음, 그 창 로그(`Cursor/logs/20261029T202207/window7`)에 우리 확장 오류 없음. 같은 창에 ChatGPT·Claude Code 등 다른 확장도 있음. 다시 생기면: 메뉴 View › Command Palette(마우스) → `Developer: Toggle Keyboard Shortcuts Troubleshooting` 후 키를 눌러 출력의 `Log (Window)`에 키가 들어오는지, `Help › Toggle Developer Tools` 콘솔에서 `document.activeElement`로 포커스 위치 확인.
 
 ## 열린 설계 이슈 추적
 

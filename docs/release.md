@@ -59,8 +59,8 @@ for p in tasks-core tasks-cli tasks-api; do pnpm --filter @hastycapybara/$p publ
 - 내용: M38(렌더 보기에서 인용문을 클릭해 바로 쓰기, 빈 인용문에 연한 "입력", 인용문 안 줄바꿈을 그대로 보임) + 저장된 쿼리가 `tasksmd.exclude`·`.gitignore`를 따름(버그)
 - [x] 검증: typecheck·lint, 단위 862, 웹뷰 41, `build:packages`, 통합 95, `pnpm package`(35 files, 타입 파일·`tasksmd.cjs`), 번들 CLI `tasksmd info` 1.1.8. vsix `48e4e140…`
 - [x] 수동(사용자, Cursor, 10-31): 인용문 입력·저장, 빈 인용문 "입력", 줄바꿈 표시 ✅
-- [ ] Marketplace 업로드(사용자) → 마켓 사본 = 업로드본 확인 → `releases/`
-- [ ] 태그 `v1.1.8` → Release(Open VSX·npm 3개) → GitHub Release 파일 `releases/`
+- [x] Marketplace 업로드(사용자, 10-31) → 22:08 KST 공개. 마켓 사본(gzip을 풀어) = 업로드본 `48e4e140…` → `releases/`
+- [x] 태그 `v1.1.8` → Release 성공(첫 시도, 2분 26초). 로그: Open VSX `🚀 v1.1.8`, npm `tasks-core`·`tasks-cli`·`tasks-api` 1.1.8. 조회 확인: Open VSX 1.1.8(`verified=true`), npm 3개 1.1.8(몇 분 걸림). GitHub Release 파일 `releases/`(`.github.vsix` `5c90b15a…`, tgz 3개)
 
 ## 1.1.7 게시 (2026-10-29)
 - 내용: M37(README 위쪽 "Four Shortcuts / 단축키" + GIF 네 개, 영·한) — **문서만**, 확장 코드는 1.1.6과 같음. 마켓 Details는 vsix 안의 README라 새 버전으로 게시(사용자 결정). 그림은 `raw/HEAD` 링크라 예전 GIF 파일은 지우지 않음(1.1.6 이하 페이지가 씀)
@@ -122,6 +122,8 @@ for p in tasks-core tasks-cli tasks-api; do pnpm --filter @hastycapybara/$p publ
 
 | 버전 | 파일 | 출처 | SHA-256 |
 |---|---|---|---|
+| 1.1.8 | `tasks-for-markdown-1.1.8.marketplace.vsix` | VS Code Marketplace에 올린 파일(마켓에서 다시 받음, gzip을 풀면 업로드본과 같음) | `48e4e1406bf712af…` |
+| 1.1.8 | `tasks-for-markdown-1.1.8.github.vsix` | GitHub Release·Open VSX(Actions 빌드) | `5c90b15adffd6752…` |
 | 1.1.7 | `tasks-for-markdown-1.1.7.marketplace.vsix` | VS Code Marketplace에 올린 파일(마켓에서 다시 받음, gzip을 풀면 업로드본과 같음) | `8002b61a8f9ae22c…` |
 | 1.1.7 | `tasks-for-markdown-1.1.7.github.vsix` | GitHub Release·Open VSX(Actions 빌드) | `38a5acc53fd9d3ee…` |
 | 1.1.6 | `tasks-for-markdown-1.1.6.marketplace.vsix` | VS Code Marketplace에 올린 파일(마켓에서 다시 받음, gzip을 풀면 업로드본과 같음) | `3443384bf12ffa8f…` |

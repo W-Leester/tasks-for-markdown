@@ -56,6 +56,8 @@ type Incoming =
   | { type: 'doc/select'; line: number | null }
   | { type: 'doc/addNote'; path: string | null; line: number; text: string }
   | { type: 'doc/editQuote'; start: number; end: number; expected: string; text: string; save?: boolean }
+  | { type: 'doc/editBlock'; start: number; end: number; expected: string; text: string; save?: boolean }
+  | { type: 'doc/append'; text: string; save?: boolean }
   | { type: 'doc/save' }
   | { type: 'doc/link'; href: string }
   | { type: 'doc/openSource' }
@@ -244,6 +246,14 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
           await this.deps.editService.replaceQuote(document.uri, msg.start, msg.end, msg.expected, msg.text);
           if (msg.save) await document.save();
           break;
+        case 'doc/editBlock':
+          await this.deps.editService.replaceBlock(document.uri, msg.start, msg.end, msg.expected, msg.text);
+          if (msg.save) await document.save();
+          break;
+        case 'doc/append':
+          await this.deps.editService.appendText(document.uri, msg.text);
+          if (msg.save) await document.save();
+          break;
         case 'doc/save':
           await document.save();
           break;
@@ -393,6 +403,9 @@ ${borrowed.styles.map((u) => `<link rel="stylesheet" href="${webview.asWebviewUr
   blockquote.rv-quote { cursor: text; border-radius: 0 4px 4px 0; } blockquote.rv-quote:hover { background: var(--rv-bg-2); }
   blockquote.rv-quote-editing { border-left-color: var(--rv-accent); padding-right: 0; } blockquote.rv-quote-editing:hover { background: none; }
   blockquote.rv-quote-empty:not(.rv-quote-editing)::before { content: attr(data-placeholder); opacity: .5; font-style: italic; }
+  .rv-block { cursor: text; border-radius: 4px; } .rv-block:hover:not(:has(.rv-block:hover)) { background: var(--rv-bg-2); } /* the innermost one: what a click opens */
+  li.rv-box { list-style: none; } div.rv-box { margin: .4em 0; } .rv-box-code .rv-quote-input { font-family: var(--vscode-editor-font-family, monospace); font-size: .92em; }
+  .rv-write { margin: 1.2em 0 2em; color: var(--rv-muted); opacity: .7; cursor: text; font-size: .95em; } .rv-write:hover { opacity: 1; }
   .rv-quote-input { display: block; width: 100%; box-sizing: border-box; min-height: 2.4em; resize: none; overflow: hidden; background: var(--rv-bg-2); color: var(--rv-fg); border: 1px solid var(--rv-accent); border-radius: 4px; padding: 4px 8px; font: inherit; line-height: inherit; outline: none; }
   table { border-collapse: collapse; margin: 0 0 .75em; } th, td { border: 1px solid var(--rv-stroke); padding: 4px 10px; } th { background: var(--rv-bg-2); }
   img { max-width: 100%; border-radius: 4px; }
@@ -544,7 +557,7 @@ ${borrowed.styles.map((u) => `<link rel="stylesheet" href="${webview.asWebviewUr
 </style>
 <title>${t('Tasks: Rendered view')}</title>
 </head>
-<body data-l-col-width="${t('Column width')}" data-l-col-width-hint="${t('Drag to resize, double-click to fit the content')}" data-l-col-desc="${t('Description')}" data-l-col-due="${t('Due date')}" data-l-col-created="${t('Created date')}" data-l-col-done="${t('Done date')}" data-l-col-more="${t('Other fields')}" data-l-col-hide="${t('Hide column')}" data-l-col-show="${t('Show column')}" data-l-edit="${t('Edit')}" data-l-postpone="${t('Postpone')}" data-l-note="${t('Add note')}" data-l-note-placeholder="${t('Note — Enter to save, Esc to cancel')}" data-l-add-below="${t('Add a task below')}" data-l-add-task="${t('Add task')}" data-l-task-placeholder="${t('New task — Enter to add, Esc to stop')}" data-l-hidden="${t('{0} hidden')}" data-l-quote-edit="${t('Click to type')}" data-l-quote-hint="${t('Cmd/Ctrl+Enter or click outside to save, Esc to cancel')}" data-l-quote-placeholder="${t('Type here')}" data-l-find="${t('Find')}" data-l-find-none="${t('No results')}">
+<body data-l-col-width="${t('Column width')}" data-l-col-width-hint="${t('Drag to resize, double-click to fit the content')}" data-l-col-desc="${t('Description')}" data-l-col-due="${t('Due date')}" data-l-col-created="${t('Created date')}" data-l-col-done="${t('Done date')}" data-l-col-more="${t('Other fields')}" data-l-col-hide="${t('Hide column')}" data-l-col-show="${t('Show column')}" data-l-edit="${t('Edit')}" data-l-postpone="${t('Postpone')}" data-l-note="${t('Add note')}" data-l-note-placeholder="${t('Note — Enter to save, Esc to cancel')}" data-l-add-below="${t('Add a task below')}" data-l-add-task="${t('Add task')}" data-l-task-placeholder="${t('New task — Enter to add, Esc to stop')}" data-l-hidden="${t('{0} hidden')}" data-l-quote-edit="${t('Click to type')}" data-l-quote-hint="${t('Cmd/Ctrl+Enter or click outside to save, Esc to cancel')}" data-l-quote-placeholder="${t('Type here')}" data-l-write="${t('Write')}" data-l-find="${t('Find')}" data-l-find-none="${t('No results')}">
 <div class="rv-tools">
   <label class="rv-select"><span>${t('Sort')}</span><select id="view-sort">
     <option value="document">${t('Document order')}</option><option value="due">${t('Due date')}</option><option value="created">${t('Created date')}</option><option value="priority">${t('Priority')}</option><option value="urgency">${t('Urgency')}</option>

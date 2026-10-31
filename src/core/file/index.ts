@@ -3,3 +3,4 @@ export { insertAfterTask, insertUnderTask, newTaskLine, placeTaskLine, type Task
 export { addNoteLines, cleanNoteTexts, noteBlock, setNoteLines, type ChildItem, type NoteBlock } from './notes';
 export { quoteLines, quoteText, type QuoteText } from './quoteBlock';
 export { findHeadingLine, headingAnchors, headingSlug, matchAnchor } from './headingAnchor';
+export { blockLines, blockText, type BlockText } from './textBlock';

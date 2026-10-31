@@ -29,7 +29,7 @@ describe('renderDocumentHtml (rendered view)', () => {
     const html = renderDocumentHtml(note, deps);
     expect(html).not.toContain('tags: [x]');
     expect(html).not.toContain('rv-frontmatter');
-    expect(html).toContain('<h1 data-tfm-anchor="title">Title</h1>');
+    expect(html).toMatch(/<h1 data-tfm-anchor="title"[^>]*>Title<\/h1>/);
     expect(html).toContain('data-tfm-line="6"'); // the task is on line 6 (0-based) of the original text
     expect(html).toContain('class="tfm-check"');
     expect(html).not.toContain('class="tfm-check" disabled');
@@ -106,14 +106,30 @@ describe('renderDocumentHtml: blockquotes the user can type into (M38)', () => {
     const html = renderDocumentHtml('> 답변: 네\n> 둘째 줄\n>\n> > 안쪽\n> > 둘\n\n밖 첫 줄\n밖 둘째 줄\n', deps);
     expect(html).toContain('답변: 네<br>\n둘째 줄');
     expect(html).toContain('안쪽<br>\n둘');
-    expect(html).toContain('<p>밖 첫 줄\n밖 둘째 줄</p>');
+    expect(html).toContain('>밖 첫 줄\n밖 둘째 줄</p>');
+  });
+
+  it('marks blocks the view can type into (M39): headings, paragraphs, list items, tables, code; not inside quotes or ```tasks', () => {
+    const src = ['# 제목', '', '문단 첫 줄', '둘째 줄', '', '- 항목', '  - 하위', '- 둘째', '', '| a | b |', '|---|---|', '| 1 | 2 |', '', '```js', 'x', '```', '', '> 인용 문단', '', '```tasks', 'not done', '```', ''].join('\n');
+    const html = renderDocumentHtml(src, deps);
+    const marks = [...html.matchAll(/data-tfm-block="([^"]+)" data-tfm-block-text="([^"]*)"/g)].map((m) => `${m[1]}:${m[2]}`);
+    expect(marks).toEqual([
+      '0-1:# 제목',
+      '2-4:문단 첫 줄\n둘째 줄',
+      '5-7:- 항목\n  - 하위',
+      '6-7:- 하위',
+      '7-8:- 둘째',
+      '9-12:| a | b |\n|---|---|\n| 1 | 2 |',
+      '13-16:```js\nx\n```',
+    ]);
+    expect(html).not.toMatch(/<p[^>]*data-tfm-block[^>]*>인용 문단/);
   });
 
   it('gives headings their GitHub-style anchor (repeats numbered, formatting ignored)', () => {
     const html = renderDocumentHtml('# 1. 비전\n\n## **굵게** `코드`\n\n## 1. 비전\n', deps);
-    expect(html).toContain('<h1 data-tfm-anchor="1-비전">');
-    expect(html).toContain('<h2 data-tfm-anchor="굵게-코드">');
-    expect(html).toContain('<h2 data-tfm-anchor="1-비전-1">');
+    expect(html).toContain('<h1 data-tfm-anchor="1-비전" ');
+    expect(html).toContain('<h2 data-tfm-anchor="굵게-코드" ');
+    expect(html).toContain('<h2 data-tfm-anchor="1-비전-1" ');
   });
 
   it('marks an empty quote (">" alone) too, with empty text', () => {

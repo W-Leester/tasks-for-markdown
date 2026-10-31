@@ -231,7 +231,7 @@ window.addEventListener('message', (e: MessageEvent<ToWebview>) => {
   if (scopeSel) scopeSel.value = view.scope;
   const y = window.scrollY;
   formText = content.querySelector<HTMLInputElement>('li.rv-task-form input')?.value ?? '';
-  const keepQuote = quoteEdit && !quoteEdit.done ? { start: quoteEdit.start, expected: quoteEdit.expected, value: quoteEdit.area.value, selection: [quoteEdit.area.selectionStart, quoteEdit.area.selectionEnd] as [number, number] } : null;
+  const keepQuote = quoteEdit && !quoteEdit.done ? { kind: quoteEdit.kind, start: quoteEdit.start, expected: quoteEdit.expected, value: quoteEdit.area.value, selection: [quoteEdit.area.selectionStart, quoteEdit.area.selectionEnd] as [number, number] } : null;
   if (quoteEdit) quoteEdit.done = true;
   quoteEdit = null;
   // Removing a focused input fires its blur while it is still attached; that is not the user leaving it.
@@ -243,6 +243,7 @@ window.addEventListener('message', (e: MessageEvent<ToWebview>) => {
   addRowActions();
   addTaskRows();
   markQuotes();
+  markBlocks();
   refreshView();
   window.scrollTo(0, y);
   // Other extensions' preview scripts (Mermaid…, M34) redraw on the event the built-in preview sends after an update.
@@ -260,8 +261,11 @@ window.addEventListener('message', (e: MessageEvent<ToWebview>) => {
   if (formLine !== null && chainLine === null) { const li = bodyRow(formLine); if (li) openTaskForm(li, formText); else formLine = null; }
   // A quote being typed into survives re-renders too (another part of the file changed, the index updated…).
   if (keepQuote) {
-    const bq = Array.from(content.querySelectorAll<HTMLElement>('blockquote.rv-quote')).find((q) => q.dataset.tfmQuote!.startsWith(`${keepQuote.start}-`));
-    if (bq) openQuote(bq, keepQuote);
+    const { kind } = keepQuote;
+    const el = kind === 'append'
+      ? content.querySelector<HTMLElement>('.rv-write')
+      : Array.from(content.querySelectorAll<HTMLElement>(kind === 'quote' ? 'blockquote.rv-quote' : '.rv-block')).find((q) => (kind === 'quote' ? q.dataset.tfmQuote : q.dataset.tfmBlock)!.startsWith(`${keepQuote.start}-`));
+    if (el) openBox(el, kind, keepQuote);
   }
   findBar.refresh();
   continueChain();
@@ -304,8 +308,14 @@ function taskRef(el: Element | null): { path: string | null; line: number } | nu
   return { path: li.dataset.tfmPath ?? null, line: Number(li.dataset.tfmLine) };
 }
 
+// Where the press started: closing an open text box on mousedown moves the blocks under the pointer, and the click then
+// lands on their common parent (11-01: clicking a sub-item opened its parent item).
+let pressed: Element | null = null;
+content.addEventListener('mousedown', (e) => { pressed = e.target as Element; }, true);
 content.addEventListener('click', (e) => {
   const target = e.target as Element;
+  const at = pressed?.isConnected ? pressed : target;
+  pressed = null;
   const colButton = target.closest<HTMLButtonElement>('.rv-colhead button');
   if (colButton) {
     e.preventDefault();
@@ -345,10 +355,15 @@ content.addEventListener('click', (e) => {
   const add = target.closest<HTMLElement>('li.rv-addrow');
   if (add) { e.preventDefault(); const last = lastTaskOf(add.parentElement!); if (last) openTaskForm(last); return; }
   // M38: clicking a note-body quote turns it into a text area (not on a task row inside it).
-  if (target.closest('textarea.rv-quote-input')) return;
-  const bq = target.closest<HTMLElement>('blockquote.rv-quote');
-  const rowIn = target.closest('li.tfm-task, input, button, details, summary');
-  if (bq && !(rowIn && bq.contains(rowIn))) { e.preventDefault(); openQuote(bq); return; }
+  if (target.closest('textarea.rv-quote-input, .rv-box')) return;
+  const bq = at.closest<HTMLElement>('blockquote.rv-quote');
+  const rowIn = at.closest('li.tfm-task, input, button, details, summary');
+  if (bq && !(rowIn && bq.contains(rowIn))) { e.preventDefault(); openBox(bq, 'quote'); return; }
+  // M39: any other marked block (paragraph, heading, list item, table, code) too — not after dragging to select text.
+  const write = at.closest<HTMLElement>('.rv-write');
+  if (write) { e.preventDefault(); openBox(write, 'append'); return; }
+  const block = at.closest<HTMLElement>('.rv-block');
+  if (block && !rowIn && !window.getSelection()?.toString()) { e.preventDefault(); openBox(block, 'block'); return; }
   // M27: clicking a note-body task row selects it; Enter then adds a task below it.
   const row = target.closest<HTMLElement>('li.tfm-task');
   if (row && row.dataset.tfmPath === undefined && row.dataset.tfmLine !== undefined && !target.closest('input, button, textarea, details, summary, .tfm-notes')) selectRow(row);
@@ -356,8 +371,10 @@ content.addEventListener('click', (e) => {
 
 // ---- M38: typing into a blockquote ----
 const IS_MAC = /Mac|iPhone|iPad/.test(navigator.platform);
-/** The quote being typed into: its lines, the text it was drawn with, and its text area. */
-let quoteEdit: { start: number; end: number; expected: string; area: HTMLTextAreaElement; done: boolean; finish(save: boolean, saveFile?: boolean): void } | null = null;
+/** What a text box edits: a quote (M38), another block (M39), or new text at the end of the note (M39). */
+type BoxKind = 'quote' | 'block' | 'append';
+/** The text box open now: its kind, lines, the text it was drawn with, and its text area. */
+let quoteEdit: { kind: BoxKind; start: number; end: number; expected: string; area: HTMLTextAreaElement; done: boolean; finish(save: boolean, saveFile?: boolean): void } | null = null;
 /**
  * Note-body quotes the host marked (outermost ones) can be clicked into; not those in query results. An empty one
  * (`>` alone) shows a faint "Type here" so it is not a sliver.
@@ -373,35 +390,82 @@ function markQuotes(): void {
   }
 }
 /**
- * The quote's source (one `>` level off) in a text area in its place. Cmd/Ctrl+Enter or leaving it saves (when
- * changed), Esc puts the quote back. `keep` restores an area that was open before a re-render.
+ * M39: note-body blocks the host marked can be clicked into — not in query results, not task rows, items holding
+ * tasks or notes under a task (those keep their row clicks and ✎). Also "+ Write" at the end of the note.
  */
-function openQuote(bq: HTMLElement, keep?: { expected: string; value: string; selection: [number, number] }): void {
+function markBlocks(): void {
+  for (const marked of Array.from(content.querySelectorAll<HTMLElement>('[data-tfm-block]'))) {
+    // markdown-it puts a fenced code block's marks on its <code>; the <pre> is the block.
+    let el = marked;
+    if (marked.tagName === 'CODE' && marked.parentElement?.tagName === 'PRE') {
+      el = marked.parentElement;
+      el.dataset.tfmBlock = marked.dataset.tfmBlock;
+      el.dataset.tfmBlockText = marked.dataset.tfmBlockText;
+      delete marked.dataset.tfmBlock;
+      delete marked.dataset.tfmBlockText;
+    }
+    if (el.closest('.tfm-query, li.tfm-task, .tfm-notes, li.tfm-note') || el.querySelector('li.tfm-task')) continue;
+    el.classList.add('rv-block');
+  }
+  const write = document.createElement('div');
+  write.className = 'rv-write';
+  write.textContent = `＋ ${document.body.dataset.lWrite ?? 'Write'}`;
+  content.appendChild(write);
+}
+/**
+ * The source of a quote (one `>` level off), a block or new text in a text area in its place. Cmd/Ctrl+Enter or
+ * leaving it saves (when changed), Esc puts the view back. `keep` restores an area that was open before a re-render.
+ * A quote's area goes inside the blockquote; a block is hidden and the area goes right after it (an `li` in a list),
+ * so tables and lists keep their structure.
+ */
+function openBox(el: HTMLElement, kind: BoxKind, keep?: { expected: string; value: string; selection: [number, number] }): void {
   quoteEdit?.finish(true);
-  const [start, end] = bq.dataset.tfmQuote!.split('-').map(Number) as [number, number];
-  const expected = keep?.expected ?? bq.dataset.tfmQuoteText ?? '';
-  const rendered = Array.from(bq.childNodes);
+  const range = kind === 'quote' ? el.dataset.tfmQuote! : kind === 'block' ? el.dataset.tfmBlock! : '-1--1';
+  const [start, end] = kind === 'append' ? [-1, -1] : (range.split('-').map(Number) as [number, number]);
+  const expected = keep?.expected ?? (kind === 'quote' ? el.dataset.tfmQuoteText : kind === 'block' ? el.dataset.tfmBlockText : '') ?? '';
   const area = document.createElement('textarea');
   area.className = 'rv-quote-input';
   area.title = document.body.dataset.lQuoteHint ?? 'Cmd/Ctrl+Enter or click outside to save, Esc to cancel';
   area.placeholder = document.body.dataset.lQuotePlaceholder ?? 'Type here';
   area.value = keep?.value ?? expected;
-  bq.replaceChildren(area);
-  bq.classList.add('rv-quote-editing');
-  bq.removeAttribute('title');
+  const rendered = Array.from(el.childNodes);
+  let holder: HTMLElement | null = null;
+  if (kind === 'quote') {
+    el.replaceChildren(area);
+    el.classList.add('rv-quote-editing');
+    el.removeAttribute('title');
+  } else {
+    holder = document.createElement(el.tagName === 'LI' ? 'li' : 'div');
+    holder.className = el.tagName === 'TABLE' || el.tagName === 'PRE' ? 'rv-box rv-box-code' : 'rv-box';
+    holder.appendChild(area);
+    el.hidden = true;
+    el.after(holder);
+  }
   const state = {
-    start, end, expected, area, done: false,
+    kind, start, end, expected, area, done: false,
     /** `saveFile` (Cmd/Ctrl+S): the note is saved to disk too, even when it is open in the source editor. */
     finish(save: boolean, saveFile = false) {
       if (state.done) return;
       state.done = true;
       if (quoteEdit === state) quoteEdit = null;
       // Saved: the area stays (read-only) until the note re-renders with the new text.
-      if (save && area.value !== expected) { area.readOnly = true; post({ type: 'doc/editQuote', start, end, expected, text: area.value, ...(saveFile ? { save: true } : {}) }); return; }
+      if (save && area.value !== expected) {
+        area.readOnly = true;
+        const s = saveFile ? { save: true } : {};
+        if (kind === 'quote') post({ type: 'doc/editQuote', start, end, expected, text: area.value, ...s });
+        else if (kind === 'block') post({ type: 'doc/editBlock', start, end, expected, text: area.value, ...s });
+        else post({ type: 'doc/append', text: area.value, ...s });
+        return;
+      }
       if (saveFile) post({ type: 'doc/save' });
-      bq.replaceChildren(...rendered);
-      bq.classList.remove('rv-quote-editing');
-      bq.title = document.body.dataset.lQuoteEdit ?? 'Click to type';
+      if (kind === 'quote') {
+        el.replaceChildren(...rendered);
+        el.classList.remove('rv-quote-editing');
+        el.title = document.body.dataset.lQuoteEdit ?? 'Click to type';
+      } else {
+        holder!.remove();
+        el.hidden = false;
+      }
     },
   };
   quoteEdit = state;

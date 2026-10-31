@@ -1,6 +1,6 @@
 import MarkdownItCtor from 'markdown-it';
 import type { MarkdownIt } from 'markdown-it';
-import { quoteText } from '../core/file';
+import { blockText, quoteText } from '../core/file';
 import { headingAnchors } from '../core/file/headingAnchor';
 import { type PluginDeps, tasksMarkdownItPlugin } from './markdownItPlugin';
 
@@ -31,6 +31,7 @@ export function renderDocumentHtml(text: string, deps: PluginDeps, options: Rend
     tasksMarkdownItPlugin(md, deps);
     md.core.ruler.push('tfm_quotes', markQuotes);
     md.core.ruler.push('tfm_headings', markHeadings);
+    md.core.ruler.push('tfm_blocks', markBlocks);
     if (borrowed) {
       (options.plugins ?? []).forEach((plugin, i) => {
         try {
@@ -117,4 +118,35 @@ function markHeadings(state: { tokens: HeadingToken[] }): void {
     texts.push(text);
   });
   headingAnchors(texts).forEach((anchor, i) => opens[i]!.attrSet('data-tfm-anchor', anchor));
+}
+
+interface BlockToken { type: string; info: string; map: [number, number] | null; attrSet(name: string, value: string): void }
+
+/**
+ * Blocks the rendered view lets the user type into (M39) get their line range and source text: `data-tfm-block`
+ * (`<start>-<end>`, end exclusive, trailing blank lines left out) and `data-tfm-block-text`. Headings, paragraphs
+ * outside lists and quotes, list items (every depth), tables and code blocks (not ```tasks). Quotes have their own
+ * marks (M38); the view leaves out task rows and items holding tasks.
+ */
+function markBlocks(state: { src: string; tokens: BlockToken[] }): void {
+  const lines = state.src.split('\n');
+  let quotes = 0;
+  let lists = 0;
+  for (const token of state.tokens) {
+    if (token.type === 'blockquote_open') quotes++;
+    else if (token.type === 'blockquote_close') quotes--;
+    else if (token.type === 'bullet_list_open' || token.type === 'ordered_list_open') lists++;
+    else if (token.type === 'bullet_list_close' || token.type === 'ordered_list_close') lists--;
+    if (quotes > 0 || !token.map) continue;
+    const t = token.type;
+    const wanted =
+      t === 'heading_open' || t === 'table_open' || t === 'list_item_open' || t === 'code_block' ||
+      (t === 'paragraph_open' && lists === 0) || (t === 'fence' && token.info.trim().split(/\s+/)[0] !== 'tasks');
+    if (!wanted) continue;
+    const [start] = token.map;
+    let end = token.map[1];
+    while (end > start + 1 && !lines[end - 1]!.trim()) end--;
+    token.attrSet('data-tfm-block', `${start}-${end}`);
+    token.attrSet('data-tfm-block-text', blockText(lines.slice(start, end)).text);
+  }
 }

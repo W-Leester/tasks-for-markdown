@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { dayjs, type Dayjs } from '../core/dates/dayjs';
 import { StatusType, type StatusRegistry, type Status, type Task, type TaskFields, applyStatusChange, generateTaskId, serializeTask } from '../core/task';
 import type { TaskIndex } from '../core/index';
-import { cleanNoteTexts, insertAfterTask, insertUnderTask, newTaskLine, noteBlock, placeTaskLine, quoteLines, quoteText } from '../core/file';
+import { cleanNoteTexts, insertAfterTask, insertUnderTask, newTaskLine, noteBlock, placeTaskLine, blockLines, blockText, quoteLines, quoteText } from '../core/file';
 import { t } from '../l10n';
 import type { IndexService } from '../index/IndexService';
 import type { Settings } from '../settings/Settings';
@@ -220,6 +220,41 @@ export class TaskEditService {
     if (quote.text === text.replace(/\r\n/g, '\n')) return;
     const edit = new vscode.WorkspaceEdit();
     edit.replace(uri, new vscode.Range(start, 0, end - 1, doc.lineAt(end - 1).text.length), quoteLines(quote.indent, text).join(eolOf(doc)));
+    await this.commit(doc, edit, shouldSave);
+  }
+
+  /**
+   * Write `text` into the block (paragraph, heading, list item, table, code block) on lines `start`..`end` (exclusive)
+   * — typed in the rendered view (M39). Refused when the block's text is no longer `expected`.
+   */
+  async replaceBlock(uri: vscode.Uri, start: number, end: number, expected: string, text: string): Promise<void> {
+    const doc = await vscode.workspace.openTextDocument(uri);
+    const shouldSave = nobodyEditing(doc);
+    const lines: string[] = [];
+    for (let i = start; i < end && i < doc.lineCount; i++) lines.push(doc.lineAt(i).text);
+    const block = end <= doc.lineCount && start < end ? blockText(lines) : null;
+    if (!block || block.text !== expected.replace(/\r\n/g, '\n')) throw new Error(t('That part of the note has changed since the view was drawn; the view has been refreshed.'));
+    if (block.text === text.replace(/\r\n/g, '\n')) return;
+    const edit = new vscode.WorkspaceEdit();
+    edit.replace(uri, new vscode.Range(start, 0, end - 1, doc.lineAt(end - 1).text.length), blockLines(block.indent, text).join(eolOf(doc)));
+    await this.commit(doc, edit, shouldSave);
+  }
+
+  /** Add `text` at the end of the note as a new block (a blank line before it) — "+ Write" in the rendered view (M39). */
+  async appendText(uri: vscode.Uri, text: string): Promise<void> {
+    if (!text.trim()) return;
+    const doc = await vscode.workspace.openTextDocument(uri);
+    const shouldSave = nobodyEditing(doc);
+    const eol = eolOf(doc);
+    const full = doc.getText();
+    let sep = '';
+    if (full.trim()) {
+      if (!full.endsWith('\n')) sep = eol + eol;
+      else if (!/\n[ \t]*\r?\n$/.test(full)) sep = eol;
+    }
+    const edit = new vscode.WorkspaceEdit();
+    const endPos = doc.lineAt(doc.lineCount - 1).range.end;
+    edit.insert(uri, endPos, sep + blockLines('', text.replace(/\s+$/, '')).join(eol) + eol);
     await this.commit(doc, edit, shouldSave);
   }
 

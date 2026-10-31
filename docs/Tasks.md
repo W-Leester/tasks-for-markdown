@@ -1163,11 +1163,13 @@
 - [x] 렌더 보기 `Cmd+F` 찾기(11-01 사용자 요청): 처음엔 웹뷰 `enableFindWidget` → Cursor에서 찾기 창은 뜨나 **찾지 못함**(브라우저판은 됨; 데스크톱은 Electron `findInFrame` 경로) → 렌더 보기가 **자기 찾기 칸**을 가짐(`webviews/rendered/find.ts`: CSS Custom Highlight로 칠하기, 개수, Enter/Shift+Enter, Esc, 다시 그려도 유지, 보기 필터로 숨은 줄 제외). VS Code 찾기 창은 끔. 브라우저 VS Code에서 확인
 - [x] 사용자 확인(11-01): 타이핑 뒤 되돌리기·다시 하기, 이모지 창 입력 됨
 - [x] 사용자 확인(11-01): 새 찾기 칸, 받아쓰기 됨. (`Cmd+Shift+V`로 넣은 글이 사라지던 보고는 재현 못 함 — 다시 나오면 조사)
-- [ ] 순수 함수: 블록 줄 ↔ 입력칸 글(목록 항목 들여쓰기·글머리, 표, 코드 블록) + 단위 테스트
-- [ ] 렌더: 블록마다 `data-tfm-block="시작-끝"`·원문 + 단위 테스트(태스크·쿼리·front matter 제외)
-- [ ] 호스트 `doc/editBlock` → 편집 서비스(원문 대조) + 통합 테스트. 인용문(`doc/editQuote`)도 같은 길로 합칠지 검토
-- [ ] 웹뷰: 인용문 칸을 블록 칸으로 일반화 + 웹뷰 테스트
-- [ ] 브라우저 VS Code 확인, 문서(user-guide, README 한·영, CHANGELOG, design), 사용자 확인(Cursor)
+- [x] 순수 함수 `blockText`/`blockLines`(`core/file/textBlock.ts`) + 단위 테스트
+- [x] 렌더: `tfm_blocks` 규칙 + 단위 테스트(인용문 안·```` ```tasks ```` 제외)
+- [x] 호스트 `doc/editBlock` → `replaceBlock`, `doc/append` → `appendText` + 통합 테스트 4개. 인용문은 `doc/editQuote` 그대로 둠
+- [x] 웹뷰: `openBox`로 일반화(인용문·블록·끝에 쓰기) + 웹뷰 테스트 7개. fence는 `<pre>`로 표시 이동, 표·코드는 고정폭 칸
+- [x] 브라우저 VS Code 실제 확인(11-01): 문단·하위 항목·표·＋ 글 쓰기 → 파일이 맞게 바뀜. 여기서 찾은 문제: **열린 칸을 두고 다른 블록을 누르면 부모 항목이 열림**(mousedown에서 칸이 닫혀 배치가 바뀌고 click이 공통 부모에 떨어짐) → mousedown 때의 요소로 판단
+- [x] 문서(user-guide, README 한·영, CHANGELOG, design 1.23)
+- [ ] 사용자 확인(Cursor)
 
 ## M38. 렌더 보기에서 인용문에 바로 쓰기 (1.1.8, 계획 2026-10-31, 사용자 요청)
 

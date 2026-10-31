@@ -98,6 +98,10 @@ export type FromWebview =
   | { type: 'doc/insertTask'; line: number; text: string }
   /** M38: the text typed into the blockquote on lines start..end (exclusive); `expected` is the text it was drawn with. */
   | { type: 'doc/editQuote'; start: number; end: number; expected: string; text: string; save?: boolean }
+  /** M39: the text typed into the block on lines start..end (exclusive); `expected` is the text it was drawn with. */
+  | { type: 'doc/editBlock'; start: number; end: number; expected: string; text: string; save?: boolean }
+  /** M39: "+ Write": new text at the end of the note. */
+  | { type: 'doc/append'; text: string; save?: boolean }
   /** Cmd/Ctrl+S in a text box: save the note to disk. */
   | { type: 'doc/save' }
   /** M27: the row selected in the rendered view (null = none), so the create/edit key edits it. */

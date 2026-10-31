@@ -35,7 +35,7 @@ export function createFindBar(root: HTMLElement): FindBar {
       const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
         acceptNode: (n) => {
           const el = n.parentElement;
-          if (!el || el.closest('textarea, script, style, .rv-find')) return NodeFilter.FILTER_REJECT;
+          if (!el || el.closest('textarea, script, style, .rv-find, .rv-write')) return NodeFilter.FILTER_REJECT;
           // Rows the Show filter hides are not matches.
           const visible = (el as HTMLElement & { checkVisibility?: () => boolean }).checkVisibility?.() ?? true;
           return visible ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;

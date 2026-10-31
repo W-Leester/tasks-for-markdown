@@ -45,7 +45,7 @@ describe('notes in the rendered note (M13)', () => {
   it('marks plain bullets directly under a task as tfm-note, not sub-tasks or bullets under plain items', () => {
     const html = renderDocumentHtml(`${text}\n\n- 일반 목록\n  - 일반 하위`, deps);
     expect(html.match(/tfm-note/g)).toHaveLength(2);
-    expect(html).toMatch(/<li class="tfm-note">3조 &lt;위약금&gt; 확인<\/li>/);
-    expect(html).not.toMatch(/tfm-note">일반 하위/);
+    expect(html).toMatch(/<li class="tfm-note"[^>]*>3조 &lt;위약금&gt; 확인<\/li>/);
+    expect(html).not.toMatch(/tfm-note"[^>]*>일반 하위/);
   });
 });

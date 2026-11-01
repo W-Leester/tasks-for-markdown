@@ -45,12 +45,7 @@ class TaskWidget extends WidgetType {
     box.checked = this.checked;
     // On mousedown, before the editor would move the cursor onto the line (which shows the line as written).
     box.addEventListener('mousedown', (e) => { e.preventDefault(); post({ type: 'live/toggle', line: this.line }); });
-    box.addEventListener('click', (e) => { if (!(e.target as Element).closest('summary, details, .rv-note-form')) e.preventDefault(); });
-    box.addEventListener('dblclick', (e) => {
-      const row = (e.target as Element).closest<HTMLElement>('li.tfm-task');
-      if (!row || (e.target as Element).closest('input, button, a, .rv-colhead, summary')) return;
-      post({ type: 'live/rowAct', act: 'edit', path: row.dataset.tfmPath!, line: Number(row.dataset.tfmLine) });
-    }); // the host's edit sets the box
+    box.addEventListener('click', (e) => e.preventDefault()); // the host's edit sets the box
     return box;
   }
   override ignoreEvent(): boolean { return true; }
@@ -115,12 +110,21 @@ class QueryWidget extends WidgetType {
       const row = target.closest<HTMLElement>('li.tfm-task');
       if (check && row?.dataset.tfmPath !== undefined) { post({ type: 'live/toggleTask', path: row.dataset.tfmPath, line: Number(row.dataset.tfmLine) }); return; }
       const a = target.closest<HTMLAnchorElement>('a[href]');
-      if (a) { openLink(a.getAttribute('href')!); return; }
-      // Anywhere else: the query's source, to edit it.
+      if (a) openLink(a.getAttribute('href')!);
+      // Anywhere else a single click does nothing, as in the rendered view (11-01: a click on a row opened the query).
+    });
+    box.addEventListener('click', (e) => { if (!(e.target as Element).closest('summary, details, .rv-note-form')) e.preventDefault(); });
+    // Double-click: a result row opens the edit dialog; the header row (or a box without rows) shows the query's source.
+    box.addEventListener('dblclick', (e) => {
+      const target = e.target as Element;
+      if (target.closest('input, button, a, summary, .rv-colgrip, .rv-note-form')) return;
+      e.preventDefault();
+      const row = target.closest<HTMLElement>('li.tfm-task');
+      if (row?.dataset.tfmPath !== undefined) { post({ type: 'live/rowAct', act: 'edit', path: row.dataset.tfmPath, line: Number(row.dataset.tfmLine) }); return; }
+      if (row) return;
       view.dispatch({ selection: EditorSelection.cursor(this.body) });
       view.focus();
     });
-    box.addEventListener('click', (e) => e.preventDefault());
     return box;
   }
   override ignoreEvent(): boolean { return true; }

@@ -301,6 +301,7 @@
   "That quote has changed since the view was drawn; the view has been refreshed.": "보기를 그린 뒤 그 인용문이 바뀌었습니다. 보기를 새로 고쳤습니다.",
   "Click to type": "클릭해서 입력",
   "Type here": "입력",
+  "Double-click to edit the query": "더블클릭하면 쿼리 편집",
   "Cmd/Ctrl+click to open": "Cmd/Ctrl+클릭으로 열기",
   "Live": "라이브",
   "Query results": "쿼리 결과",

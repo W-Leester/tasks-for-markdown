@@ -450,7 +450,9 @@ ${borrowed.styles.map((u) => `<link rel="stylesheet" href="${webview.asWebviewUr
   body.fields-columns .tfm-col-created, body.fields-columns .tfm-col-done { color: var(--rv-muted); }
   body.fields-columns .tfm-col-tags { margin-left: .3em; font-size: .92em; }
   body.fields-columns .tfm-col-tags .tfm-tag { color: var(--vscode-textLink-foreground); }
-  body.fields-columns .tfm-col-more { color: var(--rv-muted); font-size: .82em; line-height: 1.5; }
+  body.fields-columns .tfm-col-more { color: var(--rv-muted); font-size: .82em; line-height: 1.5; overflow: hidden; }
+  /* A long value in a narrow column ends with … instead of running past the box (11-01). */
+  body.fields-columns .tfm-col .tfm-badge { max-width: 100%; box-sizing: border-box; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: bottom; }
   body.fields-columns .tfm-col-pri { margin-left: .2em; }
   body.fields-columns .tfm-col .tfm-badge { margin: 1px 0; }
   body.fields-columns li.tfm-task > ul, body.fields-columns li.tfm-task > ol { grid-column: 1 / -1; margin: 0; padding-left: 1.6em; }

@@ -258,7 +258,10 @@ export class LiveViewProvider implements vscode.CustomTextEditorProvider {
   .cm-lv-query .tfm-col-due, .cm-lv-query .tfm-col-created, .cm-lv-query .tfm-col-done { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .cm-lv-query .tfm-col-created, .cm-lv-query .tfm-col-done { color: var(--rv-muted); }
   .cm-lv-query .tfm-col-tags { margin-left: .3em; font-size: .92em; } .cm-lv-query .tfm-col-tags .tfm-tag { color: var(--vscode-textLink-foreground); }
-  .cm-lv-query .tfm-col-more { color: var(--rv-muted); font-size: .82em; line-height: 1.5; }
+  .cm-lv-query .tfm-col-more { color: var(--rv-muted); font-size: .82em; line-height: 1.5; overflow: hidden; }
+  /* A long value in a narrow column ends with … instead of running past the box (11-01). */
+  .cm-lv-query .tfm-col .tfm-badge { max-width: 100%; box-sizing: border-box; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: bottom; }
+  .cm-lv-query .tfm-query { overflow: hidden; }
   .cm-lv-query .tfm-col-pri { margin-left: .2em; } .cm-lv-query .tfm-col .tfm-badge { margin: 1px 0; }
   .cm-lv-query li.tfm-task > ul, .cm-lv-query li.tfm-task > ol { grid-column: 1 / -1; margin: 0; padding-left: 1.6em; }
   .cm-lv-query li.tfm-task.tfm-status-done .tfm-desc { color: var(--rv-muted); }
@@ -289,7 +292,7 @@ export class LiveViewProvider implements vscode.CustomTextEditorProvider {
   }
 </style>
 </head>
-<body data-l-hidden="${t('{0} hidden')}" data-l-edit="${t('Edit')}" data-l-postpone="${t('Postpone')}" data-l-note="${t('Add note')}" data-l-add-below="${t('Add a task below')}" data-l-note-placeholder="${t('Note — Enter to save, Esc to cancel')}" data-l-link-hint="${t('Cmd/Ctrl+click to open')}">
+<body data-l-hidden="${t('{0} hidden')}" data-l-edit="${t('Edit')}" data-l-postpone="${t('Postpone')}" data-l-note="${t('Add note')}" data-l-add-below="${t('Add a task below')}" data-l-note-placeholder="${t('Note — Enter to save, Esc to cancel')}" data-l-link-hint="${t('Cmd/Ctrl+click to open')}" data-l-query-edit="${t('Double-click to edit the query')}">
 <div class="rv-tools">
   <label class="rv-select" title="${t('Query results')}"><span>${t('Sort')}</span><select id="view-sort">
     <option value="document">${t('Document order')}</option><option value="due">${t('Due date')}</option><option value="created">${t('Created date')}</option><option value="priority">${t('Priority')}</option><option value="urgency">${t('Urgency')}</option>

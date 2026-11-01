@@ -35,6 +35,7 @@ export class QueryColumns {
     if (!query?.querySelector('li.tfm-task')) return;
     const head = document.createElement('div');
     head.className = 'rv-colhead';
+    head.title = document.body.dataset.lQueryEdit ?? 'Double-click to edit the query';
     head.innerHTML = this.headerHtml();
     query.insertBefore(head, query.firstChild);
   }

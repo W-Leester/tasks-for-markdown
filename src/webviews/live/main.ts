@@ -93,7 +93,9 @@ function addRowActions(box: HTMLElement): void {
       setTimeout(() => input.focus());
     });
     const desc = li.querySelector(':scope > .tfm-desc, :scope > p > .tfm-desc');
-    (desc ?? li).appendChild(actions);
+    // On the task's own line: before the notes listed under the description (11-01).
+    const host = desc ?? li;
+    host.insertBefore(actions, host.querySelector(':scope > .tfm-notes-list, :scope > ul, :scope > ol'));
   }
 }
 

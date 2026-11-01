@@ -83,9 +83,13 @@ function editNote(note: HTMLElement, ref: NonNullable<ReturnType<typeof noteRef>
     const text = input.value.trim();
     if (keep && text !== ref.text.trim()) save({ path: ref.path, line: ref.line, index: ref.index, text: text || null });
     input.remove();
-    // Until the view is drawn again with the new text.
+    // Until the view is drawn again: the new text, faded.
     for (const n of shown) note.insertBefore(n, note.querySelector(':scope > ul, :scope > ol'));
-    if (keep && text !== ref.text.trim()) note.style.opacity = '.4';
+    if (keep && text !== ref.text.trim()) {
+      const span = note.querySelector<HTMLElement>(':scope > .tfm-note-text');
+      if (span && text) span.textContent = text;
+      note.style.opacity = '.4';
+    }
   };
   input.addEventListener('keydown', (e) => {
     e.stopPropagation(); // not the view's or the editor's keys

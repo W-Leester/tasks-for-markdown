@@ -297,7 +297,8 @@ function addRowActions(): void {
     const nested = li.querySelector(':scope > ul, :scope > ol');
     const para = li.querySelector(':scope > p');
     const desc = li.querySelector(':scope > .tfm-desc, :scope > p > .tfm-desc');
-    if (document.body.classList.contains('fields-columns') && desc) desc.appendChild(actions); // keep the grid cells in place
+    // In columns: in the description cell, on its first line — before the notes listed under it (11-01).
+    if (document.body.classList.contains('fields-columns') && desc) desc.insertBefore(actions, desc.querySelector(':scope > .tfm-notes-list'));
     else if (para) para.appendChild(actions);
     else if (nested) li.insertBefore(actions, nested);
     else li.appendChild(actions);

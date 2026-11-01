@@ -19,6 +19,8 @@ import { cleanWidths } from './RenderedView';
  * to the document as they are; changes made elsewhere are sent back as the whole text.
  */
 export const LIVE_VIEW_TYPE = 'tasksmd.live';
+/** Messages after which the query results are drawn again right away. */
+const QUICK_REDRAW = new Set(['live/toggle', 'live/toggleTask', 'live/editNote', 'live/addNote']);
 /** Shared with the rendered view: sort and show filter per note. */
 const VIEW_STATE_KEY = 'rendered.viewState';
 
@@ -105,7 +107,10 @@ export class LiveViewProvider implements vscode.CustomTextEditorProvider {
       { dispose: () => { indexSub.dispose(); clearTimeout(queryTimer); this.open.delete(refresh); } },
       vscode.workspace.onDidChangeTextDocument((e) => { if (e.document === document) sendQueries(300); }),
       webview.onDidReceiveMessage((m: FromLive) => {
-        queue = queue.then(() => this.handle(m, document, post, sync, panel)).catch((err) => {
+        queue = queue.then(() => this.handle(m, document, post, sync, panel)).then(() => {
+          // A change made from the view: its results at once, not after the index's pause (11-01: notes lagged).
+          if (QUICK_REDRAW.has(m.type)) sendQueries(0);
+        }).catch((err) => {
           const message = err instanceof Error ? err.message : String(err);
           this.deps.log(`live view: ${m.type}: ${message}`);
           void vscode.window.showErrorMessage(t('Tasks: {0}', message));

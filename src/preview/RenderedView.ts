@@ -190,7 +190,10 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
         docTimer = setTimeout(render, DOC_DEBOUNCE_MS);
       }),
       this.deps.settings.onDidChange(render),
-      webview.onDidReceiveMessage((m: Incoming) => void this.handle(m, document, panel, render)),
+      webview.onDidReceiveMessage((m: Incoming) => void this.handle(m, document, panel, render).then(() => {
+        // A change made from the view: drawn at once, not after the pauses for typing and indexing (11-01: notes lagged).
+        if (m.type === 'doc/toggle' || m.type === 'doc/editNote' || m.type === 'doc/addNote') { clearTimeout(docTimer); clearTimeout(indexTimer); render(); }
+      })),
       panel.onDidChangeViewState((e) => {
         if (e.webviewPanel.active) this.activeDocument = document.uri;
         else if (this.activeDocument?.toString() === document.uri.toString()) this.activeDocument = null;

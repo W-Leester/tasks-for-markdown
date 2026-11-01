@@ -10,8 +10,8 @@ import type { SyntaxNode } from '@lezer/common';
 export type LiveDeco =
   /** Text not shown (a Markdown mark). */
   | { kind: 'hide'; from: number; to: number }
-  /** A bullet list mark shown as `•`. */
-  | { kind: 'bullet'; from: number; to: number }
+  /** A bullet list mark shown as `•`, or as `💬` on a note (a plain bullet right under a task, as the rendered view). */
+  | { kind: 'bullet'; from: number; to: number; note?: boolean }
   /** `- [ ]` / `- [x]` shown as a checkbox; `line` is 0-based. */
   | { kind: 'task'; from: number; to: number; checked: boolean; line: number }
   /** A class on a whole line (at its start). */
@@ -82,7 +82,10 @@ export function liveDecos(state: EditorState, active: Set<number>, from = 0, to 
           const mark = doc.sliceString(task.from, task.to);
           out.push({ kind: 'task', from: n.from, to: withSpace(task), checked: !/^\[ \]$/.test(mark), line: lineOf(n.from) - 1 });
         } else if (n.parent?.parent?.name === 'BulletList') {
-          out.push({ kind: 'bullet', from: n.from, to: n.to });
+          // A note: its list sits right under a task item.
+          const outer = n.parent.parent.parent;
+          const note = outer?.name === 'ListItem' && !!outer.getChild('Task');
+          out.push({ kind: 'bullet', from: n.from, to: n.to, ...(note ? { note: true } : {}) });
         }
       }
       return undefined;

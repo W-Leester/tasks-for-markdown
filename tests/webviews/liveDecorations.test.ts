@@ -40,6 +40,12 @@ describe('live view decorations (M40)', () => {
     expect(liveDecos(s, new Set())[0]).toMatchObject({ from: 0, to: 6 }); // "- [ ] " in one
   });
 
+  it('a plain bullet right under a task is a note (💬); one under a plain item is a bullet', () => {
+    const s = state('- [ ] 할 일\n  - 메모\n- 그냥\n  - 하위\n');
+    const bullets = liveDecos(s, new Set()).filter((d) => d.kind === 'bullet').map((d) => `${s.doc.lineAt(d.from).number}:${'note' in d && d.note ? 'note' : 'bullet'}`);
+    expect(bullets).toEqual(['2:note', '3:bullet', '4:bullet']);
+  });
+
   it('links show only their text, carrying the address; bare URLs are links too', () => {
     const s = state('[문서](docs/a.md#제목 "t") 와 https://example.com\n');
     expect(show(s, liveDecos(s, new Set()))).toEqual(['hide:"["', 'mark:cm-lv-link:"문서"->docs/a.md#제목', 'hide:"](docs/a.md#제목 \\"t\\")"', 'mark:cm-lv-link:"https://example.com"->https://example.com']);

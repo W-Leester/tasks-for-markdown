@@ -29,6 +29,14 @@ export class QueryColumns {
     this.applyHidden(state.hidden);
   }
 
+  /** A header row on its own (over a task list in the note, M40 C). */
+  headerElement(): HTMLElement {
+    const head = document.createElement('div');
+    head.className = 'rv-colhead cm-lv-bodyhead';
+    head.innerHTML = this.headerHtml();
+    return head;
+  }
+
   /** A new result box: its header (only where there are task rows). */
   addHeader(box: HTMLElement): void {
     const query = box.querySelector<HTMLElement>('.tfm-query');
@@ -53,7 +61,10 @@ export class QueryColumns {
   }
 
   private applyWidths(): void {
-    document.body.style.setProperty('--rv-cols', columnTracks(this.hidden, this.widths));
+    const tracks = columnTracks(this.hidden, this.widths);
+    document.body.style.setProperty('--rv-cols', tracks);
+    // Note task lines (M40 C): the checkbox is outside the row's grid.
+    document.body.style.setProperty('--rv-cols-body', tracks.replace(/^\S+\s+/, ''));
   }
 
   /** From the toolbar's column menu. */
@@ -67,11 +78,11 @@ export class QueryColumns {
     this.onHidden(this.hidden);
     for (const c of HIDEABLE_COLUMNS) document.body.classList.toggle(`hide-col-${c}`, this.hidden.includes(c));
     this.applyWidths();
-    for (const head of Array.from(this.root.querySelectorAll<HTMLElement>('.cm-lv-query .rv-colhead'))) head.innerHTML = this.headerHtml();
+    for (const head of Array.from(this.root.querySelectorAll<HTMLElement>('.rv-colhead'))) head.innerHTML = this.headerHtml();
   }
 
   private onClick(e: MouseEvent): void {
-    const b = (e.target as Element).closest<HTMLButtonElement>('.cm-lv-query .rv-colhead button');
+    const b = (e.target as Element).closest<HTMLButtonElement>('.rv-colhead button');
     if (!b) return;
     e.preventDefault();
     const hidden = b.dataset.hide ? [...this.hidden, b.dataset.hide] : this.hidden.filter((c) => c !== b.dataset.show);
@@ -81,7 +92,7 @@ export class QueryColumns {
 
   private saveWidths(): void {
     this.save({ widths: { ...this.widths } as Record<string, number> });
-    for (const g of Array.from(this.root.querySelectorAll<HTMLElement>('.cm-lv-query .rv-colgrip'))) g.setAttribute('aria-valuenow', String(widthOf(g.dataset.col as HideableColumn, this.widths)));
+    for (const g of Array.from(this.root.querySelectorAll<HTMLElement>('.rv-colgrip'))) g.setAttribute('aria-valuenow', String(widthOf(g.dataset.col as HideableColumn, this.widths)));
   }
 
   /** Widths as drawn, in em (the "more" track may be narrower than its setting; the description gives only above 8em). */
@@ -99,7 +110,7 @@ export class QueryColumns {
   }
 
   private onPointerDown(e: PointerEvent): void {
-    const grip = (e.target as Element).closest<HTMLElement>('.cm-lv-query .rv-colgrip');
+    const grip = (e.target as Element).closest<HTMLElement>('.rv-colgrip');
     if (!grip || e.button !== 0) return;
     e.preventDefault();
     const c = grip.dataset.col as HideableColumn;
@@ -129,7 +140,7 @@ export class QueryColumns {
   }
 
   private onKeyDown(e: KeyboardEvent): void {
-    const grip = (e.target as Element).closest<HTMLElement>('.cm-lv-query .rv-colgrip');
+    const grip = (e.target as Element).closest<HTMLElement>('.rv-colgrip');
     if (!grip) return;
     const c = grip.dataset.col as HideableColumn;
     if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
@@ -146,13 +157,13 @@ export class QueryColumns {
 
   /** Double-click a grip: the widest visible cell or the title, whichever is wider. */
   private onDoubleClick(e: MouseEvent): void {
-    const grip = (e.target as Element).closest<HTMLElement>('.cm-lv-query .rv-colgrip');
+    const grip = (e.target as Element).closest<HTMLElement>('.rv-colgrip');
     if (!grip) return;
     e.preventDefault();
     const c = grip.dataset.col as HideableColumn;
     const px = parseFloat(getComputedStyle(grip.closest('.rv-colhead')!).fontSize) || 14;
     let widest = natural(grip.parentElement!);
-    for (const cell of Array.from(this.root.querySelectorAll<HTMLElement>(`.cm-lv-query li.tfm-task > .tfm-col-${c}, .cm-lv-query li.tfm-task > p > .tfm-col-${c}`))) {
+    for (const cell of Array.from(this.root.querySelectorAll<HTMLElement>(`.cm-lv-query li.tfm-task > .tfm-col-${c}, .cm-lv-query li.tfm-task > p > .tfm-col-${c}, .cm-lv-row > .tfm-col-${c}`))) {
       if (cell.getClientRects().length) widest = Math.max(widest, natural(cell));
     }
     this.widths[c] = clampWidth(fitWidth(widest, px));

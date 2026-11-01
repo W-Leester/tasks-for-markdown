@@ -12,11 +12,11 @@ import { tags } from '@lezer/highlight';
 import { findHeadingLine } from '../../core/file/headingAnchor';
 import { checkboxMode, toggleCheckboxLine } from '../../core/task/toggleCheckbox';
 import { activeLines, findQueryBlocks, liveDecos } from './decorations';
-import { applyView, SCOPE_MODES, type ScopeMode, SORT_MODES, type SortMode, type ViewState } from '../rendered/view';
+import { applyView, matchesScope, SCOPE_MODES, type ScopeMode, SORT_MODES, type SortMode, type ViewState } from '../rendered/view';
 import { decorateNotes, handleNoteClick } from '../shared/notes';
 import { QueryColumns } from './columns';
 import { keepKey } from './keys';
-import { type FromLive, minimalChange, type ToLive } from './sync';
+import { type FromLive, type LiveRow, minimalChange, type ToLive } from './sync';
 
 declare function acquireVsCodeApi(): { postMessage(m: unknown): void };
 const vscode = acquireVsCodeApi();
@@ -27,11 +27,12 @@ const IS_MAC = /Mac|iPhone|iPad/.test(navigator.platform);
 const fromHost = Annotation.define<boolean>();
 
 class BulletWidget extends WidgetType {
-  override eq(): boolean { return true; }
+  constructor(readonly note = false) { super(); }
+  override eq(o: BulletWidget): boolean { return o.note === this.note; }
   toDOM(): HTMLElement {
     const s = document.createElement('span');
-    s.className = 'cm-lv-bullet';
-    s.textContent = '•';
+    s.className = this.note ? 'cm-lv-bullet cm-lv-notemark' : 'cm-lv-bullet';
+    s.textContent = this.note ? '💬' : '•';
     return s;
   }
 }
@@ -40,14 +41,18 @@ class TaskWidget extends WidgetType {
   constructor(readonly checked: boolean, readonly line: number) { super(); }
   override eq(o: TaskWidget): boolean { return o.checked === this.checked && o.line === this.line; }
   toDOM(): HTMLElement {
+    // In a box as wide as the header's first column, so the cells after it line up with the header (M40 C).
+    const wrap = document.createElement('span');
+    wrap.className = 'cm-lv-checkwrap';
     const box = document.createElement('input');
     box.type = 'checkbox';
     box.className = 'cm-lv-check';
     box.checked = this.checked;
+    wrap.appendChild(box);
     // On mousedown, before the editor would move the cursor onto the line (which shows the line as written).
     box.addEventListener('mousedown', (e) => { e.preventDefault(); post({ type: 'live/toggle', line: this.line }); });
     box.addEventListener('click', (e) => e.preventDefault()); // the host's edit sets the box
-    return box;
+    return wrap;
   }
   override ignoreEvent(): boolean { return true; }
 }
@@ -241,33 +246,159 @@ function blockEnd(state: EditorState, line: number): number {
   return end;
 }
 
+/** ✎ ⏩ on a note task line go to the host; 💬 a note / ＋ a task are typed in place, after the task's own block. */
+function lineAct(view: EditorView, line: number, act: string): void {
+  if (act === 'edit' || act === 'postpone') { post({ type: 'live/rowAct', act, path: null, line }); return; }
+  const { state } = view;
+  const task = state.doc.line(line + 1);
+  const indent = /^\s*/.exec(task.text)![0];
+  const after = state.doc.line(blockEnd(state, line + 1));
+  const insert = act === 'note' ? `\n${indent}  - ` : `\n${indent}- [ ] `;
+  view.dispatch({ changes: { from: after.to, insert }, selection: EditorSelection.cursor(after.to + insert.length), userEvent: 'input' });
+  view.focus();
+}
+
 class ActionsWidget extends WidgetType {
   constructor(readonly line: number, readonly dated: boolean) { super(); }
   override eq(o: ActionsWidget): boolean { return o.line === this.line && o.dated === this.dated; }
   toDOM(view: EditorView): HTMLElement {
-    return actionButtons(this.dated, true, (act) => {
-      if (act === 'edit' || act === 'postpone') { post({ type: 'live/rowAct', act, path: null, line: this.line }); return; }
-      // 💬 a note (an indented bullet) / ＋ a task, after the task's own block — then type it in place.
-      const { state } = view;
-      const task = state.doc.line(this.line + 1);
-      const indent = /^\s*/.exec(task.text)![0];
-      const after = state.doc.line(blockEnd(state, this.line + 1));
-      const insert = act === 'note' ? `\n${indent}  - ` : `\n${indent}- [ ] `;
-      view.dispatch({ changes: { from: after.to, insert }, selection: EditorSelection.cursor(after.to + insert.length), userEvent: 'input' });
-      view.focus();
-    });
+    return actionButtons(this.dated, true, (act) => lineAct(view, this.line, act));
   }
   override ignoreEvent(): boolean { return true; }
 }
 
+// ---- M40 C: note task lines in columns, a header over task lists, the show filter on note lines ----
+/** The host's column cells and filter data for the note's task lines, by line text. */
+let rows = new Map<string, LiveRow>();
+const setRows = StateEffect.define<Map<string, LiveRow>>();
+const setBodyView = StateEffect.define<{ view: ViewState; today: string }>();
+
+/** A task line off the cursor: the cells after its checkbox, in the rendered view's columns (✎ ⏩ 💬 ＋ inside). */
+class RowWidget extends WidgetType {
+  constructor(readonly html: string, readonly line: number, readonly dated: boolean) { super(); }
+  override eq(o: RowWidget): boolean { return o.html === this.html && o.line === this.line; }
+  toDOM(view: EditorView): HTMLElement {
+    const row = document.createElement('span');
+    row.className = 'cm-lv-row';
+    row.innerHTML = this.html;
+    const desc = row.querySelector('.tfm-desc') ?? row;
+    desc.appendChild(actionButtons(this.dated, true, (act) => lineAct(view, this.line, act)));
+    // A click on the cells puts the cursor on the line, which then shows as written (a link still opens with Cmd/Ctrl).
+    row.addEventListener('mousedown', (e) => {
+      const a = (e.target as Element).closest<HTMLAnchorElement>('a[href]');
+      if (a && (e.metaKey || e.ctrlKey)) { e.preventDefault(); openLink(a.getAttribute('href')!); return; }
+      e.preventDefault();
+      view.dispatch({ selection: EditorSelection.cursor(view.state.doc.line(this.line + 1).to) });
+      view.focus();
+    });
+    return row;
+  }
+  override ignoreEvent(): boolean { return true; }
+}
+
+class BodyHeadWidget extends WidgetType {
+  override eq(): boolean { return true; }
+  toDOM(): HTMLElement { return columns.headerElement(); }
+  override ignoreEvent(): boolean { return true; }
+}
+
+const TASK_TEXT = /^(\s*)(?:[-*+]|\d+[.)])\s+\[.\]/;
+const LIST_TEXT = /^\s*(?:[-*+]|\d+[.)])\s/;
+/** Headers over top-level task lists, and note task lines the show filter hides (with their notes). */
+function bodyDecos(state: EditorState, view: { view: ViewState; today: string }): { decos: DecorationSet; hidden: number } {
+  const doc = state.doc;
+  const ranges: Range<Decoration>[] = [];
+  const indentOf = (t: string) => /^\s*/.exec(t)![0].replace(/\t/g, '    ').length;
+  const active = activeLines(state, true);
+  // Headers: the first line of a top-level list whose items include tasks.
+  for (let n = 1; n <= doc.lines; n++) {
+    const text = doc.line(n).text;
+    if (!TASK_TEXT.test(text) || indentOf(text) > 0) continue;
+    if (n > 1 && LIST_TEXT.test(doc.line(n - 1).text)) continue;
+    // Not inside a code block (the syntax tree may not be complete: a quick fence count).
+    let fences = 0;
+    for (let k = 1; k < n; k++) if (/^ {0,3}(`{3,}|~{3,})/.test(doc.line(k).text)) fences++;
+    if (fences % 2) continue;
+    ranges.push(Decoration.widget({ widget: new BodyHeadWidget(), block: true, side: -1 }).range(doc.line(n).from));
+  }
+  // Show filter: a task line is hidden when it and no task under it match; its notes go with it.
+  let hidden = 0;
+  if (view.view.scope !== 'all') {
+    const hide: boolean[] = [];
+    const owner: number[] = []; // for each line, the task line it belongs to (0 = none)
+    const stack: { n: number; indent: number }[] = [];
+    const matches = new Map<number, boolean>();
+    for (let n = 1; n <= doc.lines; n++) {
+      const text = doc.line(n).text;
+      if (!text.trim()) { stack.length = 0; owner[n] = 0; continue; }
+      const ind = indentOf(text);
+      while (stack.length && stack[stack.length - 1]!.indent >= ind) stack.pop();
+      owner[n] = stack.length ? stack[stack.length - 1]!.n : 0;
+      const row = TASK_TEXT.test(text) ? rows.get(text) : undefined;
+      if (row) {
+        matches.set(n, matchesScope({ ...row.data, line: n }, view.view.scope, view.today));
+        stack.push({ n, indent: ind });
+      } else if (LIST_TEXT.test(text)) stack.push({ n: owner[n] || 0, indent: ind });
+    }
+    // A task stays when a task under it matches.
+    const keep = new Set<number>();
+    for (const [n, ok] of matches) if (ok) for (let k = n; k; k = owner[k] ?? 0) keep.add(k);
+    for (let n = 1; n <= doc.lines; n++) {
+      const own = matches.has(n) ? n : owner[n] ?? 0;
+      hide[n] = own > 0 && matches.has(own) && !keep.has(own) && !active.has(n);
+    }
+    for (const [n] of matches) if (hide[n]) hidden++;
+    for (let n = 1; n <= doc.lines; n++) {
+      if (!hide[n]) continue;
+      let m = n;
+      while (m < doc.lines && hide[m + 1]) m++;
+      ranges.push(Decoration.replace({ block: true }).range(doc.line(n).from, doc.line(m).to));
+      n = m;
+    }
+  }
+  return { decos: Decoration.set(ranges, true), hidden };
+}
+
+const bodyField = StateField.define<{ view: { view: ViewState; today: string }; decos: DecorationSet; hidden: number }>({
+  create: (state) => { const v = { view: { sort: 'document', scope: 'all' } as ViewState, today: '' }; return { view: v, ...bodyDecos(state, v) }; },
+  update(value, tr) {
+    let v = value.view;
+    let changed = tr.docChanged || !!tr.selection;
+    for (const e of tr.effects) {
+      if (e.is(setBodyView)) { v = e.value; changed = true; }
+      if (e.is(setRows)) changed = true;
+    }
+    return changed ? { view: v, ...bodyDecos(tr.state, v) } : value;
+  },
+  provide: (f) => EditorView.decorations.from(f, (v) => v.decos),
+});
+
 function build(view: EditorView): DecorationSet {
   const active = activeLines(view.state, view.hasFocus);
   const ranges: Range<Decoration>[] = [];
+  /** Lines shown in columns: their ✎ ⏩ 💬 ＋ are inside the row. */
+  const inRows = new Set<number>();
   for (const { from, to } of view.visibleRanges) {
     for (const d of liveDecos(view.state, active, from, to)) {
+      if (d.kind === 'task') {
+        const line = view.state.doc.line(d.line + 1);
+        const row = rows.get(line.text);
+        if (row && d.to <= line.to) {
+          ranges.push(Decoration.replace({ widget: new TaskWidget(d.checked, d.line) }).range(d.from, d.to));
+          ranges.push(Decoration.replace({ widget: new RowWidget(row.html, d.line, /[📅⏳]/u.test(line.text)) }).range(d.to, line.to));
+          inRows.add(d.line);
+          continue;
+        }
+      }
+      if (d.kind === 'actions' && inRows.has(d.line)) continue;
+      // Marks inside a line drawn as a row are covered by it.
+      if ((d.kind === 'hide' || d.kind === 'mark') && inRows.has(view.state.doc.lineAt(d.from).number - 1)) continue;
       if (d.kind === 'line') ranges.push(Decoration.line({ class: d.cls }).range(d.from));
       else if (d.kind === 'hide') { if (d.to > d.from) ranges.push(Decoration.replace({}).range(d.from, d.to)); }
-      else if (d.kind === 'bullet') ranges.push(Decoration.replace({ widget: new BulletWidget() }).range(d.from, d.to));
+      else if (d.kind === 'bullet') {
+        ranges.push(Decoration.replace({ widget: new BulletWidget(!!d.note) }).range(d.from, d.to));
+        if (d.note) ranges.push(Decoration.line({ class: 'cm-lv-note' }).range(view.state.doc.lineAt(d.from).from));
+      }
       else if (d.kind === 'task') ranges.push(Decoration.replace({ widget: new TaskWidget(d.checked, d.line) }).range(d.from, d.to));
       else if (d.kind === 'actions') ranges.push(Decoration.widget({ widget: new ActionsWidget(d.line, d.dated), side: 1 }).range(d.from));
       else if (d.to > d.from) ranges.push(Decoration.mark({ class: d.cls, attributes: d.href !== undefined ? { 'data-href': d.href, title: document.body.dataset.lLinkHint ?? 'Cmd/Ctrl+click to open' } : {} }).range(d.from, d.to));
@@ -281,7 +412,8 @@ const livePreview = ViewPlugin.fromClass(
     decorations: DecorationSet;
     constructor(view: EditorView) { this.decorations = build(view); }
     update(u: ViewUpdate): void {
-      if (u.docChanged || u.viewportChanged || u.selectionSet || u.focusChanged || syntaxTree(u.startState) !== syntaxTree(u.state)) this.decorations = build(u.view);
+      const newRows = u.transactions.some((tr) => tr.effects.some((e) => e.is(setRows)));
+      if (newRows || u.docChanged || u.viewportChanged || u.selectionSet || u.focusChanged || syntaxTree(u.startState) !== syntaxTree(u.state)) this.decorations = build(u.view);
     }
   },
   { decorations: (v) => v.decorations },
@@ -319,7 +451,10 @@ function theme(fontSize: number, lineHeight: number, maxWidth: number): Extensio
     '.cm-lv-link': { color: 'var(--vscode-textLink-foreground)', cursor: 'pointer', textDecoration: 'underline', textDecorationColor: 'transparent' },
     '.cm-lv-link:hover': { textDecorationColor: 'currentColor' },
     '.cm-lv-bullet': { display: 'inline-block', width: '1ch', color: 'var(--vscode-descriptionForeground)' },
-    '.cm-lv-check': { margin: '0 .45em 0 0', verticalAlign: '-2px', cursor: 'pointer' },
+    '.cm-lv-notemark': { width: '1.6em', fontSize: '.8em', opacity: '.7' },
+    '.cm-lv-note': { color: 'var(--vscode-descriptionForeground)', fontSize: '.93em' },
+    '.cm-lv-checkwrap': { display: 'inline-block', width: '1.4em', marginRight: '.9em', textAlign: 'center' },
+    '.cm-lv-check': { margin: '0', verticalAlign: '-2px', cursor: 'pointer' },
     '.cm-panels': { backgroundColor: 'var(--vscode-editorWidget-background)', color: 'inherit' },
     '.cm-panels input, .cm-panels button': { color: 'var(--vscode-input-foreground)', backgroundColor: 'var(--vscode-input-background)', border: '1px solid var(--vscode-input-border, transparent)' },
     '.cm-searchMatch': { backgroundColor: 'rgba(255, 200, 0, .4)' },
@@ -350,11 +485,12 @@ const sortSel = document.getElementById('view-sort') as HTMLSelectElement | null
 const scopeSel = document.getElementById('view-scope') as HTMLSelectElement | null;
 const hiddenEl = document.getElementById('view-hidden');
 function countHidden(): void {
-  const n = document.querySelectorAll('.cm-lv-query li.tfm-task.rv-hidden').length;
+  const n = document.querySelectorAll('.cm-lv-query li.tfm-task.rv-hidden').length + (view?.state.field(bodyField, false)?.hidden ?? 0);
   if (hiddenEl) hiddenEl.textContent = n ? (document.body.dataset.lHidden ?? '{0} hidden').replace('{0}', String(n)) : '';
 }
 function refreshView(): void {
   for (const box of Array.from(document.querySelectorAll<HTMLElement>('.cm-lv-query'))) applyView(box, viewState, today);
+  view?.dispatch({ effects: setBodyView.of({ view: viewState, today }) });
   countHidden();
 }
 const pickView = () => {
@@ -405,6 +541,7 @@ function create(init: Extract<ToLive, { type: 'live/init' }>): EditorView {
           },
         })),
         queryField,
+        bodyField,
         EditorView.domEventHandlers({
           mousedown: (e) => {
             const link = (e.target as Element).closest<HTMLElement>('.cm-lv-link');
@@ -436,8 +573,12 @@ window.addEventListener('message', (e: MessageEvent<ToLive>) => {
     if (sortSel) sortSel.value = viewState.sort;
     if (scopeSel) scopeSel.value = viewState.scope;
     view = create(m);
-    view.dispatch({ effects: setQueries.of(queries) });
+    view.dispatch({ effects: [setQueries.of(queries), setRows.of(rows), setBodyView.of({ view: viewState, today })] });
     view.focus();
+  } else if (m.type === 'live/rows') {
+    rows = new Map(m.rows.map((r) => [r.text, r]));
+    view?.dispatch({ effects: setRows.of(rows) });
+    requestAnimationFrame(countHidden);
   } else if (m.type === 'live/queries') {
     queries = new Map(m.blocks.map((b) => [b.source, b.html]));
     columns.set(m.columns); // before the boxes are drawn: they take their header from it

@@ -1,7 +1,8 @@
 import * as vscode from 'vscode';
 import { findHeadingLine } from '../core/file/headingAnchor';
 import type { TaskIndex } from '../core/index';
-import { parseTaskLine, type StatusRegistry, type Task } from '../core/task';
+import { parseTaskLine, type StatusRegistry, type Task, urgency } from '../core/task';
+import { renderColumns, renderDescriptionText } from '../core/render';
 import type { IndexService } from '../index/IndexService';
 import type { PreviewIntegration } from './PreviewIntegration';
 import { renderDocumentHtml } from './renderDocument';
@@ -9,7 +10,7 @@ import { t } from '../l10n';
 import { systemClock } from '../core/dates';
 import type { TaskEditService } from '../services/TaskEditService';
 import type { Settings } from '../settings/Settings';
-import { applyChanges, type ColumnState, type FromLive, type ToLive } from '../webviews/live/sync';
+import { applyChanges, type ColumnState, type FromLive, type LiveRow, type ToLive } from '../webviews/live/sync';
 import { HIDEABLE_COLUMNS } from '../webviews/rendered/columns';
 import { cleanWidths } from './RenderedView';
 
@@ -69,6 +70,31 @@ export class LiveViewProvider implements vscode.CustomTextEditorProvider {
     };
   }
 
+  /** The note's task lines in columns, as the rendered view shows them (M40 C). */
+  private rows(document: vscode.TextDocument): Extract<ToLive, { type: 'live/rows' }> {
+    const base = this.deps.preview.pluginDeps().renderOptions(undefined, 'line');
+    const o = { ...base, columns: true, fieldStyle: this.deps.settings.get('rendered.fieldStyle') };
+    const key = document.uri.toString();
+    const path = this.deps.indexService.displayPath(document.uri);
+    const seen = new Set<string>();
+    const rows: LiveRow[] = [];
+    for (let line = 0; line < document.lineCount; line++) {
+      const text = document.lineAt(line).text;
+      if (seen.has(text) || !/^\s*(?:[-*+]|\d+[.)])\s+\[.\]/.test(text)) continue;
+      seen.add(text);
+      const task = parseTaskLine(text, { statusRegistry: this.deps.getStatusRegistry(), globalFilter: this.deps.settings.get('globalFilter') || undefined, location: { key, path, line, heading: null, frontmatterTags: [], depth: 0, parentLine: null } });
+      if (!task) continue;
+      const c = renderColumns(task, null, o);
+      const happens = task.happens();
+      rows.push({
+        text,
+        html: `<span class="tfm-desc">${renderDescriptionText(task, { ...o, stripTags: true })}${c.afterDescription}</span>${c.cells}`,
+        data: { due: task.due?.valid ? task.due.format() : null, created: task.created?.valid ? task.created.format() : null, happens: happens?.valid ? happens.format() : null, priority: Number(task.priority), urgency: Math.round(urgency(task, o.today) * 100) / 100, done: task.isCompleted },
+      });
+    }
+    return { type: 'live/rows', rows };
+  }
+
   /** Query results for the note's ```tasks blocks, in columns with a header as in the rendered view. */
   private queries(document: vscode.TextDocument): Extract<ToLive, { type: 'live/queries' }> {
     const base = this.deps.preview.pluginDeps();
@@ -95,7 +121,7 @@ export class LiveViewProvider implements vscode.CustomTextEditorProvider {
     let queryTimer: ReturnType<typeof setTimeout> | undefined;
     const sendQueries = (delay: number) => {
       clearTimeout(queryTimer);
-      queryTimer = setTimeout(() => post(this.queries(document)), delay);
+      queryTimer = setTimeout(() => { post(this.rows(document)); post(this.queries(document)); }, delay);
     };
     const indexSub = this.deps.index.onDidChange(() => sendQueries(400));
     const refresh = () => sendQueries(0);
@@ -149,6 +175,7 @@ export class LiveViewProvider implements vscode.CustomTextEditorProvider {
   private async handle(msg: FromLive, document: vscode.TextDocument, post: (m: ToLive) => void, sync: LiveSync, panel: vscode.WebviewPanel): Promise<void> {
     switch (msg.type) {
       case 'live/ready':
+        post(this.rows(document));
         post(this.queries(document));
         post({ type: 'live/init', text: document.getText(), eol: document.eol === vscode.EndOfLine.CRLF ? '\r\n' : '\n', fontSize: this.deps.settings.get('rendered.fontSize'), lineHeight: this.deps.settings.get('rendered.lineHeight'), maxWidth: this.deps.settings.get('rendered.maxWidth'), view: this.viewState(document.uri), today: systemClock.now().startOf('day').format('YYYY-MM-DD') });
         break;
@@ -244,6 +271,23 @@ export class LiveViewProvider implements vscode.CustomTextEditorProvider {
   .rv-toggle button:hover { color: var(--rv-fg); }
   .rv-toggle button[aria-pressed="true"] { background: var(--rv-bg-3); color: var(--rv-fg); cursor: default; }
   .cm-lv-query li.tfm-task.rv-hidden { display: none !important; }
+  /* Note task lines in columns (M40 C): the cells after the checkbox, on the header's grid. */
+  .cm-lv-row { display: inline-grid; grid-template-columns: var(--rv-cols-body, minmax(8em, 1fr) 8.6em 8.6em 8.6em minmax(0, 18em)); column-gap: .9em; align-items: baseline; width: calc(100% - 2.4em); vertical-align: top; cursor: text; }
+  .cm-lv-row .tfm-desc { min-width: 0; }
+  .cm-lv-row .tfm-col { min-width: 0; font-size: .92em; }
+  .cm-lv-row .tfm-col-due, .cm-lv-row .tfm-col-created, .cm-lv-row .tfm-col-done { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cm-lv-row .tfm-col-created, .cm-lv-row .tfm-col-done { color: var(--rv-muted); }
+  .cm-lv-row .tfm-col-tags { margin-left: .3em; font-size: .92em; } .cm-lv-row .tfm-col-tags .tfm-tag { color: var(--vscode-textLink-foreground); }
+  .cm-lv-row .tfm-col-more { color: var(--rv-muted); font-size: .82em; line-height: 1.5; overflow: hidden; }
+  .cm-lv-row .tfm-col .tfm-badge { max-width: 100%; box-sizing: border-box; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: bottom; }
+  .cm-lv-row .tfm-col-pri { margin-left: .2em; }
+  .cm-lv-row .tfm-field.tfm-overdue, .cm-lv-row .tfm-overdue { color: var(--vscode-errorForeground, #f14c4c); }
+  .cm-lv-row .rv-actions { white-space: nowrap; }
+  .cm-line:hover .cm-lv-row .rv-actions { display: inline-flex; }
+  body.hide-col-due .cm-lv-row .tfm-col-due, body.hide-col-created .cm-lv-row .tfm-col-created, body.hide-col-done .cm-lv-row .tfm-col-done, body.hide-col-more .cm-lv-row .tfm-col-more { display: none !important; }
+  /* The header over a task list in the note: the query header's look. */
+  .rv-colhead.cm-lv-bodyhead { display: grid; grid-template-columns: var(--rv-cols, 1.4em minmax(8em, 1fr) 8.6em 8.6em 8.6em minmax(0, 18em)); column-gap: .9em; align-items: center; height: 22px; margin: .3em 0 2px; overflow: hidden; color: var(--rv-muted); border-bottom: 1px solid color-mix(in srgb, var(--rv-fg) 14%, transparent); font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, sans-serif); }
+  @media (max-width: 640px) { .cm-lv-row { display: inline; } .cm-lv-row .tfm-col:empty { display: none; } .cm-lv-bodyhead { display: none; } }
   .cm-lv-query li.tfm-task:not(.tfm-notes-folded):has(> .tfm-desc > .tfm-notes-list) > .tfm-check { align-self: start; margin-top: .3em; }
   .cm-lv-query .tfm-notes, .cm-lv-query .tfm-notes-list { color: var(--rv-muted); }
   .rv-note-actions { display: none; margin-left: .4em; gap: 2px; vertical-align: -1px; }
@@ -285,25 +329,25 @@ export class LiveViewProvider implements vscode.CustomTextEditorProvider {
   .cm-lv-query .tfm-badge { font-size: .78em; line-height: 1.6; background: var(--rv-bg-3); color: var(--rv-fg); }
   .cm-lv-query h4.tfm-group, .cm-lv-query h5.tfm-group, .cm-lv-query h6.tfm-group { margin: .6em 0 .2em; font-size: 1em; font-weight: 600; }
   .cm-lv-query .tfm-task-count { color: var(--rv-muted); }
-  .cm-lv-query .rv-colhead { display: grid; grid-template-columns: var(--rv-cols, 1.4em minmax(8em, 1fr) 8.6em 8.6em 8.6em minmax(0, 18em)); column-gap: .9em; align-items: center; height: 22px; margin: 0 0 2px; overflow: hidden; color: var(--rv-muted); border-bottom: 1px solid color-mix(in srgb, var(--rv-fg) 14%, transparent); }
-  .cm-lv-query .rv-colhead-text, .cm-lv-query .rv-colhead button, .cm-lv-query .rv-colhead-chips { font-size: 11px; }
-  .cm-lv-query .rv-colhead-cell { position: relative; display: inline-flex; align-items: center; gap: 3px; min-width: 0; white-space: nowrap; }
-  .cm-lv-query .rv-colhead-text { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
-  .cm-lv-query .rv-colhead button { border: none; background: transparent; color: var(--rv-muted); font: inherit; font-size: 11px; padding: 0 4px; border-radius: 3px; cursor: pointer; line-height: 16px; }
-  .cm-lv-query .rv-colhead button:hover, .cm-lv-query .rv-colhead button:focus-visible { background: var(--rv-bg-3); color: var(--rv-fg); }
-  .cm-lv-query .rv-colhead-chips { margin-left: auto; flex: none; display: inline-flex; gap: 4px; padding: 0 .3em 0 6px; }
-  .cm-lv-query .rv-colhead button, .cm-lv-query .rv-colhead .rv-colhead-chips, .cm-lv-query .rv-colgrip::after { opacity: 0; transition: opacity .12s; }
-  .cm-lv-query .rv-colhead:is(:hover, :focus-within) :is(button, .rv-colhead-chips, .rv-colgrip::after), body.rv-resizing .cm-lv-query .rv-colhead :is(button, .rv-colhead-chips) { opacity: 1; }
-  .cm-lv-query .rv-colhead:is(:hover, :focus-within) .rv-colgrip::after, body.rv-resizing .cm-lv-query .rv-colgrip::after { opacity: 1; }
-  .cm-lv-query .rv-colgrip { position: absolute; top: 0; bottom: 0; left: calc(-.45em - 5px); width: 10px; cursor: col-resize; touch-action: none; outline: none; }
-  .cm-lv-query .rv-colgrip::after { content: ''; position: absolute; top: 3px; bottom: 3px; left: 4px; width: 2px; border-radius: 1px; background: color-mix(in srgb, var(--rv-fg) 22%, transparent); }
-  .cm-lv-query .rv-colgrip:hover::after, .cm-lv-query .rv-colgrip:focus-visible::after, .cm-lv-query .rv-colgrip.rv-active::after { background: var(--vscode-focusBorder); }
+  .rv-colhead { display: grid; grid-template-columns: var(--rv-cols, 1.4em minmax(8em, 1fr) 8.6em 8.6em 8.6em minmax(0, 18em)); column-gap: .9em; align-items: center; height: 22px; margin: 0 0 2px; overflow: hidden; color: var(--rv-muted); border-bottom: 1px solid color-mix(in srgb, var(--rv-fg) 14%, transparent); }
+  .rv-colhead-text, .rv-colhead button, .rv-colhead-chips { font-size: 11px; }
+  .rv-colhead-cell { position: relative; display: inline-flex; align-items: center; gap: 3px; min-width: 0; white-space: nowrap; }
+  .rv-colhead-text { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .rv-colhead button { border: none; background: transparent; color: var(--rv-muted); font: inherit; font-size: 11px; padding: 0 4px; border-radius: 3px; cursor: pointer; line-height: 16px; }
+  .rv-colhead button:hover, .rv-colhead button:focus-visible { background: var(--rv-bg-3); color: var(--rv-fg); }
+  .rv-colhead-chips { margin-left: auto; flex: none; display: inline-flex; gap: 4px; padding: 0 .3em 0 6px; }
+  .rv-colhead button, .rv-colhead .rv-colhead-chips, .rv-colgrip::after { opacity: 0; transition: opacity .12s; }
+  .rv-colhead:is(:hover, :focus-within) :is(button, .rv-colhead-chips, .rv-colgrip::after), body.rv-resizing .rv-colhead :is(button, .rv-colhead-chips) { opacity: 1; }
+  .rv-colhead:is(:hover, :focus-within) .rv-colgrip::after, body.rv-resizing .rv-colgrip::after { opacity: 1; }
+  .rv-colgrip { position: absolute; top: 0; bottom: 0; left: calc(-.45em - 5px); width: 10px; cursor: col-resize; touch-action: none; outline: none; }
+  .rv-colgrip::after { content: ''; position: absolute; top: 3px; bottom: 3px; left: 4px; width: 2px; border-radius: 1px; background: color-mix(in srgb, var(--rv-fg) 22%, transparent); }
+  .rv-colgrip:hover::after, .rv-colgrip:focus-visible::after, .rv-colgrip.rv-active::after { background: var(--vscode-focusBorder); }
   body.rv-resizing, body.rv-resizing * { cursor: col-resize !important; user-select: none; }
   .rv-measure { position: absolute !important; left: 0; top: 0; visibility: hidden; width: max-content !important; max-width: none !important; white-space: nowrap !important; overflow: visible !important; pointer-events: none; }
   body.hide-col-due .cm-lv-query .tfm-col-due, body.hide-col-created .cm-lv-query .tfm-col-created, body.hide-col-done .cm-lv-query .tfm-col-done, body.hide-col-more .cm-lv-query .tfm-col-more { display: none !important; }
   @media (max-width: 640px) {
     .cm-lv-query li.tfm-task { grid-template-columns: 1.4em minmax(0, 1fr); }
-    .cm-lv-query .tfm-col { grid-column: 2; } .cm-lv-query .tfm-col:empty { display: none; } .cm-lv-query .rv-colhead { display: none; }
+    .cm-lv-query .tfm-col { grid-column: 2; } .cm-lv-query .tfm-col:empty { display: none; } .rv-colhead { display: none; }
   }
 </style>
 </head>

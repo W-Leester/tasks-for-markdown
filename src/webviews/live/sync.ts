@@ -13,12 +13,20 @@ export interface TextChange {
 export interface ColumnLabels { desc: string; due: string; created: string; done: string; more: string; hide: string; show: string; width: string; widthHint: string }
 export interface ColumnState { hidden: string[]; widths: Record<string, number>; labels: ColumnLabels }
 
+/** One task line of the note in columns. */
+export interface LiveRow { text: string; html: string; data: { due: string | null; created: string | null; happens: string | null; priority: number; urgency: number; done: boolean } }
+
 /** Messages to the live view's webview. */
 export type ToLive =
   /** `eol`: the note's line ends, so the editor's offsets match the document's (CRLF counts two). */
   | { type: 'live/init'; text: string; eol: '\n' | '\r\n'; fontSize: number; lineHeight: number; maxWidth: number; view: { sort: string; scope: string }; today: string }
   /** The note changed elsewhere (source editor, an AI, a command): its whole text. */
   | { type: 'live/text'; text: string }
+  /**
+   * The note's task lines in columns (M40 C), by the line's text: the cells after the checkbox, and the data for the
+   * toolbar's show filter.
+   */
+  | { type: 'live/rows'; rows: LiveRow[] }
   /** Results of the note's ```tasks blocks, by the block's source (the lines between the fences). */
   | { type: 'live/queries'; blocks: { source: string; html: string }[]; columns: ColumnState };
 

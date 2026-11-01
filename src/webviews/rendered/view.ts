@@ -9,7 +9,7 @@ export interface ViewState { sort: SortMode; scope: ScopeMode }
 export const SORT_MODES: SortMode[] = ['document', 'due', 'created', 'priority', 'urgency'];
 export const SCOPE_MODES: ScopeMode[] = ['all', 'today', 'week', 'nextWeek', 'overdue', 'open'];
 
-interface TaskData { due: string | null; created: string | null; happens: string | null; priority: number; urgency: number; done: boolean; line: number }
+export interface TaskData { due: string | null; created: string | null; happens: string | null; priority: number; urgency: number; done: boolean; line: number }
 
 function dataOf(li: HTMLElement): TaskData {
   const d = li.dataset;

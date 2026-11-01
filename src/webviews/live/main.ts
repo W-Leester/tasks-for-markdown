@@ -6,11 +6,12 @@ import { defaultKeymap, history, historyKeymap, indentWithTab } from '@codemirro
 import { markdown, markdownKeymap, markdownLanguage } from '@codemirror/lang-markdown';
 import { HighlightStyle, syntaxHighlighting, syntaxTree } from '@codemirror/language';
 import { search, searchKeymap } from '@codemirror/search';
-import { Annotation, EditorSelection, EditorState, type Extension, Prec, type Range, Transaction } from '@codemirror/state';
+import { Annotation, EditorSelection, EditorState, type Extension, Prec, type Range, StateEffect, StateField, Transaction } from '@codemirror/state';
 import { Decoration, type DecorationSet, EditorView, keymap, ViewPlugin, type ViewUpdate, WidgetType } from '@codemirror/view';
 import { tags } from '@lezer/highlight';
 import { findHeadingLine } from '../../core/file/headingAnchor';
-import { activeLines, liveDecos } from './decorations';
+import { checkboxMode, toggleCheckboxLine } from '../../core/task/toggleCheckbox';
+import { activeLines, findQueryBlocks, liveDecos } from './decorations';
 import { keepKey } from './keys';
 import { type FromLive, minimalChange, type ToLive } from './sync';
 
@@ -46,6 +47,92 @@ class TaskWidget extends WidgetType {
     return box;
   }
   override ignoreEvent(): boolean { return true; }
+}
+
+// ---- ```tasks blocks: their results in place, the source when the cursor is in the block ----
+const setQueries = StateEffect.define<Map<string, string>>();
+class QueryWidget extends WidgetType {
+  constructor(readonly html: string, readonly body: number) { super(); }
+  override eq(o: QueryWidget): boolean { return o.html === this.html && o.body === this.body; }
+  toDOM(view: EditorView): HTMLElement {
+    const box = document.createElement('div');
+    box.className = 'cm-lv-query';
+    box.innerHTML = this.html || '<div class="tfm-query">…</div>';
+    box.addEventListener('mousedown', (e) => {
+      const target = e.target as Element;
+      e.preventDefault();
+      const check = target.closest<HTMLInputElement>('input.tfm-check');
+      const row = target.closest<HTMLElement>('li.tfm-task');
+      if (check && row?.dataset.tfmPath !== undefined) { post({ type: 'live/toggleTask', path: row.dataset.tfmPath, line: Number(row.dataset.tfmLine) }); return; }
+      const a = target.closest<HTMLAnchorElement>('a[href]');
+      if (a) { openLink(a.getAttribute('href')!); return; }
+      // Anywhere else: the query's source, to edit it.
+      view.dispatch({ selection: EditorSelection.cursor(this.body) });
+      view.focus();
+    });
+    box.addEventListener('click', (e) => e.preventDefault());
+    return box;
+  }
+  override ignoreEvent(): boolean { return true; }
+}
+
+function queryDecos(state: EditorState, html: Map<string, string>): DecorationSet {
+  const ranges: Range<Decoration>[] = [];
+  const sel = state.selection.main;
+  for (const b of findQueryBlocks(state)) {
+    if (sel.to >= b.from && sel.from <= b.to) continue; // the cursor is in it: the source
+    ranges.push(Decoration.replace({ widget: new QueryWidget(html.get(b.source) ?? '', b.body), block: true }).range(b.from, b.to));
+  }
+  return Decoration.set(ranges);
+}
+
+const queryField = StateField.define<{ html: Map<string, string>; decos: DecorationSet }>({
+  create: (state) => ({ html: new Map(), decos: queryDecos(state, new Map()) }),
+  update(value, tr) {
+    let html = value.html;
+    for (const e of tr.effects) if (e.is(setQueries)) html = e.value;
+    if (html === value.html && !tr.docChanged && !tr.selection) return value;
+    return { html, decos: queryDecos(tr.state, html) };
+  },
+  provide: (f) => EditorView.decorations.from(f, (v) => v.decos),
+});
+
+// ---- our shortcuts (as in the source editor): Option/Alt+C done, Option/Alt+Shift+C create/edit, Cmd/Ctrl+Shift+C box ----
+const TASK_LINE = /^\s*(?:[-*+]|\d+[.)])\s+\[.\]/;
+function taskKeys(e: KeyboardEvent, view: EditorView): boolean {
+  if (e.code !== 'KeyC') return false;
+  const line = view.state.doc.lineAt(view.state.selection.main.head);
+  const plainAlt = e.altKey && !e.metaKey && !e.ctrlKey;
+  if (plainAlt && !e.shiftKey) {
+    if (TASK_LINE.test(line.text)) post({ type: 'live/toggle', line: line.number - 1 });
+    return true;
+  }
+  if (plainAlt && e.shiftKey) {
+    post({ type: 'live/editTask', line: line.number - 1 });
+    return true;
+  }
+  const mod = IS_MAC ? e.metaKey && !e.ctrlKey : e.ctrlKey && !e.metaKey;
+  if (mod && e.shiftKey && !e.altKey) {
+    const { state } = view;
+    const numbers = new Set<number>();
+    for (const r of state.selection.ranges) {
+      const a = state.doc.lineAt(r.from).number;
+      // A selection ending at the start of a later line does not take that line.
+      const b = r.to > r.from && state.doc.lineAt(r.to).from === r.to ? state.doc.lineAt(r.to).number - 1 : state.doc.lineAt(r.to).number;
+      for (let n = a; n <= Math.max(a, b); n++) numbers.add(n);
+    }
+    const ordered = [...numbers].sort((x, y) => x - y);
+    const mode = checkboxMode(state.doc.line(ordered[0]!).text);
+    const changes = ordered.map((n) => {
+      const l = state.doc.line(n);
+      return { from: l.from, to: l.to, insert: toggleCheckboxLine(l.text, mode) };
+    }).filter((c) => c.insert !== state.doc.sliceString(c.from, c.to));
+    if (!changes.length) return true;
+    const single = ordered.length === 1 && state.selection.main.empty;
+    view.dispatch({ changes, userEvent: 'input.checkbox', ...(single && mode === 'add' ? { selection: EditorSelection.cursor(changes[0]!.from + changes[0]!.insert.indexOf('[ ] ') + 4) } : {}) });
+    return true;
+  }
+  return false;
 }
 
 function build(view: EditorView): DecorationSet {
@@ -120,6 +207,8 @@ function keepKeys(e: KeyboardEvent): boolean {
 }
 
 let view: EditorView | null = null;
+/** The latest query results (they can come before the editor exists). */
+let queries = new Map<string, string>();
 
 function openLink(href: string): void {
   if (href.startsWith('#') && !/^#L\d+$/.test(href)) {
@@ -150,7 +239,13 @@ function create(init: Extract<ToLive, { type: 'live/init' }>): EditorView {
         theme(init.fontSize, init.lineHeight, init.maxWidth),
         // First, before the keymap: a key the keymap handles (Cmd+Z) must still not reach VS Code (11-01: VS Code undid
         // the note under the editor's own undo).
-        Prec.highest(EditorView.domEventHandlers({ keydown: keepKeys })),
+        Prec.highest(EditorView.domEventHandlers({
+          keydown: (e, v) => {
+            if (taskKeys(e, v)) { e.preventDefault(); e.stopPropagation(); return true; }
+            return keepKeys(e);
+          },
+        })),
+        queryField,
         EditorView.domEventHandlers({
           mousedown: (e) => {
             const link = (e.target as Element).closest<HTMLElement>('.cm-lv-link');
@@ -178,7 +273,11 @@ window.addEventListener('message', (e: MessageEvent<ToLive>) => {
   if (m.type === 'live/init') {
     view?.destroy();
     view = create(m);
+    view.dispatch({ effects: setQueries.of(queries) });
     view.focus();
+  } else if (m.type === 'live/queries') {
+    queries = new Map(m.blocks.map((b) => [b.source, b.html]));
+    view?.dispatch({ effects: setQueries.of(queries) });
   } else if (m.type === 'live/text' && view) {
     const change = minimalChange(view.state.doc.toString(), m.text);
     if (change) view.dispatch({ changes: change, annotations: [fromHost.of(true), Transaction.addToHistory.of(false)] });

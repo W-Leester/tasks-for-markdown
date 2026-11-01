@@ -14,15 +14,21 @@ export type ToLive =
   /** `eol`: the note's line ends, so the editor's offsets match the document's (CRLF counts two). */
   | { type: 'live/init'; text: string; eol: '\n' | '\r\n'; fontSize: number; lineHeight: number; maxWidth: number }
   /** The note changed elsewhere (source editor, an AI, a command): its whole text. */
-  | { type: 'live/text'; text: string };
+  | { type: 'live/text'; text: string }
+  /** Results of the note's ```tasks blocks, by the block's source (the lines between the fences). */
+  | { type: 'live/queries'; blocks: { source: string; html: string }[] };
 
 /** Messages from the live view's webview. */
 export type FromLive =
   | { type: 'live/ready' }
   /** Changes in the editor, in the coordinates of the text before them (`length` is that text's length). */
   | { type: 'live/edit'; changes: TextChange[]; length: number }
-  /** A task's checkbox was clicked (0-based line). */
+  /** A task's checkbox was clicked, or Option/Alt+C on its line (0-based line). */
   | { type: 'live/toggle'; line: number }
+  /** A task in a query result was ticked: its file (as shown) and line. */
+  | { type: 'live/toggleTask'; path: string; line: number }
+  /** Option/Alt+Shift+C: edit the task on this line, or create one there. */
+  | { type: 'live/editTask'; line: number }
   | { type: 'live/link'; href: string };
 
 const isHigh = (c: number) => c >= 0xd800 && c <= 0xdbff;

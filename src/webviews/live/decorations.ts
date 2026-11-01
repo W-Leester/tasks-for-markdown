@@ -100,3 +100,24 @@ function linkDecos(link: SyntaxNode, state: EditorState, out: LiveDeco[]): void 
   // Everything after the text: `](url "title")`.
   out.push({ kind: 'hide', from: marks[1]!.from, to: link.to });
 }
+
+/** The ```tasks blocks in the text: whole lines from the opening fence to the closing one, and the source between. */
+export function findQueryBlocks(state: EditorState): { from: number; to: number; source: string; body: number }[] {
+  const out: { from: number; to: number; source: string; body: number }[] = [];
+  const doc = state.doc;
+  for (let n = 1; n <= doc.lines; n++) {
+    const open = /^ {0,3}(`{3,}|~{3,})[ \t]*tasks\b/.exec(doc.line(n).text);
+    if (!open) continue;
+    const fence = open[1]!;
+    for (let m = n + 1; m <= doc.lines; m++) {
+      const close = /^ {0,3}(`{3,}|~{3,})[ \t]*$/.exec(doc.line(m).text);
+      if (!close || close[1]![0] !== fence[0] || close[1]!.length < fence.length) continue;
+      const lines: string[] = [];
+      for (let k = n + 1; k < m; k++) lines.push(doc.line(k).text);
+      out.push({ from: doc.line(n).from, to: doc.line(m).to, source: lines.join('\n'), body: n < m - 1 ? doc.line(n + 1).from : doc.line(n).to });
+      n = m;
+      break;
+    }
+  }
+  return out;
+}

@@ -1030,19 +1030,19 @@
       {
         "command": "tasksmd.createOrEdit",
         "key": "alt+shift+c",
-        "when": "!terminalFocus && (editorTextFocus && editorLangId == markdown || activeCustomEditorId == tasksmd.rendered || focusedView =~ /^tasksmd\\./)"
+        "when": "!terminalFocus && (editorTextFocus && editorLangId == markdown || activeCustomEditorId == tasksmd.rendered || activeCustomEditorId == tasksmd.live || focusedView =~ /^tasksmd\\./)"
       },
       {
         "command": "tasksmd.quickSearch",
         "key": "ctrl+shift+;",
         "mac": "cmd+shift+;",
-        "when": "!terminalFocus && (editorTextFocus && editorLangId == markdown || activeCustomEditorId == tasksmd.rendered || focusedView =~ /^tasksmd\\./)"
+        "when": "!terminalFocus && (editorTextFocus && editorLangId == markdown || activeCustomEditorId == tasksmd.rendered || activeCustomEditorId == tasksmd.live || focusedView =~ /^tasksmd\\./)"
       },
       {
         "command": "tasksmd.openRendered",
         "key": "ctrl+shift+r",
         "mac": "cmd+shift+r",
-        "when": "!terminalFocus && (editorTextFocus && editorLangId == markdown || activeCustomEditorId == tasksmd.rendered || !inputFocus && resourceExtname =~ /\\.(md|markdown)$/)"
+        "when": "!terminalFocus && (editorTextFocus && editorLangId == markdown || activeCustomEditorId == tasksmd.rendered || activeCustomEditorId == tasksmd.live || !inputFocus && resourceExtname =~ /\\.(md|markdown)$/)"
       }
     ],
     "menus": {

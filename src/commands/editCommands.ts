@@ -127,6 +127,12 @@ export function registerEditCommands(context: vscode.ExtensionContext, deps: Com
         deps.openEdit(inRendered);
         return;
       }
+      // Option/Alt+Shift+C in the live view (M40): its cursor line.
+      const inLive = await vscode.commands.executeCommand<{ key: string; line: number } | undefined>('tasksmd.live.editLine');
+      if (inLive) {
+        deps.openEdit(inLive);
+        return;
+      }
       // The active editor, or — when the preview / a sidebar has focus — the Markdown editor
       // still visible next to it: its cursor line decides (edit that task, or create there).
       const editor = vscode.window.activeTextEditor?.document.languageId === 'markdown'

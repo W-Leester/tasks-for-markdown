@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { ensureSyntaxTree } from '@codemirror/language';
 import { markdown, markdownLanguage } from '@codemirror/lang-markdown';
 import { EditorSelection, EditorState } from '@codemirror/state';
-import { activeLines, type LiveDeco, liveDecos } from '../../src/webviews/live/decorations';
+import { activeLines, findQueryBlocks, type LiveDeco, liveDecos } from '../../src/webviews/live/decorations';
 
 const state = (text: string, cursor = 0) => {
   const s = EditorState.create({ doc: text, selection: EditorSelection.cursor(cursor), extensions: [markdown({ base: markdownLanguage })] });
@@ -56,5 +56,14 @@ describe('live view decorations (M40)', () => {
     const s = EditorState.create({ doc: 'a\nb\nc\nd', selection: EditorSelection.range(2, 5) });
     expect([...activeLines(s, true)]).toEqual([2, 3]);
     expect(activeLines(s, false).size).toBe(0);
+  });
+
+  it('finds ```tasks blocks (whole lines, the source between the fences); other fences and unclosed ones are not', () => {
+    const s = state('a\n```tasks\nnot done\ndue today\n```\n```js\nx\n```\n~~~~tasks\n~~~\n~~~~\n```tasks\nopen');
+    const blocks = findQueryBlocks(s).map((b) => ({ text: s.doc.sliceString(b.from, b.to), source: b.source, body: s.doc.lineAt(b.body).number }));
+    expect(blocks).toEqual([
+      { text: '```tasks\nnot done\ndue today\n```', source: 'not done\ndue today', body: 3 },
+      { text: '~~~~tasks\n~~~\n~~~~', source: '~~~', body: 10 },
+    ]);
   });
 });

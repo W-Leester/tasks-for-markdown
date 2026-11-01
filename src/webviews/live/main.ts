@@ -277,6 +277,9 @@ window.addEventListener('message', (e: MessageEvent<ToLive>) => {
     view.focus();
   } else if (m.type === 'live/queries') {
     queries = new Map(m.blocks.map((b) => [b.source, b.html]));
+    // The rendered view's column choice: hidden columns and widths.
+    for (const c of ['due', 'created', 'done', 'more']) document.body.classList.toggle(`hide-col-${c}`, m.columns.hidden.includes(c));
+    document.body.style.setProperty('--rv-cols', m.columns.tracks);
     view?.dispatch({ effects: setQueries.of(queries) });
   } else if (m.type === 'live/text' && view) {
     const change = minimalChange(view.state.doc.toString(), m.text);

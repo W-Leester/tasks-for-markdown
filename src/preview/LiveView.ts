@@ -9,6 +9,8 @@ import { t } from '../l10n';
 import type { TaskEditService } from '../services/TaskEditService';
 import type { Settings } from '../settings/Settings';
 import { applyChanges, type FromLive, type ToLive } from '../webviews/live/sync';
+import { columnTracks, HIDEABLE_COLUMNS } from '../webviews/rendered/columns';
+import { cleanWidths } from './RenderedView';
 
 /**
  * Live view (M40, trial): the note in a CodeMirror editor inside a webview, Markdown marks hidden except where the
@@ -50,16 +52,31 @@ export class LiveViewProvider implements vscode.CustomTextEditorProvider {
     return l;
   }
 
-  /** Query results for the note's ```tasks blocks (badges, as in the rendered view's query boxes). */
-  private queries(document: vscode.TextDocument): { source: string; html: string }[] {
-    const deps = { ...this.deps.preview.pluginDeps(), enabled: () => true };
-    return [...new Set(queryBlocks(document.getText()))].map((source) => {
+  /** The rendered view's column choice (hidden columns, widths), shared by all notes. */
+  private columns(): { hidden: string[]; tracks: string } {
+    const saved = this.deps.context.globalState.get<string[]>('rendered.hiddenColumns', []);
+    const hidden = HIDEABLE_COLUMNS.filter((c) => saved.includes(c));
+    return { hidden, tracks: columnTracks(hidden, cleanWidths(this.deps.context.globalState.get<Record<string, number>>('rendered.columnWidths', {}))) };
+  }
+
+  /** Query results for the note's ```tasks blocks, in columns with a header as in the rendered view. */
+  private queries(document: vscode.TextDocument): Extract<ToLive, { type: 'live/queries' }> {
+    const base = this.deps.preview.pluginDeps();
+    const deps = { ...base, enabled: () => true, renderOptions: (source?: Parameters<typeof base.renderOptions>[0], context?: 'line' | 'query') => ({ ...base.renderOptions(source, context), columns: true }) };
+    const columns = this.columns();
+    const label: Record<string, string> = { due: t('Due date'), created: t('Created date'), done: t('Done date'), more: t('Other fields') };
+    const esc = (s: string) => s.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
+    const header = `<div class="rv-colhead"><span></span><span class="rv-colhead-cell"><span class="rv-colhead-text">${esc(t('Description'))}</span></span>` +
+      HIDEABLE_COLUMNS.filter((c) => !columns.hidden.includes(c)).map((c) => `<span class="rv-colhead-cell"><span class="rv-colhead-text">${esc(label[c]!)}</span></span>`).join('') + '</div>';
+    const blocks = [...new Set(queryBlocks(document.getText()))].map((source) => {
       try {
-        return { source, html: renderDocumentHtml('```tasks\n' + source + '\n```\n', deps, { env: { currentDocument: document.uri } }) };
+        const html = renderDocumentHtml('```tasks\n' + source + '\n```\n', deps, { env: { currentDocument: document.uri } });
+        return { source, html: html.includes('tfm-task') ? html.replace(/(<div class="tfm-query"[^>]*>)/, `$1${header}`) : html };
       } catch (err) {
-        return { source, html: `<div class="tfm-query tfm-error">${String(err).replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]!)}</div>` };
+        return { source, html: `<div class="tfm-query tfm-error">${esc(String(err))}</div>` };
       }
     });
+    return { type: 'live/queries', blocks, columns };
   }
 
   async resolveCustomTextEditor(document: vscode.TextDocument, panel: vscode.WebviewPanel): Promise<void> {
@@ -71,7 +88,7 @@ export class LiveViewProvider implements vscode.CustomTextEditorProvider {
     let queryTimer: ReturnType<typeof setTimeout> | undefined;
     const sendQueries = (delay: number) => {
       clearTimeout(queryTimer);
-      queryTimer = setTimeout(() => post({ type: 'live/queries', blocks: this.queries(document) }), delay);
+      queryTimer = setTimeout(() => post(this.queries(document)), delay);
     };
     const indexSub = this.deps.index.onDidChange(() => sendQueries(400));
     // Messages are handled one after another, in the order the editor sent them.
@@ -94,7 +111,7 @@ export class LiveViewProvider implements vscode.CustomTextEditorProvider {
   private async handle(msg: FromLive, document: vscode.TextDocument, post: (m: ToLive) => void, sync: LiveSync): Promise<void> {
     switch (msg.type) {
       case 'live/ready':
-        post({ type: 'live/queries', blocks: this.queries(document) });
+        post(this.queries(document));
         post({ type: 'live/init', text: document.getText(), eol: document.eol === vscode.EndOfLine.CRLF ? '\r\n' : '\n', fontSize: this.deps.settings.get('rendered.fontSize'), lineHeight: this.deps.settings.get('rendered.lineHeight'), maxWidth: this.deps.settings.get('rendered.maxWidth') });
         break;
       case 'live/edit':
@@ -163,10 +180,36 @@ export class LiveViewProvider implements vscode.CustomTextEditorProvider {
 <style>
   html, body { margin: 0; padding: 0; height: 100%; background: var(--vscode-editor-background); color: var(--vscode-editor-foreground); }
   #editor { height: 100%; }
-  .cm-lv-query { cursor: default; padding: 2px 0; font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, sans-serif); }
-  .cm-lv-query .tfm-query { background: var(--vscode-textCodeBlock-background, rgba(128,128,128,.08)); border: 1px solid var(--vscode-widget-border, rgba(128,128,128,.25)); border-radius: 6px; padding: 8px 12px; margin: 0; }
-  .cm-lv-query ul { list-style: none; padding-left: 0; margin: .2em 0; }
-  .cm-lv-query input.tfm-check { cursor: pointer; }
+  /* Query results in columns, as in the rendered view (a copy of its rules, scoped to the result boxes). */
+  :root { --rv-fg: var(--vscode-editor-foreground, var(--vscode-foreground)); --rv-muted: var(--vscode-descriptionForeground); --rv-bg-2: color-mix(in srgb, var(--rv-fg) 6%, transparent); --rv-bg-3: color-mix(in srgb, var(--rv-fg) 12%, transparent); --rv-stroke: color-mix(in srgb, var(--rv-fg) 12%, transparent); }
+  .cm-lv-query { cursor: default; padding: 2px 0; line-height: 1.6; font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, sans-serif); }
+  .cm-lv-query .tfm-query { background: var(--rv-bg-2); border: 1px solid var(--rv-stroke); border-radius: 6px; padding: 10px 14px; margin: 0; }
+  .cm-lv-query .tfm-list { margin: .2em 0 .3em; padding-left: 0; list-style: none; }
+  .cm-lv-query ul { list-style: none; } .cm-lv-query ul.tfm-subtree { margin: 0; padding-left: 1.6em; }
+  .cm-lv-query li.tfm-task { display: grid; grid-template-columns: var(--rv-cols, 1.4em minmax(8em, 1fr) 8.6em 8.6em 8.6em minmax(0, 18em)); column-gap: .9em; align-items: baseline; margin-left: 0; border-top: 1px solid color-mix(in srgb, var(--rv-fg) 7%, transparent); padding: 2px 0; }
+  .cm-lv-query li.tfm-task > p { display: contents; }
+  .cm-lv-query li.tfm-task .tfm-check { margin: 0; align-self: center; cursor: pointer; }
+  .cm-lv-query .tfm-desc { min-width: 0; }
+  .cm-lv-query .tfm-col { min-width: 0; font-size: .92em; }
+  .cm-lv-query .tfm-col-due, .cm-lv-query .tfm-col-created, .cm-lv-query .tfm-col-done { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cm-lv-query .tfm-col-created, .cm-lv-query .tfm-col-done { color: var(--rv-muted); }
+  .cm-lv-query .tfm-col-tags { margin-left: .3em; font-size: .92em; } .cm-lv-query .tfm-col-tags .tfm-tag { color: var(--vscode-textLink-foreground); }
+  .cm-lv-query .tfm-col-more { color: var(--rv-muted); font-size: .82em; line-height: 1.5; }
+  .cm-lv-query .tfm-col-pri { margin-left: .2em; } .cm-lv-query .tfm-col .tfm-badge { margin: 1px 0; }
+  .cm-lv-query li.tfm-task > ul, .cm-lv-query li.tfm-task > ol { grid-column: 1 / -1; margin: 0; padding-left: 1.6em; }
+  .cm-lv-query li.tfm-task.tfm-status-done .tfm-desc { color: var(--rv-muted); }
+  .cm-lv-query li.tfm-task.tfm-status-cancelled .tfm-desc { color: var(--rv-muted); text-decoration: line-through; }
+  .cm-lv-query li.tfm-context > .tfm-desc { opacity: .5; }
+  .cm-lv-query .tfm-badge { font-size: .78em; line-height: 1.6; background: var(--rv-bg-3); color: var(--rv-fg); }
+  .cm-lv-query h4.tfm-group, .cm-lv-query h5.tfm-group, .cm-lv-query h6.tfm-group { margin: .6em 0 .2em; font-size: 1em; font-weight: 600; }
+  .cm-lv-query .tfm-task-count { color: var(--rv-muted); }
+  .cm-lv-query .rv-colhead { display: grid; grid-template-columns: var(--rv-cols, 1.4em minmax(8em, 1fr) 8.6em 8.6em 8.6em minmax(0, 18em)); column-gap: .9em; align-items: center; height: 22px; margin: 0 0 2px; overflow: hidden; color: var(--rv-muted); border-bottom: 1px solid color-mix(in srgb, var(--rv-fg) 14%, transparent); }
+  .cm-lv-query .rv-colhead-text { font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  body.hide-col-due .cm-lv-query .tfm-col-due, body.hide-col-created .cm-lv-query .tfm-col-created, body.hide-col-done .cm-lv-query .tfm-col-done, body.hide-col-more .cm-lv-query .tfm-col-more { display: none !important; }
+  @media (max-width: 640px) {
+    .cm-lv-query li.tfm-task { grid-template-columns: 1.4em minmax(0, 1fr); }
+    .cm-lv-query .tfm-col { grid-column: 2; } .cm-lv-query .tfm-col:empty { display: none; } .cm-lv-query .rv-colhead { display: none; }
+  }
 </style>
 </head>
 <body>
@@ -238,7 +281,7 @@ export function registerLiveView(context: vscode.ExtensionContext, deps: LiveVie
   context.subscriptions.push(
     // Internal: Option/Alt+Shift+C in a live view, for the create/edit command.
     vscode.commands.registerCommand('tasksmd.live.editLine', () => provider.takeEditLine()),
-    vscode.window.registerCustomEditorProvider(LIVE_VIEW_TYPE, provider, { webviewOptions: { retainContextWhenHidden: true }, supportsMultipleEditorsPerDocument: true }),
+    vscode.window.registerCustomEditorProvider(LIVE_VIEW_TYPE, provider, { webviewOptions: { retainContextWhenHidden: true, enableFindWidget: true }, supportsMultipleEditorsPerDocument: true }),
     vscode.commands.registerCommand('tasksmd.openLive', async (arg?: unknown) => {
       const editor = vscode.window.activeTextEditor;
       const input = vscode.window.tabGroups.activeTabGroup.activeTab?.input as { uri?: vscode.Uri } | undefined;

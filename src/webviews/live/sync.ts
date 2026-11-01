@@ -16,7 +16,7 @@ export type ToLive =
   /** The note changed elsewhere (source editor, an AI, a command): its whole text. */
   | { type: 'live/text'; text: string }
   /** Results of the note's ```tasks blocks, by the block's source (the lines between the fences). */
-  | { type: 'live/queries'; blocks: { source: string; html: string }[] };
+  | { type: 'live/queries'; blocks: { source: string; html: string }[]; columns: { hidden: string[]; tracks: string } };
 
 /** Messages from the live view's webview. */
 export type FromLive =

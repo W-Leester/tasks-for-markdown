@@ -24,7 +24,7 @@ const COLUMN_WIDTHS_KEY = 'rendered.columnWidths';
 export { HIDEABLE_COLUMNS };
 
 /** Only known columns with a width in the allowed range (MIN_WIDTH–MAX_WIDTH em) are kept. */
-function cleanWidths(input: unknown): Record<string, number> {
+export function cleanWidths(input: unknown): Record<string, number> {
   const out: Record<string, number> = {};
   if (!input || typeof input !== 'object') return out;
   for (const c of HIDEABLE_COLUMNS) {
@@ -656,7 +656,7 @@ export function registerRenderedView(context: vscode.ExtensionContext, deps: Ren
   };
   context.subscriptions.push(
     provider,
-    vscode.window.registerCustomEditorProvider(RENDERED_VIEW_TYPE, provider, { webviewOptions: { retainContextWhenHidden: true }, supportsMultipleEditorsPerDocument: true }),
+    vscode.window.registerCustomEditorProvider(RENDERED_VIEW_TYPE, provider, { webviewOptions: { retainContextWhenHidden: true, enableFindWidget: true }, supportsMultipleEditorsPerDocument: true }),
     vscode.commands.registerCommand('tasksmd.openRendered', (arg?: unknown) => openRendered(arg, vscode.ViewColumn.Active, true)),
     // Text button in the editor title bar (no icon, so the title "Preview 렌더" is shown as the label).
     vscode.commands.registerCommand('tasksmd.previewRender', (arg?: unknown) => openRendered(arg, vscode.ViewColumn.Active, false)),

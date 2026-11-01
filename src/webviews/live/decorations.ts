@@ -16,6 +16,8 @@ export type LiveDeco =
   | { kind: 'task'; from: number; to: number; checked: boolean; line: number }
   /** A class on a whole line (at its start). */
   | { kind: 'line'; from: number; cls: string }
+  /** ✎ ⏩ 💬 ＋ at the end of a task line (0-based `line`; `dated`: it has a due or scheduled date to postpone). */
+  | { kind: 'actions'; from: number; line: number; dated: boolean }
   /** A class on a stretch of text; `href` for links. */
   | { kind: 'mark'; from: number; to: number; cls: string; href?: string };
 
@@ -57,6 +59,10 @@ export function liveDecos(state: EditorState, active: Set<number>, from = 0, to 
         return;
       }
       if (name === 'InlineCode') out.push({ kind: 'mark', from: n.from, to: n.to, cls: 'cm-lv-code' });
+      if (name === 'Task') {
+        const line = doc.lineAt(n.from);
+        out.push({ kind: 'actions', from: line.to, line: line.number - 1, dated: /[📅⏳]/u.test(line.text) });
+      }
       if (shown(n.from)) return; // the cursor's line: Markdown as written
       if (name === 'HeaderMark' && /^ATXHeading/.test(parent)) {
         // Opening marks with their space; closing `##` too.

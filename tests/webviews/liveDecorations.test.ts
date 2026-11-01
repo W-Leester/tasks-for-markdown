@@ -14,6 +14,7 @@ const show = (s: EditorState, ds: LiveDeco[]) => ds.map((d) => {
   const text = 'to' in d ? JSON.stringify(s.doc.sliceString(d.from, d.to)) : '';
   if (d.kind === 'line') return `line:${d.cls}@${s.doc.lineAt(d.from).number}`;
   if (d.kind === 'task') return `task:${d.checked ? 'x' : ' '}@${d.line}`;
+  if (d.kind === 'actions') return `actions@${d.line}${d.dated ? ' dated' : ''}`;
   if (d.kind === 'mark') return `mark:${d.cls}:${text}${d.href !== undefined ? `->${d.href}` : ''}`;
   return `${d.kind}:${text}`;
 });
@@ -33,7 +34,9 @@ describe('live view decorations (M40)', () => {
 
   it('tasks become checkboxes (with their bullet), plain bullets •, numbers stay', () => {
     const s = state('- [ ] 할 일 📅 2026-11-05\n- [x] 끝남\n- 그냥\n1. 하나\n');
-    expect(show(s, liveDecos(s, new Set()))).toEqual(['task: @0', 'task:x@1', 'bullet:"-"']);
+    expect(show(s, liveDecos(s, new Set()))).toEqual(['task: @0', 'actions@0 dated', 'task:x@1', 'actions@1', 'bullet:"-"']);
+    // On the cursor's line the task is written out, and its buttons stay.
+    expect(show(s, liveDecos(s, new Set([1])))).toEqual(['actions@0 dated', 'task:x@1', 'actions@1', 'bullet:"-"']);
     expect(liveDecos(s, new Set())[0]).toMatchObject({ from: 0, to: 6 }); // "- [ ] " in one
   });
 

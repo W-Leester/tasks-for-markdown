@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { findHeadingLine } from '../core/file/headingAnchor';
 import type { TaskIndex } from '../core/index';
-import { parseTaskLine, type StatusRegistry } from '../core/task';
+import { parseTaskLine, type StatusRegistry, type Task } from '../core/task';
 import type { IndexService } from '../index/IndexService';
 import type { PreviewIntegration } from './PreviewIntegration';
 import { renderDocumentHtml } from './renderDocument';
@@ -115,6 +115,27 @@ export class LiveViewProvider implements vscode.CustomTextEditorProvider {
     panel.onDidDispose(() => { for (const s of subs) s.dispose(); });
   }
 
+  /** The task at `line` of the note (`path` null) or of the file a query result shows; an error when it moved. */
+  private task(document: vscode.TextDocument, path: string | null, line: number): Task {
+    let task: Task | null | undefined;
+    if (path !== null) {
+      const key = this.deps.index.fileKeys().find((k) => this.deps.index.file(k)?.path === path);
+      task = key ? this.deps.index.taskAt(key, line) : undefined;
+    } else {
+      const key = document.uri.toString();
+      task = this.deps.index.taskAt(key, line);
+      if (!task || task.originalMarkdown !== (line < document.lineCount ? document.lineAt(line).text : '')) {
+        task = line < document.lineCount ? parseTaskLine(document.lineAt(line).text, {
+          statusRegistry: this.deps.getStatusRegistry(),
+          globalFilter: this.deps.settings.get('globalFilter') || undefined,
+          location: { key, path: this.deps.indexService.displayPath(document.uri), line, heading: null, frontmatterTags: [], depth: 0, parentLine: null },
+        }) : null;
+      }
+    }
+    if (!task) throw new Error(t('That task is no longer at line {0}; the view has been refreshed.', line + 1));
+    return task;
+  }
+
   /** Sort and show filter of a note: the rendered view's, kept per note. */
   private viewState(uri: vscode.Uri): { sort: string; scope: string } {
     return this.deps.context.workspaceState.get<Record<string, { sort: string; scope: string }>>(VIEW_STATE_KEY, {})[uri.toString()] ?? { sort: 'document', scope: 'all' };
@@ -129,26 +150,18 @@ export class LiveViewProvider implements vscode.CustomTextEditorProvider {
       case 'live/edit':
         await sync.edit(msg);
         break;
-      case 'live/toggle': {
-        const key = document.uri.toString();
-        const task = this.deps.index.taskAt(key, msg.line) ?? (msg.line < document.lineCount
-          ? parseTaskLine(document.lineAt(msg.line).text, {
-            statusRegistry: this.deps.getStatusRegistry(),
-            globalFilter: this.deps.settings.get('globalFilter') || undefined,
-            location: { key, path: this.deps.indexService.displayPath(document.uri), line: msg.line, heading: null, frontmatterTags: [], depth: 0, parentLine: null },
-          })
-          : null);
-        if (!task) throw new Error(t('That task is no longer at line {0}; the view has been refreshed.', msg.line + 1));
-        await this.deps.editService.toggle(task);
+      case 'live/toggle':
+        await this.deps.editService.toggle(this.task(document, null, msg.line));
         break;
-      }
-      case 'live/toggleTask': {
-        const key = this.deps.index.fileKeys().find((k) => this.deps.index.file(k)?.path === msg.path);
-        const task = key ? this.deps.index.taskAt(key, msg.line) : undefined;
-        if (!task) throw new Error(t('That task is no longer at line {0}; the view has been refreshed.', msg.line + 1));
-        await this.deps.editService.toggle(task);
+      case 'live/toggleTask':
+        await this.deps.editService.toggle(this.task(document, msg.path, msg.line));
         break;
-      }
+      case 'live/rowAct':
+        await vscode.commands.executeCommand(msg.act === 'edit' ? 'tasksmd.createOrEdit' : 'tasksmd.postpone', this.task(document, msg.path, msg.line));
+        break;
+      case 'live/addNote':
+        await this.deps.editService.addNote(this.task(document, msg.path, msg.line), msg.text);
+        break;
       case 'live/columns': {
         if (msg.hidden) await this.deps.context.globalState.update('rendered.hiddenColumns', HIDEABLE_COLUMNS.filter((c) => msg.hidden!.includes(c)));
         if (msg.widths) await this.deps.context.globalState.update('rendered.columnWidths', cleanWidths(msg.widths));
@@ -223,6 +236,13 @@ export class LiveViewProvider implements vscode.CustomTextEditorProvider {
   .rv-toggle button:hover { color: var(--rv-fg); }
   .rv-toggle button[aria-pressed="true"] { background: var(--rv-bg-3); color: var(--rv-fg); cursor: default; }
   .cm-lv-query li.tfm-task.rv-hidden { display: none !important; }
+  /* ✎ ⏩ 💬 ＋ on a task (hover), as in the rendered view. */
+  .rv-actions { display: none; margin-left: .5em; vertical-align: -1px; gap: 2px; }
+  .cm-lv-query li.tfm-task:hover > .tfm-desc > .rv-actions, .cm-lv-query li.tfm-task:hover > p > .tfm-desc > .rv-actions, .cm-lv-query li.tfm-task:hover > .rv-actions, .cm-line:hover .rv-actions { display: inline-flex; }
+  .rv-actions button { border: none; background: var(--rv-bg-2); color: var(--rv-muted); border-radius: 4px; padding: 0 5px; line-height: 18px; font-size: 12px; cursor: pointer; font-family: inherit; }
+  .rv-actions button:hover { background: var(--rv-bg-3); color: var(--rv-fg); }
+  .rv-note-form { display: block; grid-column: 1 / -1; margin: 4px 0 4px 1.6em; }
+  .rv-note-form input { width: 100%; max-width: 40em; box-sizing: border-box; background: var(--rv-bg-2); color: var(--rv-fg); border: 1px solid var(--vscode-focusBorder); border-radius: 4px; padding: 3px 8px; font: inherit; outline: none; }
   .cm-lv-query li.tfm-task.rv-dim > .tfm-desc, .cm-lv-query li.tfm-task.rv-dim > p > .tfm-desc { opacity: .45; }
   /* Query results in columns, as in the rendered view (a copy of its rules, scoped to the result boxes). */
   :root { --rv-fg: var(--vscode-editor-foreground, var(--vscode-foreground)); --rv-muted: var(--vscode-descriptionForeground); --rv-bg-2: color-mix(in srgb, var(--rv-fg) 6%, transparent); --rv-bg-3: color-mix(in srgb, var(--rv-fg) 12%, transparent); --rv-stroke: color-mix(in srgb, var(--rv-fg) 12%, transparent); }
@@ -269,7 +289,7 @@ export class LiveViewProvider implements vscode.CustomTextEditorProvider {
   }
 </style>
 </head>
-<body data-l-hidden="${t('{0} hidden')}">
+<body data-l-hidden="${t('{0} hidden')}" data-l-edit="${t('Edit')}" data-l-postpone="${t('Postpone')}" data-l-note="${t('Add note')}" data-l-add-below="${t('Add a task below')}" data-l-note-placeholder="${t('Note — Enter to save, Esc to cancel')}" data-l-link-hint="${t('Cmd/Ctrl+click to open')}">
 <div class="rv-tools">
   <label class="rv-select" title="${t('Query results')}"><span>${t('Sort')}</span><select id="view-sort">
     <option value="document">${t('Document order')}</option><option value="due">${t('Due date')}</option><option value="created">${t('Created date')}</option><option value="priority">${t('Priority')}</option><option value="urgency">${t('Urgency')}</option>

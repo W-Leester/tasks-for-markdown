@@ -31,6 +31,10 @@ export type FromLive =
   | { type: 'live/toggle'; line: number }
   /** A task in a query result was ticked: its file (as shown) and line. */
   | { type: 'live/toggleTask'; path: string; line: number }
+  /** ✎ / ⏩ on a task: in the note (`path` null, 0-based line) or in a query result (its file as shown). */
+  | { type: 'live/rowAct'; act: 'edit' | 'postpone'; path: string | null; line: number }
+  /** 💬 on a query result row: a note under that task. */
+  | { type: 'live/addNote'; path: string; line: number; text: string }
   /** Option/Alt+Shift+C: edit the task on this line, or create one there. */
   | { type: 'live/editTask'; line: number }
   | { type: 'live/link'; href: string }

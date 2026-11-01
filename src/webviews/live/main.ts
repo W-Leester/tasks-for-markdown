@@ -45,7 +45,12 @@ class TaskWidget extends WidgetType {
     box.checked = this.checked;
     // On mousedown, before the editor would move the cursor onto the line (which shows the line as written).
     box.addEventListener('mousedown', (e) => { e.preventDefault(); post({ type: 'live/toggle', line: this.line }); });
-    box.addEventListener('click', (e) => e.preventDefault()); // the host's edit sets the box
+    box.addEventListener('click', (e) => { if (!(e.target as Element).closest('summary, details, .rv-note-form')) e.preventDefault(); });
+    box.addEventListener('dblclick', (e) => {
+      const row = (e.target as Element).closest<HTMLElement>('li.tfm-task');
+      if (!row || (e.target as Element).closest('input, button, a, .rv-colhead, summary')) return;
+      post({ type: 'live/rowAct', act: 'edit', path: row.dataset.tfmPath!, line: Number(row.dataset.tfmLine) });
+    }); // the host's edit sets the box
     return box;
   }
   override ignoreEvent(): boolean { return true; }
@@ -53,6 +58,43 @@ class TaskWidget extends WidgetType {
 
 // ---- ```tasks blocks: their results in place, the source when the cursor is in the block ----
 const setQueries = StateEffect.define<Map<string, string>>();
+/** ✎ ⏩ 💬 on each result row; 💬 opens a one-line note input under the row (Enter saves, Esc closes). */
+function addRowActions(box: HTMLElement): void {
+  for (const li of Array.from(box.querySelectorAll<HTMLElement>('li.tfm-task'))) {
+    if (li.dataset.tfmPath === undefined) continue;
+    const ref = { path: li.dataset.tfmPath, line: Number(li.dataset.tfmLine) };
+    const dated = !!li.querySelector(':scope .tfm-due, :scope .tfm-scheduled');
+    const actions = actionButtons(dated, false, (act) => {
+      if (act === 'edit' || act === 'postpone') { post({ type: 'live/rowAct', act, ...ref }); return; }
+      li.querySelector(':scope > .rv-note-form')?.remove();
+      const form = document.createElement('div');
+      form.className = 'rv-note-form';
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.placeholder = document.body.dataset.lNotePlaceholder ?? 'Note — Enter to save, Esc to cancel';
+      form.appendChild(input);
+      const nested = li.querySelector(':scope > ul, :scope > ol');
+      if (nested) li.insertBefore(form, nested);
+      else li.appendChild(form);
+      input.addEventListener('keydown', (e) => {
+        e.stopPropagation();
+        if (e.isComposing || e.keyCode === 229) return;
+        if (e.key === 'Escape') { e.preventDefault(); form.remove(); }
+        else if (e.key === 'Enter') {
+          e.preventDefault();
+          const text = input.value.trim();
+          if (text) post({ type: 'live/addNote', ...ref, text });
+          form.remove();
+        }
+      });
+      input.addEventListener('blur', () => { if (!input.value.trim()) form.remove(); });
+      setTimeout(() => input.focus());
+    });
+    const desc = li.querySelector(':scope > .tfm-desc, :scope > p > .tfm-desc');
+    (desc ?? li).appendChild(actions);
+  }
+}
+
 class QueryWidget extends WidgetType {
   constructor(readonly html: string, readonly body: number) { super(); }
   override eq(o: QueryWidget): boolean { return o.html === this.html && o.body === this.body; }
@@ -61,11 +103,13 @@ class QueryWidget extends WidgetType {
     box.className = 'cm-lv-query';
     box.innerHTML = this.html || '<div class="tfm-query">…</div>';
     columns.addHeader(box);
+    addRowActions(box);
     applyView(box, viewState, today);
     requestAnimationFrame(countHidden);
     box.addEventListener('mousedown', (e) => {
       const target = e.target as Element;
-      if (target.closest('.rv-colhead')) return; // the column header's own buttons and grips
+      // The column header's buttons and grips, a note being typed, a note list opened or closed: their own handling.
+      if (target.closest('.rv-colhead, .rv-note-form, summary, details')) return;
       e.preventDefault();
       const check = target.closest<HTMLInputElement>('input.tfm-check');
       const row = target.closest<HTMLElement>('li.tfm-task');
@@ -141,6 +185,61 @@ function taskKeys(e: KeyboardEvent, view: EditorView): boolean {
   return false;
 }
 
+/** ✎ ⏩ 💬 ＋ buttons (hover), as in the rendered view; `run` gets the button's action. */
+function actionButtons(dated: boolean, withAdd: boolean, run: (act: string, e: MouseEvent) => void): HTMLElement {
+  const labels = document.body.dataset;
+  const span = document.createElement('span');
+  span.className = 'rv-actions';
+  const add = (act: string, icon: string, title: string | undefined, fallback: string) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = icon;
+    b.title = title ?? fallback;
+    b.setAttribute('aria-label', b.title);
+    b.addEventListener('mousedown', (e) => { e.preventDefault(); e.stopPropagation(); run(act, e); });
+    span.appendChild(b);
+  };
+  add('edit', '✎', labels.lEdit, 'Edit');
+  if (dated) add('postpone', '⏩', labels.lPostpone, 'Postpone');
+  add('note', '💬', labels.lNote, 'Add note');
+  if (withAdd) add('add', '＋', labels.lAddBelow, 'Add a task below');
+  return span;
+}
+
+/** The last line of a task's block in the note: the task and everything indented under it (notes, sub-tasks). */
+function blockEnd(state: EditorState, line: number): number {
+  const doc = state.doc;
+  const indent = (t: string) => /^\s*/.exec(t)![0].replace(/\t/g, '    ').length;
+  const own = indent(doc.line(line).text);
+  let end = line;
+  for (let n = line + 1; n <= doc.lines; n++) {
+    const text = doc.line(n).text;
+    if (!text.trim()) break;
+    if (indent(text) <= own) break;
+    end = n;
+  }
+  return end;
+}
+
+class ActionsWidget extends WidgetType {
+  constructor(readonly line: number, readonly dated: boolean) { super(); }
+  override eq(o: ActionsWidget): boolean { return o.line === this.line && o.dated === this.dated; }
+  toDOM(view: EditorView): HTMLElement {
+    return actionButtons(this.dated, true, (act) => {
+      if (act === 'edit' || act === 'postpone') { post({ type: 'live/rowAct', act, path: null, line: this.line }); return; }
+      // 💬 a note (an indented bullet) / ＋ a task, after the task's own block — then type it in place.
+      const { state } = view;
+      const task = state.doc.line(this.line + 1);
+      const indent = /^\s*/.exec(task.text)![0];
+      const after = state.doc.line(blockEnd(state, this.line + 1));
+      const insert = act === 'note' ? `\n${indent}  - ` : `\n${indent}- [ ] `;
+      view.dispatch({ changes: { from: after.to, insert }, selection: EditorSelection.cursor(after.to + insert.length), userEvent: 'input' });
+      view.focus();
+    });
+  }
+  override ignoreEvent(): boolean { return true; }
+}
+
 function build(view: EditorView): DecorationSet {
   const active = activeLines(view.state, view.hasFocus);
   const ranges: Range<Decoration>[] = [];
@@ -150,6 +249,7 @@ function build(view: EditorView): DecorationSet {
       else if (d.kind === 'hide') { if (d.to > d.from) ranges.push(Decoration.replace({}).range(d.from, d.to)); }
       else if (d.kind === 'bullet') ranges.push(Decoration.replace({ widget: new BulletWidget() }).range(d.from, d.to));
       else if (d.kind === 'task') ranges.push(Decoration.replace({ widget: new TaskWidget(d.checked, d.line) }).range(d.from, d.to));
+      else if (d.kind === 'actions') ranges.push(Decoration.widget({ widget: new ActionsWidget(d.line, d.dated), side: 1 }).range(d.from));
       else if (d.to > d.from) ranges.push(Decoration.mark({ class: d.cls, attributes: d.href !== undefined ? { 'data-href': d.href, title: document.body.dataset.lLinkHint ?? 'Cmd/Ctrl+click to open' } : {} }).range(d.from, d.to));
     }
   }

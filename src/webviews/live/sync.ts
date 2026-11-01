@@ -1,0 +1,53 @@
+/**
+ * Keeping the live view's editor (M40) and the note in step. Pure; the host and the webview both use it.
+ */
+
+/** One replacement in a text: offsets `from`..`to` of the old text become `insert`. */
+export interface TextChange {
+  from: number;
+  to: number;
+  insert: string;
+}
+
+/** Messages to the live view's webview. */
+export type ToLive =
+  /** `eol`: the note's line ends, so the editor's offsets match the document's (CRLF counts two). */
+  | { type: 'live/init'; text: string; eol: '\n' | '\r\n'; fontSize: number; lineHeight: number; maxWidth: number }
+  /** The note changed elsewhere (source editor, an AI, a command): its whole text. */
+  | { type: 'live/text'; text: string };
+
+/** Messages from the live view's webview. */
+export type FromLive =
+  | { type: 'live/ready' }
+  /** Changes in the editor, in the coordinates of the text before them (`length` is that text's length). */
+  | { type: 'live/edit'; changes: TextChange[]; length: number }
+  /** A task's checkbox was clicked (0-based line). */
+  | { type: 'live/toggle'; line: number }
+  | { type: 'live/link'; href: string };
+
+const isHigh = (c: number) => c >= 0xd800 && c <= 0xdbff;
+const isLow = (c: number) => c >= 0xdc00 && c <= 0xdfff;
+
+/**
+ * The smallest single replacement turning `a` into `b` (common start and end left out), or null when equal. Never splits
+ * a surrogate pair (an emoji stays whole).
+ */
+export function minimalChange(a: string, b: string): TextChange | null {
+  if (a === b) return null;
+  const max = Math.min(a.length, b.length);
+  let start = 0;
+  while (start < max && a.charCodeAt(start) === b.charCodeAt(start)) start++;
+  if (start > 0 && isHigh(a.charCodeAt(start - 1))) start--;
+  let endA = a.length;
+  let endB = b.length;
+  while (endA > start && endB > start && a.charCodeAt(endA - 1) === b.charCodeAt(endB - 1)) { endA--; endB--; }
+  if (endA < a.length && isLow(a.charCodeAt(endA))) { endA++; endB++; }
+  return { from: start, to: endA, insert: b.slice(start, endB) };
+}
+
+/** `changes` (old-text coordinates, any order, not overlapping) applied to `text`. */
+export function applyChanges(text: string, changes: readonly TextChange[]): string {
+  let out = text;
+  for (const c of [...changes].sort((x, y) => y.from - x.from)) out = out.slice(0, c.from) + c.insert + out.slice(c.to);
+  return out;
+}

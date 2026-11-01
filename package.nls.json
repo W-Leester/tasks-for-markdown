@@ -112,6 +112,8 @@
   "tasksmd.previewRender.title": "Rendered Preview",
   "tasksmd.openRendered.title": "Open rendered view",
   "tasksmd.openRenderedToSide.title": "Open rendered view to the side",
+  "tasksmd.openLive.title": "Open live view (trial)",
+  "tasksmd.live.displayName": "Tasks: Live view (trial)",
   "tasksmd.openSource.title": "Edit Markdown source",
   "tasksmd.openCalendarFullScreen.title": "Open calendar (full screen)",
   "tasksmd.toggleFullScreen.title": "Calendar: toggle full screen",

@@ -112,6 +112,8 @@
   "tasksmd.previewRender.title": "Preview 렌더",
   "tasksmd.openRendered.title": "렌더 보기로 열기",
   "tasksmd.openRenderedToSide.title": "렌더 보기를 옆에 열기",
+  "tasksmd.openLive.title": "라이브 보기로 열기(시험판)",
+  "tasksmd.live.displayName": "Tasks: 라이브 보기(시험판)",
   "tasksmd.openSource.title": "마크다운 소스 편집",
   "tasksmd.openCalendarFullScreen.title": "캘린더 열기(전체 화면)",
   "tasksmd.toggleFullScreen.title": "캘린더: 전체 화면 전환",

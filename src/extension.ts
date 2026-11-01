@@ -15,6 +15,7 @@ import { TaskLineContext } from './editor/TaskLineContext';
 import { IndexService } from './index/IndexService';
 import { PreviewIntegration } from './preview/PreviewIntegration';
 import { type RenderedViewProvider, registerRenderedView } from './preview/RenderedView';
+import { registerLiveView } from './preview/LiveView';
 import { TasksApiError, createTasksApi, registerApiCommands, type ApiCaller, type TasksApi } from './api';
 import { ArchiveService } from './services/ArchiveService';
 import { NotificationService } from './services/NotificationService';
@@ -125,6 +126,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<Extens
 
   const preview = new PreviewIntegration({ index, queries, settings, getStatusRegistry, log });
   const rendered = registerRenderedView(context, { context, index, indexService, editService, settings, preview, getStatusRegistry, log });
+  registerLiveView(context, { context, index, indexService, editService, settings, getStatusRegistry, log });
   context.subscriptions.push(preview);
 
   const archive = new ArchiveService({ index, indexService, settings, log });

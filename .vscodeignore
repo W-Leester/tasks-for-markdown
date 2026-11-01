@@ -27,3 +27,4 @@ media/icon_v1.png
 *.zip
 releases/**
 *.tgz
+.opspanorama/**

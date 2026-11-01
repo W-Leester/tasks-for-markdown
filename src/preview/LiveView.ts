@@ -281,7 +281,7 @@ export function registerLiveView(context: vscode.ExtensionContext, deps: LiveVie
   context.subscriptions.push(
     // Internal: Option/Alt+Shift+C in a live view, for the create/edit command.
     vscode.commands.registerCommand('tasksmd.live.editLine', () => provider.takeEditLine()),
-    vscode.window.registerCustomEditorProvider(LIVE_VIEW_TYPE, provider, { webviewOptions: { retainContextWhenHidden: true, enableFindWidget: true }, supportsMultipleEditorsPerDocument: true }),
+    vscode.window.registerCustomEditorProvider(LIVE_VIEW_TYPE, provider, { webviewOptions: { retainContextWhenHidden: true }, supportsMultipleEditorsPerDocument: true }),
     vscode.commands.registerCommand('tasksmd.openLive', async (arg?: unknown) => {
       const editor = vscode.window.activeTextEditor;
       const input = vscode.window.tabGroups.activeTabGroup.activeTab?.input as { uri?: vscode.Uri } | undefined;

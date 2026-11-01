@@ -61,7 +61,9 @@ function addRowActions(box: HTMLElement): void {
     const dated = !!li.querySelector(':scope .tfm-due, :scope .tfm-scheduled');
     const actions = actionButtons(dated, false, (act) => {
       if (act === 'edit' || act === 'postpone') { post({ type: 'live/rowAct', act, ...ref }); return; }
-      li.querySelector(':scope > .rv-note-form')?.remove();
+      // Another open note input: leaving it saves it, as below.
+      document.querySelector<HTMLInputElement>('.rv-note-form input')?.blur();
+      document.querySelector('.rv-note-form')?.remove();
       const form = document.createElement('div');
       form.className = 'rv-note-form';
       const input = document.createElement('input');
@@ -71,18 +73,22 @@ function addRowActions(box: HTMLElement): void {
       const nested = li.querySelector(':scope > ul, :scope > ol');
       if (nested) li.insertBefore(form, nested);
       else li.appendChild(form);
+      // Enter or leaving the input saves what was typed (11-01: it stayed open after clicking elsewhere); Esc drops it.
+      let done = false;
+      const finish = (save: boolean) => {
+        if (done) return;
+        done = true;
+        const text = input.value.trim();
+        if (save && text) post({ type: 'live/addNote', ...ref, text });
+        form.remove();
+      };
       input.addEventListener('keydown', (e) => {
         e.stopPropagation();
         if (e.isComposing || e.keyCode === 229) return;
-        if (e.key === 'Escape') { e.preventDefault(); form.remove(); }
-        else if (e.key === 'Enter') {
-          e.preventDefault();
-          const text = input.value.trim();
-          if (text) post({ type: 'live/addNote', ...ref, text });
-          form.remove();
-        }
+        if (e.key === 'Escape') { e.preventDefault(); finish(false); }
+        else if (e.key === 'Enter') { e.preventDefault(); finish(true); }
       });
-      input.addEventListener('blur', () => { if (!input.value.trim()) form.remove(); });
+      input.addEventListener('blur', () => finish(true));
       setTimeout(() => input.focus());
     });
     const desc = li.querySelector(':scope > .tfm-desc, :scope > p > .tfm-desc');
@@ -103,6 +109,8 @@ class QueryWidget extends WidgetType {
     requestAnimationFrame(countHidden);
     box.addEventListener('mousedown', (e) => {
       const target = e.target as Element;
+      // A click elsewhere in the box keeps the focus where it is (below), so leave an open note input by hand.
+      if (!target.closest('.rv-note-form')) box.querySelector<HTMLInputElement>('.rv-note-form input')?.blur();
       // The column header's buttons and grips, a note being typed, a note list opened or closed: their own handling.
       if (target.closest('.rv-colhead, .rv-note-form, summary, details')) return;
       e.preventDefault();

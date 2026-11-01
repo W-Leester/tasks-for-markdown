@@ -27,6 +27,18 @@ describe('rendered view 💬 add note (M13)', () => {
     again.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
     expect(document.querySelector('.rv-note-form')).toBeNull();
     expect(posted.filter((m: FromWebview) => m.type === 'doc/addNote')).toHaveLength(1);
+
+    // Leaving the input (a click elsewhere) saves what was typed and closes it; an empty one just closes.
+    button.click();
+    const left = document.querySelector<HTMLInputElement>('.rv-note-form input')!;
+    left.value = '밖을 눌러 저장';
+    left.dispatchEvent(new FocusEvent('blur'));
+    expect(document.querySelector('.rv-note-form')).toBeNull();
+    expect(posted.filter((m: FromWebview) => m.type === 'doc/addNote').at(-1)).toEqual({ type: 'doc/addNote', path: null, line: 4, text: '밖을 눌러 저장' });
+    button.click();
+    document.querySelector<HTMLInputElement>('.rv-note-form input')!.dispatchEvent(new FocusEvent('blur'));
+    expect(document.querySelector('.rv-note-form')).toBeNull();
+    expect(posted.filter((m: FromWebview) => m.type === 'doc/addNote')).toHaveLength(2);
   });
 });
 

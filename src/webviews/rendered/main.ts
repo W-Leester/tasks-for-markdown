@@ -662,6 +662,8 @@ content.addEventListener('keydown', (e) => {
 
 /** Input under the task row; Enter adds the note (an indented bullet) to the file, Esc/blur closes it. */
 function openNoteForm(li: HTMLElement, ref: { path: string | null; line: number }): void {
+  // Another open note input: leaving it saves it, as below.
+  content.querySelector<HTMLInputElement>('.rv-note-form input')?.blur();
   content.querySelector('.rv-note-form')?.remove();
   const form = document.createElement('div');
   form.className = 'rv-note-form';
@@ -672,16 +674,22 @@ function openNoteForm(li: HTMLElement, ref: { path: string | null; line: number 
   const nested = li.querySelector(':scope > ul, :scope > ol');
   if (nested) li.insertBefore(form, nested);
   else li.appendChild(form);
-  const close = () => form.remove();
-  input.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') { e.preventDefault(); close(); return; }
-    if (e.key !== 'Enter' || e.isComposing) return;
-    e.preventDefault();
+  // Enter or leaving the input saves what was typed (11-01: the input stayed open after clicking elsewhere); Esc drops it.
+  let done = false;
+  const finish = (save: boolean) => {
+    if (done) return;
+    done = true;
     const text = input.value.trim();
-    if (text) post({ type: 'doc/addNote', ...ref, text });
-    close();
+    if (save && text) post({ type: 'doc/addNote', ...ref, text });
+    form.remove();
+  };
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { e.preventDefault(); finish(false); return; }
+    if (e.key !== 'Enter' || e.isComposing || e.keyCode === 229) return;
+    e.preventDefault();
+    finish(true);
   });
-  input.addEventListener('blur', () => { if (!input.value.trim()) close(); });
+  input.addEventListener('blur', () => { if (!rerendering) finish(true); });
   input.focus();
 }
 

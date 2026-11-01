@@ -159,6 +159,9 @@ export class LiveViewProvider implements vscode.CustomTextEditorProvider {
       case 'live/rowAct':
         await vscode.commands.executeCommand(msg.act === 'edit' ? 'tasksmd.createOrEdit' : 'tasksmd.postpone', this.task(document, msg.path, msg.line));
         break;
+      case 'live/editNote':
+        await this.deps.editService.editNote(this.task(document, msg.path, msg.line), msg.index, msg.text);
+        break;
       case 'live/addNote':
         await this.deps.editService.addNote(this.task(document, msg.path, msg.line), msg.text);
         break;
@@ -236,8 +239,13 @@ export class LiveViewProvider implements vscode.CustomTextEditorProvider {
   .rv-toggle button:hover { color: var(--rv-fg); }
   .rv-toggle button[aria-pressed="true"] { background: var(--rv-bg-3); color: var(--rv-fg); cursor: default; }
   .cm-lv-query li.tfm-task.rv-hidden { display: none !important; }
-  .cm-lv-query li.tfm-task:has(> .tfm-desc > .tfm-notes[open]) > .tfm-check { align-self: start; margin-top: .3em; }
-  .cm-lv-query .tfm-notes > summary, .cm-lv-query .tfm-notes-list { color: var(--rv-muted); }
+  .cm-lv-query li.tfm-task:not(.tfm-notes-folded):has(> .tfm-desc > .tfm-notes-list) > .tfm-check { align-self: start; margin-top: .3em; }
+  .cm-lv-query .tfm-notes, .cm-lv-query .tfm-notes-list { color: var(--rv-muted); }
+  .rv-note-actions { display: none; margin-left: .4em; gap: 2px; vertical-align: -1px; }
+  li.tfm-qnote:hover > .rv-note-actions { display: inline-flex; }
+  .rv-note-actions button { border: none; background: var(--rv-bg-2); color: var(--rv-muted); border-radius: 4px; padding: 0 5px; line-height: 16px; font-size: 11px; cursor: pointer; font-family: inherit; }
+  .rv-note-actions button:hover { background: var(--rv-bg-3); color: var(--rv-fg); }
+  .rv-note-edit { width: min(100%, 36em); box-sizing: border-box; background: var(--rv-bg-2); color: var(--rv-fg); border: 1px solid var(--vscode-focusBorder); border-radius: 4px; padding: 1px 6px; font: inherit; outline: none; }
   /* ✎ ⏩ 💬 ＋ on a task (hover), as in the rendered view. */
   .rv-actions { display: none; margin-left: .5em; vertical-align: -1px; gap: 2px; }
   .cm-lv-query li.tfm-task:hover > .tfm-desc > .rv-actions, .cm-lv-query li.tfm-task:hover > p > .tfm-desc > .rv-actions, .cm-lv-query li.tfm-task:hover > .rv-actions, .cm-line:hover .rv-actions { display: inline-flex; }
@@ -294,7 +302,7 @@ export class LiveViewProvider implements vscode.CustomTextEditorProvider {
   }
 </style>
 </head>
-<body data-l-hidden="${t('{0} hidden')}" data-l-edit="${t('Edit')}" data-l-postpone="${t('Postpone')}" data-l-note="${t('Add note')}" data-l-add-below="${t('Add a task below')}" data-l-note-placeholder="${t('Note — Enter to save, Esc to cancel')}" data-l-link-hint="${t('Cmd/Ctrl+click to open')}" data-l-query-edit="${t('Double-click to edit the query')}">
+<body data-l-hidden="${t('{0} hidden')}" data-l-edit="${t('Edit')}" data-l-postpone="${t('Postpone')}" data-l-note="${t('Add note')}" data-l-add-below="${t('Add a task below')}" data-l-note-placeholder="${t('Note — Enter to save, Esc to cancel')}" data-l-link-hint="${t('Cmd/Ctrl+click to open')}" data-l-query-edit="${t('Double-click to edit the query')}" data-l-note-edit="${t('Edit note')}" data-l-note-delete="${t('Delete note')}">
 <div class="rv-tools">
   <label class="rv-select" title="${t('Query results')}"><span>${t('Sort')}</span><select id="view-sort">
     <option value="document">${t('Document order')}</option><option value="due">${t('Due date')}</option><option value="created">${t('Created date')}</option><option value="priority">${t('Priority')}</option><option value="urgency">${t('Urgency')}</option>

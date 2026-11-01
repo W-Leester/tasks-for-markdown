@@ -55,6 +55,7 @@ type Incoming =
   | { type: 'doc/insertTask'; line: number; text: string }
   | { type: 'doc/select'; line: number | null }
   | { type: 'doc/addNote'; path: string | null; line: number; text: string }
+  | { type: 'doc/editNote'; path: string | null; line: number; index: number; text: string | null }
   | { type: 'doc/editQuote'; start: number; end: number; expected: string; text: string; save?: boolean }
   | { type: 'doc/editBlock'; start: number; end: number; expected: string; text: string; save?: boolean }
   | { type: 'doc/append'; text: string; save?: boolean }
@@ -230,6 +231,12 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
           const task = this.taskFor(msg.path, msg.line, document);
           if (!task) throw new Error(t('That task is no longer at line {0}; the view has been refreshed.', msg.line + 1));
           await this.deps.editService.addNote(task, msg.text);
+          break;
+        }
+        case 'doc/editNote': {
+          const task = this.taskFor(msg.path, msg.line, document);
+          if (!task) throw new Error(t('That task is no longer at line {0}; the view has been refreshed.', msg.line + 1));
+          await this.deps.editService.editNote(task, msg.index, msg.text);
           break;
         }
         case 'doc/select':
@@ -474,7 +481,7 @@ ${borrowed.styles.map((u) => `<link rel="stylesheet" href="${webview.asWebviewUr
   /* Notes (M13): plain bullets under a task, muted with a 💬 marker; the add-note input; 💬 N on query rows. */
   li.tfm-note { list-style: none; color: var(--rv-muted); font-size: .93em; }
   li.tfm-note::before { content: '💬'; display: inline-block; width: 1.9em; margin-left: -1.9em; font-size: .8em; opacity: .7; }
-  body.fields-columns li.tfm-task:has(> .tfm-desc > .tfm-notes[open]) > .tfm-check { align-self: start; margin-top: .3em; }
+  body.fields-columns li.tfm-task:not(.tfm-notes-folded):has(> .tfm-desc > .tfm-notes-list) > .tfm-check { align-self: start; margin-top: .3em; }
   li.tfm-note > p:first-child { display: inline; }
   /* M27: the selected row (Enter adds a task below it), the new-task input and the "＋ Add task" row at the end of a list. */
   li.tfm-task.rv-selected { outline: 1px solid var(--rv-accent); outline-offset: 1px; border-radius: 3px; }
@@ -488,7 +495,13 @@ ${borrowed.styles.map((u) => `<link rel="stylesheet" href="${webview.asWebviewUr
   li.rv-addrow button:hover, li.rv-addrow button:focus-visible { opacity: 1; background: var(--rv-bg-2); color: var(--rv-fg); }
   .rv-note-form { display: block; flex-basis: 100%; grid-column: 1 / -1; margin: 4px 0 4px 1.6em; }
   .rv-note-form input { width: 100%; max-width: 40em; box-sizing: border-box; background: var(--rv-bg-2); color: var(--rv-fg); border: 1px solid var(--rv-accent); border-radius: 4px; padding: 3px 7px; font: inherit; font-size: .93em; outline: none; }
-  .tfm-notes > summary { color: var(--rv-muted); }
+  .tfm-notes, .tfm-notes-list { color: var(--rv-muted); }
+  /* ✎ ✕ on a note (hover), and its edit input. */
+  .rv-note-actions { display: none; margin-left: .4em; gap: 2px; vertical-align: -1px; }
+  li.tfm-qnote:hover > .rv-note-actions, li.tfm-note:hover > .rv-note-actions { display: inline-flex; }
+  .rv-note-actions button { border: none; background: var(--rv-bg-2); color: var(--rv-muted); border-radius: 4px; padding: 0 5px; line-height: 16px; font-size: 11px; cursor: pointer; font-family: inherit; }
+  .rv-note-actions button:hover { background: var(--rv-bg-3); color: var(--rv-fg); }
+  .rv-note-edit { width: min(100%, 36em); box-sizing: border-box; background: var(--rv-bg-2); color: var(--rv-fg); border: 1px solid var(--vscode-focusBorder); border-radius: 4px; padding: 1px 6px; font: inherit; outline: none; }
   .tfm-notes-list { color: var(--rv-muted); } .tfm-field.tfm-overdue { color: var(--vscode-errorForeground, #f14c4c); }
   .tfm-field.tfm-invalid { color: var(--vscode-editorWarning-foreground, #cca700); }
   .rv-frontmatter { color: var(--rv-muted); font-size: 1em; margin: 0 0 1.25em; padding: 0 0 .75em; border-bottom: 1px solid var(--rv-stroke); }
@@ -564,7 +577,7 @@ ${borrowed.styles.map((u) => `<link rel="stylesheet" href="${webview.asWebviewUr
 </style>
 <title>${t('Tasks: Rendered view')}</title>
 </head>
-<body data-l-col-width="${t('Column width')}" data-l-col-width-hint="${t('Drag to resize, double-click to fit the content')}" data-l-col-desc="${t('Description')}" data-l-col-due="${t('Due date')}" data-l-col-created="${t('Created date')}" data-l-col-done="${t('Done date')}" data-l-col-more="${t('Other fields')}" data-l-col-hide="${t('Hide column')}" data-l-col-show="${t('Show column')}" data-l-edit="${t('Edit')}" data-l-postpone="${t('Postpone')}" data-l-note="${t('Add note')}" data-l-note-placeholder="${t('Note — Enter to save, Esc to cancel')}" data-l-add-below="${t('Add a task below')}" data-l-add-task="${t('Add task')}" data-l-task-placeholder="${t('New task — Enter to add, Esc to stop')}" data-l-hidden="${t('{0} hidden')}" data-l-quote-edit="${t('Click to type')}" data-l-quote-hint="${t('Cmd/Ctrl+Enter or click outside to save, Esc to cancel')}" data-l-quote-placeholder="${t('Type here')}" data-l-write="${t('Write')}" data-l-find="${t('Find')}" data-l-find-none="${t('No results')}">
+<body data-l-col-width="${t('Column width')}" data-l-col-width-hint="${t('Drag to resize, double-click to fit the content')}" data-l-col-desc="${t('Description')}" data-l-col-due="${t('Due date')}" data-l-col-created="${t('Created date')}" data-l-col-done="${t('Done date')}" data-l-col-more="${t('Other fields')}" data-l-col-hide="${t('Hide column')}" data-l-col-show="${t('Show column')}" data-l-edit="${t('Edit')}" data-l-postpone="${t('Postpone')}" data-l-note="${t('Add note')}" data-l-note-placeholder="${t('Note — Enter to save, Esc to cancel')}" data-l-add-below="${t('Add a task below')}" data-l-add-task="${t('Add task')}" data-l-task-placeholder="${t('New task — Enter to add, Esc to stop')}" data-l-hidden="${t('{0} hidden')}" data-l-quote-edit="${t('Click to type')}" data-l-quote-hint="${t('Cmd/Ctrl+Enter or click outside to save, Esc to cancel')}" data-l-quote-placeholder="${t('Type here')}" data-l-write="${t('Write')}" data-l-find="${t('Find')}" data-l-note-edit="${t('Edit note')}" data-l-note-delete="${t('Delete note')}" data-l-find-none="${t('No results')}">
 <div class="rv-tools">
   <label class="rv-select"><span>${t('Sort')}</span><select id="view-sort">
     <option value="document">${t('Document order')}</option><option value="due">${t('Due date')}</option><option value="created">${t('Created date')}</option><option value="priority">${t('Priority')}</option><option value="urgency">${t('Urgency')}</option>

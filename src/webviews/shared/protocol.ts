@@ -94,6 +94,8 @@ export type FromWebview =
   | { type: 'doc/postpone'; path: string | null; line: number }
   /** Add a note (indented bullet) under the task. */
   | { type: 'doc/addNote'; path: string | null; line: number; text: string }
+  /** ✎ / ✕ on a note: its new text, or null to delete it. */
+  | { type: 'doc/editNote'; path: string | null; line: number; index: number; text: string | null }
   /** M27: a new task line below this body task (note body only — no path). */
   | { type: 'doc/insertTask'; line: number; text: string }
   /** M38: the text typed into the blockquote on lines start..end (exclusive); `expected` is the text it was drawn with. */

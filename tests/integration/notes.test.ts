@@ -45,6 +45,17 @@ suite('task notes (M13)', () => {
     assert.deepStrictEqual(taskAt(6).location.notes?.map((n) => n.text), ['b의 메모']);
   });
 
+  test('editNote (✎ / ✕ in the views, 11-01): changes or deletes one note, leaving the others and the sub-items', async () => {
+    await write(['- [ ] a 📅 2026-10-01', '  - one', '  - two', '  - [ ] sub 📅 2026-10-01', '- [ ] b 📅 2026-10-01', ''].join('\n'));
+    await internal.editService.editNote(taskAt(0), 1, ' 고친 둘 ');
+    await waitFor(() => read().includes('고친 둘'));
+    assert.strictEqual(read(), ['- [ ] a 📅 2026-10-01', '  - one', '  - 고친 둘', '  - [ ] sub 📅 2026-10-01', '- [ ] b 📅 2026-10-01', ''].join('\n'));
+    await internal.editService.editNote(taskAt(0), 0, null);
+    await waitFor(() => !read().includes('  - one'));
+    assert.strictEqual(read(), ['- [ ] a 📅 2026-10-01', '  - 고친 둘', '  - [ ] sub 📅 2026-10-01', '- [ ] b 📅 2026-10-01', ''].join('\n'));
+    await assert.rejects(internal.editService.editNote(taskAt(0), 5, 'x'), /note has changed/);
+  });
+
   test('addNote refuses a stale task line', async () => {
     await write('- [ ] a 📅 2026-10-01\n');
     const task = taskAt(0);

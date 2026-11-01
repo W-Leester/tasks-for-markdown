@@ -125,6 +125,18 @@ export class TaskEditService {
   }
 
   /**
+   * Change or delete (`text` null or blank) the task's note number `index` (11-01: ✎ / ✕ on a note in the rendered and
+   * live views). Only that note's line changes. Refused when the task has no such note any more.
+   */
+  async editNote(task: Task, index: number, text: string | null): Promise<void> {
+    const notes = (task.location.notes ?? []).map((n) => n.text);
+    if (index < 0 || index >= notes.length) throw new Error(t('That note has changed since the view was drawn; the view has been refreshed.'));
+    if (text === null || !text.trim()) notes.splice(index, 1);
+    else notes[index] = text.trim();
+    await this.update(task, {}, notes);
+  }
+
+  /**
    * Add one note (an indented plain bullet) under the task, after its existing notes or right
    * below the task line. Returns the new line number.
    */

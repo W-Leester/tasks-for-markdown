@@ -163,14 +163,18 @@ export function renderTaskRow(task: Task, layout: Layout | null, o: RenderOption
   return `${open}<span class="tfm-desc">${renderDescriptionText(task, o)}</span>${renderBadges(task, layout, { ...o, afterPriority: backlink })}${notes ? ' ' + notes : ''}${extra.children ?? ''}</li>`;
 }
 
-/** `💬 N` for a task's notes, expandable without scripts (`<details>`) so the built-in preview can open it too. */
+/**
+ * A task's notes on a query row (11-01): `💬 N` beside the description and the notes under it, one `💬` line each, as
+ * notes look in the note itself. Shown by default; the rendered and live views fold them when `💬 N` is clicked and
+ * let each note be edited or deleted (`data-tfm-note` is its place, `data-tfm-note-text` its text).
+ */
 export function renderNotes(task: Task, o: RenderOptions): string {
   const notes = task.location.notes ?? [];
   if (!notes.length) return '';
   const t = o.t ?? fmt;
   const title = notes.map((n) => n.text).join('\n');
-  // Open: the notes show under the task; 💬 N folds them (11-01, user: shown by default).
-  return `<details class="tfm-notes" open><summary title="${esc(title)}" aria-label="${esc(t('{0} notes', notes.length))}">💬 ${notes.length}</summary><ul class="tfm-notes-list">${notes.map((n) => `<li>${esc(n.text)}</li>`).join('')}</ul></details>`;
+  return `<span class="tfm-notes" role="button" tabindex="0" title="${esc(title)}" aria-label="${esc(t('{0} notes', notes.length))}">💬 ${notes.length}</span>` +
+    `<ul class="tfm-notes-list">${notes.map((n, i) => `<li class="tfm-qnote" data-tfm-note="${i}" data-tfm-note-text="${esc(n.text)}"><span class="tfm-note-text">${esc(n.text)}</span></li>`).join('')}</ul>`;
 }
 
 function renderGroup(node: GroupNode, depth: number, layout: Layout, o: RenderOptions, out: string[]): void {

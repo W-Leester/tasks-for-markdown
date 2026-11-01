@@ -145,14 +145,23 @@ function decorateTaskLines(state: StateCore, deps: PluginDeps): void {
 /** Notes (M13): direct child list items of a task that are not tasks themselves get `tfm-note`. */
 function markNotes(tokens: Token[]): void {
   const stack: Token[] = [];
-  for (const tok of tokens) {
+  const count = new Map<Token, number>();
+  tokens.forEach((tok, i) => {
     if (tok.type === 'list_item_open') {
       const parent = stack[stack.length - 1];
       const isTask = /\btfm-task\b/u.test(String(tok.attrGet('class') ?? ''));
-      if (parent && !isTask && /\btfm-task\b/u.test(String(parent.attrGet('class') ?? ''))) tok.attrJoin('class', 'tfm-note');
+      if (parent && !isTask && /\btfm-task\b/u.test(String(parent.attrGet('class') ?? ''))) {
+        tok.attrJoin('class', 'tfm-note');
+        // Its place among the task's notes and its text as written, so the rendered view can edit or delete it (11-01).
+        const n = count.get(parent) ?? 0;
+        count.set(parent, n + 1);
+        tok.attrSet('data-tfm-note', String(n));
+        const inline = tokens.slice(i + 1, i + 4).find((t) => t.type === 'inline');
+        if (inline) tok.attrSet('data-tfm-note-text', inline.content.split('\n')[0]!);
+      }
       stack.push(tok);
     } else if (tok.type === 'list_item_close') stack.pop();
-  }
+  });
 }
 
 /** Offset in `body` where the metadata starts (after the description), or null when there is none. */

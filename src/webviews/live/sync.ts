@@ -33,6 +33,8 @@ export type FromLive =
   | { type: 'live/toggleTask'; path: string; line: number }
   /** ✎ / ⏩ on a task: in the note (`path` null, 0-based line) or in a query result (its file as shown). */
   | { type: 'live/rowAct'; act: 'edit' | 'postpone'; path: string | null; line: number }
+  /** ✎ / ✕ on a note in a query result: its new text, or null to delete it. */
+  | { type: 'live/editNote'; path: string | null; line: number; index: number; text: string | null }
   /** 💬 on a query result row: a note under that task. */
   | { type: 'live/addNote'; path: string; line: number; text: string }
   /** Option/Alt+Shift+C: edit the task on this line, or create one there. */

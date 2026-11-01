@@ -267,22 +267,39 @@ describe('column widths (M16)', () => {
   });
 });
 
-describe('query result notes show by default; folded ones stay folded (11-01)', () => {
-  it('a 💬 N list folded by the user is still folded after the results are drawn again', async () => {
+describe('query result notes: shown, folded with 💬 N (kept across redraws), ✎ edits and ✕ deletes a note (11-01)', () => {
+  it('folds, edits and deletes', async () => {
     // The view script is already loaded (first test) and draws into its #content.
     await import('../../src/webviews/rendered/main');
-    const html = '<div class="tfm-query"><ul class="tfm-list"><li class="tfm-task" data-tfm-path="a.md" data-tfm-line="3"><span class="tfm-desc">x <details class="tfm-notes" open><summary>💬 1</summary><ul class="tfm-notes-list"><li>메모</li></ul></details></span></li></ul></div>';
+    const html = '<div class="tfm-query"><ul class="tfm-list"><li class="tfm-task" data-tfm-path="a.md" data-tfm-line="3"><input type="checkbox" class="tfm-check"><span class="tfm-desc">x <span class="tfm-notes" role="button">💬 2</span><ul class="tfm-notes-list"><li class="tfm-qnote" data-tfm-note="0" data-tfm-note-text="첫 메모"><span class="tfm-note-text">첫 메모</span></li><li class="tfm-qnote" data-tfm-note="1" data-tfm-note-text="둘째"><span class="tfm-note-text">둘째</span></li></ul></span></li></ul></div>';
     const draw = () => receive({ type: 'doc/html', html, fontSize: 14, lineHeight: 1.6, fieldsAlign: 'inline', maxWidth: 0, today: '2026-11-01', view: { sort: 'document', scope: 'all' } });
+    const row = () => document.querySelector<HTMLElement>('.tfm-query li.tfm-task')!;
+    const edits = () => posted.filter((m: FromWebview) => m.type === 'doc/editNote');
     draw();
-    const notes = () => document.querySelector<HTMLDetailsElement>('details.tfm-notes')!;
-    expect(notes().open).toBe(true);
-    notes().open = false;
-    notes().dispatchEvent(new Event('toggle'));
+    expect(row().classList.contains('tfm-notes-folded')).toBe(false);
+    document.querySelector<HTMLElement>('.tfm-notes')!.click();
+    expect(row().classList.contains('tfm-notes-folded')).toBe(true);
     draw();
-    expect(notes().open).toBe(false);
-    notes().open = true;
-    notes().dispatchEvent(new Event('toggle'));
+    expect(row().classList.contains('tfm-notes-folded')).toBe(true); // still folded after the redraw
+    document.querySelector<HTMLElement>('.tfm-notes')!.click();
     draw();
-    expect(notes().open).toBe(true);
+    expect(row().classList.contains('tfm-notes-folded')).toBe(false);
+
+    // ✎ on the second note: an input with its text; Enter saves.
+    const notes = () => Array.from(document.querySelectorAll<HTMLElement>('li.tfm-qnote'));
+    expect(notes()[1]!.querySelectorAll('.rv-note-actions button')).toHaveLength(2);
+    notes()[1]!.querySelector<HTMLButtonElement>('[data-note-act="edit"]')!.click();
+    const input = notes()[1]!.querySelector<HTMLInputElement>('input.rv-note-edit')!;
+    expect(input.value).toBe('둘째');
+    input.value = '고친 둘째';
+    input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+    expect(edits().at(-1)).toEqual({ type: 'doc/editNote', path: 'a.md', line: 3, index: 1, text: '고친 둘째' });
+    // Esc changes nothing; ✕ deletes.
+    notes()[0]!.querySelector<HTMLButtonElement>('[data-note-act="edit"]')!.click();
+    notes()[0]!.querySelector<HTMLInputElement>('input.rv-note-edit')!.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    expect(edits()).toHaveLength(1);
+    expect(notes()[0]!.textContent).toContain('첫 메모');
+    notes()[0]!.querySelector<HTMLButtonElement>('[data-note-act="delete"]')!.click();
+    expect(edits().at(-1)).toEqual({ type: 'doc/editNote', path: 'a.md', line: 3, index: 0, text: null });
   });
 });

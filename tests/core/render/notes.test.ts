@@ -18,12 +18,13 @@ const run = (q: string) => Query.parse(q).run({ index, today, allowFunctions: fa
 
 describe('notes in query results (M13)', () => {
   for (const columns of [false, true]) {
-    it(`shows 💬 N with an expandable, escaped note list (columns=${columns})`, () => {
+    it(`shows 💬 N beside the description and the escaped notes under it, each editable (columns=${columns})`, () => {
       const q = Query.parse('not done\nhide tree');
       const html = renderQueryResult(run('not done\nhide tree'), q.layout, '', { today, columns });
-      expect(html.match(/class="tfm-notes" open/g)).toHaveLength(1); // shown; 💬 folds them
-      expect(html).toContain('<summary title="3조 &lt;위약금&gt; 확인\n회신 대기" aria-label="2 notes">💬 2</summary>');
-      expect(html).toContain('<li>3조 &lt;위약금&gt; 확인</li><li>회신 대기</li>');
+      expect(html.match(/class="tfm-notes"/g)).toHaveLength(1);
+      expect(html).toContain('<span class="tfm-notes" role="button" tabindex="0" title="3조 &lt;위약금&gt; 확인\n회신 대기" aria-label="2 notes">💬 2</span><ul class="tfm-notes-list">');
+      // Each note knows its place and text, for ✎ / ✕ in the views.
+      expect(html).toContain('<li class="tfm-qnote" data-tfm-note="0" data-tfm-note-text="3조 &lt;위약금&gt; 확인"><span class="tfm-note-text">3조 &lt;위약금&gt; 확인</span></li><li class="tfm-qnote" data-tfm-note="1" data-tfm-note-text="회신 대기">');
       // After the backlink so an opened list doesn't push it down; in columns mode still inside the description cell.
       const row = html.slice(html.indexOf('계약서 검토'));
       expect(row.indexOf('tfm-notes')).toBeGreaterThan(row.indexOf('tfm-backlink'));
@@ -44,8 +45,9 @@ describe('notes in the rendered note (M13)', () => {
   };
   it('marks plain bullets directly under a task as tfm-note, not sub-tasks or bullets under plain items', () => {
     const html = renderDocumentHtml(`${text}\n\n- 일반 목록\n  - 일반 하위`, deps);
-    expect(html.match(/tfm-note/g)).toHaveLength(2);
-    expect(html).toMatch(/<li class="tfm-note"[^>]*>3조 &lt;위약금&gt; 확인<\/li>/);
+    expect(html.match(/class="tfm-note"/g)).toHaveLength(2);
+    expect(html).toMatch(/<li class="tfm-note"[^>]* data-tfm-note="0" data-tfm-note-text="3조 &lt;위약금&gt; 확인"[^>]*>3조 &lt;위약금&gt; 확인<\/li>/);
+    expect(html).toMatch(/<li class="tfm-note"[^>]* data-tfm-note="1" data-tfm-note-text="9\/25 김대리 회신 대기|<li class="tfm-note"[^>]* data-tfm-note="1"/);
     expect(html).not.toMatch(/tfm-note"[^>]*>일반 하위/);
   });
 });

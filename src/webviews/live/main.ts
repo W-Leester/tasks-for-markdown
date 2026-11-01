@@ -13,6 +13,7 @@ import { findHeadingLine } from '../../core/file/headingAnchor';
 import { checkboxMode, toggleCheckboxLine } from '../../core/task/toggleCheckbox';
 import { activeLines, findQueryBlocks, liveDecos } from './decorations';
 import { applyView, SCOPE_MODES, type ScopeMode, SORT_MODES, type SortMode, type ViewState } from '../rendered/view';
+import { decorateNotes, handleNoteClick } from '../shared/notes';
 import { QueryColumns } from './columns';
 import { keepKey } from './keys';
 import { type FromLive, minimalChange, type ToLive } from './sync';
@@ -96,21 +97,6 @@ function addRowActions(box: HTMLElement): void {
   }
 }
 
-/**
- * Note lists folded with 💬 in query results stay folded when the results are drawn again (notes show by default).
- * Keyed by the task's file and line.
- */
-const foldedNotes = new Set<string>();
-const notesKey = (d: Element) => { const li = d.closest<HTMLElement>('li.tfm-task'); return li ? `${li.dataset.tfmPath ?? ''}:${li.dataset.tfmLine ?? ''}` : ''; };
-document.addEventListener('toggle', (e) => {
-  const d = e.target as HTMLDetailsElement;
-  if (!d.classList?.contains('tfm-notes')) return;
-  if (d.open) foldedNotes.delete(notesKey(d));
-  else foldedNotes.add(notesKey(d));
-}, true);
-function keepFolded(root: ParentNode): void {
-  for (const d of Array.from(root.querySelectorAll<HTMLDetailsElement>('details.tfm-notes'))) if (foldedNotes.has(notesKey(d))) d.open = false;
-}
 
 class QueryWidget extends WidgetType {
   constructor(readonly html: string, readonly body: number) { super(); }
@@ -121,15 +107,15 @@ class QueryWidget extends WidgetType {
     box.innerHTML = this.html || '<div class="tfm-query">…</div>';
     columns.addHeader(box);
     addRowActions(box);
-    keepFolded(box);
+    decorateNotes(box, { edit: document.body.dataset.lNoteEdit ?? 'Edit note', remove: document.body.dataset.lNoteDelete ?? 'Delete note' });
     applyView(box, viewState, today);
     requestAnimationFrame(countHidden);
     box.addEventListener('mousedown', (e) => {
       const target = e.target as Element;
       // A click elsewhere in the box keeps the focus where it is (below), so leave an open note input by hand.
       if (!target.closest('.rv-note-form')) box.querySelector<HTMLInputElement>('.rv-note-form input')?.blur();
-      // The column header's buttons and grips, a note being typed, a note list opened or closed: their own handling.
-      if (target.closest('.rv-colhead, .rv-note-form, summary, details')) return;
+      // The column header's buttons and grips, a note being typed or edited: their own handling.
+      if (target.closest('.rv-colhead, .rv-note-form, .rv-note-edit')) return;
       e.preventDefault();
       const check = target.closest<HTMLInputElement>('input.tfm-check');
       const row = target.closest<HTMLElement>('li.tfm-task');
@@ -138,11 +124,14 @@ class QueryWidget extends WidgetType {
       if (a) openLink(a.getAttribute('href')!);
       // Anywhere else a single click does nothing, as in the rendered view (11-01: a click on a row opened the query).
     });
-    box.addEventListener('click', (e) => { if (!(e.target as Element).closest('summary, details, .rv-note-form')) e.preventDefault(); });
+    box.addEventListener('click', (e) => {
+      if (handleNoteClick(e, (edit) => post({ type: 'live/editNote', ...edit }))) return;
+      if (!(e.target as Element).closest('.rv-note-form, .rv-note-edit')) e.preventDefault();
+    });
     // Double-click: a result row opens the edit dialog; the header row (or a box without rows) shows the query's source.
     box.addEventListener('dblclick', (e) => {
       const target = e.target as Element;
-      if (target.closest('input, button, a, summary, .rv-colgrip, .rv-note-form')) return;
+      if (target.closest('input, button, a, .tfm-notes, .tfm-notes-list, .rv-colgrip, .rv-note-form')) return;
       e.preventDefault();
       const row = target.closest<HTMLElement>('li.tfm-task');
       if (row?.dataset.tfmPath !== undefined) { post({ type: 'live/rowAct', act: 'edit', path: row.dataset.tfmPath, line: Number(row.dataset.tfmLine) }); return; }

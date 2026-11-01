@@ -12,6 +12,7 @@ import { tags } from '@lezer/highlight';
 import { findHeadingLine } from '../../core/file/headingAnchor';
 import { checkboxMode, toggleCheckboxLine } from '../../core/task/toggleCheckbox';
 import { activeLines, findQueryBlocks, liveDecos } from './decorations';
+import { QueryColumns } from './columns';
 import { keepKey } from './keys';
 import { type FromLive, minimalChange, type ToLive } from './sync';
 
@@ -58,8 +59,10 @@ class QueryWidget extends WidgetType {
     const box = document.createElement('div');
     box.className = 'cm-lv-query';
     box.innerHTML = this.html || '<div class="tfm-query">…</div>';
+    columns.addHeader(box);
     box.addEventListener('mousedown', (e) => {
       const target = e.target as Element;
+      if (target.closest('.rv-colhead')) return; // the column header's own buttons and grips
       e.preventDefault();
       const check = target.closest<HTMLInputElement>('input.tfm-check');
       const row = target.closest<HTMLElement>('li.tfm-task');
@@ -207,6 +210,7 @@ function keepKeys(e: KeyboardEvent): boolean {
 }
 
 let view: EditorView | null = null;
+const columns = new QueryColumns(document.getElementById('editor')!, (change) => post({ type: 'live/columns', ...change }));
 /** The latest query results (they can come before the editor exists). */
 let queries = new Map<string, string>();
 
@@ -277,9 +281,7 @@ window.addEventListener('message', (e: MessageEvent<ToLive>) => {
     view.focus();
   } else if (m.type === 'live/queries') {
     queries = new Map(m.blocks.map((b) => [b.source, b.html]));
-    // The rendered view's column choice: hidden columns and widths.
-    for (const c of ['due', 'created', 'done', 'more']) document.body.classList.toggle(`hide-col-${c}`, m.columns.hidden.includes(c));
-    document.body.style.setProperty('--rv-cols', m.columns.tracks);
+    columns.set(m.columns); // before the boxes are drawn: they take their header from it
     view?.dispatch({ effects: setQueries.of(queries) });
   } else if (m.type === 'live/text' && view) {
     const change = minimalChange(view.state.doc.toString(), m.text);

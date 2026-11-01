@@ -8,8 +8,8 @@ import { renderDocumentHtml } from './renderDocument';
 import { t } from '../l10n';
 import type { TaskEditService } from '../services/TaskEditService';
 import type { Settings } from '../settings/Settings';
-import { applyChanges, type FromLive, type ToLive } from '../webviews/live/sync';
-import { columnTracks, HIDEABLE_COLUMNS } from '../webviews/rendered/columns';
+import { applyChanges, type ColumnState, type FromLive, type ToLive } from '../webviews/live/sync';
+import { HIDEABLE_COLUMNS } from '../webviews/rendered/columns';
 import { cleanWidths } from './RenderedView';
 
 /**
@@ -40,6 +40,8 @@ export function queryBlocks(text: string): string[] {
 }
 
 export class LiveViewProvider implements vscode.CustomTextEditorProvider {
+  /** Open live views: their note and a way to send them new query results (after a column change). */
+  private readonly open = new Set<() => void>();
   /** Option/Alt+Shift+C in a live view: the line the create/edit command should use (read once). */
   private editLine: { key: string; line: number } | undefined;
 
@@ -52,11 +54,14 @@ export class LiveViewProvider implements vscode.CustomTextEditorProvider {
     return l;
   }
 
-  /** The rendered view's column choice (hidden columns, widths), shared by all notes. */
-  private columns(): { hidden: string[]; tracks: string } {
+  /** The rendered view's column choice (hidden columns, widths) and the header's words; shared by all notes. */
+  private columns(): ColumnState {
     const saved = this.deps.context.globalState.get<string[]>('rendered.hiddenColumns', []);
-    const hidden = HIDEABLE_COLUMNS.filter((c) => saved.includes(c));
-    return { hidden, tracks: columnTracks(hidden, cleanWidths(this.deps.context.globalState.get<Record<string, number>>('rendered.columnWidths', {}))) };
+    return {
+      hidden: HIDEABLE_COLUMNS.filter((c) => saved.includes(c)),
+      widths: cleanWidths(this.deps.context.globalState.get<Record<string, number>>('rendered.columnWidths', {})),
+      labels: { desc: t('Description'), due: t('Due date'), created: t('Created date'), done: t('Done date'), more: t('Other fields'), hide: t('Hide column'), show: t('Show column'), width: t('Column width'), widthHint: t('Drag to resize, double-click to fit the content') },
+    };
   }
 
   /** Query results for the note's ```tasks blocks, in columns with a header as in the rendered view. */
@@ -64,14 +69,11 @@ export class LiveViewProvider implements vscode.CustomTextEditorProvider {
     const base = this.deps.preview.pluginDeps();
     const deps = { ...base, enabled: () => true, renderOptions: (source?: Parameters<typeof base.renderOptions>[0], context?: 'line' | 'query') => ({ ...base.renderOptions(source, context), columns: true }) };
     const columns = this.columns();
-    const label: Record<string, string> = { due: t('Due date'), created: t('Created date'), done: t('Done date'), more: t('Other fields') };
     const esc = (s: string) => s.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
-    const header = `<div class="rv-colhead"><span></span><span class="rv-colhead-cell"><span class="rv-colhead-text">${esc(t('Description'))}</span></span>` +
-      HIDEABLE_COLUMNS.filter((c) => !columns.hidden.includes(c)).map((c) => `<span class="rv-colhead-cell"><span class="rv-colhead-text">${esc(label[c]!)}</span></span>`).join('') + '</div>';
     const blocks = [...new Set(queryBlocks(document.getText()))].map((source) => {
       try {
         const html = renderDocumentHtml('```tasks\n' + source + '\n```\n', deps, { env: { currentDocument: document.uri } });
-        return { source, html: html.includes('tfm-task') ? html.replace(/(<div class="tfm-query"[^>]*>)/, `$1${header}`) : html };
+        return { source, html };
       } catch (err) {
         return { source, html: `<div class="tfm-query tfm-error">${esc(String(err))}</div>` };
       }
@@ -91,11 +93,13 @@ export class LiveViewProvider implements vscode.CustomTextEditorProvider {
       queryTimer = setTimeout(() => post(this.queries(document)), delay);
     };
     const indexSub = this.deps.index.onDidChange(() => sendQueries(400));
+    const refresh = () => sendQueries(0);
+    this.open.add(refresh);
     // Messages are handled one after another, in the order the editor sent them.
     let queue: Promise<void> = Promise.resolve();
     const subs: vscode.Disposable[] = [
       sync,
-      { dispose: () => { indexSub.dispose(); clearTimeout(queryTimer); } },
+      { dispose: () => { indexSub.dispose(); clearTimeout(queryTimer); this.open.delete(refresh); } },
       vscode.workspace.onDidChangeTextDocument((e) => { if (e.document === document) sendQueries(300); }),
       webview.onDidReceiveMessage((m: FromLive) => {
         queue = queue.then(() => this.handle(m, document, post, sync)).catch((err) => {
@@ -135,6 +139,12 @@ export class LiveViewProvider implements vscode.CustomTextEditorProvider {
         const task = key ? this.deps.index.taskAt(key, msg.line) : undefined;
         if (!task) throw new Error(t('That task is no longer at line {0}; the view has been refreshed.', msg.line + 1));
         await this.deps.editService.toggle(task);
+        break;
+      }
+      case 'live/columns': {
+        if (msg.hidden) await this.deps.context.globalState.update('rendered.hiddenColumns', HIDEABLE_COLUMNS.filter((c) => msg.hidden!.includes(c)));
+        if (msg.widths) await this.deps.context.globalState.update('rendered.columnWidths', cleanWidths(msg.widths));
+        for (const refresh of this.open) refresh(); // the other live views follow
         break;
       }
       case 'live/editTask':
@@ -204,7 +214,20 @@ export class LiveViewProvider implements vscode.CustomTextEditorProvider {
   .cm-lv-query h4.tfm-group, .cm-lv-query h5.tfm-group, .cm-lv-query h6.tfm-group { margin: .6em 0 .2em; font-size: 1em; font-weight: 600; }
   .cm-lv-query .tfm-task-count { color: var(--rv-muted); }
   .cm-lv-query .rv-colhead { display: grid; grid-template-columns: var(--rv-cols, 1.4em minmax(8em, 1fr) 8.6em 8.6em 8.6em minmax(0, 18em)); column-gap: .9em; align-items: center; height: 22px; margin: 0 0 2px; overflow: hidden; color: var(--rv-muted); border-bottom: 1px solid color-mix(in srgb, var(--rv-fg) 14%, transparent); }
-  .cm-lv-query .rv-colhead-text { font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .cm-lv-query .rv-colhead-text, .cm-lv-query .rv-colhead button, .cm-lv-query .rv-colhead-chips { font-size: 11px; }
+  .cm-lv-query .rv-colhead-cell { position: relative; display: inline-flex; align-items: center; gap: 3px; min-width: 0; white-space: nowrap; }
+  .cm-lv-query .rv-colhead-text { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .cm-lv-query .rv-colhead button { border: none; background: transparent; color: var(--rv-muted); font: inherit; font-size: 11px; padding: 0 4px; border-radius: 3px; cursor: pointer; line-height: 16px; }
+  .cm-lv-query .rv-colhead button:hover, .cm-lv-query .rv-colhead button:focus-visible { background: var(--rv-bg-3); color: var(--rv-fg); }
+  .cm-lv-query .rv-colhead-chips { margin-left: auto; flex: none; display: inline-flex; gap: 4px; padding: 0 .3em 0 6px; }
+  .cm-lv-query .rv-colhead button, .cm-lv-query .rv-colhead .rv-colhead-chips, .cm-lv-query .rv-colgrip::after { opacity: 0; transition: opacity .12s; }
+  .cm-lv-query .rv-colhead:is(:hover, :focus-within) :is(button, .rv-colhead-chips, .rv-colgrip::after), body.rv-resizing .cm-lv-query .rv-colhead :is(button, .rv-colhead-chips) { opacity: 1; }
+  .cm-lv-query .rv-colhead:is(:hover, :focus-within) .rv-colgrip::after, body.rv-resizing .cm-lv-query .rv-colgrip::after { opacity: 1; }
+  .cm-lv-query .rv-colgrip { position: absolute; top: 0; bottom: 0; left: calc(-.45em - 5px); width: 10px; cursor: col-resize; touch-action: none; outline: none; }
+  .cm-lv-query .rv-colgrip::after { content: ''; position: absolute; top: 3px; bottom: 3px; left: 4px; width: 2px; border-radius: 1px; background: color-mix(in srgb, var(--rv-fg) 22%, transparent); }
+  .cm-lv-query .rv-colgrip:hover::after, .cm-lv-query .rv-colgrip:focus-visible::after, .cm-lv-query .rv-colgrip.rv-active::after { background: var(--vscode-focusBorder); }
+  body.rv-resizing, body.rv-resizing * { cursor: col-resize !important; user-select: none; }
+  .rv-measure { position: absolute !important; left: 0; top: 0; visibility: hidden; width: max-content !important; max-width: none !important; white-space: nowrap !important; overflow: visible !important; pointer-events: none; }
   body.hide-col-due .cm-lv-query .tfm-col-due, body.hide-col-created .cm-lv-query .tfm-col-created, body.hide-col-done .cm-lv-query .tfm-col-done, body.hide-col-more .cm-lv-query .tfm-col-more { display: none !important; }
   @media (max-width: 640px) {
     .cm-lv-query li.tfm-task { grid-template-columns: 1.4em minmax(0, 1fr); }

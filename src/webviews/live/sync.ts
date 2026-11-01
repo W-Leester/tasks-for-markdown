@@ -9,6 +9,10 @@ export interface TextChange {
   insert: string;
 }
 
+/** The query column header's words, and the column choice shared with the rendered view. */
+export interface ColumnLabels { desc: string; due: string; created: string; done: string; more: string; hide: string; show: string; width: string; widthHint: string }
+export interface ColumnState { hidden: string[]; widths: Record<string, number>; labels: ColumnLabels }
+
 /** Messages to the live view's webview. */
 export type ToLive =
   /** `eol`: the note's line ends, so the editor's offsets match the document's (CRLF counts two). */
@@ -16,7 +20,7 @@ export type ToLive =
   /** The note changed elsewhere (source editor, an AI, a command): its whole text. */
   | { type: 'live/text'; text: string }
   /** Results of the note's ```tasks blocks, by the block's source (the lines between the fences). */
-  | { type: 'live/queries'; blocks: { source: string; html: string }[]; columns: { hidden: string[]; tracks: string } };
+  | { type: 'live/queries'; blocks: { source: string; html: string }[]; columns: ColumnState };
 
 /** Messages from the live view's webview. */
 export type FromLive =
@@ -29,7 +33,9 @@ export type FromLive =
   | { type: 'live/toggleTask'; path: string; line: number }
   /** Option/Alt+Shift+C: edit the task on this line, or create one there. */
   | { type: 'live/editTask'; line: number }
-  | { type: 'live/link'; href: string };
+  | { type: 'live/link'; href: string }
+  /** The query column header changed: hidden columns or widths (kept for the rendered view too). */
+  | { type: 'live/columns'; hidden?: string[]; widths?: Record<string, number> };
 
 const isHigh = (c: number) => c >= 0xd800 && c <= 0xdbff;
 const isLow = (c: number) => c >= 0xdc00 && c <= 0xdfff;

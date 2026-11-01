@@ -65,11 +65,20 @@ describe('tree display (M11)', () => {
     const r = q.run({ index, today, allowFunctions: false, showTree: true });
     const html = renderQueryResult(r, q.layout, '', { today, link: (t) => `${t.location.path}#L${t.location.line + 1}` });
     expect(html).toContain('<ul class="tfm-list tfm-tree">');
-    expect(html).toMatch(/data-tfm-line="0">.*<ul class="tfm-list tfm-subtree">.*data-tfm-line="1"/s);
+    expect(html).toMatch(/data-tfm-line="0"[^>]*>.*<ul class="tfm-list tfm-subtree">.*data-tfm-line="1"/s);
     expect(html).toContain('tfm-context" data-tfm-path="plan.md" data-tfm-line="2"');
     // the root row has a backlink, the nested rows do not
     const flights = html.slice(html.indexOf('data-tfm-line="1"'), html.indexOf('data-tfm-line="2"'));
     expect(flights).not.toContain('tfm-backlink');
     expect(html).toContain('5 of 5 tasks');
+  });
+});
+
+describe('query rows carry sort/scope data (11-01)', () => {
+  it('due, created, priority, urgency and done, as note task lines do', () => {
+    const q = Query.parse('has due date');
+    const r = q.run({ index, today, allowFunctions: false });
+    const html = renderQueryResult(r, q.layout, '', { today });
+    expect(html).toMatch(/<li class="tfm-task[^"]*" data-tfm-path="[^"]+" data-tfm-line="\d+" data-tfm-due="\d{4}-\d\d-\d\d"[^>]* data-tfm-priority="[^"]+" data-tfm-urgency="[\d.]+"/);
   });
 });

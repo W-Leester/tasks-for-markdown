@@ -16,7 +16,7 @@ export class QueryColumns {
   private labels: ColumnLabels = { desc: 'Description', due: 'Due date', created: 'Created date', done: 'Done date', more: 'Other fields', hide: 'Hide column', show: 'Show column', width: 'Column width', widthHint: 'Drag to resize, double-click to fit the content' };
 
   /** `root`: where the result boxes are; `save`: tell the host about a change. */
-  constructor(private readonly root: HTMLElement, private readonly save: (change: { hidden?: string[]; widths?: Record<string, number> }) => void) {
+  constructor(private readonly root: HTMLElement, private readonly save: (change: { hidden?: string[]; widths?: Record<string, number> }) => void, private readonly onHidden: (hidden: readonly string[]) => void = () => undefined) {
     root.addEventListener('click', (e) => this.onClick(e));
     root.addEventListener('pointerdown', (e) => this.onPointerDown(e));
     root.addEventListener('keydown', (e) => this.onKeyDown(e), true);
@@ -55,8 +55,15 @@ export class QueryColumns {
     document.body.style.setProperty('--rv-cols', columnTracks(this.hidden, this.widths));
   }
 
+  /** From the toolbar's column menu. */
+  setHidden(hidden: readonly string[]): void {
+    this.applyHidden(hidden);
+    this.save({ hidden: this.hidden });
+  }
+
   private applyHidden(hidden: readonly string[]): void {
     this.hidden = HIDEABLE_COLUMNS.filter((c) => hidden.includes(c));
+    this.onHidden(this.hidden);
     for (const c of HIDEABLE_COLUMNS) document.body.classList.toggle(`hide-col-${c}`, this.hidden.includes(c));
     this.applyWidths();
     for (const head of Array.from(this.root.querySelectorAll<HTMLElement>('.cm-lv-query .rv-colhead'))) head.innerHTML = this.headerHtml();

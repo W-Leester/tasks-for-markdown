@@ -12,6 +12,7 @@ import { tags } from '@lezer/highlight';
 import { findHeadingLine } from '../../core/file/headingAnchor';
 import { checkboxMode, toggleCheckboxLine } from '../../core/task/toggleCheckbox';
 import { activeLines, findQueryBlocks, liveDecos } from './decorations';
+import { applyView, SCOPE_MODES, type ScopeMode, SORT_MODES, type SortMode, type ViewState } from '../rendered/view';
 import { QueryColumns } from './columns';
 import { keepKey } from './keys';
 import { type FromLive, minimalChange, type ToLive } from './sync';
@@ -60,6 +61,8 @@ class QueryWidget extends WidgetType {
     box.className = 'cm-lv-query';
     box.innerHTML = this.html || '<div class="tfm-query">…</div>';
     columns.addHeader(box);
+    applyView(box, viewState, today);
+    requestAnimationFrame(countHidden);
     box.addEventListener('mousedown', (e) => {
       const target = e.target as Element;
       if (target.closest('.rv-colhead')) return; // the column header's own buttons and grips
@@ -210,7 +213,39 @@ function keepKeys(e: KeyboardEvent): boolean {
 }
 
 let view: EditorView | null = null;
-const columns = new QueryColumns(document.getElementById('editor')!, (change) => post({ type: 'live/columns', ...change }));
+const colsMenu = document.getElementById('view-cols') as HTMLDetailsElement | null;
+const colBoxes = Array.from(document.querySelectorAll<HTMLInputElement>('#view-cols input[data-col]'));
+const columns = new QueryColumns(document.getElementById('editor')!, (change) => post({ type: 'live/columns', ...change }), (hidden) => {
+  for (const b of colBoxes) b.checked = !hidden.includes(b.dataset.col!);
+  const summary = colsMenu?.querySelector<HTMLElement>('summary');
+  if (summary) summary.textContent = hidden.length ? (summary.dataset.lHidden ?? 'Columns · {0} hidden').replace('{0}', String(hidden.length)) : (summary.dataset.lLabel ?? 'Columns');
+});
+for (const b of colBoxes) b.addEventListener('change', () => columns.setHidden(colBoxes.filter((x) => !x.checked).map((x) => x.dataset.col!)));
+document.addEventListener('click', (e) => { if (colsMenu?.open && !colsMenu.contains(e.target as Node)) colsMenu.open = false; });
+
+// ---- toolbar: sort and show filter (query results, as in the rendered view), mode buttons ----
+let viewState: ViewState = { sort: 'document', scope: 'all' };
+let today = new Date().toISOString().slice(0, 10);
+const sortSel = document.getElementById('view-sort') as HTMLSelectElement | null;
+const scopeSel = document.getElementById('view-scope') as HTMLSelectElement | null;
+const hiddenEl = document.getElementById('view-hidden');
+function countHidden(): void {
+  const n = document.querySelectorAll('.cm-lv-query li.tfm-task.rv-hidden').length;
+  if (hiddenEl) hiddenEl.textContent = n ? (document.body.dataset.lHidden ?? '{0} hidden').replace('{0}', String(n)) : '';
+}
+function refreshView(): void {
+  for (const box of Array.from(document.querySelectorAll<HTMLElement>('.cm-lv-query'))) applyView(box, viewState, today);
+  countHidden();
+}
+const pickView = () => {
+  viewState = { sort: (sortSel?.value ?? 'document') as SortMode, scope: (scopeSel?.value ?? 'all') as ScopeMode };
+  post({ type: 'live/view', ...viewState });
+  refreshView();
+};
+sortSel?.addEventListener('change', pickView);
+scopeSel?.addEventListener('change', pickView);
+document.getElementById('mode-rendered')?.addEventListener('click', () => post({ type: 'live/mode', mode: 'rendered' }));
+document.getElementById('mode-source')?.addEventListener('click', () => post({ type: 'live/mode', mode: 'source' }));
 /** The latest query results (they can come before the editor exists). */
 let queries = new Map<string, string>();
 
@@ -276,6 +311,10 @@ window.addEventListener('message', (e: MessageEvent<ToLive>) => {
   const m = e.data;
   if (m.type === 'live/init') {
     view?.destroy();
+    viewState = { sort: (SORT_MODES as string[]).includes(m.view.sort) ? (m.view.sort as SortMode) : 'document', scope: (SCOPE_MODES as string[]).includes(m.view.scope) ? (m.view.scope as ScopeMode) : 'all' };
+    today = m.today;
+    if (sortSel) sortSel.value = viewState.sort;
+    if (scopeSel) scopeSel.value = viewState.scope;
     view = create(m);
     view.dispatch({ effects: setQueries.of(queries) });
     view.focus();

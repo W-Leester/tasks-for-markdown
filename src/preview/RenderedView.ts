@@ -61,6 +61,7 @@ type Incoming =
   | { type: 'doc/save' }
   | { type: 'doc/link'; href: string }
   | { type: 'doc/openSource' }
+  | { type: 'doc/openLive' }
   | { type: 'doc/view'; sort: string; scope: string }
   | { type: 'doc/columns'; hidden: string[] }
   | { type: 'doc/columnWidths'; widths: Record<string, number> };
@@ -259,6 +260,10 @@ export class RenderedViewProvider implements vscode.CustomTextEditorProvider, vs
           break;
         case 'doc/link':
           await this.openLink(msg.href, document);
+          break;
+        case 'doc/openLive':
+          await vscode.commands.executeCommand('vscode.openWith', document.uri, 'tasksmd.live', panel.viewColumn);
+          panel.dispose();
           break;
         case 'doc/openSource':
           await vscode.commands.executeCommand('vscode.openWith', document.uri, 'default', panel.viewColumn);
@@ -577,6 +582,7 @@ ${borrowed.styles.map((u) => `<link rel="stylesheet" href="${webview.asWebviewUr
 </div>
 <div class="rv-toggle" role="group" aria-label="${t('Editor mode')}">
   <button id="mode-rendered" aria-pressed="true">${t('Rendered')}</button>
+  <button id="mode-live" title="${t('Live view (trial): edit anywhere, Markdown marks show on the line you are on')}">${t('Live')}</button>
   <button id="mode-source" title="${t('Open the Markdown source in the text editor')} (${RENDERED_KEY})">${t('Source')}</button>
 </div>
 <div id="content"></div>

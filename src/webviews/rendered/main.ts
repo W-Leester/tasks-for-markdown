@@ -704,5 +704,6 @@ content.addEventListener('dblclick', (e) => {
 });
 
 document.getElementById('mode-source')?.addEventListener('click', () => post({ type: 'doc/openSource' }));
+document.getElementById('mode-live')?.addEventListener('click', () => post({ type: 'doc/openLive' }));
 
 post({ type: 'ui/ready' });

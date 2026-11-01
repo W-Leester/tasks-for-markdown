@@ -108,6 +108,7 @@ export type FromWebview =
   | { type: 'doc/select'; line: number | null }
   | { type: 'doc/link'; href: string }
   | { type: 'doc/openSource' }
+  | { type: 'doc/openLive' }
   /** Rendered view: remember the sort/scope the user picked for this note. */
   | { type: 'doc/view'; sort: string; scope: string }
   /** Rendered view: columns hidden via the toolbar menu (all notes). */

@@ -16,7 +16,7 @@ export interface ColumnState { hidden: string[]; widths: Record<string, number>;
 /** Messages to the live view's webview. */
 export type ToLive =
   /** `eol`: the note's line ends, so the editor's offsets match the document's (CRLF counts two). */
-  | { type: 'live/init'; text: string; eol: '\n' | '\r\n'; fontSize: number; lineHeight: number; maxWidth: number }
+  | { type: 'live/init'; text: string; eol: '\n' | '\r\n'; fontSize: number; lineHeight: number; maxWidth: number; view: { sort: string; scope: string }; today: string }
   /** The note changed elsewhere (source editor, an AI, a command): its whole text. */
   | { type: 'live/text'; text: string }
   /** Results of the note's ```tasks blocks, by the block's source (the lines between the fences). */
@@ -35,7 +35,11 @@ export type FromLive =
   | { type: 'live/editTask'; line: number }
   | { type: 'live/link'; href: string }
   /** The query column header changed: hidden columns or widths (kept for the rendered view too). */
-  | { type: 'live/columns'; hidden?: string[]; widths?: Record<string, number> };
+  | { type: 'live/columns'; hidden?: string[]; widths?: Record<string, number> }
+  /** Sort and show filter picked in the toolbar (kept per note, shared with the rendered view). */
+  | { type: 'live/view'; sort: string; scope: string }
+  /** The toolbar's mode buttons: this note in the rendered view or the text editor. */
+  | { type: 'live/mode'; mode: 'rendered' | 'source' };
 
 const isHigh = (c: number) => c >= 0xd800 && c <= 0xdbff;
 const isLow = (c: number) => c >= 0xdc00 && c <= 0xdfff;

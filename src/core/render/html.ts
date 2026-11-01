@@ -1,6 +1,6 @@
 import { type Dayjs, describeRelative, relativeToEnglish, type RelativeDate } from '../dates';
 import type { GroupNode, Layout, QueryResult, TreeNode } from '../query';
-import { PRIORITY_EMOJI, PRIORITY_NAME, Priority, StatusType, type Task } from '../task';
+import { PRIORITY_EMOJI, PRIORITY_NAME, Priority, StatusType, type Task, urgency } from '../task';
 
 export interface RenderOptions {
   today: Dayjs;
@@ -135,13 +135,26 @@ export function renderCheckbox(task: Task): string {
   return `<input type="checkbox" class="tfm-check" disabled${checked} data-symbol="${esc(task.status.symbol)}" title="[${esc(task.status.symbol)}] ${esc(task.status.name)}">`;
 }
 
+/**
+ * Sort/scope data for the rendered and live views' toolbars, as note task lines have it (markdownItPlugin). Without it
+ * a date filter hid every query result row (11-01).
+ */
+function viewData(task: Task, o: RenderOptions): string {
+  const happens = task.happens();
+  return (task.due?.valid ? ` data-tfm-due="${task.due.format()}"` : '') +
+    (task.created?.valid ? ` data-tfm-created="${task.created.format()}"` : '') +
+    (happens?.valid ? ` data-tfm-happens="${happens.format()}"` : '') +
+    ` data-tfm-priority="${esc(String(task.priority))}" data-tfm-urgency="${Math.round(urgency(task, opts(o).today) * 100) / 100}"` +
+    (task.isCompleted ? ' data-tfm-done="1"' : '');
+}
+
 /** One result row in a query block. `extra` is used by tree display: nested children, context rows, no backlink on children. */
 export function renderTaskRow(task: Task, layout: Layout | null, o: RenderOptions, extra: { children?: string; context?: boolean; hideBacklink?: boolean } = {}): string {
   const href = o.link?.(task);
   const where = `${task.location.path}:${task.location.line + 1}`;
   const backlink = layout?.hidden.has('backlink') || extra.hideBacklink ? '' : `<span class="tfm-backlink">${href ? `<a href="${esc(href)}" title="${esc(where)}">${esc(task.location.path.split('/').pop()!.replace(/\.md$/, ''))}${task.location.heading ? ` › ${esc(task.location.heading)}` : ''}</a>` : esc(where)}</span>`;
   const notes = renderNotes(task, o);
-  const open = `<li class="tfm-task tfm-status-${statusClass(task)}${extra.context ? ' tfm-context' : ''}" data-tfm-path="${esc(task.location.path)}" data-tfm-line="${task.location.line}">${renderCheckbox(task)}`;
+  const open = `<li class="tfm-task tfm-status-${statusClass(task)}${extra.context ? ' tfm-context' : ''}" data-tfm-path="${esc(task.location.path)}" data-tfm-line="${task.location.line}"${viewData(task, o)}>${renderCheckbox(task)}`;
   if (o.columns) {
     const c = renderColumns(task, layout, o, { backlink, notes });
     const desc = renderDescriptionText(task, { ...o, stripTags: true });

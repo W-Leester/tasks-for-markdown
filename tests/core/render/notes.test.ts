@@ -21,7 +21,7 @@ describe('notes in query results (M13)', () => {
     it(`shows 💬 N with an expandable, escaped note list (columns=${columns})`, () => {
       const q = Query.parse('not done\nhide tree');
       const html = renderQueryResult(run('not done\nhide tree'), q.layout, '', { today, columns });
-      expect(html.match(/class="tfm-notes"/g)).toHaveLength(1);
+      expect(html.match(/class="tfm-notes" open/g)).toHaveLength(1); // shown; 💬 folds them
       expect(html).toContain('<summary title="3조 &lt;위약금&gt; 확인\n회신 대기" aria-label="2 notes">💬 2</summary>');
       expect(html).toContain('<li>3조 &lt;위약금&gt; 확인</li><li>회신 대기</li>');
       // After the backlink so an opened list doesn't push it down; in columns mode still inside the description cell.

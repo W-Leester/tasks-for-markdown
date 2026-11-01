@@ -169,7 +169,8 @@ export function renderNotes(task: Task, o: RenderOptions): string {
   if (!notes.length) return '';
   const t = o.t ?? fmt;
   const title = notes.map((n) => n.text).join('\n');
-  return `<details class="tfm-notes"><summary title="${esc(title)}" aria-label="${esc(t('{0} notes', notes.length))}">💬 ${notes.length}</summary><ul class="tfm-notes-list">${notes.map((n) => `<li>${esc(n.text)}</li>`).join('')}</ul></details>`;
+  // Open: the notes show under the task; 💬 N folds them (11-01, user: shown by default).
+  return `<details class="tfm-notes" open><summary title="${esc(title)}" aria-label="${esc(t('{0} notes', notes.length))}">💬 ${notes.length}</summary><ul class="tfm-notes-list">${notes.map((n) => `<li>${esc(n.text)}</li>`).join('')}</ul></details>`;
 }
 
 function renderGroup(node: GroupNode, depth: number, layout: Layout, o: RenderOptions, out: string[]): void {

@@ -236,6 +236,8 @@ export class LiveViewProvider implements vscode.CustomTextEditorProvider {
   .rv-toggle button:hover { color: var(--rv-fg); }
   .rv-toggle button[aria-pressed="true"] { background: var(--rv-bg-3); color: var(--rv-fg); cursor: default; }
   .cm-lv-query li.tfm-task.rv-hidden { display: none !important; }
+  .cm-lv-query li.tfm-task:has(> .tfm-desc > .tfm-notes[open]) > .tfm-check { align-self: start; margin-top: .3em; }
+  .cm-lv-query .tfm-notes > summary, .cm-lv-query .tfm-notes-list { color: var(--rv-muted); }
   /* ✎ ⏩ 💬 ＋ on a task (hover), as in the rendered view. */
   .rv-actions { display: none; margin-left: .5em; vertical-align: -1px; gap: 2px; }
   .cm-lv-query li.tfm-task:hover > .tfm-desc > .rv-actions, .cm-lv-query li.tfm-task:hover > p > .tfm-desc > .rv-actions, .cm-lv-query li.tfm-task:hover > .rv-actions, .cm-line:hover .rv-actions { display: inline-flex; }

@@ -266,3 +266,23 @@ describe('column widths (M16)', () => {
     expect(cols()).toBe('1.4em minmax(8em, 1fr) 8.6em 8.6em minmax(0, 18em)');
   });
 });
+
+describe('query result notes show by default; folded ones stay folded (11-01)', () => {
+  it('a 💬 N list folded by the user is still folded after the results are drawn again', async () => {
+    // The view script is already loaded (first test) and draws into its #content.
+    await import('../../src/webviews/rendered/main');
+    const html = '<div class="tfm-query"><ul class="tfm-list"><li class="tfm-task" data-tfm-path="a.md" data-tfm-line="3"><span class="tfm-desc">x <details class="tfm-notes" open><summary>💬 1</summary><ul class="tfm-notes-list"><li>메모</li></ul></details></span></li></ul></div>';
+    const draw = () => receive({ type: 'doc/html', html, fontSize: 14, lineHeight: 1.6, fieldsAlign: 'inline', maxWidth: 0, today: '2026-11-01', view: { sort: 'document', scope: 'all' } });
+    draw();
+    const notes = () => document.querySelector<HTMLDetailsElement>('details.tfm-notes')!;
+    expect(notes().open).toBe(true);
+    notes().open = false;
+    notes().dispatchEvent(new Event('toggle'));
+    draw();
+    expect(notes().open).toBe(false);
+    notes().open = true;
+    notes().dispatchEvent(new Event('toggle'));
+    draw();
+    expect(notes().open).toBe(true);
+  });
+});

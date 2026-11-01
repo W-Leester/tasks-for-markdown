@@ -241,6 +241,7 @@ window.addEventListener('message', (e: MessageEvent<ToWebview>) => {
   columnWidths = { ...(m.columnWidths ?? {}) };
   applyColumns(m.hiddenColumns ?? []);
   addRowActions();
+  keepFolded(content);
   addTaskRows();
   markQuotes();
   markBlocks();
@@ -368,6 +369,22 @@ content.addEventListener('click', (e) => {
   const row = target.closest<HTMLElement>('li.tfm-task');
   if (row && row.dataset.tfmPath === undefined && row.dataset.tfmLine !== undefined && !target.closest('input, button, textarea, details, summary, .tfm-notes')) selectRow(row);
 });
+
+/**
+ * Note lists folded with 💬 in query results stay folded when the results are drawn again (notes show by default).
+ * Keyed by the task's file and line.
+ */
+const foldedNotes = new Set<string>();
+const notesKey = (d: Element) => { const li = d.closest<HTMLElement>('li.tfm-task'); return li ? `${li.dataset.tfmPath ?? ''}:${li.dataset.tfmLine ?? ''}` : ''; };
+document.addEventListener('toggle', (e) => {
+  const d = e.target as HTMLDetailsElement;
+  if (!d.classList?.contains('tfm-notes')) return;
+  if (d.open) foldedNotes.delete(notesKey(d));
+  else foldedNotes.add(notesKey(d));
+}, true);
+function keepFolded(root: ParentNode): void {
+  for (const d of Array.from(root.querySelectorAll<HTMLDetailsElement>('details.tfm-notes'))) if (foldedNotes.has(notesKey(d))) d.open = false;
+}
 
 // ---- M38: typing into a blockquote ----
 const IS_MAC = /Mac|iPhone|iPad/.test(navigator.platform);

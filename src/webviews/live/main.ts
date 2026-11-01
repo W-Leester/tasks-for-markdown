@@ -96,6 +96,22 @@ function addRowActions(box: HTMLElement): void {
   }
 }
 
+/**
+ * Note lists folded with 💬 in query results stay folded when the results are drawn again (notes show by default).
+ * Keyed by the task's file and line.
+ */
+const foldedNotes = new Set<string>();
+const notesKey = (d: Element) => { const li = d.closest<HTMLElement>('li.tfm-task'); return li ? `${li.dataset.tfmPath ?? ''}:${li.dataset.tfmLine ?? ''}` : ''; };
+document.addEventListener('toggle', (e) => {
+  const d = e.target as HTMLDetailsElement;
+  if (!d.classList?.contains('tfm-notes')) return;
+  if (d.open) foldedNotes.delete(notesKey(d));
+  else foldedNotes.add(notesKey(d));
+}, true);
+function keepFolded(root: ParentNode): void {
+  for (const d of Array.from(root.querySelectorAll<HTMLDetailsElement>('details.tfm-notes'))) if (foldedNotes.has(notesKey(d))) d.open = false;
+}
+
 class QueryWidget extends WidgetType {
   constructor(readonly html: string, readonly body: number) { super(); }
   override eq(o: QueryWidget): boolean { return o.html === this.html && o.body === this.body; }
@@ -105,6 +121,7 @@ class QueryWidget extends WidgetType {
     box.innerHTML = this.html || '<div class="tfm-query">…</div>';
     columns.addHeader(box);
     addRowActions(box);
+    keepFolded(box);
     applyView(box, viewState, today);
     requestAnimationFrame(countHidden);
     box.addEventListener('mousedown', (e) => {

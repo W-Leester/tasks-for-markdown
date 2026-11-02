@@ -63,13 +63,13 @@ export function matchesScope(t: TaskData, scope: ScopeMode, today: string): bool
 
 /** Task list items that are direct children of the list (via <p> for loose lists they are still li children). */
 function taskItems(list: Element): HTMLElement[] {
-  return Array.from(list.children).filter((el): el is HTMLElement => el.tagName === 'LI' && el.classList.contains('tfm-task') && (el as HTMLElement).dataset.tfmLine !== undefined);
+  return Array.from(list.children).filter((el): el is HTMLElement => el.tagName === 'LI' && el.classList.contains('tfm-task') && !el.classList.contains('tfm-plain') && (el as HTMLElement).dataset.tfmLine !== undefined);
 }
 
 /**
  * Apply sort and scope to every list under `root`. Sorting reorders only the task items of each
  * list and leaves non-task items where they were; nested lists travel with their parent.
- * Returns how many task items are hidden.
+ * Returns how many task items are hidden. Plain checklists (`tfm-plain`, 11-02) are left as written.
  */
 export function applyView(root: ParentNode, view: ViewState, today: string): number {
   // Reset from a previous pass.
@@ -91,7 +91,7 @@ export function applyView(root: ParentNode, view: ViewState, today: string): num
   }
   let hidden = 0;
   if (view.scope !== 'all') {
-    const all = Array.from(root.querySelectorAll<HTMLElement>('li.tfm-task')).filter((li) => li.dataset.tfmLine !== undefined);
+    const all = Array.from(root.querySelectorAll<HTMLElement>('li.tfm-task')).filter((li) => li.dataset.tfmLine !== undefined && !li.classList.contains('tfm-plain'));
     // Decide bottom-up so a parent stays visible (dimmed) when a descendant matches.
     const matches = new Map<HTMLElement, boolean>();
     for (const li of all) matches.set(li, matchesScope(dataOf(li), view.scope, today));

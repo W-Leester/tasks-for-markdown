@@ -61,4 +61,29 @@ describe('column layout (M12)', () => {
     expect(html).toContain('tfm-col tfm-col-created');
     expect(html).toMatch(/<span class="tfm-col-tags"><span class="tfm-tag">#work<\/span><\/span><\/span>/); // tags inside the description cell
   });
+
+  it('a list where no task has a Tasks field stays a plain checklist: no cells, tfm-plain (11-02)', () => {
+    const md = new MarkdownIt();
+    const index = new TaskIndex();
+    tasksMarkdownItPlugin(md, {
+      getStatusRegistry: () => reg,
+      runQuery: (text, source) => Query.parse(text, source).run({ index, today, allowFunctions: false, source }),
+      parseQuery: (text, source) => Query.parse(text, source),
+      renderOptions: () => ({ today, fieldStyle: 'plain', columns: true }),
+      sourceFromEnv: () => undefined,
+      globalFilter: () => undefined,
+      enabled: () => true,
+    });
+    const html = md.render('#### Q20\n- [ ] Answer: #tag\n\n#### Q21\n- [ ] plain\n- [ ] dated 📅 2026-10-01\n  - [ ] nested child\n');
+    const items = [...html.matchAll(/<li class="([^"]*)"[^>]*>(.*?)(?=<li|<\/ul>)/gs)].map((m) => [m[1]!, m[2]!]);
+    expect(items).toHaveLength(4);
+    expect(items[0]![0]).toContain('tfm-plain');
+    expect(items[0]![1]).not.toContain('tfm-col tfm-col-');
+    expect(items[0]![1]).toContain('#tag'); // tags stay in the text
+    // One field anywhere in the list puts the whole list (nested tasks too) in columns.
+    for (const [cls, body] of items.slice(1)) {
+      expect(cls).not.toContain('tfm-plain');
+      expect(body).toContain('tfm-col tfm-col-due');
+    }
+  });
 });

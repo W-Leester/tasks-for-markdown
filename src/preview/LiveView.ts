@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { findHeadingLine } from '../core/file/headingAnchor';
 import type { TaskIndex } from '../core/index';
-import { parseTaskLine, type StatusRegistry, type Task, urgency } from '../core/task';
+import { hasTaskFields, parseTaskLine, type StatusRegistry, type Task, urgency } from '../core/task';
 import { renderColumns, renderDescriptionText } from '../core/render';
 import type { IndexService } from '../index/IndexService';
 import type { PreviewIntegration } from './PreviewIntegration';
@@ -88,6 +88,7 @@ export class LiveViewProvider implements vscode.CustomTextEditorProvider {
       const happens = task.happens();
       rows.push({
         text,
+        fields: hasTaskFields(task),
         html: `<span class="tfm-desc">${renderDescriptionText(task, { ...o, stripTags: true })}${c.afterDescription}</span>${c.cells}`,
         data: { due: task.due?.valid ? task.due.format() : null, created: task.created?.valid ? task.created.format() : null, happens: happens?.valid ? happens.format() : null, priority: Number(task.priority), urgency: Math.round(urgency(task, o.today) * 100) / 100, done: task.isCompleted },
       });

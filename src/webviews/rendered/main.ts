@@ -69,7 +69,7 @@ function headerHtml(): string {
       .join('')
   );
 }
-/** Where headers go: result boxes with tasks, and top-level note lists whose own items include tasks. */
+/** Where headers go: result boxes with tasks, and top-level note lists whose own items include tasks in columns. */
 function applyHeaders(): void {
   const html = headerHtml();
   for (const query of Array.from(content.querySelectorAll<HTMLElement>('.tfm-query-block > .tfm-query'))) {
@@ -84,7 +84,7 @@ function applyHeaders(): void {
   }
   for (const list of Array.from(content.querySelectorAll<HTMLElement>('ul, ol'))) {
     if (list.closest('.tfm-query') || list.parentElement?.closest('li')) continue;
-    if (!list.querySelector(':scope > li.tfm-task')) continue;
+    if (!list.querySelector(':scope > li.tfm-task:not(.tfm-plain)')) continue; // a plain checklist: no header (11-02)
     let head = list.querySelector<HTMLElement>(':scope > li.rv-colhead');
     if (!head) {
       head = document.createElement('li');

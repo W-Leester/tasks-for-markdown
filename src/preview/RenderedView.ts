@@ -448,12 +448,14 @@ ${borrowed.styles.map((u) => `<link rel="stylesheet" href="${webview.asWebviewUr
   /* Faint separator between task rows (document lists and query results) so wrapped fields stay with their task. */
   li.tfm-task { border-top: 1px solid color-mix(in srgb, var(--rv-fg) 10%, transparent); padding-top: 4px; padding-bottom: 4px; margin: 0; }
   ul > li.tfm-task:first-child, ol > li.tfm-task:first-child { border-top-color: transparent; }
+  /* A plain checklist (no Tasks field in the list, 11-02): checkboxes without row lines or columns. */
+  li.tfm-task.tfm-plain, li.tfm-task > ul > li.tfm-task.tfm-plain:first-child, li.tfm-task > p + ul > li.tfm-task.tfm-plain:first-child { border-top-color: transparent; padding-top: 1px; padding-bottom: 1px; }
   li.tfm-task > ul > li.tfm-task:first-child, li.tfm-task > p + ul > li.tfm-task:first-child { border-top-color: color-mix(in srgb, var(--rv-fg) 10%, transparent); }
   .tfm-fields { margin-left: .2em; } .tfm-field { white-space: nowrap; }
   /* fieldsAlign = columns (M12): the same grid on every task row so due / tags / recurrence line up vertically. */
-  body.fields-columns li.tfm-task { display: grid; grid-template-columns: var(--rv-cols, 1.4em minmax(8em, 1fr) 8.6em 8.6em 8.6em minmax(0, 18em)); column-gap: .9em; align-items: baseline; }
-  body.fields-columns li.tfm-task > p { display: contents; }
-  body.fields-columns li.tfm-task > .tfm-check, body.fields-columns li.tfm-task > p > .tfm-check { margin: 0; align-self: center; }
+  body.fields-columns li.tfm-task:not(.tfm-plain) { display: grid; grid-template-columns: var(--rv-cols, 1.4em minmax(8em, 1fr) 8.6em 8.6em 8.6em minmax(0, 18em)); column-gap: .9em; align-items: baseline; }
+  body.fields-columns li.tfm-task:not(.tfm-plain) > p { display: contents; }
+  body.fields-columns li.tfm-task:not(.tfm-plain) > .tfm-check, body.fields-columns li.tfm-task:not(.tfm-plain) > p > .tfm-check { margin: 0; align-self: center; }
   body.fields-columns .tfm-desc { min-width: 0; }
   body.fields-columns .tfm-col { min-width: 0; font-size: .92em; }
   body.fields-columns .tfm-col-due, body.fields-columns .tfm-col-created, body.fields-columns .tfm-col-done { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -465,9 +467,9 @@ ${borrowed.styles.map((u) => `<link rel="stylesheet" href="${webview.asWebviewUr
   body.fields-columns .tfm-col .tfm-badge { max-width: 100%; box-sizing: border-box; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: bottom; }
   body.fields-columns .tfm-col-pri { margin-left: .2em; }
   body.fields-columns .tfm-col .tfm-badge { margin: 1px 0; }
-  body.fields-columns li.tfm-task > ul, body.fields-columns li.tfm-task > ol { grid-column: 1 / -1; margin: 0; padding-left: 1.6em; }
+  body.fields-columns li.tfm-task:not(.tfm-plain) > ul, body.fields-columns li.tfm-task:not(.tfm-plain) > ol { grid-column: 1 / -1; margin: 0; padding-left: 1.6em; }
   @media (max-width: 640px) {
-    body.fields-columns li.tfm-task { grid-template-columns: 1.4em minmax(0, 1fr); }
+    body.fields-columns li.tfm-task:not(.tfm-plain) { grid-template-columns: 1.4em minmax(0, 1fr); }
     body.fields-columns .tfm-col { grid-column: 2; }
     body.fields-columns .tfm-col:empty { display: none; }
     body.fields-columns .rv-colhead { display: none; }
@@ -484,7 +486,7 @@ ${borrowed.styles.map((u) => `<link rel="stylesheet" href="${webview.asWebviewUr
   /* Notes (M13): plain bullets under a task, muted with a 💬 marker; the add-note input; 💬 N on query rows. */
   li.tfm-note { list-style: none; color: var(--rv-muted); font-size: .93em; }
   li.tfm-note::before { content: '💬'; display: inline-block; width: 1.9em; margin-left: -1.9em; font-size: .8em; opacity: .7; }
-  body.fields-columns li.tfm-task:not(.tfm-notes-folded):has(> .tfm-desc > .tfm-notes-list) > .tfm-check { align-self: start; margin-top: .3em; }
+  body.fields-columns li.tfm-task:not(.tfm-plain):not(.tfm-notes-folded):has(> .tfm-desc > .tfm-notes-list) > .tfm-check { align-self: start; margin-top: .3em; }
   li.tfm-note > p:first-child { display: inline; }
   /* M27: the selected row (Enter adds a task below it), the new-task input and the "＋ Add task" row at the end of a list. */
   li.tfm-task.rv-selected { outline: 1px solid var(--rv-accent); outline-offset: 1px; border-radius: 3px; }

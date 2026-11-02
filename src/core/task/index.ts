@@ -12,3 +12,4 @@ export { applyStatusChange, nextInstance, type RecurrenceSettings, type StatusCh
 export { generateTaskId } from './ids';
 export { STATUS_PRESETS, presetStatuses, type StatusPresetName } from './statusPresets';
 export { urgency } from './Urgency';
+export { hasTaskFields, listGroups } from './listGroups';

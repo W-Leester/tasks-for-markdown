@@ -10,6 +10,7 @@ import { Annotation, EditorSelection, EditorState, type Extension, Prec, type Ra
 import { Decoration, type DecorationSet, EditorView, keymap, ViewPlugin, type ViewUpdate, WidgetType } from '@codemirror/view';
 import { tags } from '@lezer/highlight';
 import { findHeadingLine } from '../../core/file/headingAnchor';
+import { listGroups } from '../../core/task/listGroups';
 import { checkboxMode, toggleCheckboxLine } from '../../core/task/toggleCheckbox';
 import { activeLines, findQueryBlocks, liveDecos } from './decorations';
 import { applyView, matchesScope, SCOPE_MODES, type ScopeMode, SORT_MODES, type SortMode, type ViewState } from '../rendered/view';
@@ -304,22 +305,28 @@ class BodyHeadWidget extends WidgetType {
 
 const TASK_TEXT = /^(\s*)(?:[-*+]|\d+[.)])\s+\[.\]/;
 const LIST_TEXT = /^\s*(?:[-*+]|\d+[.)])\s/;
-/** Headers over top-level task lists, and note task lines the show filter hides (with their notes). */
-function bodyDecos(state: EditorState, view: { view: ViewState; today: string }): { decos: DecorationSet; hidden: number } {
+/**
+ * Lines drawn in columns (1-based): task lines of a list where some task has a Tasks field — a plain checklist stays a
+ * checklist (11-02). Headers over those lists, and those task lines the show filter hides (with their notes).
+ */
+function bodyDecos(state: EditorState, view: { view: ViewState; today: string }): { decos: DecorationSet; hidden: number; rowLines: Set<number> } {
   const doc = state.doc;
   const ranges: Range<Decoration>[] = [];
   const indentOf = (t: string) => /^\s*/.exec(t)![0].replace(/\t/g, '    ').length;
   const active = activeLines(state, true);
-  // Headers: the first line of a top-level list whose items include tasks.
-  for (let n = 1; n <= doc.lines; n++) {
-    const text = doc.line(n).text;
-    if (!TASK_TEXT.test(text) || indentOf(text) > 0) continue;
-    if (n > 1 && LIST_TEXT.test(doc.line(n - 1).text)) continue;
-    // Not inside a code block (the syntax tree may not be complete: a quick fence count).
-    let fences = 0;
-    for (let k = 1; k < n; k++) if (/^ {0,3}(`{3,}|~{3,})/.test(doc.line(k).text)) fences++;
-    if (fences % 2) continue;
-    ranges.push(Decoration.widget({ widget: new BodyHeadWidget(), block: true, side: -1 }).range(doc.line(n).from));
+  const lines: string[] = [];
+  for (let n = 1; n <= doc.lines; n++) lines.push(doc.line(n).text);
+  const groups = listGroups(lines);
+  const fielded = new Set<number>();
+  for (let i = 0; i < lines.length; i++) if (groups[i]! >= 0 && rows.get(lines[i]!)?.fields) fielded.add(groups[i]!);
+  const rowLines = new Set<number>();
+  for (let i = 0; i < lines.length; i++) if (fielded.has(groups[i]!) && TASK_TEXT.test(lines[i]!) && rows.has(lines[i]!)) rowLines.add(i + 1);
+  // Headers: the first line of each list drawn in columns, when it is a task line at the top level.
+  for (let i = 0; i < lines.length; i++) {
+    const g = groups[i]!;
+    if (!fielded.has(g) || (i > 0 && groups[i - 1] === g)) continue;
+    if (!TASK_TEXT.test(lines[i]!) || indentOf(lines[i]!) > 0) continue;
+    ranges.push(Decoration.widget({ widget: new BodyHeadWidget(), block: true, side: -1 }).range(doc.line(i + 1).from));
   }
   // Show filter: a task line is hidden when it and no task under it match; its notes go with it.
   let hidden = 0;
@@ -334,7 +341,7 @@ function bodyDecos(state: EditorState, view: { view: ViewState; today: string })
       const ind = indentOf(text);
       while (stack.length && stack[stack.length - 1]!.indent >= ind) stack.pop();
       owner[n] = stack.length ? stack[stack.length - 1]!.n : 0;
-      const row = TASK_TEXT.test(text) ? rows.get(text) : undefined;
+      const row = rowLines.has(n) ? rows.get(text) : undefined;
       if (row) {
         matches.set(n, matchesScope({ ...row.data, line: n }, view.view.scope, view.today));
         stack.push({ n, indent: ind });
@@ -356,10 +363,10 @@ function bodyDecos(state: EditorState, view: { view: ViewState; today: string })
       n = m;
     }
   }
-  return { decos: Decoration.set(ranges, true), hidden };
+  return { decos: Decoration.set(ranges, true), hidden, rowLines };
 }
 
-const bodyField = StateField.define<{ view: { view: ViewState; today: string }; decos: DecorationSet; hidden: number }>({
+const bodyField = StateField.define<{ view: { view: ViewState; today: string }; decos: DecorationSet; hidden: number; rowLines: Set<number> }>({
   create: (state) => { const v = { view: { sort: 'document', scope: 'all' } as ViewState, today: '' }; return { view: v, ...bodyDecos(state, v) }; },
   update(value, tr) {
     let v = value.view;
@@ -378,11 +385,12 @@ function build(view: EditorView): DecorationSet {
   const ranges: Range<Decoration>[] = [];
   /** Lines shown in columns: their ✎ ⏩ 💬 ＋ are inside the row. */
   const inRows = new Set<number>();
+  const rowLines = view.state.field(bodyField).rowLines;
   for (const { from, to } of view.visibleRanges) {
     for (const d of liveDecos(view.state, active, from, to)) {
       if (d.kind === 'task') {
         const line = view.state.doc.line(d.line + 1);
-        const row = rows.get(line.text);
+        const row = rowLines.has(line.number) ? rows.get(line.text) : undefined;
         if (row && d.to <= line.to) {
           ranges.push(Decoration.replace({ widget: new TaskWidget(d.checked, d.line) }).range(d.from, d.to));
           ranges.push(Decoration.replace({ widget: new RowWidget(row.html, d.line, /[📅⏳]/u.test(line.text)) }).range(d.to, line.to));

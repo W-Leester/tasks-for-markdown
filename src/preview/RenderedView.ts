@@ -80,7 +80,7 @@ const INDEX_DEBOUNCE_MS = 400;
 const RENDERED_KEY = process.platform === 'darwin' ? 'Cmd+Shift+R' : 'Ctrl+Shift+R';
 
 /** Other extensions' preview contributions in use (M34). Their scripts load after ours, which takes the webview API. */
-interface Borrowed {
+export interface Borrowed {
   plugins: { id: string; apply: (md: MarkdownIt) => unknown }[];
   scripts: { uri: vscode.Uri; module: boolean }[];
   styles: vscode.Uri[];

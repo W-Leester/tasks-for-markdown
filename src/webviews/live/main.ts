@@ -12,7 +12,7 @@ import { tags } from '@lezer/highlight';
 import { findHeadingLine } from '../../core/file/headingAnchor';
 import { listGroups } from '../../core/task/listGroups';
 import { checkboxMode, toggleCheckboxLine } from '../../core/task/toggleCheckbox';
-import { activeLines, findQueryBlocks, liveDecos } from './decorations';
+import { activeLines, findBlocks, findQueryBlocks, liveDecos } from './decorations';
 import { applyView, matchesScope, SCOPE_MODES, type ScopeMode, SORT_MODES, type SortMode, type ViewState } from '../rendered/view';
 import { decorateNotes, handleNoteClick } from '../shared/notes';
 import { QueryColumns } from './columns';
@@ -169,6 +169,93 @@ const queryField = StateField.define<{ html: Map<string, string>; decos: Decorat
     for (const e of tr.effects) if (e.is(setQueries)) html = e.value;
     if (html === value.html && !tr.docChanged && !tr.selection) return value;
     return { html, decos: queryDecos(tr.state, html) };
+  },
+  provide: (f) => EditorView.decorations.from(f, (v) => v.decos),
+});
+
+// ---- M40 F: front matter, tables, other extensions' previews (drawn by the host) and images, off the cursor ----
+/** The note folder's address in the webview, for relative image paths. */
+let imageBase = '';
+/** `![alt](src)`: the image; a click puts the cursor there (the Markdown shows). */
+class ImageWidget extends WidgetType {
+  constructor(readonly src: string, readonly alt: string, readonly at: number) { super(); }
+  override eq(o: ImageWidget): boolean { return o.src === this.src && o.alt === this.alt && o.at === this.at; }
+  toDOM(view: EditorView): HTMLElement {
+    const img = document.createElement('img');
+    img.className = 'cm-lv-image';
+    img.alt = this.alt;
+    img.title = this.alt;
+    let src = this.src;
+    if (!/^(?:[a-z][a-z0-9+.-]*:|\/\/)/i.test(src) && imageBase) {
+      try { src = new URL(src.split('/').map((p) => encodeURIComponent(decodeURIComponent(p))).join('/'), imageBase).toString(); } catch { /* left as written */ }
+    }
+    img.src = src;
+    img.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      view.dispatch({ selection: EditorSelection.cursor(this.at) });
+      view.focus();
+    });
+    return img;
+  }
+  override ignoreEvent(): boolean { return true; }
+}
+
+let blocks = new Map<string, { kind: string; html: string }>();
+const setBlocks = StateEffect.define<Map<string, { kind: string; html: string }>>();
+
+class BlockWidget extends WidgetType {
+  constructor(readonly html: string, readonly kind: string, readonly first: number) { super(); }
+  override eq(o: BlockWidget): boolean { return o.html === this.html && o.first === this.first; }
+  toDOM(view: EditorView): HTMLElement {
+    const box = document.createElement('div');
+    box.className = `cm-lv-block cm-lv-block-${this.kind}`;
+    box.innerHTML = this.html;
+    // Other extensions' preview scripts (Mermaid…) draw on the event the built-in preview sends after an update.
+    if (this.kind === 'fence') requestAnimationFrame(() => window.dispatchEvent(new CustomEvent('vscode.markdown.updateContent')));
+    box.addEventListener('mousedown', (e) => {
+      const target = e.target as Element;
+      const a = target.closest<HTMLAnchorElement>('a[href]');
+      if (a && (e.metaKey || e.ctrlKey)) { e.preventDefault(); openLink(a.getAttribute('href')!); return; }
+      e.preventDefault();
+      // A table: the clicked row's line (the header is the first line, then the |---| line, then the body rows).
+      let line = this.first;
+      const tr = target.closest('tr');
+      if (this.kind === 'table' && tr) {
+        const inHead = !!tr.closest('thead');
+        const index = Array.from(tr.parentElement!.children).indexOf(tr);
+        line = this.first + (inHead ? 0 : 2 + index);
+      } else if (this.kind !== 'table') line = this.first + 1; // into the block, past its opening line
+      const doc = view.state.doc;
+      view.dispatch({ selection: EditorSelection.cursor(doc.line(Math.min(line, doc.lines)).to), scrollIntoView: false });
+      view.focus();
+    });
+    return box;
+  }
+  override ignoreEvent(): boolean { return true; }
+}
+
+function blockDecos(state: EditorState, map: Map<string, { kind: string; html: string }>): DecorationSet {
+  if (!map.size) return Decoration.none;
+  const doc = state.doc;
+  const lines: string[] = [];
+  for (let n = 1; n <= doc.lines; n++) lines.push(doc.line(n).text);
+  const ranges: Range<Decoration>[] = [];
+  for (const b of findBlocks(lines, map.keys())) {
+    const from = doc.line(b.first).from, to = doc.line(b.last).to;
+    if (state.selection.ranges.some((r) => r.to >= from && r.from <= to)) continue; // the cursor is in it: the source
+    const { kind, html } = map.get(b.source)!;
+    ranges.push(Decoration.replace({ widget: new BlockWidget(html, kind, b.first), block: true }).range(from, to));
+  }
+  return Decoration.set(ranges);
+}
+
+const blockField = StateField.define<{ map: Map<string, { kind: string; html: string }>; decos: DecorationSet }>({
+  create: (state) => ({ map: new Map(), decos: blockDecos(state, new Map()) }),
+  update(value, tr) {
+    let map = value.map;
+    for (const e of tr.effects) if (e.is(setBlocks)) map = e.value;
+    if (map === value.map && !tr.docChanged && !tr.selection) return value;
+    return { map, decos: blockDecos(tr.state, map) };
   },
   provide: (f) => EditorView.decorations.from(f, (v) => v.decos),
 });
@@ -409,6 +496,7 @@ function build(view: EditorView): DecorationSet {
       }
       else if (d.kind === 'task') ranges.push(Decoration.replace({ widget: new TaskWidget(d.checked, d.line) }).range(d.from, d.to));
       else if (d.kind === 'actions') ranges.push(Decoration.widget({ widget: new ActionsWidget(d.line, d.dated), side: 1 }).range(d.from));
+      else if (d.kind === 'image') ranges.push(Decoration.replace({ widget: new ImageWidget(d.src, d.alt, d.from) }).range(d.from, d.to));
       else if (d.to > d.from) ranges.push(Decoration.mark({ class: d.cls, attributes: d.href !== undefined ? { 'data-href': d.href, title: document.body.dataset.lLinkHint ?? 'Cmd/Ctrl+click to open' } : {} }).range(d.from, d.to));
     }
   }
@@ -549,6 +637,7 @@ function create(init: Extract<ToLive, { type: 'live/init' }>): EditorView {
           },
         })),
         queryField,
+        blockField,
         bodyField,
         EditorView.domEventHandlers({
           mousedown: (e) => {
@@ -580,8 +669,15 @@ window.addEventListener('message', (e: MessageEvent<ToLive>) => {
     today = m.today;
     if (sortSel) sortSel.value = viewState.sort;
     if (scopeSel) scopeSel.value = viewState.scope;
+    imageBase = m.imageBase;
     view = create(m);
-    view.dispatch({ effects: [setQueries.of(queries), setRows.of(rows), setBodyView.of({ view: viewState, today })] });
+    // Start below the front matter, so it shows as its box (M40 F) rather than as written.
+    const doc = view.state.doc;
+    let start = 0;
+    if (doc.lines > 1 && doc.line(1).text === '---') {
+      for (let n = 2; n <= doc.lines; n++) if (/^---[ \t]*$/.test(doc.line(n).text)) { start = n < doc.lines ? doc.line(n + 1).from : doc.line(n).to; break; }
+    }
+    view.dispatch({ effects: [setQueries.of(queries), setBlocks.of(blocks), setRows.of(rows), setBodyView.of({ view: viewState, today })], ...(start ? { selection: EditorSelection.cursor(start) } : {}) });
     view.focus();
   } else if (m.type === 'live/rows') {
     rows = new Map(m.rows.map((r) => [r.text, r]));
@@ -591,6 +687,9 @@ window.addEventListener('message', (e: MessageEvent<ToLive>) => {
     queries = new Map(m.blocks.map((b) => [b.source, b.html]));
     columns.set(m.columns); // before the boxes are drawn: they take their header from it
     view?.dispatch({ effects: setQueries.of(queries) });
+  } else if (m.type === 'live/blocks') {
+    blocks = new Map(m.blocks.map((b) => [b.source, { kind: b.kind, html: b.html }]));
+    view?.dispatch({ effects: setBlocks.of(blocks) });
   } else if (m.type === 'live/text' && view) {
     const change = minimalChange(view.state.doc.toString(), m.text);
     if (change) view.dispatch({ changes: change, annotations: [fromHost.of(true), Transaction.addToHistory.of(false)] });

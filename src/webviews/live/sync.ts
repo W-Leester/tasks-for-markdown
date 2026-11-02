@@ -20,7 +20,7 @@ export interface LiveRow { text: string; html: string; fields: boolean; data: { 
 /** Messages to the live view's webview. */
 export type ToLive =
   /** `eol`: the note's line ends, so the editor's offsets match the document's (CRLF counts two). */
-  | { type: 'live/init'; text: string; eol: '\n' | '\r\n'; fontSize: number; lineHeight: number; maxWidth: number; view: { sort: string; scope: string }; today: string }
+  | { type: 'live/init'; text: string; eol: '\n' | '\r\n'; fontSize: number; lineHeight: number; maxWidth: number; view: { sort: string; scope: string }; today: string; imageBase: string }
   /** The note changed elsewhere (source editor, an AI, a command): its whole text. */
   | { type: 'live/text'; text: string }
   /**
@@ -29,7 +29,9 @@ export type ToLive =
    */
   | { type: 'live/rows'; rows: LiveRow[] }
   /** Results of the note's ```tasks blocks, by the block's source (the lines between the fences). */
-  | { type: 'live/queries'; blocks: { source: string; html: string }[]; columns: ColumnState };
+  | { type: 'live/queries'; blocks: { source: string; html: string }[]; columns: ColumnState }
+  /** Blocks drawn off the cursor (M40 F): front matter, tables, other extensions' previews; by their lines as written. */
+  | { type: 'live/blocks'; blocks: { kind: 'front' | 'table' | 'fence'; source: string; html: string }[] };
 
 /** Messages from the live view's webview. */
 export type FromLive =

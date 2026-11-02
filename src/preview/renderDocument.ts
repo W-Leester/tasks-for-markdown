@@ -25,6 +25,60 @@ export interface RenderDocumentOptions {
  * preserved so `data-tfm-line` still maps to the document), checkboxes are made clickable, and
  * relative image paths are resolved for the webview. No vscode imports so it is unit-testable.
  */
+const FRONT_MATTER = /^---\r?\n([\s\S]*?)\r?\n---[ \t]*(?:\r?\n|$)/;
+
+/** YAML front matter as a muted key/value block. */
+function frontMatterHtml(body: string): string {
+  const rows = body.split(/\r?\n/).filter((l) => l.trim()).map((l) => {
+    const m = /^([^:]+):\s*(.*)$/.exec(l);
+    return m ? `<div><span class="k">${escape(m[1]!.trim())}</span>: ${escape(m[2]!)}</div>` : `<div>${escape(l)}</div>`;
+  });
+  return `<div class="rv-frontmatter">${rows.join('')}</div>`;
+}
+
+/** A block the live view (M40 F) draws off the cursor: its lines as written (joined with `\n`) and its HTML. */
+export interface LiveBlock { kind: 'front' | 'table' | 'fence'; source: string; html: string }
+
+/**
+ * The note's blocks the live view shows rendered when the cursor is not in them (M40 F): the front matter, top-level
+ * tables, and fenced code another extension draws (Mermaid…: its HTML is not a plain `<pre><code>`). ```tasks blocks
+ * are drawn as query results elsewhere; plain code stays text to edit.
+ */
+export function liveBlocks(text: string, deps: PluginDeps, options: RenderDocumentOptions = {}): LiveBlock[] {
+  const out: LiveBlock[] = [];
+  const lines = text.split(/\r?\n/);
+  const front = FRONT_MATTER.exec(text);
+  if (front) {
+    const n = front[0].replace(/\r?\n$/, '').split(/\r?\n/).length;
+    out.push({ kind: 'front', source: lines.slice(0, n).join('\n'), html: front[1]!.trim() ? frontMatterHtml(front[1]!) : '<div class="rv-frontmatter"></div>' });
+  }
+  const blanked = text.replace(FRONT_MATTER, (m) => m.replace(/[^\n]/g, ''));
+  const md = new MarkdownItCtor({ html: false, linkify: true });
+  (options.plugins ?? []).forEach((plugin, i) => {
+    try { plugin(md); } catch (err) { options.onPluginError?.(i, err); }
+  });
+  let tokens: { type: string; level: number; info: string; map: [number, number] | null }[];
+  try { tokens = md.parse(blanked, options.env ?? {}); } catch (err) { options.onPluginError?.('render', err); tokens = new MarkdownItCtor().parse(blanked, {}); }
+  const seen = new Set<string>();
+  for (const token of tokens) {
+    if (token.level !== 0 || !token.map) continue;
+    const kind = token.type === 'table_open' ? 'table' : token.type === 'fence' && token.info.trim().split(/\s+/)[0] !== 'tasks' && token.info.trim() ? 'fence' : null;
+    if (!kind) continue;
+    const [start] = token.map;
+    let end = token.map[1];
+    while (end > start + 1 && !lines[end - 1]!.trim()) end--;
+    const source = lines.slice(start, end).join('\n');
+    if (seen.has(source)) continue;
+    seen.add(source);
+    let html: string;
+    try { html = renderDocumentHtml(source + '\n', deps, { ...options, frontMatter: false }); } catch { continue; }
+    // A fence drawn as plain code: leave it as text to edit.
+    if (kind === 'fence' && /^\s*<pre><code[\s>]/.test(html)) continue;
+    out.push({ kind, source, html });
+  }
+  return out;
+}
+
 export function renderDocumentHtml(text: string, deps: PluginDeps, options: RenderDocumentOptions = {}): string {
   const build = (borrowed: boolean): MarkdownIt => {
     const md = new MarkdownItCtor({ html: false, linkify: true });
@@ -45,7 +99,7 @@ export function renderDocumentHtml(text: string, deps: PluginDeps, options: Rend
   };
   // Keep the line count: replace every non-newline character of the front matter with nothing.
   let frontMatter = '';
-  const source = text.replace(/^---\r?\n([\s\S]*?)\r?\n---[ \t]*(?:\r?\n|$)/, (m, body: string) => {
+  const source = text.replace(FRONT_MATTER, (m, body: string) => {
     frontMatter = body;
     return m.replace(/[^\n]/g, '');
   });
@@ -57,13 +111,7 @@ export function renderDocumentHtml(text: string, deps: PluginDeps, options: Rend
     options.onPluginError?.('render', err); // a borrowed plugin broke rendering: the note without them
     html = build(false).render(source, options.env);
   }
-  if (options.frontMatter && frontMatter.trim()) {
-    const rows = frontMatter.split(/\r?\n/).filter((l) => l.trim()).map((l) => {
-      const m = /^([^:]+):\s*(.*)$/.exec(l);
-      return m ? `<div><span class="k">${escape(m[1]!.trim())}</span>: ${escape(m[2]!)}</div>` : `<div>${escape(l)}</div>`;
-    });
-    html = `<div class="rv-frontmatter">${rows.join('')}</div>` + html;
-  }
+  if (options.frontMatter && frontMatter.trim()) html = frontMatterHtml(frontMatter) + html;
   html = html.replace(/(<input type="checkbox" class="tfm-check") disabled/g, '$1');
   if (options.resolveImage) {
     const resolve = options.resolveImage;

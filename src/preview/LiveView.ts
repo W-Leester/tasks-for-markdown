@@ -5,14 +5,14 @@ import { hasTaskFields, parseTaskLine, type StatusRegistry, type Task, urgency }
 import { renderColumns, renderDescriptionText } from '../core/render';
 import type { IndexService } from '../index/IndexService';
 import type { PreviewIntegration } from './PreviewIntegration';
-import { renderDocumentHtml } from './renderDocument';
+import { liveBlocks, renderDocumentHtml } from './renderDocument';
 import { t } from '../l10n';
 import { systemClock } from '../core/dates';
 import type { TaskEditService } from '../services/TaskEditService';
 import type { Settings } from '../settings/Settings';
 import { applyChanges, type ColumnState, type FromLive, type LiveRow, type ToLive } from '../webviews/live/sync';
 import { HIDEABLE_COLUMNS } from '../webviews/rendered/columns';
-import { cleanWidths } from './RenderedView';
+import { type Borrowed, cleanWidths } from './RenderedView';
 
 /**
  * Live view (M40, trial): the note in a CodeMirror editor inside a webview, Markdown marks hidden except where the
@@ -34,6 +34,8 @@ export interface LiveViewDeps {
   preview: PreviewIntegration;
   getStatusRegistry(): StatusRegistry;
   log(message: string): void;
+  /** Other extensions' preview contributions (M34), shared with the rendered view. */
+  borrowed(): Promise<Borrowed>;
 }
 
 /** The ```tasks blocks of a note: the lines between the fences. */
@@ -113,16 +115,32 @@ export class LiveViewProvider implements vscode.CustomTextEditorProvider {
     return { type: 'live/queries', blocks, columns };
   }
 
+  /** Front matter, tables and other extensions' previews, drawn as the rendered view draws them (M40 F). */
+  private blocks(document: vscode.TextDocument, webview: vscode.Webview, borrowed: Borrowed): Extract<ToLive, { type: 'live/blocks' }> {
+    const base = this.deps.preview.pluginDeps();
+    const deps = { ...base, enabled: () => true, renderOptions: (source?: Parameters<typeof base.renderOptions>[0], context?: 'line' | 'query') => ({ ...base.renderOptions(source, context), columns: true }) };
+    const blocks = liveBlocks(document.getText(), deps, {
+      env: { currentDocument: document.uri },
+      resolveImage: (src) => webview.asWebviewUri(vscode.Uri.joinPath(document.uri, '..', src)).toString(),
+      plugins: borrowed.plugins.map((p) => p.apply),
+      onPluginError: (which, err) => this.deps.log(`live view: ${which === 'render' ? 'other extensions failed' : `${borrowed.plugins[which]?.id} failed`}: ${String(err)}`),
+    });
+    return { type: 'live/blocks', blocks };
+  }
+
   async resolveCustomTextEditor(document: vscode.TextDocument, panel: vscode.WebviewPanel): Promise<void> {
     const { webview } = panel;
-    webview.options = { enableScripts: true, localResourceRoots: [this.deps.context.extensionUri] };
-    webview.html = this.shell(webview);
+    const borrowed = await this.deps.borrowed();
+    // Images next to the note or anywhere in the workspace; other extensions' preview files.
+    const roots = [this.deps.context.extensionUri, vscode.Uri.joinPath(document.uri, '..'), ...(vscode.workspace.workspaceFolders ?? []).map((f) => f.uri), ...borrowed.roots];
+    webview.options = { enableScripts: true, localResourceRoots: roots };
+    webview.html = this.shell(webview, borrowed);
     const post = (m: ToLive) => void webview.postMessage(m);
     const sync = new LiveSync(document, post, this.deps.log);
     let queryTimer: ReturnType<typeof setTimeout> | undefined;
     const sendQueries = (delay: number) => {
       clearTimeout(queryTimer);
-      queryTimer = setTimeout(() => { post(this.rows(document)); post(this.queries(document)); }, delay);
+      queryTimer = setTimeout(() => { post(this.rows(document)); post(this.queries(document)); post(this.blocks(document, webview, borrowed)); }, delay);
     };
     const indexSub = this.deps.index.onDidChange(() => sendQueries(400));
     const refresh = () => sendQueries(0);
@@ -134,7 +152,7 @@ export class LiveViewProvider implements vscode.CustomTextEditorProvider {
       { dispose: () => { indexSub.dispose(); clearTimeout(queryTimer); this.open.delete(refresh); } },
       vscode.workspace.onDidChangeTextDocument((e) => { if (e.document === document) sendQueries(300); }),
       webview.onDidReceiveMessage((m: FromLive) => {
-        queue = queue.then(() => this.handle(m, document, post, sync, panel)).then(() => {
+        queue = queue.then(() => this.handle(m, document, post, sync, panel, borrowed)).then(() => {
           // A change made from the view: its results at once, not after the index's pause (11-01: notes lagged).
           if (QUICK_REDRAW.has(m.type)) sendQueries(0);
         }).catch((err) => {
@@ -173,12 +191,13 @@ export class LiveViewProvider implements vscode.CustomTextEditorProvider {
     return this.deps.context.workspaceState.get<Record<string, { sort: string; scope: string }>>(VIEW_STATE_KEY, {})[uri.toString()] ?? { sort: 'document', scope: 'all' };
   }
 
-  private async handle(msg: FromLive, document: vscode.TextDocument, post: (m: ToLive) => void, sync: LiveSync, panel: vscode.WebviewPanel): Promise<void> {
+  private async handle(msg: FromLive, document: vscode.TextDocument, post: (m: ToLive) => void, sync: LiveSync, panel: vscode.WebviewPanel, borrowed: Borrowed): Promise<void> {
     switch (msg.type) {
       case 'live/ready':
         post(this.rows(document));
         post(this.queries(document));
-        post({ type: 'live/init', text: document.getText(), eol: document.eol === vscode.EndOfLine.CRLF ? '\r\n' : '\n', fontSize: this.deps.settings.get('rendered.fontSize'), lineHeight: this.deps.settings.get('rendered.lineHeight'), maxWidth: this.deps.settings.get('rendered.maxWidth'), view: this.viewState(document.uri), today: systemClock.now().startOf('day').format('YYYY-MM-DD') });
+        post(this.blocks(document, panel.webview, borrowed));
+        post({ type: 'live/init', text: document.getText(), eol: document.eol === vscode.EndOfLine.CRLF ? '\r\n' : '\n', fontSize: this.deps.settings.get('rendered.fontSize'), lineHeight: this.deps.settings.get('rendered.lineHeight'), maxWidth: this.deps.settings.get('rendered.maxWidth'), view: this.viewState(document.uri), today: systemClock.now().startOf('day').format('YYYY-MM-DD'), imageBase: panel.webview.asWebviewUri(vscode.Uri.joinPath(document.uri, '..')).toString() + '/' });
         break;
       case 'live/edit':
         await sync.edit(msg);
@@ -242,7 +261,7 @@ export class LiveViewProvider implements vscode.CustomTextEditorProvider {
     }
   }
 
-  private shell(webview: vscode.Webview): string {
+  private shell(webview: vscode.Webview, borrowed: Borrowed): string {
     const nonce = Array.from({ length: 32 }, () => 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'[Math.floor(Math.random() * 62)]).join('');
     const script = webview.asWebviewUri(vscode.Uri.joinPath(this.deps.context.extensionUri, 'dist', 'webviews', 'live.js'));
     const css = webview.asWebviewUri(vscode.Uri.joinPath(this.deps.context.extensionUri, 'media', 'preview.css'));
@@ -253,6 +272,7 @@ export class LiveViewProvider implements vscode.CustomTextEditorProvider {
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}'; img-src ${webview.cspSource} https: data:; font-src ${webview.cspSource};">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="${css}">
+${borrowed.styles.map((u) => `<link rel="stylesheet" href="${webview.asWebviewUri(u)}">`).join('\n')}
 <style>
   html, body { margin: 0; padding: 0; height: 100%; background: var(--vscode-editor-background); color: var(--vscode-editor-foreground); }
   body { display: flex; flex-direction: column; }
@@ -306,6 +326,15 @@ export class LiveViewProvider implements vscode.CustomTextEditorProvider {
   .cm-lv-query li.tfm-task.rv-dim > .tfm-desc, .cm-lv-query li.tfm-task.rv-dim > p > .tfm-desc { opacity: .45; }
   /* Query results in columns, as in the rendered view (a copy of its rules, scoped to the result boxes). */
   :root { --rv-fg: var(--vscode-editor-foreground, var(--vscode-foreground)); --rv-muted: var(--vscode-descriptionForeground); --rv-bg-2: color-mix(in srgb, var(--rv-fg) 6%, transparent); --rv-bg-3: color-mix(in srgb, var(--rv-fg) 12%, transparent); --rv-stroke: color-mix(in srgb, var(--rv-fg) 12%, transparent); }
+  /* M40 F: front matter, tables, other extensions' previews and images off the cursor (the rendered view's rules). */
+  .cm-lv-block { cursor: text; padding: 2px 0; line-height: 1.6; font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, sans-serif); overflow-x: auto; }
+  .cm-lv-block table { border-collapse: collapse; margin: .2em 0 .4em; } .cm-lv-block th, .cm-lv-block td { border: 1px solid var(--rv-stroke); padding: 4px 10px; } .cm-lv-block th { background: var(--rv-bg-2); }
+  .cm-lv-block code { font-family: var(--vscode-editor-font-family, monospace); font-size: .9em; background: var(--rv-bg-2); border: 1px solid var(--rv-stroke); border-radius: 4px; padding: 0 .35em; }
+  .cm-lv-block a { color: var(--vscode-textLink-foreground); text-decoration: none; }
+  .cm-lv-block img, .cm-lv-image { max-width: 100%; border-radius: 4px; vertical-align: middle; cursor: text; }
+  .cm-lv-block .rv-frontmatter { color: var(--rv-muted); margin: 0 0 .4em; padding: 0 0 .5em; border-bottom: 1px solid var(--rv-stroke); }
+  .cm-lv-block .rv-frontmatter .k { color: var(--rv-fg); font-weight: 600; }
+  .cm-lv-block-fence pre { margin: .2em 0; }
   .cm-lv-query { cursor: default; padding: 2px 0; line-height: 1.6; font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, sans-serif); }
   .cm-lv-query .tfm-query { background: var(--rv-bg-2); border: 1px solid var(--rv-stroke); border-radius: 6px; padding: 10px 14px; margin: 0; }
   .cm-lv-query .tfm-list { margin: .2em 0 .3em; padding-left: 0; list-style: none; }
@@ -377,6 +406,7 @@ export class LiveViewProvider implements vscode.CustomTextEditorProvider {
 </div>
 <div id="editor"></div>
 <script nonce="${nonce}" src="${script}"></script>
+${borrowed.scripts.map((s) => `<script nonce="${nonce}"${s.module ? ' type="module"' : ''} src="${webview.asWebviewUri(s.uri)}"></script>`).join('\n')}
 </body>
 </html>`;
   }

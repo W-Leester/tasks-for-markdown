@@ -18,6 +18,8 @@ export type LiveDeco =
   | { kind: 'line'; from: number; cls: string }
   /** ✎ ⏩ 💬 ＋ at the end of a task line (0-based `line`; `dated`: it has a due or scheduled date to postpone). */
   | { kind: 'actions'; from: number; line: number; dated: boolean }
+  /** `![alt](src)` shown as the image (M40 F); `src` as written. */
+  | { kind: 'image'; from: number; to: number; src: string; alt: string }
   /** A class on a stretch of text; `href` for links. */
   | { kind: 'mark'; from: number; to: number; cls: string; href?: string };
 
@@ -71,6 +73,13 @@ export function liveDecos(state: EditorState, active: Set<number>, from = 0, to 
         out.push({ kind: 'hide', from: n.from, to: n.to });
       } else if (name === 'QuoteMark') {
         out.push({ kind: 'hide', from: n.from, to: withSpace(n) });
+      } else if (name === 'Image') {
+        const url = n.getChild('URL');
+        const marks = n.getChildren('LinkMark');
+        if (url && marks.length >= 2) {
+          out.push({ kind: 'image', from: n.from, to: n.to, src: doc.sliceString(url.from, url.to).replace(/^<|>$/g, ''), alt: doc.sliceString(marks[0]!.to, marks[1]!.from) });
+        }
+        return false;
       } else if (name === 'Link') {
         linkDecos(n, state, out);
         return false;
@@ -129,4 +138,28 @@ export function findQueryBlocks(state: EditorState): { from: number; to: number;
     }
   }
   return out;
+}
+
+/**
+ * Where the host's rendered blocks (M40 F: front matter, tables, other extensions' previews) are in the text: runs of
+ * whole lines equal to a block's source. 1-based first and last line.
+ */
+export function findBlocks(lines: readonly string[], sources: Iterable<string>): { first: number; last: number; source: string }[] {
+  const out: { first: number; last: number; source: string }[] = [];
+  const starts = new Map<string, number[]>();
+  lines.forEach((l, i) => { const a = starts.get(l); if (a) a.push(i); else starts.set(l, [i]); });
+  for (const source of sources) {
+    const want = source.split('\n');
+    for (const i of starts.get(want[0]!) ?? []) {
+      if (i + want.length > lines.length) continue;
+      let ok = true;
+      for (let k = 1; k < want.length && ok; k++) ok = lines[i + k] === want[k];
+      if (ok) out.push({ first: i + 1, last: i + want.length, source });
+    }
+  }
+  // Overlaps (a block's text inside another): the earlier, longer one wins.
+  out.sort((a, b) => a.first - b.first || b.last - a.last);
+  const kept: typeof out = [];
+  for (const b of out) if (!kept.length || b.first > kept[kept.length - 1]!.last) kept.push(b);
+  return kept;
 }

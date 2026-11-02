@@ -126,7 +126,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<Extens
 
   const preview = new PreviewIntegration({ index, queries, settings, getStatusRegistry, log });
   const rendered = registerRenderedView(context, { context, index, indexService, editService, settings, preview, getStatusRegistry, log });
-  registerLiveView(context, { context, index, indexService, editService, settings, preview, getStatusRegistry, log });
+  registerLiveView(context, { context, index, indexService, editService, settings, preview, getStatusRegistry, log, borrowed: () => rendered.borrowed() });
   context.subscriptions.push(preview);
 
   const archive = new ArchiveService({ index, indexService, settings, log });

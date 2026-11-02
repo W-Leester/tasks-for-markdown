@@ -148,3 +148,25 @@ describe('renderDocumentHtml: blockquotes the user can type into (M38)', () => {
     expect(renderDocumentHtml('> a\r\n> b\r\n', deps)).toContain('data-tfm-quote="0-2" data-tfm-quote-text="a\nb"');
   });
 });
+
+describe('liveBlocks (live view, M40 F)', () => {
+  it('finds the front matter, top-level tables and fences another extension draws; plain code and ```tasks are left out', async () => {
+    const { liveBlocks } = await import('../src/preview/renderDocument');
+    const text = ['---', 'title: T', '---', '# H', '', '| a | b |', '|---|---|', '| [x](y.md) | 2 |', '', '```js', 'let a', '```', '', '```tasks', 'not done', '```', '', '```mermaid', 'graph TD', '```', '', '- item', '', '  | in | list |', '  |---|---|', '  | 1 | 2 |'].join('\r\n');
+    // A stand-in for an extension that draws ```mermaid itself.
+    const mermaid = (md: { renderer: { rules: Record<string, unknown> } }) => {
+      const fence = md.renderer.rules.fence as (...a: unknown[]) => string;
+      md.renderer.rules.fence = (tokens: { info: string; content: string }[], idx: number, ...rest: unknown[]) =>
+        tokens[idx]!.info.trim() === 'mermaid' ? `<div class="mermaid">${tokens[idx]!.content}</div>` : fence(tokens, idx, ...rest);
+    };
+    const blocks = liveBlocks(text, deps, { plugins: [mermaid as never] });
+    expect(blocks.map((b) => [b.kind, b.source])).toEqual([
+      ['front', '---\ntitle: T\n---'],
+      ['table', '| a | b |\n|---|---|\n| [x](y.md) | 2 |'],
+      ['fence', '```mermaid\ngraph TD\n```'],
+    ]);
+    expect(blocks[0]!.html).toContain('<span class="k">title</span>: T');
+    expect(blocks[1]!.html).toMatch(/<table[\s\S]*<a href="y.md">x<\/a>/);
+    expect(blocks[2]!.html).toContain('<div class="mermaid">graph TD');
+  });
+});

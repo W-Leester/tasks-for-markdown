@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { ensureSyntaxTree } from '@codemirror/language';
 import { markdown, markdownLanguage } from '@codemirror/lang-markdown';
 import { EditorSelection, EditorState } from '@codemirror/state';
-import { activeLines, findQueryBlocks, type LiveDeco, liveDecos } from '../../src/webviews/live/decorations';
+import { activeLines, findBlocks, findQueryBlocks, type LiveDeco, liveDecos } from '../../src/webviews/live/decorations';
 
 const state = (text: string, cursor = 0) => {
   const s = EditorState.create({ doc: text, selection: EditorSelection.cursor(cursor), extensions: [markdown({ base: markdownLanguage })] });
@@ -74,5 +74,24 @@ describe('live view decorations (M40)', () => {
       { text: '```tasks\nnot done\ndue today\n```', source: 'not done\ndue today', body: 3 },
       { text: '~~~~tasks\n~~~\n~~~~', source: '~~~', body: 10 },
     ]);
+  });
+
+  it('an image off the cursor line is shown as the image (M40 F); on the cursor line it stays as written', () => {
+    const s = state('글\n\n![그림 하나](<img/a b.png>) 끝\n');
+    const ds = liveDecos(s, new Set());
+    const img = ds.find((d) => d.kind === 'image');
+    expect(img).toMatchObject({ kind: 'image', src: 'img/a b.png', alt: '그림 하나' });
+    expect(s.doc.sliceString(img!.from, img!.to)).toBe('![그림 하나](<img/a b.png>)');
+    expect(liveDecos(s, new Set([3])).some((d) => d.kind === 'image')).toBe(false);
+  });
+
+  it('findBlocks: whole-line runs equal to a block source; overlaps keep the first', () => {
+    const lines = ['x', '| a |', '|---|', '| 1 |', '', '| a |', '|---|', '| 1 |', 'y'];
+    expect(findBlocks(lines, ['| a |\n|---|\n| 1 |'])).toEqual([
+      { first: 2, last: 4, source: '| a |\n|---|\n| 1 |' },
+      { first: 6, last: 8, source: '| a |\n|---|\n| 1 |' },
+    ]);
+    expect(findBlocks(lines, ['| a |\n|---|\n| 2 |'])).toEqual([]);
+    expect(findBlocks(['a', 'b', 'c'], ['a\nb\nc', 'b'])).toEqual([{ first: 1, last: 3, source: 'a\nb\nc' }]);
   });
 });

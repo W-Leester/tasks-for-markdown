@@ -218,7 +218,11 @@ scopeSel?.addEventListener('change', () => { view = { ...view, scope: scopeSel.v
 window.addEventListener('message', (e: MessageEvent<ToWebview>) => {
   const m = e.data;
   if (m.type === 'doc/columns') { applyColumns(m.hidden); return; }
-  if (m.type === 'doc/inserted') { chainLine = m.line; continueChain(); return; }
+  if (m.type === 'doc/inserted') {
+    // Added by clicking elsewhere (11-02): no next input.
+    if (stopAfterInsert) { stopAfterInsert = false; chainLine = null; return; }
+    chainLine = m.line; continueChain(); return;
+  }
   if (m.type === 'doc/columnWidths') { columnWidths = { ...m.widths }; applyWidths(); applyHeaders(); return; }
   if (m.type !== 'doc/html') return;
   document.documentElement.style.setProperty('--rv-font-size', `${m.fontSize}px`);
@@ -574,6 +578,8 @@ let selected: HTMLElement | null = null;
  */
 let chainLine: number | null = null;
 let awaitingRender = false;
+/** The new-task input was left with text in it: add it, and open no next input. */
+let stopAfterInsert = false;
 /** The row the new-task input sits under, and what was typed, to put it back after a re-render. */
 let formLine: number | null = null;
 let formText = '';
@@ -607,6 +613,14 @@ function openTaskForm(li: HTMLElement, value = ''): void {
   form.appendChild(input);
   li.after(form);
   const close = (refocus: boolean) => { formLine = null; form.remove(); if (refocus && li.isConnected) selectRow(li); };
+  const add = (text: string, chain: boolean) => {
+    input.disabled = true;
+    formLine = null;
+    stopAfterInsert = !chain;
+    chainLine = -1; // waiting for doc/inserted
+    awaitingRender = true; // and for the note to re-render
+    post({ type: 'doc/insertTask', line, text });
+  };
   input.addEventListener('keydown', (e) => {
     // Korean (and other IME) input: Enter that ends a composition is not "add".
     if (e.isComposing || e.keyCode === 229) return;
@@ -615,13 +629,16 @@ function openTaskForm(li: HTMLElement, value = ''): void {
     e.preventDefault();
     const text = input.value.trim();
     if (!text) { close(true); return; }
-    input.disabled = true;
-    formLine = null;
-    chainLine = -1; // waiting for doc/inserted
-    awaitingRender = true; // and for the note to re-render
-    post({ type: 'doc/insertTask', line, text });
+    add(text, true);
   });
-  input.addEventListener('blur', () => { if (rerendering || input.disabled || input.value.trim()) return; formLine = null; form.remove(); });
+  // Clicking elsewhere (11-02): what was typed is added as with Enter, but no next input opens; empty just closes.
+  input.addEventListener('blur', () => {
+    if (rerendering || input.disabled) return;
+    const text = input.value.trim();
+    if (text) { add(text, false); form.remove(); return; }
+    formLine = null;
+    form.remove();
+  });
   input.focus();
 }
 /** After a re-render (or the host's reply), continue below the task just added. */

@@ -10,6 +10,7 @@
 - **Find in the rendered view:** `Cmd/Ctrl+F` opens a find bar; matches are highlighted with a count, `Enter` / `Shift+Enter` go to the next / previous one, `Esc` closes.
 - **`#heading` links in the rendered view go to the heading.** A table of contents like `[1. Vision](#1-vision)` scrolls to that heading in the view (GitHub's anchor rules; the heading text itself works too), and `other.md#heading` opens that note at the heading. Before, the link only opened the file.
 - **Plain checklists stay plain in the rendered (and live) view.** A list is shown in columns with a header only when one of its tasks has a Tasks field (a date, priority, recurrence, id, dependency or on-completion); a checklist like `- [ ] Answer:` is drawn as checkboxes, and sort and the show filter leave it alone. Tags alone do not count.
+- **The rendered view's new-task input adds what you typed when you click elsewhere** (it stayed open before), without opening the next input; an empty input just closes.
 
 ### 한국어 요약
 - **렌더 보기에서 어느 블록이든 바로 쓰기:** 문단·제목·목록 항목(그 항목과 하위 항목)·표·코드 블록을 클릭하면 그 자리에 마크다운 원문 입력칸이 열림. 키는 인용문과 같음(`Cmd/Ctrl+Enter`·바깥 클릭·`Cmd/Ctrl+S` 저장, `Esc` 취소). 태스크 줄은 그대로(클릭은 줄 고르기, 더블클릭·✎ 편집). 노트 끝 **＋ 글 쓰기**로 새 글.
@@ -20,6 +21,7 @@
 - **렌더 보기에서 찾기:** `Cmd/Ctrl+F`로 찾기 칸. 찾은 곳을 칠하고 개수 표시, `Enter`·`Shift+Enter`로 다음·이전, `Esc`로 닫기.
 - **렌더 보기의 `#제목` 링크가 그 제목으로 이동:** 목차 `[1. 비전](#1-비전)`을 누르면 렌더 보기 안에서 그 제목으로 스크롤(GitHub 앵커 규칙, 제목 글자 그대로도 됨), `다른노트.md#제목`은 그 노트의 제목 줄을 엶. 전에는 파일만 열렸음.
 - **필드 없는 체크리스트는 렌더(·라이브) 보기에서 그냥 체크리스트로:** 목록 안 태스크 중 하나라도 Tasks 필드(날짜·우선순위·반복·ID·의존·완료 시 동작)가 있을 때만 열과 머리로 보여 줌. `- [ ] 답변:` 같은 목록은 체크박스만, 정렬·보기 필터도 적용 안 함. 태그만으로는 열이 되지 않음.
+- **렌더 보기 새 태스크 입력칸: 다른 곳을 클릭하면 쓴 내용을 넣고 닫힘**(전에는 그대로 남음). 다음 입력칸은 열지 않음. 빈 칸은 그냥 닫힘.
 
 ## 1.1.8 — 2026-10-31
 

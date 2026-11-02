@@ -210,8 +210,14 @@ class BlockWidget extends WidgetType {
     const box = document.createElement('div');
     box.className = `cm-lv-block cm-lv-block-${this.kind}`;
     box.innerHTML = this.html;
-    // Other extensions' preview scripts (Mermaid…) draw on the event the built-in preview sends after an update.
-    if (this.kind === 'fence') requestAnimationFrame(() => window.dispatchEvent(new CustomEvent('vscode.markdown.updateContent')));
+    // Other extensions' preview scripts (Mermaid…) draw on the event the built-in preview sends after an update — once
+    // the box is on the page (they size the drawing from it), and once for all boxes drawn together.
+    if (this.kind === 'fence') previewUpdate(box);
+    // A drawing that changes the box's height (Mermaid draws later): the editor measures again, or lines below
+    // overlap or leave a gap (11-02).
+    const ro = new ResizeObserver(() => view.requestMeasure());
+    ro.observe(box);
+    observers.set(box, ro);
     box.addEventListener('mousedown', (e) => {
       const target = e.target as Element;
       const a = target.closest<HTMLAnchorElement>('a[href]');
@@ -231,7 +237,17 @@ class BlockWidget extends WidgetType {
     });
     return box;
   }
+  override destroy(dom: HTMLElement): void { observers.get(dom)?.disconnect(); observers.delete(dom); }
   override ignoreEvent(): boolean { return true; }
+}
+
+const observers = new WeakMap<HTMLElement, ResizeObserver>();
+let previewTimer: ReturnType<typeof setTimeout> | undefined;
+/** Tell other extensions' preview scripts to draw, when `box` is attached; boxes drawn together share one call. */
+function previewUpdate(box: HTMLElement, tries = 0): void {
+  if (!box.isConnected) { if (tries < 40) requestAnimationFrame(() => previewUpdate(box, tries + 1)); return; }
+  clearTimeout(previewTimer);
+  previewTimer = setTimeout(() => window.dispatchEvent(new CustomEvent('vscode.markdown.updateContent')), 30);
 }
 
 function blockDecos(state: EditorState, map: Map<string, { kind: string; html: string }>): DecorationSet {

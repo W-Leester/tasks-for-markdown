@@ -15,7 +15,7 @@ export interface ColumnState { hidden: string[]; widths: Record<string, number>;
 
 /** One task line of the note in columns. */
 /** `fields`: the task has a Tasks field; a list shows in columns only when one of its tasks has (11-02). */
-export interface LiveRow { text: string; html: string; fields: boolean; data: { due: string | null; created: string | null; happens: string | null; priority: number; urgency: number; done: boolean } }
+export interface LiveRow { text: string; html: string; fields: boolean; /** The box's state, as the rendered view. */ checked: boolean; cancelled: boolean; data: { due: string | null; created: string | null; happens: string | null; priority: number; urgency: number; done: boolean } }
 
 /** Messages to the live view's webview. */
 export type ToLive =

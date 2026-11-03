@@ -45,4 +45,8 @@ describe('plain checklists vs task lists (11-02)', () => {
     expect(g[11]).toBe(-1);
     expect(g[13]).toBeGreaterThan(g[9]!);
   });
+
+  it('another kind of mark starts a new list, as in Markdown', () => {
+    expect(listGroups(['- a', '- b', '', '* c', '+ d', '1. e', '2. f', '3) g'])).toEqual([0, 0, 0, 1, 2, 3, 3, 4]);
+  });
 });

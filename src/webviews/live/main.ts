@@ -12,7 +12,7 @@ import { tags } from '@lezer/highlight';
 import { findHeadingLine } from '../../core/file/headingAnchor';
 import { listGroups } from '../../core/task/listGroups';
 import { checkboxMode, toggleCheckboxLine } from '../../core/task/toggleCheckbox';
-import { activeLines, findBlocks, findQueryBlocks, liveDecos } from './decorations';
+import { activeLines, findBlocks, findQueryBlocks, type LiveDeco, liveDecos } from './decorations';
 import { applyView, matchesScope, SCOPE_MODES, type ScopeMode, SORT_MODES, type SortMode, type ViewState } from '../rendered/view';
 import { decorateNotes, handleNoteClick } from '../shared/notes';
 import { QueryColumns } from './columns';
@@ -544,31 +544,40 @@ function build(view: EditorView): DecorationSet {
   /** Lines shown in columns: their ✎ ⏩ 💬 ＋ are inside the row. */
   const inRows = new Set<number>();
   const rowLines = columnsOn ? view.state.field(bodyField).rowLines : new Set<number>();
+  const add = (d: LiveDeco): void => {
+    if (d.kind === 'indent') {
+      ranges.push(Decoration.replace({}).range(d.from, d.to));
+      ranges.push(Decoration.line({ attributes: { style: `padding-left: ${d.depth * 1.6}em` } }).range(d.from));
+    } else if (d.kind === 'task') {
+      const line = view.state.doc.line(d.line + 1);
+      // Checked and crossed out as the rendered view: the host knows the note's statuses.
+      const known = rows.get(line.text);
+      const box = new TaskWidget(known ? known.checked : d.checked, d.line);
+      if (known?.checked) ranges.push(Decoration.line({ class: known.cancelled ? 'cm-lv-cancelled' : 'cm-lv-done' }).range(line.from));
+      ranges.push(Decoration.replace({ widget: box }).range(d.from, d.to));
+      if (known && rowLines.has(line.number) && d.to <= line.to) {
+        const cells = new RowWidget(known.html, d.line, /[📅⏳]/u.test(line.text));
+        // An empty task has nothing after its box, and a replace needs a stretch of text (11-04: this threw).
+        ranges.push(d.to < line.to ? Decoration.replace({ widget: cells }).range(d.to, line.to) : Decoration.widget({ widget: cells, side: 1 }).range(d.to));
+        inRows.add(d.line);
+      }
+    } else if (d.kind === 'actions') {
+      if (!inRows.has(d.line)) ranges.push(Decoration.widget({ widget: new ActionsWidget(d.line, d.dated), side: 1 }).range(d.from));
+    } else if (d.kind === 'line') ranges.push(Decoration.line({ class: d.cls }).range(d.from));
+    else if (d.kind === 'bullet') {
+      ranges.push(Decoration.replace({ widget: new BulletWidget(!!d.note) }).range(d.from, d.to));
+      if (d.note) ranges.push(Decoration.line({ class: 'cm-lv-note' }).range(view.state.doc.lineAt(d.from).from));
+    } else if (d.kind === 'image') ranges.push(Decoration.replace({ widget: new ImageWidget(d.src, d.alt, d.from) }).range(d.from, d.to));
+    // Marks inside a line drawn as a row are covered by it.
+    else if (d.to <= d.from || inRows.has(view.state.doc.lineAt(d.from).number - 1)) return;
+    else if (d.kind === 'hide') ranges.push(Decoration.replace({}).range(d.from, d.to));
+    else ranges.push(Decoration.mark({ class: d.cls, attributes: d.href !== undefined ? { 'data-href': d.href, title: document.body.dataset.lLinkHint ?? 'Cmd/Ctrl+click to open' } : {} }).range(d.from, d.to));
+  };
   for (const { from, to } of view.visibleRanges) {
     for (const d of liveDecos(view.state, active, from, to)) {
-      if (d.kind === 'task') {
-        const line = view.state.doc.line(d.line + 1);
-        const row = rowLines.has(line.number) ? rows.get(line.text) : undefined;
-        if (row && d.to <= line.to) {
-          ranges.push(Decoration.replace({ widget: new TaskWidget(d.checked, d.line) }).range(d.from, d.to));
-          ranges.push(Decoration.replace({ widget: new RowWidget(row.html, d.line, /[📅⏳]/u.test(line.text)) }).range(d.to, line.to));
-          inRows.add(d.line);
-          continue;
-        }
-      }
-      if (d.kind === 'actions' && inRows.has(d.line)) continue;
-      // Marks inside a line drawn as a row are covered by it.
-      if ((d.kind === 'hide' || d.kind === 'mark') && inRows.has(view.state.doc.lineAt(d.from).number - 1)) continue;
-      if (d.kind === 'line') ranges.push(Decoration.line({ class: d.cls }).range(d.from));
-      else if (d.kind === 'hide') { if (d.to > d.from) ranges.push(Decoration.replace({}).range(d.from, d.to)); }
-      else if (d.kind === 'bullet') {
-        ranges.push(Decoration.replace({ widget: new BulletWidget(!!d.note) }).range(d.from, d.to));
-        if (d.note) ranges.push(Decoration.line({ class: 'cm-lv-note' }).range(view.state.doc.lineAt(d.from).from));
-      }
-      else if (d.kind === 'task') ranges.push(Decoration.replace({ widget: new TaskWidget(d.checked, d.line) }).range(d.from, d.to));
-      else if (d.kind === 'actions') ranges.push(Decoration.widget({ widget: new ActionsWidget(d.line, d.dated), side: 1 }).range(d.from));
-      else if (d.kind === 'image') ranges.push(Decoration.replace({ widget: new ImageWidget(d.src, d.alt, d.from) }).range(d.from, d.to));
-      else if (d.to > d.from) ranges.push(Decoration.mark({ class: d.cls, attributes: d.href !== undefined ? { 'data-href': d.href, title: document.body.dataset.lLinkHint ?? 'Cmd/Ctrl+click to open' } : {} }).range(d.from, d.to));
+      // One mark that cannot be drawn must not take the whole view down: a throw here stops the plugin for good, and
+      // everything scrolled to afterwards stays raw Markdown (11-04).
+      try { add(d); } catch (err) { console.error('live view: could not draw', d, err); }
     }
   }
   return Decoration.set(ranges, true);
@@ -619,6 +628,10 @@ function theme(fontSize: number, lineHeight: number, maxWidth: number): Extensio
     '.cm-lv-hr': { borderBottom: '1px solid var(--vscode-widget-border, rgba(128,128,128,.35))', lineHeight: '.6' },
     '.cm-lv-link': { color: 'var(--vscode-textLink-foreground)', cursor: 'pointer', textDecoration: 'underline', textDecorationColor: 'transparent' },
     '.cm-lv-link:hover': { textDecorationColor: 'currentColor' },
+    '.cm-lv-nolink, .cm-lv-nolink span': { color: 'var(--vscode-editor-foreground) !important' },
+    '.cm-lv-markline': { height: '.5em', overflow: 'hidden', lineHeight: '.5em' },
+    '.cm-lv-done, .cm-lv-done .tfm-desc': { color: 'var(--vscode-descriptionForeground)' },
+    '.cm-lv-cancelled, .cm-lv-cancelled .tfm-desc': { color: 'var(--vscode-descriptionForeground)', textDecoration: 'line-through' },
     '.cm-lv-bullet': { display: 'inline-block', width: '1ch', color: 'var(--vscode-descriptionForeground)' },
     '.cm-lv-notemark': { width: '1.6em', fontSize: '.8em', opacity: '.7' },
     '.cm-lv-note': { color: 'var(--vscode-descriptionForeground)', fontSize: '.93em' },

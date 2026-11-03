@@ -2,10 +2,10 @@ import * as vscode from 'vscode';
 import { findHeadingLine } from '../core/file/headingAnchor';
 import type { TaskIndex } from '../core/index';
 import { hasTaskFields, parseTaskLine, type StatusRegistry, type Task, urgency } from '../core/task';
-import { renderColumns, renderDescriptionText } from '../core/render';
+import { renderColumns, stripTags } from '../core/render';
 import type { IndexService } from '../index/IndexService';
 import type { PreviewIntegration } from './PreviewIntegration';
-import { liveBlocks, renderDocumentHtml } from './renderDocument';
+import { liveBlocks, renderDocumentHtml, renderInlineMarkdown } from './renderDocument';
 import { t } from '../l10n';
 import { systemClock } from '../core/dates';
 import type { TaskEditService } from '../services/TaskEditService';
@@ -80,6 +80,11 @@ export class LiveViewProvider implements vscode.CustomTextEditorProvider {
     const path = this.deps.indexService.displayPath(document.uri);
     const seen = new Set<string>();
     const rows: LiveRow[] = [];
+    const filter = this.deps.settings.get('globalFilter');
+    const description = (task: Task) => {
+      const d = stripTags(task.description).trim();
+      return filter ? d.replace(filter, '').replace(/\s{2,}/g, ' ').trim() : d;
+    };
     for (let line = 0; line < document.lineCount; line++) {
       const text = document.lineAt(line).text;
       if (seen.has(text) || !/^\s*(?:[-*+]|\d+[.)])\s+\[.\]/.test(text)) continue;
@@ -91,7 +96,10 @@ export class LiveViewProvider implements vscode.CustomTextEditorProvider {
       rows.push({
         text,
         fields: hasTaskFields(task),
-        html: `<span class="tfm-desc">${renderDescriptionText(task, { ...o, stripTags: true })}${c.afterDescription}</span>${c.cells}`,
+        checked: task.isCompleted,
+        cancelled: task.isCancelled,
+        // The description as Markdown and no "(empty task)", as the rendered view draws the note's own task lines.
+        html: `<span class="tfm-desc">${renderInlineMarkdown(description(task))}${c.afterDescription}</span>${c.cells}`,
         data: { due: task.due?.valid ? task.due.format() : null, created: task.created?.valid ? task.created.format() : null, happens: happens?.valid ? happens.format() : null, priority: Number(task.priority), urgency: Math.round(urgency(task, o.today) * 100) / 100, done: task.isCompleted },
       });
     }
@@ -301,6 +309,8 @@ ${borrowed.styles.map((u) => `<link rel="stylesheet" href="${webview.asWebviewUr
   /* Note task lines in columns (M40 C): the cells after the checkbox, on the header's grid. */
   .cm-lv-row { display: inline-grid; grid-template-columns: var(--rv-cols-body, minmax(8em, 1fr) 8.6em 8.6em 8.6em minmax(0, 18em)); column-gap: .9em; align-items: baseline; width: calc(100% - 2.4em); vertical-align: top; cursor: text; }
   .cm-lv-row .tfm-desc { min-width: 0; }
+  .cm-lv-row .tfm-desc code { font-family: var(--vscode-editor-font-family, monospace); font-size: .9em; background: var(--rv-bg-2); border: 1px solid var(--rv-stroke); border-radius: 4px; padding: 0 .35em; }
+  .cm-lv-row .tfm-desc a { color: var(--vscode-textLink-foreground); text-decoration: none; }
   .cm-lv-row .tfm-col { min-width: 0; font-size: .92em; }
   .cm-lv-row .tfm-col-due, .cm-lv-row .tfm-col-created, .cm-lv-row .tfm-col-done { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .cm-lv-row .tfm-col-created, .cm-lv-row .tfm-col-done { color: var(--rv-muted); }
@@ -342,6 +352,8 @@ ${borrowed.styles.map((u) => `<link rel="stylesheet" href="${webview.asWebviewUr
   body.fields-plain .cm-lv-query li.tfm-task .tfm-check { margin: 0 .6em 0 0; vertical-align: -2px; }
   body.fields-plain .cm-lv-query li.tfm-task > ul, body.fields-plain .cm-lv-query li.tfm-task > ol { margin-left: 1.6em; padding-left: 0; }
   /* M40 F: front matter, tables, other extensions' previews and images off the cursor (the rendered view's rules). */
+  /* white-space: the editor keeps line breaks; in HTML from the host they would show as blank lines (11-04). */
+  .cm-lv-block, .cm-lv-query { white-space: normal; }
   .cm-lv-block { cursor: text; padding: 2px 0; line-height: 1.6; font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, sans-serif); overflow-x: auto; }
   .cm-lv-block table { border-collapse: collapse; margin: .2em 0 .4em; } .cm-lv-block th, .cm-lv-block td { border: 1px solid var(--rv-stroke); padding: 4px 10px; } .cm-lv-block th { background: var(--rv-bg-2); }
   .cm-lv-block code { font-family: var(--vscode-editor-font-family, monospace); font-size: .9em; background: var(--rv-bg-2); border: 1px solid var(--rv-stroke); border-radius: 4px; padding: 0 .35em; }
@@ -350,6 +362,7 @@ ${borrowed.styles.map((u) => `<link rel="stylesheet" href="${webview.asWebviewUr
   .cm-lv-block .rv-frontmatter { color: var(--rv-muted); margin: 0 0 .4em; padding: 0 0 .5em; border-bottom: 1px solid var(--rv-stroke); }
   .cm-lv-block .rv-frontmatter .k { color: var(--rv-fg); font-weight: 600; }
   .cm-lv-block-fence pre { margin: .2em 0; }
+  .cm-lv-block > span[aria-hidden="true"]:empty { display: none; } /* Mermaid's settings, put before every block: no gap */
   .cm-lv-block-fence { overflow: hidden; } /* Mermaid has its own pan and zoom; no scroll bar under it */
   .cm-lv-query { cursor: default; padding: 2px 0; line-height: 1.6; font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, sans-serif); }
   .cm-lv-query .tfm-query { background: var(--rv-bg-2); border: 1px solid var(--rv-stroke); border-radius: 6px; padding: 10px 14px; margin: 0; }

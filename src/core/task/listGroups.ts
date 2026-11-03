@@ -14,15 +14,18 @@ export function hasTaskFields(task: Task): boolean {
 
 const LIST_LINE = /^\s*(?:[-*+]|\d+[.)])\s/;
 const FENCE = /^ {0,3}(`{3,}|~{3,})/;
+/** What makes two items one list: the bullet's character, a number's `.` or `)`. */
+const markKind = (line: string) => /^(?:([-*+])|\d+([.)]))\s/.exec(line)?.slice(1).join('') ?? '';
 
 /**
  * The top-level list each line belongs to (0-based lines; -1 outside a list or inside a code block). A list starts at
  * an unindented item and goes on through items, indented lines and blank lines that lead to more of it; unindented
- * text that is not an item ends it.
+ * text that is not an item ends it, and so does an item with another kind of mark (`-` then `*`, `1.` then `1)`), which
+ * Markdown takes for a new list.
  */
 export function listGroups(lines: readonly string[]): number[] {
   const out: number[] = new Array<number>(lines.length).fill(-1);
-  let group = -1, next = 0, fence: string | null = null;
+  let group = -1, next = 0, kind = '', fence: string | null = null;
   for (let i = 0; i < lines.length; i++) {
     const text = lines[i]!;
     const f = FENCE.exec(text);
@@ -41,7 +44,13 @@ export function listGroups(lines: readonly string[]): number[] {
       continue;
     }
     if (/^\s/.test(text)) { if (group >= 0) out[i] = group; continue; }
-    if (LIST_LINE.test(text)) { if (group < 0) group = next++; out[i] = group; continue; }
+    if (LIST_LINE.test(text)) {
+      const k = markKind(text);
+      if (group < 0 || k !== kind) group = next++;
+      kind = k;
+      out[i] = group;
+      continue;
+    }
     group = -1;
   }
   return out;

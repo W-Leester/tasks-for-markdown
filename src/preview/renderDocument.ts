@@ -6,6 +6,12 @@ import { type PluginDeps, tasksMarkdownItPlugin } from './markdownItPlugin';
 
 const escape = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
+const inlineMd = new MarkdownItCtor({ html: false, linkify: true });
+/** A line's Markdown (`**bold**`, `` `code` ``, links) as HTML, as the note's task lines show it in the rendered view. */
+export function renderInlineMarkdown(text: string): string {
+  return inlineMd.renderInline(text);
+}
+
 export interface RenderDocumentOptions {
   /** Absolute URL for a relative image path, or null to leave it alone. */
   resolveImage?(src: string): string | null;
@@ -73,7 +79,8 @@ export function liveBlocks(text: string, deps: PluginDeps, options: RenderDocume
     let html: string;
     try { html = renderDocumentHtml(source + '\n', deps, { ...options, frontMatter: false }); } catch { continue; }
     // A fence drawn as plain code: leave it as text to edit.
-    if (kind === 'fence' && /^\s*<pre><code[\s>]/.test(html)) continue;
+    // (With a borrowed plugin, or VS Code's own, the two tags can have spaces between them or attributes.)
+    if (kind === 'fence' && /^\s*(?:<span\b[^>]*>\s*<\/span>\s*)*<pre\b[^>]*>\s*<code[\s>]/.test(html)) continue;
     out.push({ kind, source, html });
   }
   return out;

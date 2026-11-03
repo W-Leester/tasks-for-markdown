@@ -4,7 +4,7 @@
  * tables. Computed from the syntax tree as plain specs so it can be tested without a view.
  */
 import { syntaxTree } from '@codemirror/language';
-import type { EditorState } from '@codemirror/state';
+import type { EditorState, Text } from '@codemirror/state';
 import type { SyntaxNode } from '@lezer/common';
 
 export type LiveDeco =
@@ -14,6 +14,8 @@ export type LiveDeco =
   | { kind: 'bullet'; from: number; to: number; note?: boolean }
   /** `- [ ]` / `- [x]` shown as a checkbox; `line` is 0-based. */
   | { kind: 'task'; from: number; to: number; checked: boolean; line: number }
+  /** The spaces before a nested list mark, drawn as a margin (`depth` levels) so columns line up, as the rendered view. */
+  | { kind: 'indent'; from: number; to: number; depth: number }
   /** A class on a whole line (at its start). */
   | { kind: 'line'; from: number; cls: string }
   /** ✎ ⏩ 💬 ＋ at the end of a task line (0-based `line`; `dated`: it has a due or scheduled date to postpone). */
@@ -34,6 +36,24 @@ export function activeLines(state: EditorState, focused: boolean): Set<number> {
   return lines;
 }
 
+/**
+ * After a list mark: a task's box. By the text, not the syntax tree: its GFM parser knows only `[ ]` and `[x]`, while
+ * any one character is a status (`[/]`, `[-]`, `[>]`…), which it would take for a link (11-04).
+ */
+const TASK_BOX = /^[ \t]+\[(.)\](?=\s|$)/;
+const LINK_DEFINITION = /^ {0,3}\[([^\]\n]+)\]:[ \t]*<?([^\s>]+)/gm;
+const definitionsOf = new WeakMap<Text, Map<string, string>>();
+/** `[label]: url` in the note, by lower-case label (a footnote's `[^1]` is not a link: the rendered view leaves it). */
+function linkDefinitions(doc: Text): Map<string, string> {
+  let map = definitionsOf.get(doc);
+  if (!map) {
+    map = new Map();
+    for (const m of doc.toString().matchAll(LINK_DEFINITION)) if (!m[1]!.startsWith('^')) map.set(m[1]!.toLowerCase(), m[2]!);
+    definitionsOf.set(doc, map);
+  }
+  return map;
+}
+
 const BLOCK_LINES: Record<string, string> = { Blockquote: 'cm-lv-quote', FencedCode: 'cm-lv-codeblock', CodeBlock: 'cm-lv-codeblock', Table: 'cm-lv-table' };
 
 export function liveDecos(state: EditorState, active: Set<number>, from = 0, to = state.doc.length): LiveDeco[] {
@@ -46,6 +66,24 @@ export function liveDecos(state: EditorState, active: Set<number>, from = 0, to 
   const linesOf = (a: number, b: number, cls: string) => {
     for (let n = lineOf(a), last = lineOf(Math.max(a, b - 1)); n <= last; n++) out.push({ kind: 'line', from: doc.line(n).from, cls });
   };
+  const taskBoxOf = (mark: SyntaxNode) => TASK_BOX.exec(doc.sliceString(mark.to, doc.lineAt(mark.to).to));
+  /** A list item that is a task, by its mark. */
+  const isTaskItem = (item: SyntaxNode | null | undefined) => {
+    const mark = item?.name === 'ListItem' ? item.getChild('ListMark') : null;
+    return !!mark && !!taskBoxOf(mark);
+  };
+  /** A fence's opening and closing lines, off the cursor: only the code shows; in the block, all as written. */
+  const fenceMarks = (block: SyntaxNode) => {
+    const first = doc.lineAt(block.from), last = doc.lineAt(block.to);
+    for (let k = first.number; k <= last.number; k++) if (active.has(k)) return;
+    const closing = block.lastChild?.name === 'CodeMark' && block.lastChild.from > first.to;
+    for (const l of closing ? [first, last] : [first]) {
+      out.push({ kind: 'line', from: l.from, cls: 'cm-lv-markline' });
+      out.push({ kind: 'hide', from: l.from, to: l.to });
+    }
+  };
+  /** Where the current line's task box ends: what the tree calls a link there is the box. */
+  let boxEnd = -1;
   syntaxTree(state).iterate({
     from,
     to,
@@ -55,20 +93,52 @@ export function liveDecos(state: EditorState, active: Set<number>, from = 0, to 
       const parent = n.parent?.name ?? '';
       const heading = /^(?:ATX|Setext)Heading(\d)$/.exec(name);
       if (heading) { out.push({ kind: 'line', from: doc.lineAt(n.from).from, cls: `cm-lv-h${heading[1]}` }); return; }
-      if (BLOCK_LINES[name]) { linesOf(n.from, n.to, BLOCK_LINES[name]!); if (name !== 'Blockquote') return; }
+      if (BLOCK_LINES[name]) {
+        linesOf(n.from, n.to, BLOCK_LINES[name]!);
+        if (name === 'FencedCode') fenceMarks(n);
+        if (name !== 'Blockquote') return;
+      }
       if (name === 'HorizontalRule') {
         if (!shown(n.from)) { out.push({ kind: 'line', from: doc.lineAt(n.from).from, cls: 'cm-lv-hr' }); out.push({ kind: 'hide', from: n.from, to: n.to }); }
         return;
       }
       if (name === 'InlineCode') out.push({ kind: 'mark', from: n.from, to: n.to, cls: 'cm-lv-code' });
-      if (name === 'Task') {
+      if (name === 'ListMark' && parent === 'ListItem') {
+        const box = taskBoxOf(n);
         const line = doc.lineAt(n.from);
-        out.push({ kind: 'actions', from: line.to, line: line.number - 1, dated: /[📅⏳]/u.test(line.text) });
+        if (box) {
+          boxEnd = n.to + box[0].length;
+          if (!shown(n.from)) {
+            const to = doc.sliceString(boxEnd, boxEnd + 1) === ' ' ? boxEnd + 1 : boxEnd;
+            out.push({ kind: 'task', from: n.from, to, checked: /^[xX-]$/.test(box[1]!), line: line.number - 1 });
+          }
+          out.push({ kind: 'actions', from: line.to, line: line.number - 1, dated: /[📅⏳]/u.test(line.text) });
+        }
+        if (!shown(n.from) && n.from > line.from && !doc.sliceString(line.from, n.from).trim()) {
+          let depth = -1;
+          for (let p: SyntaxNode | null = n.parent; p; p = p.parent) if (p.name === 'ListItem') depth++;
+          if (depth > 0) out.push({ kind: 'indent', from: line.from, to: n.from, depth });
+        }
+        if (box) return;
       }
+      // `[/]` right after a list mark is the box; on the cursor's line it reads as written, not as a link.
+      if (name === 'Link' && n.to <= boxEnd) { out.push({ kind: 'mark', from: n.from, to: n.to, cls: 'cm-lv-nolink' }); return false; }
       if (shown(n.from)) return; // the cursor's line: Markdown as written
       if (name === 'HeaderMark' && /^ATXHeading/.test(parent)) {
         // Opening marks with their space; closing `##` too.
         out.push({ kind: 'hide', from: n.from, to: n.from === n.parent!.from ? withSpace(n) : n.to });
+      } else if (name === 'HeaderMark' && /^SetextHeading/.test(parent)) {
+        // The `---` or `===` under a heading.
+        out.push({ kind: 'line', from: doc.lineAt(n.from).from, cls: 'cm-lv-markline' });
+        out.push({ kind: 'hide', from: n.from, to: n.to });
+      } else if (name === 'HardBreak') {
+        // The node takes the line break too; only the backslash goes.
+        if (doc.sliceString(n.from, n.from + 1) === '\\') out.push({ kind: 'hide', from: n.from, to: n.from + 1 });
+      } else if (name === 'Autolink') {
+        for (const mark of n.getChildren('LinkMark')) out.push({ kind: 'hide', from: mark.from, to: mark.to });
+        const url = n.getChild('URL');
+        if (url) out.push({ kind: 'mark', from: url.from, to: url.to, cls: 'cm-lv-link', href: doc.sliceString(url.from, url.to) });
+        return false;
       } else if (name === 'EmphasisMark' || name === 'StrikethroughMark' || (name === 'CodeMark' && parent === 'InlineCode')) {
         out.push({ kind: 'hide', from: n.from, to: n.to });
       } else if (name === 'QuoteMark') {
@@ -81,21 +151,14 @@ export function liveDecos(state: EditorState, active: Set<number>, from = 0, to 
         }
         return false;
       } else if (name === 'Link') {
-        linkDecos(n, state, out);
+        linkDecos(n, state, linkDefinitions(doc), out);
         return false;
       } else if (name === 'URL' && parent !== 'Link' && parent !== 'Image' && parent !== 'Autolink') {
         out.push({ kind: 'mark', from: n.from, to: n.to, cls: 'cm-lv-link', href: doc.sliceString(n.from, n.to) });
       } else if (name === 'ListMark' && parent === 'ListItem') {
-        const task = n.nextSibling?.name === 'Task' ? n.nextSibling.firstChild : null;
-        if (task?.name === 'TaskMarker') {
-          const mark = doc.sliceString(task.from, task.to);
-          out.push({ kind: 'task', from: n.from, to: withSpace(task), checked: !/^\[ \]$/.test(mark), line: lineOf(n.from) - 1 });
-        } else if (n.parent?.parent?.name === 'BulletList') {
-          // A note: its list sits right under a task item.
-          const outer = n.parent.parent.parent;
-          const note = outer?.name === 'ListItem' && !!outer.getChild('Task');
-          out.push({ kind: 'bullet', from: n.from, to: n.to, ...(note ? { note: true } : {}) });
-        }
+        // A note: an item (bullet or numbered) right under a task, as the rendered view.
+        const note = isTaskItem(n.parent?.parent?.parent);
+        if (note || n.parent?.parent?.name === 'BulletList') out.push({ kind: 'bullet', from: n.from, to: n.to, ...(note ? { note: true } : {}) });
       }
       return undefined;
     },
@@ -104,17 +167,26 @@ export function liveDecos(state: EditorState, active: Set<number>, from = 0, to 
 }
 
 /** `[text](url "title")`: only the text, styled as a link that knows where it goes. */
-function linkDecos(link: SyntaxNode, state: EditorState, out: LiveDeco[]): void {
+function linkDecos(link: SyntaxNode, state: EditorState, definitions: Map<string, string>, out: LiveDeco[]): void {
   const marks: SyntaxNode[] = [];
   let url: SyntaxNode | null = null;
   for (let c = link.firstChild; c; c = c.nextSibling) {
     if (c.name === 'LinkMark') marks.push(c);
     else if (c.name === 'URL') url = c;
   }
-  if (marks.length < 2) return; // a reference link or unfinished: leave as written
+  if (marks.length < 2) return; // unfinished: leave as written
   const textFrom = marks[0]!.to, textTo = marks[1]!.from;
+  let href: string | undefined;
+  if (url) href = state.doc.sliceString(url.from, url.to).replace(/^<|>$/g, '');
+  else {
+    // `[text][label]`, `[text][]`, `[label]`: a link only when the note defines the label; otherwise plain text.
+    const label = link.getChild('LinkLabel');
+    const written = label ? state.doc.sliceString(label.from + 1, label.to - 1) : '';
+    href = definitions.get((written || state.doc.sliceString(textFrom, textTo)).toLowerCase());
+    if (href === undefined) { out.push({ kind: 'mark', from: link.from, to: link.to, cls: 'cm-lv-nolink' }); return; }
+  }
   out.push({ kind: 'hide', from: marks[0]!.from, to: marks[0]!.to });
-  out.push({ kind: 'mark', from: textFrom, to: textTo, cls: 'cm-lv-link', href: url ? state.doc.sliceString(url.from, url.to).replace(/^<|>$/g, '') : '' });
+  out.push({ kind: 'mark', from: textFrom, to: textTo, cls: 'cm-lv-link', href });
   // Everything after the text: `](url "title")`.
   out.push({ kind: 'hide', from: marks[1]!.from, to: link.to });
 }

@@ -5,7 +5,7 @@ import { TaskIndex } from '../src/core/index';
 import { Query } from '../src/core/query';
 import { StatusRegistry } from '../src/core/task';
 import type { PluginDeps } from '../src/preview/markdownItPlugin';
-import { renderDocumentHtml } from '../src/preview/renderDocument';
+import { liveBlocks, renderDocumentHtml, renderInlineMarkdown } from '../src/preview/renderDocument';
 
 const reg = StatusRegistry.default();
 const today = dayjs('2026-09-22');
@@ -151,7 +151,6 @@ describe('renderDocumentHtml: blockquotes the user can type into (M38)', () => {
 
 describe('liveBlocks (live view, M40 F)', () => {
   it('finds the front matter, top-level tables and fences another extension draws; plain code and ```tasks are left out', async () => {
-    const { liveBlocks } = await import('../src/preview/renderDocument');
     const text = ['---', 'title: T', '---', '# H', '', '| a | b |', '|---|---|', '| [x](y.md) | 2 |', '', '```js', 'let a', '```', '', '```tasks', 'not done', '```', '', '```mermaid', 'graph TD', '```', '', '- item', '', '  | in | list |', '  |---|---|', '  | 1 | 2 |'].join('\r\n');
     // A stand-in for an extension that draws ```mermaid itself.
     const mermaid = (md: { renderer: { rules: Record<string, unknown> } }) => {
@@ -168,5 +167,16 @@ describe('liveBlocks (live view, M40 F)', () => {
     expect(blocks[0]!.html).toContain('<span class="k">title</span>: T');
     expect(blocks[1]!.html).toMatch(/<table[\s\S]*<a href="y.md">x<\/a>/);
     expect(blocks[2]!.html).toContain('<div class="mermaid">graph TD');
+  });
+
+  it('a fence with a language that is drawn as plain code stays text to edit, with spaces or a stray span around its tags', () => {
+    const spaced = (md: { renderer: { rules: Record<string, unknown> } }) => {
+      md.renderer.rules.fence = (tokens: { content: string }[], i: number) => `<span id="x" aria-hidden="true"></span><pre class="a">\n\t\t<code class="language-js">${tokens[i]!.content}</code></pre>`;
+    };
+    expect(liveBlocks('```js\nx\n```\n', deps, { plugins: [spaced as never] })).toEqual([]);
+  });
+
+  it('renderInlineMarkdown draws a line, and escapes HTML', () => {
+    expect(renderInlineMarkdown('**a** `b` [c](http://d.e) <i>')).toBe('<strong>a</strong> <code>b</code> <a href="http://d.e">c</a> &lt;i&gt;');
   });
 });

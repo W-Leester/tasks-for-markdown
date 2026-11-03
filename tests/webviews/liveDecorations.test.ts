@@ -55,7 +55,7 @@ describe('live view decorations (M40)', () => {
     const s = state('> 인용\n> 둘\n\n```js\nx\n```\n\n| a |\n|---|\n\n---\n');
     expect(show(s, liveDecos(s, new Set()))).toEqual([
       'line:cm-lv-quote@1', 'line:cm-lv-quote@2', 'hide:"> "', 'hide:"> "',
-      'line:cm-lv-codeblock@4', 'line:cm-lv-codeblock@5', 'line:cm-lv-codeblock@6',
+      'line:cm-lv-codeblock@4', 'line:cm-lv-codeblock@5', 'line:cm-lv-codeblock@6', 'line:cm-lv-markline@4', 'hide:"```js"', 'line:cm-lv-markline@6', 'hide:"```"',
       'line:cm-lv-table@8', 'line:cm-lv-table@9',
       'line:cm-lv-hr@11', 'hide:"---"',
     ]);
@@ -93,5 +93,42 @@ describe('live view decorations (M40)', () => {
     ]);
     expect(findBlocks(lines, ['| a |\n|---|\n| 2 |'])).toEqual([]);
     expect(findBlocks(['a', 'b', 'c'], ['a\nb\nc', 'b'])).toEqual([{ first: 1, last: 3, source: 'a\nb\nc' }]);
+  });
+
+  it('any one character in the box is a task, not a link; notes go by it too (11-04)', () => {
+    const s = state('- [/] going 📅 2026-12-03\n  - its note\n- [-] dropped\n- [x](http://a.b) a link');
+    const ds = liveDecos(s, new Set());
+    expect(ds.filter((d) => d.kind === 'task').map((d) => [s.doc.lineAt(d.from).number, 'checked' in d && d.checked])).toEqual([[1, false], [3, true]]);
+    expect(ds.filter((d) => d.kind === 'actions').length).toBe(2);
+    expect(ds.some((d) => d.kind === 'bullet' && d.note)).toBe(true);
+    // On the cursor's line the box reads as written, not as a link.
+    expect(liveDecos(s, new Set([1])).some((d) => d.kind === 'mark' && d.cls === 'cm-lv-nolink' && d.from === 2)).toBe(true);
+  });
+
+  it('nested items: their spaces become a margin; a numbered item under a task is a note', () => {
+    const s = state('- [ ] parent\n  - [ ] child\n    - [ ] grandchild\n  1. numbered note');
+    const ds = liveDecos(s, new Set());
+    expect(ds.filter((d) => d.kind === 'indent').map((d) => [s.doc.lineAt(d.from).number, 'depth' in d && d.depth])).toEqual([[2, 1], [3, 2], [4, 1]]);
+    expect(ds.some((d) => d.kind === 'bullet' && d.note && s.doc.lineAt(d.from).number === 4)).toBe(true);
+  });
+
+  it('an empty task still gets its box', () => {
+    const s = state('- [ ] \n- [ ]');
+    expect(liveDecos(s, new Set()).filter((d) => d.kind === 'task').map((d) => [d.from, d.to])).toEqual([[0, 6], [7, 12]]);
+  });
+
+  it('marks hidden: autolink brackets, a hard break, a setext underline, fence lines off the cursor', () => {
+    const s = state('<https://a.b> x\\\ny\n\nTitle\n---\n\n~~~\ncode\n~~~');
+    const hidden = liveDecos(s, new Set()).filter((d) => d.kind === 'hide').map((d) => s.doc.sliceString(d.from, d.to));
+    expect(hidden).toEqual(['<', '>', '\\', '---', '~~~', '~~~']);
+    // The cursor anywhere in the block: all of it as written.
+    expect(liveDecos(s, new Set([8])).filter((d) => d.kind === 'hide').map((d) => s.doc.sliceString(d.from, d.to))).toEqual(['<', '>', '\\', '---']);
+  });
+
+  it('[text] is a link only when the note defines it; a footnote mark stays text', () => {
+    const s = state('[a][ref] and [ref] and [none] and [^1]\n\n[ref]: https://a.b\n[^1]: note');
+    const ds = liveDecos(s, new Set());
+    expect(ds.filter((d) => d.kind === 'mark' && d.cls === 'cm-lv-link' && d.href === 'https://a.b' && s.doc.lineAt(d.from).number === 1).map((d) => s.doc.sliceString(d.from, d.to))).toEqual(['a', 'ref']);
+    expect(ds.filter((d) => d.kind === 'mark' && d.cls === 'cm-lv-nolink').map((d) => s.doc.sliceString(d.from, d.to))).toEqual(['[none]', '[^1]']);
   });
 });

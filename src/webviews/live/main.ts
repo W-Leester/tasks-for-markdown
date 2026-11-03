@@ -6,7 +6,7 @@ import { defaultKeymap, history, historyKeymap, indentWithTab } from '@codemirro
 import { markdown, markdownKeymap, markdownLanguage } from '@codemirror/lang-markdown';
 import { HighlightStyle, syntaxHighlighting, syntaxTree } from '@codemirror/language';
 import { search, searchKeymap } from '@codemirror/search';
-import { Annotation, EditorSelection, EditorState, type Extension, Prec, type Range, StateEffect, StateField, Transaction } from '@codemirror/state';
+import { Annotation, Compartment, EditorSelection, EditorState, type Extension, Prec, type Range, StateEffect, StateField, Transaction } from '@codemirror/state';
 import { Decoration, type DecorationSet, EditorView, keymap, ViewPlugin, type ViewUpdate, WidgetType } from '@codemirror/view';
 import { tags } from '@lezer/highlight';
 import { findHeadingLine } from '../../core/file/headingAnchor';
@@ -385,6 +385,8 @@ class ActionsWidget extends WidgetType {
 // ---- M40 C: note task lines in columns, a header over task lists, the show filter on note lines ----
 /** The host's column cells and filter data for the note's task lines, by line text. */
 let rows = new Map<string, LiveRow>();
+/** Fields in columns (`tasksmd.rendered.fieldsAlign: columns`, G); otherwise task lines stay as written. */
+let columnsOn = true;
 const setRows = StateEffect.define<Map<string, LiveRow>>();
 const setBodyView = StateEffect.define<{ view: ViewState; today: string }>();
 
@@ -417,6 +419,29 @@ class BodyHeadWidget extends WidgetType {
   override ignoreEvent(): boolean { return true; }
 }
 
+/** A quiet "＋ Add task" under a list (E): a new task line after the list's last line, the cursor on it. */
+class AddRowWidget extends WidgetType {
+  constructor(readonly line: number, readonly marker: string) { super(); }
+  override eq(o: AddRowWidget): boolean { return o.line === this.line && o.marker === this.marker; }
+  toDOM(view: EditorView): HTMLElement {
+    const row = document.createElement('div');
+    row.className = 'cm-lv-addrow';
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = `＋ ${document.body.dataset.lAddTask ?? 'Add task'}`;
+    b.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      const at = view.state.doc.line(Math.min(this.line, view.state.doc.lines)).to;
+      const insert = `\n${this.marker}[ ] `;
+      view.dispatch({ changes: { from: at, insert }, selection: EditorSelection.cursor(at + insert.length), userEvent: 'input', scrollIntoView: true });
+      view.focus();
+    });
+    row.appendChild(b);
+    return row;
+  }
+  override ignoreEvent(): boolean { return true; }
+}
+
 const TASK_TEXT = /^(\s*)(?:[-*+]|\d+[.)])\s+\[.\]/;
 const LIST_TEXT = /^\s*(?:[-*+]|\d+[.)])\s/;
 /**
@@ -436,11 +461,30 @@ function bodyDecos(state: EditorState, view: { view: ViewState; today: string })
   const rowLines = new Set<number>();
   for (let i = 0; i < lines.length; i++) if (fielded.has(groups[i]!) && TASK_TEXT.test(lines[i]!) && rows.has(lines[i]!)) rowLines.add(i + 1);
   // Headers: the first line of each list drawn in columns, when it is a task line at the top level.
-  for (let i = 0; i < lines.length; i++) {
+  for (let i = 0; i < lines.length && columnsOn; i++) {
     const g = groups[i]!;
     if (!fielded.has(g) || (i > 0 && groups[i - 1] === g)) continue;
     if (!TASK_TEXT.test(lines[i]!) || indentOf(lines[i]!) > 0) continue;
     ranges.push(Decoration.widget({ widget: new BodyHeadWidget(), block: true, side: -1 }).range(doc.line(i + 1).from));
+  }
+  // E: "＋ Add task" under each top-level list that has tasks (checklists too, as in the rendered view).
+  const lastOf = new Map<number, number>();
+  const withTasks = new Set<number>();
+  for (let i = 0; i < lines.length; i++) {
+    const g = groups[i]!;
+    if (g < 0) continue;
+    if (lines[i]!.trim()) lastOf.set(g, i);
+    if (TASK_TEXT.test(lines[i]!)) withTasks.add(g);
+  }
+  for (const g of withTasks) {
+    const last = lastOf.get(g)!;
+    // The list's own marker: its last top-level item's (a numbered list goes on with the next number).
+    let marker = '- ';
+    for (let i = last; i >= 0 && groups[i] === g; i--) {
+      const m = /^([-*+]|(\d+)([.)]))\s/.exec(lines[i]!);
+      if (m) { marker = m[2] ? `${Number(m[2]) + 1}${m[3]} ` : `${m[1]} `; break; }
+    }
+    ranges.push(Decoration.widget({ widget: new AddRowWidget(last + 1, marker), block: true, side: 1 }).range(doc.line(last + 1).to));
   }
   // Show filter: a task line is hidden when it and no task under it match; its notes go with it.
   let hidden = 0;
@@ -499,7 +543,7 @@ function build(view: EditorView): DecorationSet {
   const ranges: Range<Decoration>[] = [];
   /** Lines shown in columns: their ✎ ⏩ 💬 ＋ are inside the row. */
   const inRows = new Set<number>();
-  const rowLines = view.state.field(bodyField).rowLines;
+  const rowLines = columnsOn ? view.state.field(bodyField).rowLines : new Set<number>();
   for (const { from, to } of view.visibleRanges) {
     for (const d of liveDecos(view.state, active, from, to)) {
       if (d.kind === 'task') {
@@ -554,6 +598,8 @@ const highlight = HighlightStyle.define([
   { tag: [tags.processingInstruction, tags.contentSeparator], color: 'var(--vscode-descriptionForeground)', opacity: '.7' },
 ]);
 
+/** The look settings, swapped when they change (G). */
+const themeSlot = new Compartment();
 function theme(fontSize: number, lineHeight: number, maxWidth: number): Extension {
   return EditorView.theme({
     '&': { height: '100%', fontSize: `${fontSize}px`, color: 'var(--vscode-editor-foreground)', backgroundColor: 'var(--vscode-editor-background)' },
@@ -654,7 +700,7 @@ function create(init: Extract<ToLive, { type: 'live/init' }>): EditorView {
         syntaxHighlighting(highlight),
         EditorView.lineWrapping,
         livePreview,
-        theme(init.fontSize, init.lineHeight, init.maxWidth),
+        themeSlot.of(theme(init.fontSize, init.lineHeight, init.maxWidth)),
         // First, before the keymap: a key the keymap handles (Cmd+Z) must still not reach VS Code (11-01: VS Code undid
         // the note under the editor's own undo).
         Prec.highest(EditorView.domEventHandlers({
@@ -713,7 +759,13 @@ window.addEventListener('message', (e: MessageEvent<ToLive>) => {
   } else if (m.type === 'live/queries') {
     queries = new Map(m.blocks.map((b) => [b.source, b.html]));
     columns.set(m.columns); // before the boxes are drawn: they take their header from it
+    columnsOn = m.layout === 'columns';
+    document.body.classList.toggle('fields-columns', columnsOn);
+    document.body.classList.toggle('fields-plain', !columnsOn);
+    view?.dispatch({ effects: setRows.of(rows) }); // rows and headers follow the layout
     view?.dispatch({ effects: setQueries.of(queries) });
+  } else if (m.type === 'live/style' && view) {
+    view.dispatch({ effects: themeSlot.reconfigure(theme(m.fontSize, m.lineHeight, m.maxWidth)) });
   } else if (m.type === 'live/blocks') {
     blocks = new Map(m.blocks.map((b) => [b.source, { kind: b.kind, html: b.html }]));
     view?.dispatch({ effects: setBlocks.of(blocks) });

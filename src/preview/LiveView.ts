@@ -101,7 +101,10 @@ export class LiveViewProvider implements vscode.CustomTextEditorProvider {
   /** Query results for the note's ```tasks blocks, in columns with a header as in the rendered view. */
   private queries(document: vscode.TextDocument): Extract<ToLive, { type: 'live/queries' }> {
     const base = this.deps.preview.pluginDeps();
-    const deps = { ...base, enabled: () => true, renderOptions: (source?: Parameters<typeof base.renderOptions>[0], context?: 'line' | 'query') => ({ ...base.renderOptions(source, context), columns: true }) };
+    // As the rendered view: fields in columns or not (fieldsAlign), and their look (fieldStyle) — G.
+    const columnsOn = this.deps.settings.get('rendered.fieldsAlign') === 'columns';
+    const fieldStyle = this.deps.settings.get('rendered.fieldStyle');
+    const deps = { ...base, enabled: () => true, renderOptions: (source?: Parameters<typeof base.renderOptions>[0], context?: 'line' | 'query') => ({ ...base.renderOptions(source, context), ...(context === 'line' || columnsOn ? { fieldStyle } : {}), columns: columnsOn }) };
     const columns = this.columns();
     const esc = (s: string) => s.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
     const blocks = [...new Set(queryBlocks(document.getText()))].map((source) => {
@@ -112,7 +115,7 @@ export class LiveViewProvider implements vscode.CustomTextEditorProvider {
         return { source, html: `<div class="tfm-query tfm-error">${esc(String(err))}</div>` };
       }
     });
-    return { type: 'live/queries', blocks, columns };
+    return { type: 'live/queries', blocks, columns, layout: columnsOn ? 'columns' : 'plain' };
   }
 
   /** Front matter, tables and other extensions' previews, drawn as the rendered view draws them (M40 F). */
@@ -143,13 +146,16 @@ export class LiveViewProvider implements vscode.CustomTextEditorProvider {
       queryTimer = setTimeout(() => { post(this.rows(document)); post(this.queries(document)); post(this.blocks(document, webview, borrowed)); }, delay);
     };
     const indexSub = this.deps.index.onDidChange(() => sendQueries(400));
+    // Settings applied at once (G): the fields' layout and look redraw the rows and results; the look of the text too.
+    const settingsSub = this.deps.settings.onDidChange(() => sendQueries(0), ['rendered.fieldsAlign', 'rendered.fieldStyle']);
+    const styleSub = this.deps.settings.onDidChange(() => post({ type: 'live/style', fontSize: this.deps.settings.get('rendered.fontSize'), lineHeight: this.deps.settings.get('rendered.lineHeight'), maxWidth: this.deps.settings.get('rendered.maxWidth') }), ['rendered.fontSize', 'rendered.lineHeight', 'rendered.maxWidth']);
     const refresh = () => sendQueries(0);
     this.open.add(refresh);
     // Messages are handled one after another, in the order the editor sent them.
     let queue: Promise<void> = Promise.resolve();
     const subs: vscode.Disposable[] = [
       sync,
-      { dispose: () => { indexSub.dispose(); clearTimeout(queryTimer); this.open.delete(refresh); } },
+      { dispose: () => { indexSub.dispose(); settingsSub.dispose(); styleSub.dispose(); clearTimeout(queryTimer); this.open.delete(refresh); } },
       vscode.workspace.onDidChangeTextDocument((e) => { if (e.document === document) sendQueries(300); }),
       webview.onDidReceiveMessage((m: FromLive) => {
         queue = queue.then(() => this.handle(m, document, post, sync, panel, borrowed)).then(() => {
@@ -326,6 +332,15 @@ ${borrowed.styles.map((u) => `<link rel="stylesheet" href="${webview.asWebviewUr
   .cm-lv-query li.tfm-task.rv-dim > .tfm-desc, .cm-lv-query li.tfm-task.rv-dim > p > .tfm-desc { opacity: .45; }
   /* Query results in columns, as in the rendered view (a copy of its rules, scoped to the result boxes). */
   :root { --rv-fg: var(--vscode-editor-foreground, var(--vscode-foreground)); --rv-muted: var(--vscode-descriptionForeground); --rv-bg-2: color-mix(in srgb, var(--rv-fg) 6%, transparent); --rv-bg-3: color-mix(in srgb, var(--rv-fg) 12%, transparent); --rv-stroke: color-mix(in srgb, var(--rv-fg) 12%, transparent); }
+  /* E: "＋ Add task" under a list. */
+  .cm-lv-addrow button { border: none; background: none; color: var(--rv-muted); opacity: .6; font: inherit; font-size: .9em; padding: 0 0 2px 2.3em; cursor: pointer; }
+  .cm-lv-addrow button:hover { opacity: 1; color: var(--rv-fg); }
+  /* G: fieldsAlign other than columns — query results as a plain list, no column menu. */
+  body.fields-plain .rv-cols { display: none; }
+  body.fields-plain .cm-lv-query li.tfm-task { display: block; }
+  body.fields-plain .cm-lv-query li.tfm-task > p { display: inline; }
+  body.fields-plain .cm-lv-query li.tfm-task .tfm-check { margin: 0 .6em 0 0; vertical-align: -2px; }
+  body.fields-plain .cm-lv-query li.tfm-task > ul, body.fields-plain .cm-lv-query li.tfm-task > ol { margin-left: 1.6em; padding-left: 0; }
   /* M40 F: front matter, tables, other extensions' previews and images off the cursor (the rendered view's rules). */
   .cm-lv-block { cursor: text; padding: 2px 0; line-height: 1.6; font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, sans-serif); overflow-x: auto; }
   .cm-lv-block table { border-collapse: collapse; margin: .2em 0 .4em; } .cm-lv-block th, .cm-lv-block td { border: 1px solid var(--rv-stroke); padding: 4px 10px; } .cm-lv-block th { background: var(--rv-bg-2); }
@@ -382,7 +397,7 @@ ${borrowed.styles.map((u) => `<link rel="stylesheet" href="${webview.asWebviewUr
   }
 </style>
 </head>
-<body data-l-hidden="${t('{0} hidden')}" data-l-edit="${t('Edit')}" data-l-postpone="${t('Postpone')}" data-l-note="${t('Add note')}" data-l-add-below="${t('Add a task below')}" data-l-note-placeholder="${t('Note — Enter to save, Esc to cancel')}" data-l-link-hint="${t('Cmd/Ctrl+click to open')}" data-l-query-edit="${t('Double-click to edit the query')}" data-l-note-edit="${t('Edit note')}" data-l-note-delete="${t('Delete note')}">
+<body data-l-add-task="${t('Add task')}" data-l-hidden="${t('{0} hidden')}" data-l-edit="${t('Edit')}" data-l-postpone="${t('Postpone')}" data-l-note="${t('Add note')}" data-l-add-below="${t('Add a task below')}" data-l-note-placeholder="${t('Note — Enter to save, Esc to cancel')}" data-l-link-hint="${t('Cmd/Ctrl+click to open')}" data-l-query-edit="${t('Double-click to edit the query')}" data-l-note-edit="${t('Edit note')}" data-l-note-delete="${t('Delete note')}">
 <div class="rv-tools">
   <label class="rv-select" title="${t('Query results')}"><span>${t('Sort')}</span><select id="view-sort">
     <option value="document">${t('Document order')}</option><option value="due">${t('Due date')}</option><option value="created">${t('Created date')}</option><option value="priority">${t('Priority')}</option><option value="urgency">${t('Urgency')}</option>

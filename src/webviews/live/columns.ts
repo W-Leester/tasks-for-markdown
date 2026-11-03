@@ -40,7 +40,7 @@ export class QueryColumns {
   /** A new result box: its header (only where there are task rows). */
   addHeader(box: HTMLElement): void {
     const query = box.querySelector<HTMLElement>('.tfm-query');
-    if (!query?.querySelector('li.tfm-task')) return;
+    if (!query?.querySelector('li.tfm-task') || document.body.classList.contains('fields-plain')) return;
     const head = document.createElement('div');
     head.className = 'rv-colhead';
     head.title = document.body.dataset.lQueryEdit ?? 'Double-click to edit the query';

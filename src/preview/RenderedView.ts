@@ -627,12 +627,20 @@ export function isRenderedDefault(): boolean {
 
 /** Point `workbench.editorAssociations["*.md"]` at the rendered view (user settings), or remove that entry. */
 export async function setRenderedDefault(on: boolean): Promise<void> {
+  await setDefaultEditor(on ? RENDERED_VIEW_TYPE : null);
+}
+
+/** The live view's type (M40); written out here, the live view module imports this one. */
+const LIVE_TYPE = 'tasksmd.live';
+
+/** Which editor opens Markdown notes: the rendered view, the live view (M40 G) or (null) the text editor. */
+async function setDefaultEditor(type: string | null): Promise<void> {
   const config = vscode.workspace.getConfiguration('workbench');
   const current = { ...config.get<Record<string, string>>('editorAssociations', {}) };
-  if (on) current['*.md'] = RENDERED_VIEW_TYPE;
-  else if (current['*.md'] === RENDERED_VIEW_TYPE) delete current['*.md'];
+  if (type) current['*.md'] = type;
+  else if (current['*.md'] === RENDERED_VIEW_TYPE || current['*.md'] === LIVE_TYPE) delete current['*.md'];
   await config.update('editorAssociations', current, vscode.ConfigurationTarget.Global);
-  void vscode.window.showInformationMessage(on ? t('Markdown notes now open in the rendered view. Source: the Source button or {0}.', RENDERED_KEY) : t('Markdown notes open in the text editor again.'));
+  void vscode.window.showInformationMessage(type === RENDERED_VIEW_TYPE ? t('Markdown notes now open in the rendered view. Source: the Source button or {0}.', RENDERED_KEY) : type === LIVE_TYPE ? t('Markdown notes now open in the live view. Source: the Source button.') : t('Markdown notes open in the text editor again.'));
 }
 
 /** Registers the custom editor and the commands that open it. */
@@ -687,9 +695,14 @@ export function registerRenderedView(context: vscode.ExtensionContext, deps: Ren
     // Text button in the editor title bar (no icon, so the title "Preview 렌더" is shown as the label).
     vscode.commands.registerCommand('tasksmd.previewRender', (arg?: unknown) => openRendered(arg, vscode.ViewColumn.Active, false)),
     vscode.commands.registerCommand('tasksmd.renderedAsDefault', async () => {
-      const on = t('Rendered view (tasks rendered, click to complete)'), off = t('Text editor');
-      const pick = await vscode.window.showQuickPick([{ label: on, picked: isRenderedDefault(), value: true }, { label: off, picked: !isRenderedDefault(), value: false }], { placeHolder: t('Which editor should open Markdown notes?') });
-      if (pick) await setRenderedDefault(pick.value);
+      const current = vscode.workspace.getConfiguration('workbench').get<Record<string, string>>('editorAssociations', {})['*.md'];
+      const choices = [
+        { label: t('Rendered view (tasks rendered, click to complete)'), value: RENDERED_VIEW_TYPE as string | null },
+        { label: t('Live view (trial): edit anywhere, Markdown marks show on the line you are on'), value: LIVE_TYPE },
+        { label: t('Text editor'), value: null },
+      ];
+      const pick = await vscode.window.showQuickPick(choices.map((c) => ({ ...c, picked: c.value === (current === RENDERED_VIEW_TYPE || current === LIVE_TYPE ? current : null) })), { placeHolder: t('Which editor should open Markdown notes?') });
+      if (pick) await setDefaultEditor(pick.value);
     }),
     vscode.commands.registerCommand('tasksmd.openRenderedToSide', (arg?: unknown) => openRendered(arg, vscode.ViewColumn.Beside, false)),
     vscode.commands.registerCommand('tasksmd.openSource', (arg?: unknown) => openSource(arg)),

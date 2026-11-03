@@ -442,5 +442,6 @@
   "Empty task": "빈 태스크",
   "{0} ({1}+click)": "{0} ({1}+클릭)",
   "Line buttons on": "줄 버튼 켬",
-  "Line buttons off": "줄 버튼 끔"
+  "Line buttons off": "줄 버튼 끔",
+  "Markdown notes now open in the live view. Source: the Source button.": "마크다운 노트가 이제 라이브 보기로 열립니다. 원문은 소스 버튼으로."
 }

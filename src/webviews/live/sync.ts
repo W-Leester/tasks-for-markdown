@@ -29,7 +29,10 @@ export type ToLive =
    */
   | { type: 'live/rows'; rows: LiveRow[] }
   /** Results of the note's ```tasks blocks, by the block's source (the lines between the fences). */
-  | { type: 'live/queries'; blocks: { source: string; html: string }[]; columns: ColumnState }
+  /** `layout`: fields in columns (`tasksmd.rendered.fieldsAlign: columns`), or not — no columns, headers or column menu. */
+  | { type: 'live/queries'; blocks: { source: string; html: string }[]; columns: ColumnState; layout: 'columns' | 'plain' }
+  /** The look settings changed (G): font size, line height, widest text column. */
+  | { type: 'live/style'; fontSize: number; lineHeight: number; maxWidth: number }
   /** Blocks drawn off the cursor (M40 F): front matter, tables, other extensions' previews; by their lines as written. */
   | { type: 'live/blocks'; blocks: { kind: 'front' | 'table' | 'fence'; source: string; html: string }[] };
 

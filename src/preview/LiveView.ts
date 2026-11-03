@@ -335,6 +335,7 @@ ${borrowed.styles.map((u) => `<link rel="stylesheet" href="${webview.asWebviewUr
   .cm-lv-block .rv-frontmatter { color: var(--rv-muted); margin: 0 0 .4em; padding: 0 0 .5em; border-bottom: 1px solid var(--rv-stroke); }
   .cm-lv-block .rv-frontmatter .k { color: var(--rv-fg); font-weight: 600; }
   .cm-lv-block-fence pre { margin: .2em 0; }
+  .cm-lv-block-fence { overflow: hidden; } /* Mermaid has its own pan and zoom; no scroll bar under it */
   .cm-lv-query { cursor: default; padding: 2px 0; line-height: 1.6; font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, sans-serif); }
   .cm-lv-query .tfm-query { background: var(--rv-bg-2); border: 1px solid var(--rv-stroke); border-radius: 6px; padding: 10px 14px; margin: 0; }
   .cm-lv-query .tfm-list { margin: .2em 0 .3em; padding-left: 0; list-style: none; }

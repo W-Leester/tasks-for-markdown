@@ -212,7 +212,7 @@ class BlockWidget extends WidgetType {
     box.innerHTML = this.html;
     // Other extensions' preview scripts (Mermaid…) draw on the event the built-in preview sends after an update — once
     // the box is on the page (they size the drawing from it), and once for all boxes drawn together.
-    if (this.kind === 'fence') previewUpdate(box);
+    if (this.kind === 'fence') { sources.set(box, this.html); previewUpdate(box); }
     // A drawing that changes the box's height (Mermaid draws later): the editor measures again, or lines below
     // overlap or leave a gap (11-02).
     const ro = new ResizeObserver(() => view.requestMeasure());
@@ -247,8 +247,19 @@ let previewTimer: ReturnType<typeof setTimeout> | undefined;
 function previewUpdate(box: HTMLElement, tries = 0): void {
   if (!box.isConnected) { if (tries < 40) requestAnimationFrame(() => previewUpdate(box, tries + 1)); return; }
   clearTimeout(previewTimer);
-  previewTimer = setTimeout(() => window.dispatchEvent(new CustomEvent('vscode.markdown.updateContent')), 30);
+  previewTimer = setTimeout(() => {
+    // Their scripts expect a page drawn afresh: Mermaid takes each block's text as the diagram's source and empties it
+    // first, so a block drawn by an earlier call (or one cut short by this call) has no source left and stays blank
+    // (11-03). Every block gets its source back before each call.
+    for (const b of Array.from(document.querySelectorAll<HTMLElement>('.cm-lv-block-fence'))) {
+      const html = sources.get(b);
+      if (html !== undefined) b.innerHTML = html;
+    }
+    window.dispatchEvent(new CustomEvent('vscode.markdown.updateContent'));
+  }, 30);
 }
+/** Each extension-drawn block's HTML as the host made it (M40 F). */
+const sources = new WeakMap<HTMLElement, string>();
 
 function blockDecos(state: EditorState, map: Map<string, { kind: string; html: string }>): DecorationSet {
   if (!map.size) return Decoration.none;

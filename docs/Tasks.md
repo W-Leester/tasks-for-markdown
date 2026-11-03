@@ -1600,6 +1600,7 @@ AI가 "이 태스크 다음에 추가"를 하면 줄 번호를 넘길 수밖에 
 - [ ] **호버 카드에서 메모 속 링크 열기(10-20):** 메일 노트 연동(메모에 `📧 [제목](경로)`)을 쓰게 되면.
 - [ ] **줄 끝 버튼 안내의 클릭 키(10-28):** 안내가 늘 `Cmd/Ctrl+클릭`인데, 편집기는 `editor.multiCursorModifier`가 `ctrlCmd`면 `Option/Alt+클릭`으로 실행 → 그 설정을 읽어 안내 글을 맞춤(`TaskCodeLensProvider.provideInlayHints`).
 - [ ] **M9.6 편집기 위임(선택):** 그대로 남음.
+- [ ] **저장 방식을 편집기처럼 한 가지로(11-04, 사용자: "나중에 생각해 볼 안으로 기록만"):** 태스크 편집(체크·미루기·메모 등)은 "보이는 소스 편집기가 없고 저장 안 한 변경도 없으면" 바로 저장(`TaskEditService.ts` `nobodyEditing`, `!visible && !doc.isDirty`). `visibleTextEditors`에는 렌더·라이브 보기(사용자 지정 편집기)가 들어가지 않아, 노트를 그 보기로만 열면 체크 한 번에 저장되고 소스 편집기에서는 ●만 남음 — 보기마다 다름. 안: 어느 보기로든 열려 있으면(탭 기준) 저장하지 않고, 어디에도 안 열린 파일(사이드바·질의 결과에서 고침)만 지금처럼 저장. 렌더 보기 인용문·블록 칸은 이미 `Cmd+S`일 때만 저장. 참고: "파일 내용이 더 최신" 저장 오류(11-04 문의)는 보기끼리가 아니라 바깥(Claude Code·`tasks` MCP·git)이 디스크에 쓴 탓이고, 이 안으로는 줄지 않음 — 대책은 `files.autoSave`.
 - [ ] **Cursor 소스 편집기에서 키 입력이 전부 멈춤(사용자 보고, 10-31 밤, 원인 모름):** 줄 앞에 초록 막대(git 새 줄 표시)가 생기며 타이핑·`Cmd+Shift+P`까지 안 먹음. `Esc`·한/영 무관, Cursor `Preview`→`Markdown` 왔다 갔다 하면 한두 번 쳐지다 다시 멈춤. `Reload Window With Extensions Disabled` 뒤와 창을 새로 연 뒤에는 사라짐. 확인한 것: 브라우저 VS Code(1.1.8)에서 같은 파일 끝에 타이핑 재현 안 됨, 우리 확장은 `type` 명령을 잡지 않고 타이핑 중 문서를 고치지 않음, 그 창 로그(`Cursor/logs/20261029T202207/window7`)에 우리 확장 오류 없음. 같은 창에 ChatGPT·Claude Code 등 다른 확장도 있음. 다시 생기면: 메뉴 View › Command Palette(마우스) → `Developer: Toggle Keyboard Shortcuts Troubleshooting` 후 키를 눌러 출력의 `Log (Window)`에 키가 들어오는지, `Help › Toggle Developer Tools` 콘솔에서 `document.activeElement`로 포커스 위치 확인.
 
 ## 열린 설계 이슈 추적
